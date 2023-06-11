@@ -1,0 +1,46 @@
+/* mt-2 */
+.mt-2 {
+  margin-top: 0.5rem !important;
+}
+
+/* bg-white p-4 rounded-full*/
+.bg-white {
+  --bg-opacity: 1;
+  background-color: #fff;
+  background-color: rgba(255, 255, 255, var(--bg-opacity));
+}
+
+.p-4 {
+  padding: 1rem !important;
+}
+
+.rounded-full {
+  border-radius: 9999px !important;
+}
+
+/* mt-2 text-white font-light */
+.text-white {
+  --text-opacity: 1;
+  color: #fff;
+  color: rgba(255, 255, 255, var(--text-opacity));
+}
+
+.font-light {
+  font-weight: 300;
+}
+
+.record-icon-recording {
+    animation: pulse 1s infinite;
+    color: #EF4444; /* Approximation for Tailwind's red-500 */
+}
+
+.record-icon-idle {
+    color: #60A5FA; /* Approximation for Tailwind's sky-500 */
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+

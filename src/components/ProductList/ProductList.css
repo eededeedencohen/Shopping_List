@@ -1,0 +1,137 @@
+.ProductListStyle {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+}
+
+@media (max-width: 768px) {
+  .ProductListStyle {
+    grid-template-columns: repeat(1, 1fr);
+  }
+}
+
+
+.product-card {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: repeat(5, auto);
+  grid-template-areas:
+    "productName productName productName productName"
+    " ProductData ProductData productImage productImage"
+    " ProductData ProductData productImage productImage"
+    " ProductData ProductData productImage productImage"
+    "HealthMarkingText  HealthMarkingText HealthMarking HealthMarking";
+  margin-bottom: 5rem; 
+  
+}
+
+.product-data {
+  display: flex;
+  grid-area: ProductData;
+  flex-direction: column;
+}
+
+.product-name {
+  display: flex;
+  justify-content: center;
+  background-color: rgb(181, 210, 210);
+  margin-bottom: 1rem;
+  grid-area: productName;
+}
+
+.product-name h1 {
+  margin: 0;
+  padding: 0;
+  font-size: 1.5rem;
+  font-weight: 400;
+  color: #ffffff;
+}
+
+.product-barcode {
+  margin-left: 0.5rem;
+  display: flex;
+  justify-content: left;
+}
+
+.product-barcode h3 {
+  margin: 0;
+  margin-bottom: 0.5rem;
+  font-size: 0.9rem;
+  color: rgb(128, 128, 128);
+}
+
+.product-brand {
+  margin-left: 0.5rem;
+  display: flex;
+  justify-content: left;
+}
+
+.product-brand h3 {
+  margin: 0;
+  margin-bottom: 0.5rem;
+  font-size: 0.9rem;
+  color: rgb(128, 128, 128);
+}
+
+.product-weight {
+  margin-left: 0.5rem;
+  display: flex;
+  justify-content: left;
+}
+
+.product-weight h3 {
+  margin: 0;
+  padding: 0;
+  font-size: 0.9rem;
+  color: rgb(106, 77, 255);
+  text-shadow: 0 0 5px rgb(106, 77, 255);
+}
+
+.product-image {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  grid-area: productImage;
+}
+
+.product-image img {
+  width: 100%;   /* Adjust as needed */
+  height:100%;  /* Adjust as needed */
+  object-fit: contain;
+}
+
+.health-marking-text {
+  margin-left: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: left;
+  grid-area: HealthMarkingText;
+}
+
+.health-marking-text h3 {
+  margin: 0;
+  padding: 0;
+  font-size: 1rem;
+  color: #64b612;
+  text-shadow: 0 0 5px #579916;
+}
+
+.health-marking {
+  margin-top: 1rem;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  grid-area: HealthMarking;
+}
+
+.health-marking img {
+  width: 40%;   /* Adjust as needed */
+  height:120%;  /* Adjust as needed */
+  object-fit: contain;
+  margin-right: 0;
+}
+
+
+
+
+
+

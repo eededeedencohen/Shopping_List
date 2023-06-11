@@ -1,0 +1,24 @@
+.spinner-container {
+  position: fixed; /* Overlay the spinner on top of the content */
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(0, 0, 0, 0.164); /* Semi-transparent black overlay */
+  z-index: 9999; /* Ensure the spinner is on top */
+  transition: opacity 0.3s ease; /* Smooth fade-in transition */
+}
+
+.spinner-container p {
+  color: white; /* Make the loading text white to contrast with the overlay */
+  margin-left: 10px; /* Space between the spinner and the text */
+  font-size: 1.5rem; /* Make the text larger */
+}
+
+.spinner-container .ant-spin-dot {
+  font-size: 50px;
+  color: purple;
+}

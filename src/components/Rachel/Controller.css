@@ -1,0 +1,76 @@
+.controller{
+    background-color: #bcdfc0;
+}
+
+.h-screen{
+    height: 100vh;
+}
+
+.overflow-hidden{
+    overflow: hidden;
+}
+
+.flex{
+    display: flex;
+}
+
+.flex-col{
+    flex-direction: column;
+}
+
+.justify-between{
+    justify-content: space-between;
+}
+
+/* h-full */
+.h-full{
+    height: 100%;
+}
+
+/* overflow-y-scroll */
+.overflow-y-scroll{
+    overflow-y: scroll;
+}
+
+/* pb-96 */
+.pb-96{
+    padding-bottom: 24rem;
+}
+
+/* fixed bottom-0 */
+.fixed{
+    position: fixed;
+}
+
+.bottom-0{
+    bottom: 0;
+}
+
+.py-6{
+    padding-top: 1.5rem;
+    padding-bottom: 1.5rem;
+}
+
+.border-t{
+    border-top-width: 1px;
+}
+
+.text-center{
+    text-align: center;
+}
+
+/* bg-gradient-to-r from-sky-500 to-green-500 */
+.bg-gradient-to-r{
+    background-image: linear-gradient(to right, #51adcf, #78e4a2);
+}
+
+.recorder{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}
+
+
+
+
