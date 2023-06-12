@@ -6,7 +6,8 @@ import ImageParser from "./components/ImageParser/ImageParser";
 import VoiceAssistant from "./components/VoiceAssistant/VoiceAssistant";
 import React from "./components/Rachel/Rachel";
 import AudioUploader from "./components/Recorder/Recorder";
-// import UploadRecord from "./components/UploadRecord/UploadRecord";
+import UploadRecord from "./components/UploadRecord/UploadRecord";
+import AudioRecorder from "./components/UploadRecord/AudioRecorder";
 import httpClient from "./network";
 import { useEffect, useState } from "react";
 
@@ -52,7 +53,8 @@ function Routing() {
       <Route path="/voice-assistant" element={<VoiceAssistant />} />
       <Route path="/rachel" element={<React />} />
       <Route path="/audio-uploader" element={<AudioUploader />} />
-      {/* <Route path="/upload-record" element={<UploadRecord />} /> */}
+      <Route path="/upload-record" element={<UploadRecord />} />
+      <Route path="/audio-recorder" element={<AudioRecorder />} />
     </Routes>
   );
 }

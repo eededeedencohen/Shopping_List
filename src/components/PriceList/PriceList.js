@@ -2,6 +2,7 @@ import { useNavigate, useParams } from "react-router";
 import { usePriceList } from "../../context/PriceContext";
 import { Children, useEffect, useState } from "react";
 import { Spin } from "antd";
+import milkiImage from "../ProductList/milki.png";
 import "./PriceList.css"; // Importing a CSS file for styling
 
 export default function PriceList() {
@@ -58,20 +59,39 @@ export default function PriceList() {
     }
    */
 
-    return (
-      <div>
-        <h1>Price list for product {product.name}</h1>
+  return (
+    <div className="product">
+      <div className="product-image">
+        <img src={milkiImage} alt="milki" />
+      </div>
+      <div className="header_product">
+        <h1 className="title"> {product.name}</h1>
+      </div>
+      <div className="products-list">
         {Children.toArray(
           priceList.map((priceObject) => (
-            <div>
-              <h5>{priceObject.price}</h5>
-              <h5>{priceObject.supermarket.name}</h5>
-              <h5>{priceObject.supermarket.address}</h5>
-              <h5>{priceObject.supermarket.city}</h5>
-              <hr/>
+            
+            <div className=" product-list">
+              
+              <div className="product-supermarket-name">
+                <span>{priceObject.supermarket.name}</span>
+              </div>
+
+              <div className="product-name-address">
+                <div className="product-address">
+                  <span>{priceObject.supermarket.address} </span>
+                  <br></br>
+                  <span> {priceObject.supermarket.city}</span>
+                </div>
+              </div>
+
+              <div className="product-price">
+                <span>{priceObject.price}</span>
+              </div>
             </div>
           ))
         )}
       </div>
-    );
-  }
+    </div>
+  );
+}
