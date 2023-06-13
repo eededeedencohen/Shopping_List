@@ -68,7 +68,7 @@ function Toolbar() {
               <h1>Statistics</h1>
             </div>
           </Link>
-          <Link to="/grocery" onClick={closeDrawer}>
+          <Link to="/upload-record" onClick={closeDrawer}>
             <div className="nav-item">
               <div className="nav-icon">
                 <img src={voiceAssistantIcon} alt="Grocery" />
@@ -76,7 +76,7 @@ function Toolbar() {
               <h1>Voice Assistant</h1>
             </div>
           </Link>
-          <Link to="/grocery" onClick={closeDrawer}>
+          <Link to="/audio-recorder" onClick={closeDrawer}>
             <div className="nav-item">
               <div className="nav-icon">
                 <img src={aiIcon} alt="Grocery" />
