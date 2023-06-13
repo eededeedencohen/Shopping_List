@@ -67,17 +67,17 @@ export default function PriceList() {
       <div className="header_product">
         <h1 className="title"> {product.name}</h1>
       </div>
-      <div className="products-list">
+      <div className="prices-list">
         {Children.toArray(
           priceList.map((priceObject) => (
             
-            <div className=" product-list">
-              
+            <div className="supermarket-price">
               <div className="product-supermarket-name">
                 <span>{priceObject.supermarket.name}</span>
               </div>
 
               <div className="product-name-address">
+                
                 <div className="product-address">
                   <span>{priceObject.supermarket.address} </span>
                   <br></br>

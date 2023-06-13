@@ -1,0 +1,102 @@
+ .audio_recorder .recording{
+z-index: 1000;
+    display: flex;
+    height: 100%;
+    width: 100%;
+    position: absolute;
+    bottom: 0;
+    flex-direction: column-reverse;
+    padding-bottom: 3rem;
+}
+.record-btn{
+    width: 50px;
+    height: 50px;
+    left: 43%;
+    bottom: 36px;
+    position: absolute;
+    border-radius: 50%;
+    background-color: red;
+    /* position: relative; */
+    overflow: hidden;
+    animation: recording 2s infinite;
+    transition: back;
+    transition: linear-gradient(90deg,rgba(2,0,36,1) 0%,rgba(9,9,121,1) 35%,rgba(0,212,255,1) 100%) 0.5s ease-in-out;
+
+}
+.record-btn::after{
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%,-50%);
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+   
+}
+.background{
+ 
+}
+@keyframes recording{
+    0%{
+        transform: scale(1);
+    }
+    50%{
+        transform: scale(1.2);
+    }
+    100%{
+        transform: scale(1);
+    }
+} 
+.audio_recorde{
+overflow: hidden;
+}
+.ocean {
+    z-index: -1;
+    height: 5%;
+    width: 100%;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+
+    background: #015871;
+  }
+  
+  .wave {
+    background: url(https://cdn.kcak11.com/codepen_assets/wave_animation/wave.svg)
+      repeat-x;
+    position: absolute;
+    top: -198px;
+    width: 6400px;
+    height: 198px;
+    animation: wave 7s cubic-bezier(0.36, 0.45, 0.63, 0.53) infinite;
+    transform: translate3d(0, 0, 0);
+  }
+  
+  .wave:nth-of-type(2) {
+    top: -175px;
+    animation: wave 7s cubic-bezier(0.36, 0.45, 0.63, 0.53) -0.125s infinite,
+      swell 7s ease -1.25s infinite;
+    opacity: 1;
+  }
+  
+  @keyframes wave {
+    0% {
+      margin-left: 0;
+    }
+    100% {
+      margin-left: -1600px;
+    }
+  }
+  @keyframes swell {
+    0%,
+    100% {
+      transform: translate3d(0, -25px, 0);
+    }
+    50% {
+      transform: translate3d(0, 5px, 0);
+    }
+  }
+  .endWave {
+    display: none;
+  }

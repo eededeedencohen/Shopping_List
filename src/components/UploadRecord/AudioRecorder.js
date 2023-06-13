@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
-import { ReactMediaRecorder } from 'react-media-recorder';
+import React, { useState } from "react";
+import { ReactMediaRecorder } from "react-media-recorder";
+import "./AudioRecorder.css";
 
 const AudioRecorder = () => {
   const [isRecording, setIsRecording] = useState(false);
-  const [blobUrl, setBlobUrl] = useState('');
+  const [blobUrl, setBlobUrl] = useState("");
 
   const handleStartRecording = () => {
     setIsRecording(true);
@@ -16,35 +17,47 @@ const AudioRecorder = () => {
   };
 
   const downloadBlob = (url) => {
-    const anchor = document.createElement('a');
+    const anchor = document.createElement("a");
     anchor.href = url;
-    anchor.download = 'recorded_audio.mp3';
+    anchor.download = "recorded_audio.mp3";
     anchor.click();
   };
 
   return (
-    <div>
+    <div className="audio_recorder" >
       <h2>Audio Recorder</h2>
-      <ReactMediaRecorder
-        audio
-        mimeType="audio/mp3"
-        onStart={handleStartRecording}
-        onStop={handleStopRecording}
-        render={({ startRecording, stopRecording }) => (
+      <div className="recording">
+        <ReactMediaRecorder
+          audio
+          mimeType="audio/mp3"
+          onStart={handleStartRecording}
+          onStop={handleStopRecording}
+          render={({ startRecording, stopRecording }) => (
+            <div>
+              {!isRecording ? (
+                <>
+            <button className="record-btn" onClick={startRecording}>
+                    !
+                  </button>
+                <div className="ocean">
+               
+                  <div className="wave"></div>
+                  <div className="wave"></div>
+               
+                </div>
+                </>
+              ) : (
+                <button onClick={stopRecording}>Stop Recording</button>
+              )}
+            </div>
+          )}
+        />
+        {blobUrl && (
           <div>
-            {!isRecording ? (
-              <button onClick={startRecording}>Start Recording</button>
-            ) : (
-              <button onClick={stopRecording}>Stop Recording</button>
-            )}
+            <audio src={blobUrl} controls />
           </div>
         )}
-      />
-      {blobUrl && (
-        <div>
-          <audio src={blobUrl} controls />
-        </div>
-      )}
+      </div>
     </div>
   );
 };

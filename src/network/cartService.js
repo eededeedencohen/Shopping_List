@@ -20,3 +20,5 @@ const addProductToCart = async (userId, barcode, amount) => {
 };
 
 export { getActiveCartByUserID, addProductToCart };
+
+
