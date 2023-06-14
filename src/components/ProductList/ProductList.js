@@ -6,7 +6,8 @@ import "./ProductList.css";
 import { useNavigate } from "react-router";
 import { addProductToCart } from "../../network/cartService"; //import here
 
-const convertWeightUnit = (weightUnit) => {
+// export this function weightUnit to use it in Cart.js:
+export const convertWeightUnit = (weightUnit) => {
   weightUnit = weightUnit.toLowerCase();
   if (weightUnit === "g") {
     return "Grams";
@@ -22,6 +23,8 @@ const convertWeightUnit = (weightUnit) => {
   }
   return weightUnit;
 };
+
+
 
 const SearchBar = ({ onQuery }) => {
   const [lastInputTime, setLastInputTime] = useState(Date.now());

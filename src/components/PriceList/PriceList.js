@@ -40,25 +40,6 @@ export default function PriceList() {
     );
   }
 
-  /*
-  example for priceObject:
-      {
-        "_id": "6470d83ada4a243eb0862529",
-        "barcode": "7290107932080",
-        "supermarket": {
-            "supermarketID": 38,
-            "name": "יש חסד",
-            "address": "כנפי נשרים 24",
-            "city": "ירושלים",
-            "_id": "6470d83ada4a243eb086252a"
-        },
-        "price": 6.9,
-        "hasDiscount": false,
-        "discount": null,
-        "__v": 0
-    }
-   */
-
   return (
     <div className="product">
       <div className="product-image">

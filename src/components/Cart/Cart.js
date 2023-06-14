@@ -2,6 +2,24 @@ import React, { useEffect } from "react";
 import { useCart } from "../../context/CartContext";
 import "./Cart.css";
 import ShaareyRevahaLogo from "./SuperMarketsLogo/שערי-רווחה.jpg";
+import MilkiImage from "../ProductList/milki.png";
+
+export const convertWeightUnit = (weightUnit) => {
+  weightUnit = weightUnit.toLowerCase();
+  if (weightUnit === "g") {
+    return "גרם";
+  }
+  if (weightUnit === "kg") {
+    return "קילוגרם";
+  }
+  if (weightUnit === "ml") {
+    return "מיליליטר";
+  }
+  if (weightUnit === "l") {
+    return "ליטר";
+  }
+  return weightUnit;
+};
 
 const getLogoBySupermarket = (supermarketName) => {
   // spep 1: save new name of the supermarket with - instead of space
@@ -78,22 +96,45 @@ export default function Cart() {
       </div>
       <div className="total-price">
         <div className="total-price__title">
-          <h1>סכום סולל של העגלה שלך</h1>
+          <h1>סכום כולל של העגלה שלך</h1>
         </div>
         <div className="total-price__price">
           {cartData && <h1>{cartData.data.totalPrice}₪</h1>}
         </div>
       </div>
+      <hr className="line" />
       <div className="products">
-        {cartData &&
-          cartData.data.productsWithPrices.map((item, index) => (
-            <div key={index} className="product-item">
-              <h4>{item.product.name}</h4>
-              <p>Amount: {item.amount}</p>
-              <p>Total Price: {item.totalPrice}₪</p>
+  {cartData &&
+    cartData.data.productsWithPrices.map((item, index) => (
+      <div>
+        <div key={index} className="product" onClick={() => alert(item.product.barcode)}>              
+          <div className="product-details">
+            <h4 className="product-details__name">
+              {item.product.name.split(" ").slice(0, 3).join(" ")}
+            </h4>
+            <h4 className="product-details__brand">{item.product.brand}</h4>
+            <div className="product-details__weight">
+              <h4 className="unit">
+                {convertWeightUnit(item.product.unitWeight)}
+              </h4>
+              <h4 className="size">{item.product.weight}</h4>
             </div>
-          ))}
+          </div>
+          <div className="product-price">
+            <h4 className="product-price__amount">{item.amount} :יחידות</h4>
+            <h4 className="product-price__total-price">
+              {parseFloat(item.totalPrice).toFixed(2)}{""}
+              <b style={{ fontSize: "1.2em" }}>₪</b>{" "}
+            </h4>
+          </div>
+          <div className="product-image">
+            <img src={MilkiImage} alt="milki" />
+          </div>
+        </div>
+        <hr />
       </div>
+    ))}
+</div>
     </div>
   );
 }
