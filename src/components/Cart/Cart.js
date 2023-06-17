@@ -23,6 +23,9 @@ export const convertWeightUnit = (weightUnit) => {
   }
   return weightUnit;
 };
+// export the function convertWeightUnit:
+
+
 
 export default function Cart() {
   const { cart, loadCart, updateProductAmount } = useCart();

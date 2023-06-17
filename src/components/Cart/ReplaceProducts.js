@@ -28,8 +28,8 @@
 //       const response = await axios.post(
 //         `http://localhost:8000/api/v1/carts/replace/1`,
 //         {
-//           oldbarcode: barcode,
-//           newbarcode: newBarcode,
+//           oldBarcode: barcode,
+//           newBarcode: newBarcode,
 //         }
 //       );
 //       console.log(response);
@@ -94,13 +94,13 @@ function ReplaceProducts({ barcode, closeModal, loadCart, userId }) {
       const response = await axios.post(
         `http://localhost:8000/api/v1/carts/replace/${userId}`,
         {
-          oldbarcode: barcode,
-          newbarcode: newBarcode,
+          oldBarcode: barcode,
+          newBarcode: newBarcode,
         }
       );
-      console.log(response);
+      console.log(response.data.data.cart);
       closeModal();
-      loadCart(userId); // Add this line
+      loadCart(userId); // Add this line to update the cart after replacing a product
     } catch (error) {
       console.error("Error posting data: ", error);
       closeModal();
@@ -116,11 +116,10 @@ function ReplaceProducts({ barcode, closeModal, loadCart, userId }) {
     <div>
       <h1>Replacement Products</h1>
       {products.map((product) => (
-        <div key={product._id}>
+        <div key={product.barcode}>
           <h2>{product.name}</h2>
           <p>{product.barcode}</p>
           <p>{product.brand}</p>
-          <p>Kosher: {product.kosher}</p>
           <p>Weight: {product.weight} {product.unitWeight}</p>
           <img src={product.imageCover} alt={product.name} />
           <button onClick={() => handleProductClick(product.barcode)}>Select Replacement</button>
