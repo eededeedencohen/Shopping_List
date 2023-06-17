@@ -1,102 +1,83 @@
- .audio_recorder .recording{
-z-index: 0;
-    display: flex;
-    height: 100%;
-    width: 100%;
-    position: absolute;
-    bottom: 0;
-    flex-direction: column-reverse;
-    padding-bottom: 3rem;
+.voice-assistant{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100vh;
+  margin-top: -60px;
 }
-.record-btn{
-    width: 50px;
-    height: 50px;
-    left: 43%;
-    bottom: 36px;
-    position: absolute;
-    border-radius: 50%;
-    background-color: red;
-    /* position: relative; */
-    overflow: hidden;
-    animation: recording 2s infinite;
-    transition: back;
-    transition: linear-gradient(90deg,rgba(2,0,36,1) 0%,rgba(9,9,121,1) 35%,rgba(0,212,255,1) 100%) 0.5s ease-in-out;
 
+.message-area{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 80%;
+  background-color: rgb(213, 235, 227);
 }
-.record-btn::after{
-    content: "";
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%,-50%);
-    width: 30px;
-    height: 30px;
-    border-radius: 50%;
-   
-}
-.background{
- 
-}
-@keyframes recording{
-    0%{
-        transform: scale(1);
-    }
-    50%{
-        transform: scale(1.2);
-    }
-    100%{
-        transform: scale(1);
-    }
-} 
-.audio_recorde{
-overflow: hidden;
-}
-.ocean {
-    z-index: -1;
-    height: 5%;
-    width: 100%;
-    position: absolute;
-    bottom: 0;
-    left: 0;
 
-    background: #015871;
+.record-area{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 20%;
+  background-color: rgb(58, 58, 196);
+  box-shadow: 0px 0px 20px 0px rgba(0,0,0,1);
+  border-radius:10px 10px  0px 0px ;
+}
+
+@keyframes pulsate {
+  0% {
+    transform: scale(1);
   }
-  
-  .wave {
-    background: url(https://cdn.kcak11.com/codepen_assets/wave_animation/wave.svg)
-      repeat-x;
-    position: absolute;
-    top: -198px;
-    width: 6400px;
-    height: 198px;
-    animation: wave 7s cubic-bezier(0.36, 0.45, 0.63, 0.53) infinite;
-    transform: translate3d(0, 0, 0);
+  50% {
+    transform: scale(1.2);
   }
-  
-  .wave:nth-of-type(2) {
-    top: -175px;
-    animation: wave 7s cubic-bezier(0.36, 0.45, 0.63, 0.53) -0.125s infinite,
-      swell 7s ease -1.25s infinite;
-    opacity: 1;
+  100% {
+    transform: scale(1);
   }
-  
-  @keyframes wave {
-    0% {
-      margin-left: 0;
-    }
-    100% {
-      margin-left: -1600px;
-    }
-  }
-  @keyframes swell {
-    0%,
-    100% {
-      transform: translate3d(0, -25px, 0);
-    }
-    50% {
-      transform: translate3d(0, 5px, 0);
-    }
-  }
-  .endWave {
-    display: none;
-  }
+}
+
+.record-area__button{
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  background-color: rgb(223, 222, 222);
+  border: 3px solid rgb(105, 155, 230); /* TO DO: ADDING ANIMATION OF GLOWING AROUND THE BORDER WITH THE CLOCK DIRECTION*/
+  outline: none; 
+  cursor: pointer;
+  transition: all 0.5s ease;
+}
+
+.record-area__button img{
+  width: 60%;
+  height: 60%;
+}
+
+@keyframes rainbow {
+  0% {background-position: 100% 50%;}
+  100% {background-position: 0 50%;}
+}
+
+@keyframes glowing {
+  /*
+  The first box-shadow is the main glow, the others are optional.
+  */
+  0% { box-shadow: 0 0 5px #105bc2, 0 0 10px #3b6db4, 0 0 15px #6386b6, 0 0 20px #98a2af; }
+
+  /*
+  The last shadow is optional - this adds a subtle glow around the element.
+  */
+  100% { box-shadow: 0 0 10px #105bc2, 0 0 20px #3b6db4, 0 0 30px #6386b6, 0 0 40px #98a2af; }
+}
+
+
+.record-area__button.recording {
+  background: radial-gradient(circle closest-corner at 50% 50%, green, blue, indigo);
+  background-size: 200% 200%;
+  animation: rainbow 10s linear infinite, pulsate 1.5s ease infinite, glowing 2s infinite;
+}

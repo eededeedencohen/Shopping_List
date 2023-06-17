@@ -1,10 +1,11 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useProducts } from "../../context/ProductContext";
-import milkiImage from "./milki.png";
 import healthSignImage from "./health-sign.png";
 import "./ProductList.css";
 import { useNavigate } from "react-router";
 import { addProductToCart } from "../../network/cartService"; //import here
+import Image from "./Images"
+
 
 // export this function weightUnit to use it in Cart.js:
 export const convertWeightUnit = (weightUnit) => {
@@ -142,7 +143,7 @@ function ProductList() {
             </div>
           </div>
           <div className="product-image">
-            <img src={milkiImage} alt="milki" />
+          <Image barcode={product.barcode} />
           </div>
           <div className="product-quantity-control">
             <button

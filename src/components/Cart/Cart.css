@@ -142,6 +142,7 @@
   justify-content: center;
   width: 100%;
   margin: 1rem;
+  margin-left:0;
   flex-direction: row-reverse;
 }
 
@@ -150,7 +151,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  width: 32%;
+  width: 33%;
 }
 
 .cart .product-details__name{
@@ -190,7 +191,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  width: 32%;
+  width: 33%;
 }
 
 
@@ -200,13 +201,89 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  width: 32%;
+  width: 33%;
 }
 
 .cart .product-price__total-price{
   background-color: rgb(183, 183, 183);
   border-radius: 7px;
   margin-top: 0.8rem;
+}
 
+.cart .update-amount{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.cart .update-amount__new{
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  margin-top: 0.8rem;
+  margin-bottom: 0.8rem;
+}
+
+.cart .update-amount__amount-input {
+  width: 50px;
+  height: 50px;
+  border-radius: 5px;
+  box-shadow: 0px 0px 10px 0px rgb(102, 230, 132);
+  border: 2px solid rgb(25, 119, 8);
+  text-align: center;
+  margin-right: 10px;
+  margin-left: 10px;
+  font-size: 1rem;
+  font-weight: bold;
+  background-color: rgba(110, 199, 123, 0.507);
+  transition: transform 0.2s;
+}
+
+.cart .update-amount__amount-input:active {
+  transform: scale(0.95);
+}
+
+.cart .update-amount__plus-button{
+  /*css for the pus button*/
+  background-color: green;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  border: none;
+  color: white;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  margin-right: 10px;
+  margin-left: 10px;
+  outline: none;
+  transition: transform 0.2s;
+}
+
+.cart .update-amount__plus-button:active {
+  transform: scale(0.90);
+}
+
+.cart .update-amount__minus-button{
+  /*css for the minus button*/
+  background-color: red;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  border: none;
+  color: white;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  margin-right: 10px;
+  margin-left: 10px;
+  outline: none;
+  transition: transform 0.2s;
+}
+
+.cart .update-amount__minus-button:active {
+  transform: scale(0.90);
 }
 

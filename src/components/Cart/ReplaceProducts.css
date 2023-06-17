@@ -1,0 +1,28 @@
+.replace-products{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #fff;
+    box-shadow: 0 0 5px #ccc;
+    width: 100%;
+}
+
+.replace-product{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    width: 90%;
+    margin: 10px 0;
+}
+
+.replace-product-details{
+    width: 50%;
+}
+
+.replace-product-image{
+    width: 50%;
+}

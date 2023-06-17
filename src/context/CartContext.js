@@ -1,5 +1,8 @@
 import { createContext, useContext, useState } from "react";
-import { getActiveCartByUserID } from "../network/cartService";
+import {
+  getActiveCartByUserID,
+  updateProductInCart,
+} from "../network/cartService";
 
 export const CartContext = createContext();
 
@@ -11,13 +14,16 @@ export const CartContextProvider = ({ children }) => {
     setCart(data);
   };
 
+  const updateProductAmount = async (userId, barcode, newAmount) => {
+    const updatedCart = await updateProductInCart(userId, barcode, newAmount);
+    setCart(updatedCart);
+  };
+
   return (
-    <CartContext.Provider value={{ cart, loadCart }}>
+    <CartContext.Provider value={{ cart, loadCart, updateProductAmount }}>
       {children}
     </CartContext.Provider>
   );
 };
 
 export const useCart = () => useContext(CartContext);
-
-

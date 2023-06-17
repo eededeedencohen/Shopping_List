@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+/*import React, { useState } from "react";
 
 function UploadRecord() {
   const [file, setFile] = useState(null);
@@ -41,6 +41,6 @@ function UploadRecord() {
 }
 
 export default UploadRecord;
-
+*/
 
 

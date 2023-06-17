@@ -19,6 +19,17 @@ const addProductToCart = async (userId, barcode, amount) => {
   return response.data;
 };
 
-export { getActiveCartByUserID, addProductToCart };
+const updateProductInCart = async (userId, barcode, amount) => {
+  const response = await axios.patch(
+    `http://localhost:8000/api/v1/carts/product/${userId}`,
+    {
+      barcode,
+      amount,
+    }
+  );
+  return response.data;
+};
+
+export { getActiveCartByUserID, addProductToCart, updateProductInCart };
 
 
