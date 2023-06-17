@@ -4,8 +4,9 @@ import Modal from "./Modal";
 import ReplaceProducts from "./ReplaceProducts";
 import "./Cart.css";
 import ShaareyRevahaLogo from "./SuperMarketsLogo/שערי-רווחה.jpg";
-import MilkiImage from "../ProductList/milki.png";
+import { Spin } from "antd";
 import Images from "../ProductList/Images";
+import SupermarketImage from "./supermarketImage";
 
 export const convertWeightUnit = (weightUnit) => {
   weightUnit = weightUnit.toLowerCase();
@@ -24,8 +25,6 @@ export const convertWeightUnit = (weightUnit) => {
   return weightUnit;
 };
 // export the function convertWeightUnit:
-
-
 
 export default function Cart() {
   const { cart, loadCart, updateProductAmount } = useCart();
@@ -70,11 +69,23 @@ export default function Cart() {
     }
   };
 
-  const handleUpdate = () => {
+  const handleUpdate = async () => {
     if (currentBarcode && updatedAmount !== 0) {
-      updateProductAmount(userId, currentBarcode, updatedAmount);
+      setIsLoading(true);
+      await updateProductAmount(userId, currentBarcode, updatedAmount);
+      loadCart(userId); // make sure the new data is loaded after the update
+      setIsLoading(false);
     }
   };
+
+  if (isLoading || !cartData) {
+    return (
+      <div className="spinner-container">
+        <Spin size="large"></Spin>
+        <p>מבצע חילוף מוצר ומשווה שוב את המחירים</p>
+      </div>
+    );
+  }
 
   console.log(isModalOpen);
   console.log(currentBarcode);
@@ -96,7 +107,7 @@ export default function Cart() {
           <h3>הסופרמרקט הכי משתלם לעגלה שלך</h3>
         </div>
         <div className="supermarket-logo">
-          <img src={ShaareyRevahaLogo} alt="Shaarey Revaha Logo" />
+          <SupermarketImage supermarketName={cartData.data.supermarket.name} />
         </div>
         <div className="supermarket-address">
           <div className="supermarket-address__city">
