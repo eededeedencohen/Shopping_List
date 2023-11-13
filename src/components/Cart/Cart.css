@@ -233,6 +233,7 @@
   font-weight: bold;
   background-color: rgba(110, 199, 123, 0.507);
   transition: transform 0.2s;
+  cursor: pointer;
 }
 
 .cart .update-amount__amount-input:active {

@@ -9,7 +9,6 @@
   }
 }
 
-
 .product-card {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -20,8 +19,7 @@
     " ProductData ProductData productImage productImage"
     " ProductData ProductData productImage productImage"
     "HealthMarkingText  HealthMarkingText HealthMarking HealthMarking";
-  margin-bottom: 5rem; 
-  
+  margin-bottom: 5rem;
 }
 
 .product-data {
@@ -33,9 +31,15 @@
 .product-name {
   display: flex;
   justify-content: center;
-  background-color: rgb(181, 210, 210);
+  background-image: linear-gradient(
+    to bottom,
+    /* Gradient flows from top to bottom */ rgb(94, 186, 73),
+    /* Top color */ rgb(134, 200, 106),
+    /* Middle color */ rgb(182, 218, 174) /* Bottom color */
+  );
   margin-bottom: 1rem;
   grid-area: productName;
+  border-radius: 8px;
 }
 
 .product-name h1 {
@@ -94,8 +98,8 @@
 }
 
 .product-image img {
-  width: 100%;   /* Adjust as needed */
-  height:100%;  /* Adjust as needed */
+  width: 100%; /* Adjust as needed */
+  height: 100%; /* Adjust as needed */
   object-fit: contain;
 }
 
@@ -124,20 +128,20 @@
 }
 
 .health-marking img {
-  width: 40%;   /* Adjust as needed */
-  height:120%;  /* Adjust as needed */
+  width: 40%; /* Adjust as needed */
+  height: 120%; /* Adjust as needed */
   object-fit: contain;
   margin-right: 0;
 }
 
-.search{
+.search {
   display: flex;
   justify-content: center;
   align-items: center;
   margin-bottom: 2rem;
 }
 
-.search-input{
+.search-input {
   width: 50%;
   height: 2rem;
   border-radius: 10px;
@@ -146,15 +150,7 @@
   font-size: 1rem;
   font-weight: 400;
   color: #009a43;
-  font-family: 'Montserrat', sans-serif;
+  font-family: "Montserrat", sans-serif;
   /*centering the characters*/
   text-align: center;
 }
-
-
-
-
-
-
-
-
