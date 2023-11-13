@@ -3,7 +3,7 @@ import axios from "axios";
 
 const getActiveCartByUserID = async (id) => {
   const Cart = await httpClient.get(`/carts/cheapest/${id}`);
-  return Cart.data;
+  return JSON.parse(Cart.data);
 };
 
 const addProductToCart = async (userId, barcode, amount) => {
@@ -31,5 +31,3 @@ const updateProductInCart = async (userId, barcode, amount) => {
 };
 
 export { getActiveCartByUserID, addProductToCart, updateProductInCart };
-
-

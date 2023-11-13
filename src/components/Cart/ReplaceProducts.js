@@ -44,7 +44,7 @@ function ReplaceProducts({ barcode, closeModal, loadCart, userId }) {
   };
 
   if (loading) {
-    return <p>Loading...</p>;
+    return <></>;
   }
 
   return (
@@ -59,7 +59,8 @@ function ReplaceProducts({ barcode, closeModal, loadCart, userId }) {
             <Image barcode={product.barcode} />
           </div>
           <div className="replace-product-details">
-            <h2 className="replace-product-details__name">{product.name}</h2>
+            {/* take only the first 4 words from product.name  */}
+            <h2 className="replace-product-details__name">{`${product.name && product.name.split(" ").slice(0, 4).join(" ")}`}</h2>
             <h2 className="replace-product-details__barcode">
               {product.barcode}
             </h2>

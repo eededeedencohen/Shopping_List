@@ -326,3 +326,29 @@
   font-size: 50px;
   color: purple;
 }
+
+.cart .green-button {
+  display: flex;
+  justify-content: center;
+  margin-top: 1rem;
+}
+
+.cart .green-button__button {
+  background-color: green;
+  border: none;
+  border-radius: 5px;
+  color: white;
+  font-size: 1rem;
+  font-weight: bold;
+  padding: 10px 20px;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.cart .green-button__button:hover {
+  transform: scale(1.05);
+}
+
+.cart .green-button__button:active {
+  transform: scale(0.95);
+}

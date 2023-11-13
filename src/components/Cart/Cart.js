@@ -3,7 +3,6 @@ import { useCart } from "../../context/CartContext";
 import Modal from "./Modal";
 import ReplaceProducts from "./ReplaceProducts";
 import "./Cart.css";
-import ShaareyRevahaLogo from "./SuperMarketsLogo/שערי-רווחה.jpg";
 import { Spin } from "antd";
 import Images from "../ProductList/Images";
 import SupermarketImage from "./supermarketImage";
@@ -27,18 +26,16 @@ export const convertWeightUnit = (weightUnit) => {
 // export the function convertWeightUnit:
 
 export default function Cart() {
-  const { cart, loadCart, updateProductAmount } = useCart();
+  const { cart, loadCart, updateProductAmount, confirmCart, updateAmount } =
+    useCart();
   const userId = "1"; // Replace this with the actual userId.
   const [isLoading, setIsLoading] = useState(false);
   const [isModalOpen, setModalOpen] = useState(false);
   const [currentBarcode, setCurrentBarcode] = useState(null);
-  const [updatedAmount, setUpdatedAmount] = useState(0);
 
   useEffect(() => {
     loadCart(userId);
   }, [loadCart, userId]);
-
-  let cartData = null;
 
   if (!cart) {
     return (
@@ -48,48 +45,39 @@ export default function Cart() {
     );
   }
 
-  if (cart) {
-    try {
-      cartData = JSON.parse(cart);
-    } catch (err) {
-      console.error("Failed to parse cart data:", err);
-      cartData = null;
-    }
-  }
-
   // TO DO: ADD BARCODE PARAMETER
-  const handleIncrement = () => {
-    setUpdatedAmount(updatedAmount + 1);
+  const handleIncrement = (barcode) => {
+    updateAmount(barcode, "increment");
   };
 
   // TO DO: ADD BARCODE PARAMETER
-  const handleDecrement = () => {
-    if (updatedAmount > 0) {
-      setUpdatedAmount(updatedAmount - 1);
-    }
+  const handleDecrement = (barcode) => {
+    updateAmount(barcode, "decrement");
   };
 
-  const handleUpdate = async () => {
-    if (currentBarcode && updatedAmount !== 0) {
-      setIsLoading(true);
-      await updateProductAmount(userId, currentBarcode, updatedAmount);
-      loadCart(userId); // make sure the new data is loaded after the update
-      setIsLoading(false);
-    }
+  const handleUpdate = async (barcode) => {
+    setIsLoading(true);
+    await updateProductAmount(userId, barcode);
+    loadCart(userId); // make sure the new data is loaded after the update
+    setIsLoading(false);
   };
 
-  if (isLoading || !cartData) {
+  const handleConfirmCart = async () => {
+    await confirmCart(userId);
+    // Perform any additional actions or navigation after cart confirmation
+  };
+
+  if (isLoading || !cart) {
     return (
       <div className="spinner-container">
         <Spin size="large"></Spin>
-        <p>מבצע חילוף מוצר ומשווה שוב את המחירים</p>
+        <p>מבצע עדכון כמות למוצר ומשווה שוב המחירים</p>
       </div>
     );
   }
 
   console.log(isModalOpen);
   console.log(currentBarcode);
-  console.log(updatedAmount);
 
   return (
     <div className="cart">
@@ -107,14 +95,14 @@ export default function Cart() {
           <h3>הסופרמרקט הכי משתלם לעגלה שלך</h3>
         </div>
         <div className="supermarket-logo">
-          <SupermarketImage supermarketName={cartData.data.supermarket.name} />
+          <SupermarketImage supermarketName={cart.supermarket.name} />
         </div>
         <div className="supermarket-address">
           <div className="supermarket-address__city">
-            {cartData && cartData.data.supermarket.city}
+            {cart && cart.supermarket.city}
           </div>
           <div className="supermarket-Street__street">
-            ,{cartData && cartData.data.supermarket.address}
+            ,{cart && cart.supermarket.address}
           </div>
         </div>
         <hr className="line" />
@@ -124,13 +112,13 @@ export default function Cart() {
           <h1>סכום כולל של העגלה שלך</h1>
         </div>
         <div className="total-price__price">
-          {cartData && <h1>{cartData.data.totalPrice}₪</h1>}
+          {cart && <h1>{cart.totalPrice}₪</h1>}
         </div>
       </div>
       <hr className="line" />
       <div className="products">
-        {cartData &&
-          cartData.data.productsWithPrices.map((item, index) => (
+        {cart &&
+          cart.productsWithPrices.map((item, index) => (
             <div key={index}>
               <div
                 className="product"
@@ -171,26 +159,24 @@ export default function Cart() {
                 <div className="update-amount__new">
                   <button
                     className="update-amount__minus-button"
-                    onClick={handleDecrement}
+                    onClick={() => handleDecrement(item.product.barcode)}
                   >
                     -
                   </button>
                   <input
                     type="text"
-                    value={updatedAmount}
+                    value={item.amount}
                     readOnly
                     className="update-amount__amount-input"
-                    // onClick={handleUpdate}
-                    // add the barcode parameter
                     onClick={() => {
                       setCurrentBarcode(item.product.barcode);
                       console.log(currentBarcode);
-                      handleUpdate();
+                      handleUpdate(item.product.barcode);
                     }}
                   />
                   <button
                     className="update-amount__plus-button"
-                    onClick={handleIncrement}
+                    onClick={() => handleIncrement(item.product.barcode)}
                   >
                     +
                   </button>
@@ -199,6 +185,11 @@ export default function Cart() {
               <hr />
             </div>
           ))}
+      </div>
+      <div className="green-button">
+        <button className="green-button__button" onClick={handleConfirmCart}>
+          Confirm Cart
+        </button>{" "}
       </div>
     </div>
   );

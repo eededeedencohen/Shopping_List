@@ -1,0 +1,93 @@
+.history-lists {
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: 3px;
+  }
+  
+  .cart-details {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    margin-top: 2rem;
+    background-color: rgb(218, 255, 225);
+    border-radius: 20px;
+    padding: 3px;
+    border: 2px solid rgb(10, 56, 81);
+    box-shadow: 0 0 10px rgb(10, 56, 81);
+  }
+  
+  .cart-details-supermarket {
+    width: 50%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .cart-details-supermarket__image {
+    width: 150px;
+    height: 80px;
+    margin-left: 1rem;
+  }
+  
+  .cart-details-supermarket__image img {
+    width: 100%;
+    height: 100%;
+  }
+  
+  .cart-details-supermarket__address,
+  .cart-details-supermarket__city {
+    font-size: 1.2rem;
+    font-weight: 500;
+    margin-top: 0.5px;
+    color: rgb(10, 56, 81);
+  }
+  
+  .cart-details-summery {
+    width: 50%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .cart-details-summery__date,
+  .cart-details-summery__time,
+  .cart-details-summary__total-price {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    align-self: flex-end;
+    margin-top: 1rem;
+  }
+  
+  .cart-details-summery__date h1,
+  .cart-details-summery__time h1,
+  .cart-details-summary__total-price h1 {
+    font-size: 1.2rem;
+    font-weight: 500;
+    margin-top: 0.5px;
+    color: rgb(10, 56, 81);
+    margin-right: 1rem;
+  }
+  
+  .cart-details-summery__date h2,
+  .cart-details-summery__time h2,
+  .cart-details-summary__total-price h2 {
+    font-size: 1.2rem;
+    font-weight: 500;
+    margin-top: 0.5px;
+    color: rgb(4, 91, 137);
+    font-weight: bold;
+  }
+
+
+  

@@ -26,6 +26,7 @@ function ImageParser() {
 
     const result = await response.json();
     setText(result.data.text);
+    console.log(result.data.text);
   };
 
   return (
