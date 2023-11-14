@@ -16,7 +16,7 @@ function ImageParser() {
 
     const response = await fetch("http://localhost:8000/api/v1/carts/text", {
       method: "POST",
-      body: formData
+      body: formData,
     });
 
     if (!response.ok) {
