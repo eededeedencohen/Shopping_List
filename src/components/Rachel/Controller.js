@@ -47,7 +47,7 @@ const Controller = () => {
             messageArray.push(rachelMessage);
             setMessages(messageArray);
 
-            // Play audio
+            //  Play audio
             setIsLoading(false);
             audio.play();
           })
