@@ -7,6 +7,7 @@ import UploadRecord from "./components/UploadRecord/UploadRecord";
 import AudioRecorder from "./components/UploadRecord/AudioRecorder";
 import HistoryPage from "./components/History/HistoryPage";
 import HistoryList from "./components/History/HistoryList";
+import CategoryList from "./components/Cart/Category/CategoryList";
 import { Stats } from "./components/Stats/Stats";
 
 function Routing() {
@@ -21,6 +22,7 @@ function Routing() {
       <Route path="/audio-recorder" element={<AudioRecorder />} />
       <Route path="/history" element={<HistoryPage />} />
       <Route path="/history/:id" element={<HistoryList />} />
+      <Route path="/category" element={<CategoryList />} />
     </Routes>
   );
 }

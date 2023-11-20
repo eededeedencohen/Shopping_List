@@ -18,11 +18,11 @@ const AudioRecorder = () => {
   const downloadBlob = async (blobUrl) => {
     const audioBlob = await fetch(blobUrl).then((r) => r.blob());
     const audioFile = new File([audioBlob], "voice.wav", { type: "audio/wav" });
-    const formData = new FormData(); 
+    const formData = new FormData();
 
     formData.append("file", audioFile);
     const response = await fetch(
-      "http://localhost:8000/api/v1/voice-assistant/blob", 
+      "http://localhost:8000/api/v1/voice-assistant/blob",
       {
         method: "POST",
         body: formData,

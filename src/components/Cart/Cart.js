@@ -30,6 +30,7 @@ export default function Cart() {
     useCart();
   const userId = "1"; // Replace this with the actual userId.
   const [isLoading, setIsLoading] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const [isModalOpen, setModalOpen] = useState(false);
   const [currentBarcode, setCurrentBarcode] = useState(null);
 
@@ -55,23 +56,55 @@ export default function Cart() {
     updateAmount(barcode, "decrement");
   };
 
+
   const handleUpdate = async (barcode) => {
-    setIsLoading(true);
-    await updateProductAmount(userId, barcode);
-    loadCart(userId); // make sure the new data is loaded after the update
-    setIsLoading(false);
+    setIsLoading(true); // Start spinner before the update process
+    try {
+      await updateProductAmount(userId, barcode); // Await the server response
+      await loadCart(userId); // Reload cart data from the server
+    } catch (error) {
+      console.error("Error updating product amount:", error);
+      // Handle any errors here, such as showing a message to the user
+    } finally {
+      setIsLoading(false); // Stop spinner after the update process and handling any errors
+    }
   };
 
+
+  // const handleConfirmCart = async () => {
+  //   await confirmCart(userId);
+  //   // Perform any additional actions or navigation after cart confirmation
+  //   // do do: add the load cart after this operation 
+  // };
+
   const handleConfirmCart = async () => {
-    await confirmCart(userId);
-    // Perform any additional actions or navigation after cart confirmation
+    setIsSaving(true); // Optionally, indicate loading state
+    try {
+      await confirmCart(userId); // Confirm the cart
+      await loadCart(userId); // Reload cart data to reflect changes
+    } catch (error) {
+      console.error("Error confirming the cart:", error);
+      // Optionally, handle the error, e.g., showing an error message
+    } finally {
+      setIsSaving(false); // Optionally, reset the loading state
+    }
   };
+  
 
   if (isLoading || !cart) {
     return (
       <div className="spinner-container">
         <Spin size="large"></Spin>
-        <p>מבצע עדכון כמות למוצר ומשווה שוב המחירים</p>
+        <p>מבצע עדכון כמות למוצר ומשווה שוב מחירים</p>
+      </div>
+    );
+  }
+
+  if (isSaving || !cart) {
+    return (
+      <div className="spinner-container">
+        <Spin size="large"></Spin>
+        <p>שומר את העגלה בהיסטוריית הקניות</p>
       </div>
     );
   }

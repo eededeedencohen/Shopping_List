@@ -6,7 +6,7 @@
   position: fixed; /* Add this */
   width: 100%; /* Add this */
   top: 0; /* Add this */
-  z-index: 2; /* Add this to ensure the navbar is above other content */
+  z-index: 3; /* Add this to ensure the navbar is above other content */
   border-radius: 0px 0px 10px 10px;
   box-shadow: 0px 0px 20px 0px rgba(0, 0, 0, 1);
 }
