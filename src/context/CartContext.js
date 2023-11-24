@@ -30,6 +30,7 @@ export const CartContextProvider = ({ children }) => {
     setCart(confirmedCart);
   };
 
+
   const updateAmount = (productBarcode, type) => {
     const productsWithPrices = cart.productsWithPrices.map((cartItem) => {
       if (cartItem.product.barcode === productBarcode) {
