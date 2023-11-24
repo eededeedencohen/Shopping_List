@@ -1,4 +1,4 @@
-.ProductListStyle {
+/* .ProductListStyle {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
 }
@@ -33,9 +33,9 @@
   justify-content: center;
   background-image: linear-gradient(
     to bottom,
-    /* Gradient flows from top to bottom */ rgb(94, 186, 73),
-    /* Top color */ rgb(134, 200, 106),
-    /* Middle color */ rgb(182, 218, 174) /* Bottom color */
+     rgb(186, 73, 73),
+     rgb(192, 162, 112),
+     rgb(255, 125, 3) 
   );
   margin-bottom: 1rem;
   grid-area: productName;
@@ -98,8 +98,8 @@
 }
 
 .product-image img {
-  width: 100%; /* Adjust as needed */
-  height: 100%; /* Adjust as needed */
+  width: 100%; 
+  height: 100%; 
   object-fit: contain;
 }
 
@@ -128,8 +128,8 @@
 }
 
 .health-marking img {
-  width: 40%; /* Adjust as needed */
-  height: 120%; /* Adjust as needed */
+  width: 40%; 
+  height: 120%; 
   object-fit: contain;
   margin-right: 0;
 }
@@ -151,6 +151,5 @@
   font-weight: 400;
   color: #009a43;
   font-family: "Montserrat", sans-serif;
-  /*centering the characters*/
   text-align: center;
-}
+} */

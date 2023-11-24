@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { ReactMediaRecorder } from "react-media-recorder";
+import { ReactMediaRecorder } from "react-media-recorder-2";
 import "./AudioRecorder.css";
 import Microphone from "./microphone.svg";
 
@@ -48,10 +48,17 @@ const AudioRecorder = () => {
               className={`record-area__button ${
                 isRecording ? "recording" : ""
               }`}
-              onMouseDown={startRecording}
-              onMouseUp={stopRecording}
-              onTouchStart={startRecording}
-              onTouchEnd={stopRecording}
+              onClick={() => {
+                if (isRecording) {
+                  stopRecording();
+                } else {
+                  startRecording();
+                }
+              }}
+              // onMouseDown={startRecording}
+              // onMouseUp={stopRecording}
+              // onTouchStart={startRecording}
+              // onTouchEnd={stopRecording}
             >
               <img src={Microphone} alt="Microphone icon" />
             </button>

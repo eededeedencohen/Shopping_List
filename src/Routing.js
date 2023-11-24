@@ -1,6 +1,7 @@
 import { Route, Routes } from "react-router";
 import Home from "./pages/Home";
 import PriceList from "./components/PriceList/PriceList";
+import ProductsListNew from "./components/ProductList/ProductsListNew";
 import Cart from "./components/Cart/Cart";
 import ImageParser from "./components/ImageParser/ImageParser";
 import UploadRecord from "./components/UploadRecord/UploadRecord";
@@ -14,6 +15,7 @@ function Routing() {
   return (
     <Routes>
       <Route path="/" element={<Home />} />
+      <Route path="/products" element={<ProductsListNew />} />
       <Route path="/priceList/:barcode" element={<PriceList />} />
       <Route path="/cart" element={<Cart />} />
       <Route path="/stats" element={<Stats />} />
