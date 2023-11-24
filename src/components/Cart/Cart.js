@@ -26,13 +26,23 @@ export const convertWeightUnit = (weightUnit) => {
 // export the function convertWeightUnit:
 
 export default function Cart() {
-  const { cart, loadCart, updateProductAmount, confirmCart, updateAmount } =
-    useCart();
+  const {
+    cart,
+    loadCart,
+    updateProductAmount,
+    confirmCart,
+    updateAmount,
+    updateSupermarketID,
+  } = useCart();
   const userId = "1"; // Replace this with the actual userId.
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [isModalOpen, setModalOpen] = useState(false);
   const [currentBarcode, setCurrentBarcode] = useState(null);
+
+  //=============================================
+  const [supermarketID, setSupermarketID] = useState(1);
+  const [isReplaceSupermarket, setIsReplaceSupermarket] = useState(false);
 
   useEffect(() => {
     loadCart(userId);
@@ -56,7 +66,6 @@ export default function Cart() {
     updateAmount(barcode, "decrement");
   };
 
-
   const handleUpdate = async (barcode) => {
     setIsLoading(true); // Start spinner before the update process
     try {
@@ -70,11 +79,10 @@ export default function Cart() {
     }
   };
 
-
   // const handleConfirmCart = async () => {
   //   await confirmCart(userId);
   //   // Perform any additional actions or navigation after cart confirmation
-  //   // do do: add the load cart after this operation 
+  //   // do do: add the load cart after this operation
   // };
 
   const handleConfirmCart = async () => {
@@ -89,7 +97,6 @@ export default function Cart() {
       setIsSaving(false); // Optionally, reset the loading state
     }
   };
-  
 
   if (isLoading || !cart) {
     return (
@@ -109,8 +116,15 @@ export default function Cart() {
     );
   }
 
-  console.log(isModalOpen);
-  console.log(currentBarcode);
+  if (isReplaceSupermarket || !cart) {
+    return (
+      <div className="spinner-container">
+        <Spin size="large"></Spin>
+        <p>מחליף סופרמרקט</p>
+      </div>
+    );
+  }
+
 
   return (
     <div className="cart">
@@ -122,6 +136,38 @@ export default function Cart() {
           userId={userId}
         />
       </Modal>
+
+      <div className="filter">
+        {/**text box: */}
+        <input
+          type="number"
+          value={supermarketID}
+          onChange={(event) => setSupermarketID(event.target.value)}
+        />
+        <button
+          onClick={() => {
+            const handleUpdateAndLoad = async () => {
+              setIsReplaceSupermarket(true); // Start loading
+              try {
+                await updateSupermarketID(userId, supermarketID);
+                await loadCart(userId);
+              } catch (error) {
+                console.error(
+                  "Error updating supermarket ID or loading cart:",
+                  error
+                );
+                // Optionally, handle the error
+              } finally {
+                setIsReplaceSupermarket(false); // Stop loading regardless of success or error
+              }
+            };
+
+            handleUpdateAndLoad();
+          }}
+        >
+          אישור
+        </button>
+      </div>
 
       <div className="supermarket">
         <div className="supermarket-title">

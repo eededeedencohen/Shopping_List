@@ -2,9 +2,11 @@ import httpClient from ".";
 import axios from "axios";
 
 const getActiveCartByUserID = async (id) => {
-  const Cart = await httpClient.get(`/carts/cheapest/${id}`);
+  // const Cart = await httpClient.get(`/carts/cheapest/${id}`);
+  const Cart = await httpClient.get(`/supermarket/full-cart/${id}`);
   return JSON.parse(Cart.data);
 };
+
 
 const addProductToCart = async (userId, barcode, amount) => {
   const response = await axios.post(

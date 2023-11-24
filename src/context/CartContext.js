@@ -3,7 +3,9 @@ import {
   getActiveCartByUserID,
   updateProductInCart,
 } from "../network/cartService";
-import confirmCart from "../network/confirmCart";
+// import confirmCart from "../network/confirmCart";
+import confirmSupermarketCart from "../network/confirmSupermarketCart";
+import updateSupermarketID from "../network/updateSupermarketID";
 
 export const CartContext = createContext();
 
@@ -12,7 +14,6 @@ export const CartContextProvider = ({ children }) => {
 
   const loadCart = useCallback(async (id) => {
     const { data } = await getActiveCartByUserID(id);
-    console.log({ data });
     setCart(data);
   }, []);
 
@@ -24,12 +25,12 @@ export const CartContextProvider = ({ children }) => {
   };
 
   const handleConfirmCart = async (userId) => {
-    const confirmedCart = await confirmCart(userId);
+    // const confirmedCart = await confirmCart(userId);
+    const confirmedCart = await confirmSupermarketCart(userId);
     setCart(confirmedCart);
   };
 
   const updateAmount = (productBarcode, type) => {
-    console.log({ cart });
     const productsWithPrices = cart.productsWithPrices.map((cartItem) => {
       if (cartItem.product.barcode === productBarcode) {
         if (type === "increment") {
@@ -43,6 +44,10 @@ export const CartContextProvider = ({ children }) => {
     setCart((prevCart) => ({ ...prevCart, productsWithPrices }));
   };
 
+  const handleSupermarketUpdate = async (userId, supermarketID) => {
+    await updateSupermarketID(userId, supermarketID);
+  };
+
   return (
     <CartContext.Provider
       value={{
@@ -51,6 +56,7 @@ export const CartContextProvider = ({ children }) => {
         updateAmount,
         updateProductAmount,
         confirmCart: handleConfirmCart,
+        updateSupermarketID: handleSupermarketUpdate,
       }}
     >
       {children}
