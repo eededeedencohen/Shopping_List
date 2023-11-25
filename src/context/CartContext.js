@@ -6,6 +6,7 @@ import {
 // import confirmCart from "../network/confirmCart";
 import confirmSupermarketCart from "../network/confirmSupermarketCart";
 import updateSupermarketID from "../network/updateSupermarketID";
+import getCheapestSupermarket from "../network/cheapestSupermarket";
 
 export const CartContext = createContext();
 
@@ -49,6 +50,14 @@ export const CartContextProvider = ({ children }) => {
     await updateSupermarketID(userId, supermarketID);
   };
 
+  const handleCheapestSupermarket = async (userId) => {
+    const cheapestSupermarket = await getCheapestSupermarket(userId);
+    return cheapestSupermarket;
+    // const supermarketID = cheapestSupermarket.supermarket.supermarketID;
+    // await updateSupermarketID(userId, supermarketID);
+    // setCart(cheapestSupermarket);
+  };
+
   return (
     <CartContext.Provider
       value={{
@@ -58,6 +67,7 @@ export const CartContextProvider = ({ children }) => {
         updateProductAmount,
         confirmCart: handleConfirmCart,
         updateSupermarketID: handleSupermarketUpdate,
+        getCheapestSupermarketCart: handleCheapestSupermarket,
       }}
     >
       {children}

@@ -33,6 +33,7 @@ export default function Cart() {
     confirmCart,
     updateAmount,
     updateSupermarketID,
+    getCheapestSupermarketCart,
   } = useCart();
   const userId = "1"; // Replace this with the actual userId.
   const [isLoading, setIsLoading] = useState(false);
@@ -98,6 +99,15 @@ export default function Cart() {
     }
   };
 
+  const handleCheapestCart = async () => {
+    await getCheapestSupermarketCart(userId);
+    // set 10 seconds:
+    setTimeout(() => {}, 10000);
+    await updateSupermarketID(userId, cart.supermarket.supermarketID);
+    setTimeout(() => {}, 5000);
+    await loadCart(userId);
+  };
+
   if (isLoading || !cart) {
     return (
       <div className="spinner-container">
@@ -124,7 +134,6 @@ export default function Cart() {
       </div>
     );
   }
-
 
   return (
     <div className="cart">
@@ -168,6 +177,15 @@ export default function Cart() {
           אישור
         </button>
       </div>
+
+      {/* <div className="cart-optimization">
+        <button
+          className="cart-optimization__button"
+          onClick={() => handleCheapestCart()}
+        >
+          מחיר הכי זול
+        </button>
+      </div> */}
 
       <div className="supermarket">
         <div className="supermarket-title">
