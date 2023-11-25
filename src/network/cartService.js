@@ -33,4 +33,17 @@ const updateProductInCart = async (userId, barcode, amount) => {
   return response.data;
 };
 
-export { getActiveCartByUserID, addProductToCart, updateProductInCart };
+const deleteProductFromCart = async (userId, barcode) => {
+  await axios.delete(
+    `${DOMAIN}/api/v1/carts/product/${userId}`,
+    {
+      data: {
+        barcode,
+      },
+    }
+  );
+  console.log("deleted", barcode);
+  return;
+};
+
+export { getActiveCartByUserID, addProductToCart, updateProductInCart, deleteProductFromCart };
