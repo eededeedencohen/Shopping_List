@@ -1,5 +1,6 @@
 import httpClient from ".";
 import axios from "axios";
+import { DOMAIN } from "../constants";
 
 const getActiveCartByUserID = async (id) => {
   // const Cart = await httpClient.get(`/carts/cheapest/${id}`);
@@ -10,7 +11,7 @@ const getActiveCartByUserID = async (id) => {
 
 const addProductToCart = async (userId, barcode, amount) => {
   const response = await axios.post(
-    `http://localhost:8000/api/v1/carts/product/${userId}`,
+    `${DOMAIN}/api/v1/carts/product/${userId}`,
     {
       product: {
         barcode,
@@ -23,7 +24,7 @@ const addProductToCart = async (userId, barcode, amount) => {
 
 const updateProductInCart = async (userId, barcode, amount) => {
   const response = await axios.patch(
-    `http://localhost:8000/api/v1/carts/product/${userId}`,
+    `${DOMAIN}/api/v1/carts/product/${userId}`,
     {
       barcode,
       amount,

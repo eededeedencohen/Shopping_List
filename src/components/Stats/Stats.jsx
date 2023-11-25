@@ -10,6 +10,7 @@ import {
 } from "chart.js";
 import { Bar } from "react-chartjs-2";
 import axios from "axios";
+import { DOMAIN } from "../../constants";
 
 ChartJS.register(
   CategoryScale,
@@ -37,7 +38,7 @@ export const Stats = () => {
   const [barData, setBarData] = useState();
 
   useEffect(() => {
-    axios.get("http://localhost:8000/api/v1/history/").then((res) => {
+    axios.get(`${DOMAIN}/api/v1/history/`).then((res) => {
       console.log(res.data);
       const history = res.data.data.history;
       const productAmounts = {};

@@ -3,6 +3,7 @@ import axios from "axios";
 import Image from "../ProductList/Images";
 import "./ReplaceProducts.css";
 import { Spin } from "antd";
+import { DOMAIN } from "../../constants";
 
 function ReplaceProducts({ barcode, closeModal, loadCart, userId }) {
   const [products, setProducts] = useState([]);
@@ -14,7 +15,7 @@ function ReplaceProducts({ barcode, closeModal, loadCart, userId }) {
       setLoading(true);
       try {
         const result = await axios(
-          `http://localhost:8000/api/v1/products/replacement-products/${barcode}`
+          `${DOMAIN}/api/v1/products/replacement-products/${barcode}`
         );
         setProducts(result.data.data.products.products);
         setLoading(false);
@@ -49,7 +50,7 @@ function ReplaceProducts({ barcode, closeModal, loadCart, userId }) {
     setIsReplacing(true); // Start spinner for replacement process
     try {
       const response = await axios.post(
-        `http://localhost:8000/api/v1/carts/replace/${userId}`,
+        `${DOMAIN}/api/v1/carts/replace/${userId}`,
         {
           oldBarcode: barcode,
           newBarcode: newBarcode,

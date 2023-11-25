@@ -33,6 +33,7 @@ function Toolbar() {
           <img src={cartIcon} alt="CartIcon" />
         </div>
       </Link>
+     
       <div className={`drawer ${isOpen ? "open" : ""}`}>
         <div className="routes-icons">
           <Link to="/" onClick={closeDrawer}>
@@ -41,6 +42,14 @@ function Toolbar() {
                 <img src={groceryIcon} alt="Grocery" />
               </div>
               <h1>Products</h1>
+            </div>
+          </Link>
+          <Link to="/image-parser" onClick={closeDrawer}>
+            <div className="nav-item">
+              <div className="nav-icon">
+                <img src={groceryIcon} alt="Grocery" />
+              </div>
+              <h1>Image parser</h1>
             </div>
           </Link>
           <Link to="/grocery" onClick={closeDrawer}>

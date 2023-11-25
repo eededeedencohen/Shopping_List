@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { ReactMediaRecorder } from "react-media-recorder-2";
 import "./AudioRecorder.css";
 import Microphone from "./microphone.svg";
+import { DOMAIN } from "../../constants";
 
 const AudioRecorder = () => {
   const [isRecording, setIsRecording] = useState(false);
@@ -22,7 +23,7 @@ const AudioRecorder = () => {
 
     formData.append("file", audioFile);
     const response = await fetch(
-      "http://localhost:8000/api/v1/voice-assistant/blob",
+      `${DOMAIN}/api/v1/voice-assistant/blob`,
       {
         method: "POST",
         body: formData,
@@ -30,7 +31,7 @@ const AudioRecorder = () => {
     );
     const { text, route } = await response.json();
     console.log(text);
-    const url = "http://localhost:8000/" + route;
+    const url = `${DOMAIN}/` + route;
     const audio = new Audio(url);
     audio.play();
   };

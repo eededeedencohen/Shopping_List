@@ -1,9 +1,10 @@
 import axios from "axios";
+import { DOMAIN } from "../constants";
 
 
 const confirmSupermarketCart = async (userId) => {
   const responseUpdate = await axios.post(
-    `http://localhost:8000/api/v1/supermarket/confirm/${userId}`
+    `${DOMAIN}/api/v1/supermarket/confirm/${userId}`
   );
   return responseUpdate.data;
 };

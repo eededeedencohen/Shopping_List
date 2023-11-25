@@ -5,6 +5,7 @@ import "./HistoryList.css";
 // import shoppingCartImage from "./shopping-cart.png";
 import Images from "../ProductList/Images";
 import SupermarketImage from "../Cart/supermarketImage";
+import { DOMAIN } from "../../constants";
 
 const formatDate = (dateString) => {
   const dateObj = new Date(dateString);
@@ -45,7 +46,7 @@ const HistoryList = () => {
     const fetchCart = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:8000/api/v1/history/${id}`
+          `${DOMAIN}/api/v1/history/${id}`
         );
         setCart(response.data.data.history);
       } catch (error) {

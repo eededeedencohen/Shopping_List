@@ -3,6 +3,7 @@ import PropTypes from "prop-types";
 import axios from "axios";
 import "./Title.css";
 import { ReactComponent as RefreshIcon } from "./refresh.svg";
+import { DOMAIN } from "../../constants";
 
 const Title = ({ setMessages }) => {
   const [isResetting, setIsResetting] = useState(false);
@@ -11,7 +12,7 @@ const Title = ({ setMessages }) => {
     setIsResetting(true);
 
     try {
-      const response = await axios.get("http://localhost:8000/reset-messages");
+      const response = await axios.get(`${DOMAIN}/reset-messages`);
       if (response.status === 200) {
         setMessages([]);
       } else {
