@@ -18,4 +18,17 @@ const getProductByQuery = async (query) => {
   );
   return product;
 };
-export { getAllProducts, getByBarcode, getProductByQuery };
+
+const getReplacementProducts = async (barcode) => {
+  const products = await httpClient.get(
+    `/products/replacement-products/${barcode}`
+  );
+  return products;
+};
+
+export {
+  getAllProducts,
+  getByBarcode,
+  getProductByQuery,
+  getReplacementProducts,
+};

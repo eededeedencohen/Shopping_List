@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { DOMAIN } from "../../constants";
 
 function ImageParser() {
   const [file, setFile] = useState(null);
@@ -14,9 +15,9 @@ function ImageParser() {
     const formData = new FormData();
     formData.append("image", file);
 
-    const response = await fetch("http://localhost:8000/api/v1/carts/text", {
+    const response = await fetch(`${DOMAIN}/api/v1/carts/text`, {
       method: "POST",
-      body: formData
+      body: formData,
     });
 
     if (!response.ok) {
@@ -26,6 +27,7 @@ function ImageParser() {
 
     const result = await response.json();
     setText(result.data.text);
+    console.log(result.data.text);
   };
 
   return (

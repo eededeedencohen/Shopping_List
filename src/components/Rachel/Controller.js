@@ -1,83 +1,125 @@
-import React, { useState } from "react";
-import PropTypes from "prop-types";
-import Title from "./Title";
-import RecordMessage from "./RecordMessage";
-import "./Controller.css";
-import axios from "axios";
+// import React, { useState, useEffect } from "react";
+// import PropTypes from "prop-types";
+// import Title from "./Title";
+// import RecordMessage from "./RecordMessage";
+// import "./Controller.css";
+// import axios from "axios";
 
-const Controller = () => {
-  const [isLoading, setIsLoading] = useState(false);
-  const [messages, setMessages] = useState([]);
+// const Controller = () => {
+//   const [isLoading, setIsLoading] = useState(false);
+//   const [messages, setMessages] = useState([]);
+//   const [errorMessage, setErrorMessage] = useState("");
 
-  const createBlobUrl = (data) => {
-    const blob = new Blob([data], { type: "audio/mpeg" });
-    const url = window.URL.createObjectURL(blob);
-    return url;
+//   useEffect(() => {
+//     console.log("Controller component mounted");
+//     return () => console.log("Controller component unmounted");
+//   }, []);
+
+//   const createBlobUrl = (data) => {
+//     const blob = new Blob([data], { type: "audio/mpeg" });
+//     return window.URL.createObjectURL(blob);
+//   };
+
+//   const handleStop = async (blobUrl) => {
+//     console.log("handleStop called");
+//     if (isLoading) {
+//       console.log("Preventing duplicate call to handleStop");
+//       return;
+//     }
+//     setIsLoading(true);
+//     setErrorMessage("");
+
+//     const myMessage = { sender: "me", blobUrl: blobUrl };
+//     const messageArray = [...messages, myMessage];
+
+//     try {
+//       const response = await fetch(blobUrl);
+//       const blob = await response.blob();
+//       const formData = new FormData();
+//       formData.append("file", blob, "myFile.wav");
+
+//       const res = await axios.post(
+//         "http://localhost:8000/post-audio",
+//         formData,
+//         {
+//           headers: { "Content-Type": "audio/mpeg" },
+//         }
+//       );
+
+//       const newBlob = res.data;
+//       const audio = new Audio();
+//       audio.src = createBlobUrl(newBlob);
+
+//       const rachelMessage = { sender: "rachel", blobUrl: audio.src };
+//       messageArray.push(rachelMessage);
+//       setMessages(messageArray);
+
+//       audio.play();
+//     } catch (err) {
+//       console.error(err.message);
+//       setErrorMessage("Error processing audio. Please try again.");
+//     } finally {
+//       setIsLoading(false);
+//     }
+//   };
+
+//   return (
+//     <div className="h-screen overflow-hidden controller">
+//       <Title setMessages={setMessages} />
+//       {errorMessage && <div className="error-message">{errorMessage}</div>}
+//       <div className="fixed bottom-0 w-full py-6 border-t text-center bg-gradient-to-r element">
+//         <RecordMessage handleStop={handleStop} />
+//       </div>
+//     </div>
+//   );
+// };
+
+// Controller.propTypes = {
+//   setMessages: PropTypes.func.isRequired,
+// };
+
+// export default Controller;
+
+import React, { useState, useRef } from "react";
+
+function AudioRecorder() {
+  const [isRecording, setIsRecording] = useState(false);
+  const [audioUrl, setAudioUrl] = useState("");
+  const mediaRecorderRef = useRef(null);
+
+  const startRecording = async () => {
+    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      mediaRecorderRef.current = new MediaRecorder(stream);
+      mediaRecorderRef.current.ondataavailable = handleDataAvailable;
+      mediaRecorderRef.current.start();
+      setIsRecording(true);
+    } else {
+      console.error("Media devices not supported");
+    }
   };
 
-  const handleStop = async (blobUrl) => {
-    setIsLoading(true);
+  const stopRecording = () => {
+    if (mediaRecorderRef.current) {
+      mediaRecorderRef.current.stop();
+      setIsRecording(false);
+    }
+  };
 
-    // append recorded message to messages.
-    const myMessage = { sender: "me", blobUrl: blobUrl };
-    const messageArray = [...messages, myMessage];
-
-    // convert blobUrl to blob object.
-    fetch(blobUrl)
-      .then((res) => res.blob())
-      .then(async (blob) => {
-        // construct audio to send file
-        // construct audio to send file
-        const formData = new FormData();
-        formData.append("file", blob, "myFile.wav");
-
-        // send form data to API endpoint
-        await axios
-          .post("http://localhost:8000/post-audio", formData, {
-            headers: { "Content-Type": "audio/mpeg" },
-            responseType: "arraybuffer",
-          })
-          .then((res) => {
-            const blob = res.data;
-            const audio = new Audio();
-            audio.src = createBlobUrl(blob);
-
-            // Append to audio
-            const rachelMessage = { sender: "rachel", blobUrl: audio.src };
-            messageArray.push(rachelMessage);
-            setMessages(messageArray);
-
-            // Play audio
-            setIsLoading(false);
-            audio.play();
-          })
-          .catch((err) => {
-            console.log(err.message);
-            setIsLoading(false);
-          });
-      });
+  const handleDataAvailable = (event) => {
+    if (event.data.size > 0) {
+      setAudioUrl(URL.createObjectURL(event.data));
+    }
   };
 
   return (
-    <div className="h-screen overflow-hidden controller">
-      <Title setMessages={setMessages} />
-      <div className="flex flex-col ustify-between h-full overflow-y-scroll pb-96">
-        <div className="fixed bottom-0 w-full py-6 border-t text-center bg-gradient-to-r element ">
-          <div className="recorder">
-            <RecordMessage handleStop={handleStop} />
-          </div>
-        </div>
-      </div>
+    <div>
+      <button onClick={isRecording ? stopRecording : startRecording}>
+        {isRecording ? "Stop Recording" : "Start Recording"}
+      </button>
+      {audioUrl && <audio src={audioUrl} controls />}
     </div>
   );
-};
+}
 
-Title.propTypes = {
-  setMessages: PropTypes.func,
-};
-
-RecordMessage.propTypes = {
-  handleStop: PropTypes.func,
-};
-
-export default Controller;
+export default AudioRecorder;

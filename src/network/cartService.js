@@ -1,14 +1,17 @@
 import httpClient from ".";
 import axios from "axios";
+import { DOMAIN } from "../constants";
 
 const getActiveCartByUserID = async (id) => {
-  const Cart = await httpClient.get(`/carts/cheapest/${id}`);
-  return Cart.data;
+  // const Cart = await httpClient.get(`/carts/cheapest/${id}`);
+  const Cart = await httpClient.get(`/supermarket/full-cart/${id}`);
+  return JSON.parse(Cart.data);
 };
+
 
 const addProductToCart = async (userId, barcode, amount) => {
   const response = await axios.post(
-    `http://localhost:8000/api/v1/carts/product/${userId}`,
+    `${DOMAIN}/api/v1/carts/product/${userId}`,
     {
       product: {
         barcode,
@@ -19,6 +22,15 @@ const addProductToCart = async (userId, barcode, amount) => {
   return response.data;
 };
 
-export { getActiveCartByUserID, addProductToCart };
+const updateProductInCart = async (userId, barcode, amount) => {
+  const response = await axios.patch(
+    `${DOMAIN}/api/v1/carts/product/${userId}`,
+    {
+      barcode,
+      amount,
+    }
+  );
+  return response.data;
+};
 
-
+export { getActiveCartByUserID, addProductToCart, updateProductInCart };

@@ -3,28 +3,26 @@ import PropTypes from "prop-types";
 import axios from "axios";
 import "./Title.css";
 import { ReactComponent as RefreshIcon } from "./refresh.svg";
+import { DOMAIN } from "../../constants";
 
 const Title = ({ setMessages }) => {
   const [isResetting, setIsResetting] = useState(false);
 
-  // Reset the conversation
   const resetConversation = async () => {
     setIsResetting(true);
 
-    await axios
-      .get("http://localhost:8000/reset-messages")
-      .then((response) => {
-        if (response.status === 200) {
-          setMessages([]);
-        } else {
-          console.log("Error resetting conversation");
-        }
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-
-    setIsResetting(false);
+    try {
+      const response = await axios.get(`${DOMAIN}/reset-messages`);
+      if (response.status === 200) {
+        setMessages([]);
+      } else {
+        console.log("Error resetting conversation");
+      }
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsResetting(false);
+    }
   };
 
   return (
@@ -32,10 +30,10 @@ const Title = ({ setMessages }) => {
       <div className="italic">Rachel</div>
       <button
         onClick={resetConversation}
-        className={
-          "transition-all duration-300 text-blue-300 hover:text-pink-500 " +
-          (isResetting ? "animate-pulse" : "")
-        }
+        className={`transition-all duration-300 text-blue-300 hover:text-pink-500 ${
+          isResetting ? "animate-pulse" : ""
+        }`}
+        disabled={isResetting}
       >
         <RefreshIcon style={{ width: "24px", height: "24px" }} />
       </button>

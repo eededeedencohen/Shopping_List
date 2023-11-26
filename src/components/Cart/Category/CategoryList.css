@@ -1,0 +1,45 @@
+.category-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px; /* Space between items */
+    margin: 0 auto; /* Centering container */
+    width: 95%; /* Almost full width */
+  }
+  
+  .category-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden; /* Ensure the overlay doesn't spill out */
+    height: 150px; /* Adjusted height */
+  }
+  
+  
+  .category-item img {
+    width: 100%; /* Image takes full width of its container */
+    height: 100%; /* Image takes full height of its container */
+    object-fit: cover; /* Ensures image covers the area without distortion */
+    opacity: 0.5;
+    border-radius: 10px;
+  }
+  
+  .category-item p {
+    position: absolute;
+    top: 85%; /* Center vertically */
+    left: 50%;
+    width: 100%;
+    transform: translate(-50%, -50%); 
+    color: rgb(9, 0, 141);
+    margin: 0;
+    padding: 0;
+    text-align: center;
+    font-size: 2rem; 
+    font-weight: bold; 
+    z-index: 2;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); /* Shadow with horizontal and vertical offsets, blur radius, and color */
+  }

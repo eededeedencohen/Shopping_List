@@ -3,6 +3,7 @@ import {
   getAllProducts,
   getByBarcode,
   getProductByQuery,
+  getReplacementProducts
 } from "../network/productService";
 
 const ProductContext = createContext(null);
@@ -51,6 +52,10 @@ export const ProductContextProvider = ({ children }) => {
       return [];
     }
   };
+
+  
+
+  
 
   return (
     <ProductContext.Provider

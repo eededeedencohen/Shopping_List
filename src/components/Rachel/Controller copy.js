@@ -4,6 +4,7 @@ import Title from "./Title";
 import RecordMessage from "./RecordMessage";
 import "./Controller.css";
 import axios from "axios";
+import { DOMAIN } from "../../constants";
 
 const Controller = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -39,7 +40,7 @@ const Controller = () => {
 
           // send form data to API endpoint
           await axios
-            .post("http://localhost:8000/api/v1/voice-assistent/post-audio", {
+            .post(`${DOMAIN}}/api/v1/voice-assistent/post-audio`, {
               data: base64data,
             })
             .then((res) => {
