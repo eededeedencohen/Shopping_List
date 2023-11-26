@@ -1,7 +1,18 @@
 import httpClient from ".";
 
 const getAllProducts = async () => {
-  const products = await httpClient.get("/products");
+
+  let activeCartResponse = await httpClient.get("/carts/active/1");
+  // console.log(activeCartResponse);
+  let activeCart =  JSON.parse(activeCartResponse.data);
+  const supermarketID = activeCart.data.cart.supermarketID;
+  let products; 
+  if (supermarketID === 0) {
+    products = await httpClient.get("/products");
+  } else {
+    products = await httpClient.get(`/products/supermarket/${supermarketID}`);
+  }
+    
   return products;
 };
 

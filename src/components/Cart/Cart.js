@@ -144,7 +144,6 @@ export default function Cart() {
       </div>
     );
   }
-
   return (
     <div className="cart">
       <Modal isOpen={isModalOpen} onClose={() => setModalOpen(false)}>
