@@ -30,6 +30,7 @@ export default function Cart() {
     cart,
     loadCart,
     updateProductAmount,
+    removeProductFromCart,
     confirmCart,
     updateAmount,
     updateSupermarketID,
@@ -80,6 +81,19 @@ export default function Cart() {
     }
   };
 
+  const handleDelete = async (barcode) => {
+    setIsLoading(true); // Start spinner before the delete process
+    try {
+      await removeProductFromCart(userId, barcode); // Await the server response
+      await loadCart(userId); // Reload cart data from the server
+    } catch (error) {
+      console.error("Error deleting product from cart:", error);
+      // Handle any errors here, such as showing a message to the user
+    } finally {
+      setIsLoading(false); // Stop spinner after the delete process and handling any errors
+    }
+  };
+
   // const handleConfirmCart = async () => {
   //   await confirmCart(userId);
   //   // Perform any additional actions or navigation after cart confirmation
@@ -101,10 +115,6 @@ export default function Cart() {
 
   const handleCheapestCart = async () => {
     await getCheapestSupermarketCart(userId);
-    // set 10 seconds:
-    setTimeout(() => {}, 10000);
-    await updateSupermarketID(userId, cart.supermarket.supermarketID);
-    setTimeout(() => {}, 5000);
     await loadCart(userId);
   };
 
@@ -178,14 +188,32 @@ export default function Cart() {
         </button>
       </div>
 
-      {/* <div className="cart-optimization">
-        <button
-          className="cart-optimization__button"
-          onClick={() => handleCheapestCart()}
-        >
-          מחיר הכי זול
-        </button>
-      </div> */}
+      <div className="cart-optimization">
+  <button
+    className="cart-optimization__button"
+    onClick={() => {
+      const handleOptimizeCart = async () => {
+        setIsReplaceSupermarket(true); // Start loading
+        try {
+          // Code to optimize the cart goes here
+          await handleCheapestCart();
+        } catch (error) {
+          console.error("Error optimizing cart:", error);
+          // Optionally, handle the error
+        } finally {
+          setIsReplaceSupermarket(false); // Stop loading regardless of success or error
+        }
+      };
+
+      handleOptimizeCart();
+    }}
+    disabled={isReplaceSupermarket} // Disable the button when loading
+  >
+    מחיר הכי זול
+  </button>
+  {isReplaceSupermarket && <div>Loading...</div>} {/* Optional: Show a loading indicator */}
+</div>
+
 
       <div className="supermarket">
         <div className="supermarket-title">
@@ -271,6 +299,18 @@ export default function Cart() {
                       handleUpdate(item.product.barcode);
                     }}
                   />
+                  <button
+                  
+                    onClick={
+                      () => {
+                        setCurrentBarcode(item.product.barcode);
+                        console.log(currentBarcode);
+                        handleDelete(item.product.barcode);
+                      }
+                    }
+                  >
+                    מחק מוצר
+                  </button>
                   <button
                     className="update-amount__plus-button"
                     onClick={() => handleIncrement(item.product.barcode)}

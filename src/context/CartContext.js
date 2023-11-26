@@ -2,6 +2,7 @@ import { createContext, useCallback, useContext, useState } from "react";
 import {
   getActiveCartByUserID,
   updateProductInCart,
+  deleteProductFromCart,
 } from "../network/cartService";
 // import confirmCart from "../network/confirmCart";
 import confirmSupermarketCart from "../network/confirmSupermarketCart";
@@ -23,6 +24,10 @@ export const CartContextProvider = ({ children }) => {
       (cartItem) => cartItem.product.barcode === barcode
     );
     await updateProductInCart(userId, barcode, cartItem.amount);
+  };
+
+  const removeProductFromCart = async (userId, barcode) => {
+    await deleteProductFromCart(userId, barcode);
   };
 
   const handleConfirmCart = async (userId) => {
@@ -65,6 +70,7 @@ export const CartContextProvider = ({ children }) => {
         loadCart,
         updateAmount,
         updateProductAmount,
+        removeProductFromCart,
         confirmCart: handleConfirmCart,
         updateSupermarketID: handleSupermarketUpdate,
         getCheapestSupermarketCart: handleCheapestSupermarket,
