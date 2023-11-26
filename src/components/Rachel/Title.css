@@ -1,0 +1,92 @@
+.bg-indigo-500 {
+  --bg-opacity: 1;
+  background-color: #5a67d8;
+  background-color: rgba(90, 103, 216, var(--bg-opacity));
+}
+
+.p-5 {
+  padding: 1.25rem;
+}
+
+.flex {
+  display: flex;
+}
+
+.justify-between {
+  justify-content: space-between;
+}
+
+.items-center {
+  align-items: center;
+}
+
+.w-full {
+  width: 100%;
+}
+
+.p-4 {
+  padding: 1rem;
+}
+
+.bg-gray-900 {
+  --bg-opacity: 1;
+  background-color: #1f2937;
+  background-color: rgba(31, 41, 55, var(--bg-opacity));
+}
+
+.text-white {
+  --text-opacity: 1;
+  color: #fff;
+  color: rgba(255, 255, 255, var(--text-opacity));
+}
+
+.font-bold {
+  font-weight: 700;
+}
+
+.shadow {
+  --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  box-shadow: var(--shadow);
+}
+
+.italic{
+    font-style: italic;
+}
+
+/* transition-all duration-300 text-blue-300 hover:text-pink-500 */
+
+.transition-all{
+    transition-property: all;
+}
+
+.duration-300{
+    transition-duration: 300ms;
+}
+
+.text-blue-300{
+    --text-opacity: 1;
+    color: #7ab6eb;
+    color: rgba(167, 243, 208, var(--text-opacity));
+}
+
+.hover\:text-pink-500:hover{
+    --text-opacity: 1;
+    color: #ec4899;
+    color: rgba(236, 72, 153, var(--text-opacity));
+}
+
+/* animate-pulse */
+
+@keyframes pulse {
+    0%,
+    100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: .5;
+    }
+}
+
+.element{
+    background: linear-gradient(to right, #64B5F6, #34D399);
+}
