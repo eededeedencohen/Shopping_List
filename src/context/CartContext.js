@@ -36,7 +36,6 @@ export const CartContextProvider = ({ children }) => {
     setCart(confirmedCart);
   };
 
-
   const updateAmount = (productBarcode, type) => {
     const productsWithPrices = cart.productsWithPrices.map((cartItem) => {
       if (cartItem.product.barcode === productBarcode) {
@@ -58,9 +57,6 @@ export const CartContextProvider = ({ children }) => {
   const handleCheapestSupermarket = async (userId) => {
     const cheapestSupermarket = await getCheapestSupermarket(userId);
     return cheapestSupermarket;
-    // const supermarketID = cheapestSupermarket.supermarket.supermarketID;
-    // await updateSupermarketID(userId, supermarketID);
-    // setCart(cheapestSupermarket);
   };
 
   return (
