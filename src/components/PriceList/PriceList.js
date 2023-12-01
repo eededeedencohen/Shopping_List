@@ -4,9 +4,7 @@ import { Children, useEffect, useState } from "react";
 import { Spin } from "antd";
 import ProductsImages from "../Images/ProductsImages";
 import SupermarketImage from "../Cart/supermarketImage";
-import "./PriceListNew.css";
-
-import "./PriceList.css"; // Importing a CSS file for styling
+import "./PriceList.css";
 
 export default function PriceList() {
   const { barcode } = useParams();
