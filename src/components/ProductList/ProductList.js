@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useProducts } from "../../context/ProductContext";
+import { useCart } from "../../context/CartContext";
 import "./ProductsListNew.css";
 import { useNavigate } from "react-router";
 import { addProductToCart } from "../../network/cartService";
@@ -61,6 +62,7 @@ const SearchBar = ({ onQuery }) => {
   const [isFocused, setIsFocused] = useState(false);
   const [hasText, setHasText] = useState(false);
   const inputRef = useRef();
+  
 
   useEffect(() => {
     // Only trigger the search if there is text in the input field
@@ -103,6 +105,8 @@ function ProductsListNew() {
   const { products, searchProducts } = useProducts();
   const [searchResults, setSearchResults] = useState();
   const [productAmounts, setProductAmounts] = useState({});
+  const { loadCart } = useCart();
+  const userId = "1"; // Replace with actual user ID
   const nav = useNavigate();
 
   const moveToPriceList = (productBarcode) => {
@@ -132,6 +136,8 @@ function ProductsListNew() {
     );
     console.log(response);
     // Consider handling the response (e.g., displaying a message to the user)
+    await loadCart(userId);
+
   };
 
   return (

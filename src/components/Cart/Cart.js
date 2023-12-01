@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useCart } from "../../context/CartContext";
+import { useProducts } from "../../context/ProductContext";
 import Modal from "./Modal";
 import ReplaceProducts from "./ReplaceProducts";
 import "./Cart.css";
@@ -36,6 +37,7 @@ export default function Cart() {
     updateSupermarketID,
     getCheapestSupermarketCart,
   } = useCart();
+  const { loadProducts } = useProducts();
   const userId = "1"; // Replace this with the actual userId.
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -116,6 +118,7 @@ export default function Cart() {
   const handleCheapestCart = async () => {
     await getCheapestSupermarketCart(userId);
     await loadCart(userId);
+    await loadProducts();
   };
 
   if (isLoading || !cart) {
@@ -169,6 +172,7 @@ export default function Cart() {
               try {
                 await updateSupermarketID(userId, supermarketID);
                 await loadCart(userId);
+                await loadProducts(); 
               } catch (error) {
                 console.error(
                   "Error updating supermarket ID or loading cart:",

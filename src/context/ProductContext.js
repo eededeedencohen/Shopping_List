@@ -29,6 +29,18 @@ export const ProductContextProvider = ({ children }) => {
     getProducts();
   }, []);
 
+  const loadProducts = async () => {
+    setLoading(true);
+    try {
+      const response = await getAllProducts();
+      setProducts(JSON.parse(response.data).data.products);
+    } catch (e) {
+      setError(e);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const getProductByBarcode = async (barcode) => {
     setLoading(true);
     try {
@@ -56,6 +68,7 @@ export const ProductContextProvider = ({ children }) => {
     <ProductContext.Provider
       value={{
         products,
+        loadProducts,
         error,
         getProductByBarcode, // exposing the function
         productByBarcode, // exposing the state
