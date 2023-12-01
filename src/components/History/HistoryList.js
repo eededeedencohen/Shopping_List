@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
 import "./HistoryList.css";
-// import shoppingCartImage from "./shopping-cart.png";
 import Images from "../ProductList/Images";
 import SupermarketImage from "../Cart/supermarketImage";
 import { DOMAIN } from "../../constants";
@@ -30,9 +29,6 @@ const weightUnitToHebrew = (weight) => {
   }
 };
 
-const limitToFourWords = (str) => {
-  return str.split(" ").slice(0, 4).join(" ");
-};
 
 const formatPrice = (price) => {
   return Number(price).toFixed(2) + "₪";
@@ -45,9 +41,7 @@ const HistoryList = () => {
   useEffect(() => {
     const fetchCart = async () => {
       try {
-        const response = await axios.get(
-          `${DOMAIN}/api/v1/history/${id}`
-        );
+        const response = await axios.get(`${DOMAIN}/api/v1/history/${id}`);
         setCart(response.data.data.history);
       } catch (error) {
         console.error("Error fetching cart:", error);
@@ -67,9 +61,6 @@ const HistoryList = () => {
         <div className="details-supermaeket-history__date">
           {formatDate(cart.date)}
         </div>
-        {/* <div className="details-supermaeket-history__cart-icon">
-          <img src={shoppingCartImage} alt="Shopping Cart" />
-        </div> */}
         <div className="details-supermaeket-history__logo">
           <SupermarketImage supermarketName={cart.supermarketName} />
         </div>
@@ -95,24 +86,50 @@ const HistoryList = () => {
             </div>
             <div className="history__product-price-container">
               <div className="history__product-amount">
-                {product.amount + "x"}
+                <span style={{ fontSize: "0.8rem", alignSelf: "flex-end" }}>
+                  'יח
+                </span>
+                <span>{product.amount}</span>
               </div>
               <div className="history__product-price">
-                <h5>:סה"כ</h5>
                 <p>{formatPrice(product.totalPrice)}</p>
               </div>
             </div>
             <div className="history__product-details">
-              <div className="history__product-name">
-                {limitToFourWords(product.name)}
-              </div>
-              <div className="history__product-weight">
-                <h3>{product.weight}</h3>
-                <h4>{weightUnitToHebrew(product.unit)}</h4>
-              </div>
-              <div className="history__product-brand">{product.brand}</div>
-              <div className="history__product-barcode">{product.barcode}</div>
-            </div>
+                  <div className="history__product-name">
+                    <span>
+                      {product.name.split(" ").slice(0, 3).join(" ")}
+                    </span>
+                  </div>
+                  <div
+                    style={{
+                      display: "flex",
+                      flexDirection: "row-reverse",
+                      alignItems: "center",
+                      width: "100%",
+                    }}
+                  >
+                    <div className="history__product-weight" style={{display:"flex"}}>
+                      <span style={{marginRight:"3px"}}>{weightUnitToHebrew(product.unit)} </span>
+                      <span className="size" >{product.weight}</span>
+                    </div>
+                    <span
+                      style={{
+                        paddingRight: "3px",
+                        paddingLeft: "3px",
+                        display: "flex",
+                        alignSelf: "normal",
+                      }}
+                    >
+                      {" "}
+                      |{" "}
+                    </span>
+                    <div className="history__product-brand">
+                      <span>{product.brand}</span>
+                    </div>
+                  </div>
+                </div>
+                <div className="history__line"/>
           </div>
         ))}
       </div>

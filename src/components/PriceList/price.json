@@ -1,0 +1,1737 @@
+{
+    "status": "success",
+    "results": 91,
+    "data": {
+        "prices": [
+            {
+                "_id": "6470d83ada4a243eb086059b",
+                "barcode": "66318",
+                "supermarket": {
+                    "supermarketID": 112,
+                    "name": "שופרסל דיל",
+                    "address": "האומן 17",
+                    "city": "ירושלים",
+                    "_id": "6470d83ada4a243eb086059c"
+                },
+                "price": 4.3,
+                "hasDiscount": true,
+                "discount": {
+                    "units": 6,
+                    "priceForUnit": 3.33,
+                    "totalPrice": 19.98,
+                    "_id": "6470d83ada4a243eb086059d"
+                }
+            },
+            {
+                "_id": "6470d83ada4a243eb086059e",
+                "barcode": "66318",
+                "supermarket": {
+                    "supermarketID": 113,
+                    "name": "שופרסל דיל",
+                    "address": "שד' משה דין 106",
+                    "city": "ירושלים",
+                    "_id": "6470d83ada4a243eb086059f"
+                },
+                "price": 4.3,
+                "hasDiscount": true,
+                "discount": {
+                    "units": 6,
+                    "priceForUnit": 3.33,
+                    "totalPrice": 19.98,
+                    "_id": "6470d83ada4a243eb08605a0"
+                }
+            },
+            {
+                "_id": "6470d83ada4a243eb08605ce",
+                "barcode": "66318",
+                "supermarket": {
+                    "supermarketID": 108,
+                    "name": "שופרסל אקספרס",
+                    "address": "בית חולים הדסה",
+                    "city": "ירושלים",
+                    "_id": "6470d83ada4a243eb08605cf"
+                },
+                "price": 4.9,
+                "hasDiscount": true,
+                "discount": {
+                    "units": 5,
+                    "priceForUnit": 4,
+                    "totalPrice": 20,
+                    "_id": "6470d83ada4a243eb08605d0"
+                }
+            },
+            {
+                "_id": "6470d83ada4a243eb0860661",
+                "barcode": "66318",
+                "supermarket": {
+                    "supermarketID": 150,
+                    "name": "yellow",
+                    "address": "11 דרך בית לחם",
+                    "city": "ירושלים",
+                    "_id": "6470d83ada4a243eb0860662"
+                },
+                "price": 8.5,
+                "hasDiscount": true,
+                "discount": {
+                    "units": 3,
+                    "priceForUnit": 6,
+                    "totalPrice": 18,
+                    "_id": "6470d83ada4a243eb0860663"
+                }
+            },
+            {
+                "_id": "6470d83ada4a243eb0860568",
+                "barcode": "66318",
+                "supermarket": {
+                    "supermarketID": 128,
+                    "name": "שערי רווחה",
+                    "address": "25 ירמיהו",
+                    "city": "ירושלים",
+                    "_id": "6470d83ada4a243eb0860569"
+                },
+                "price": 3.9,
+                "hasDiscount": true,
+                "discount": {
+                    "units": 3,
+                    "priceForUnit": 3,
+                    "totalPrice": 9,
+                    "_id": "6470d83ada4a243eb086056a"
+                }
+            },
+            {
+                "_id": "6470d83ada4a243eb0860583",
+                "barcode": "66318",
+                "supermarket": {
+                    "supermarketID": 105,
+                    "name": "רמי לוי",
+                    "address": "בית הדפוס 13",
+                    "city": "ירושלים",
+                    "_id": "6470d83ada4a243eb0860584"
+                },
+                "price": 3.9,
+                "hasDiscount": true,
+                "discount": {
+                    "units": 1,
+                    "priceForUnit": 1.9,
+                    "totalPrice": 1.9,
+                    "_id": "6470d83ada4a243eb0860585"
+                }
+            },
+            {
+                "_id": "6470d83ada4a243eb0860625",
+                "barcode": "66318",
+                "supermarket": {
+                    "supermarketID": 80,
+                    "name": "סופר פארם",
+                    "address": "יד-חרוצים 18",
+                    "city": "ירושלים",
+                    "_id": "6470d83ada4a243eb0860626"
+                },
+                "price": 6.9,
+                "hasDiscount": true,
+                "discount": {
+                    "units": 3,
+                    "priceForUnit": 4.3,
+                    "totalPrice": 12.899999999999999,
+                    "_id": "6470d83ada4a243eb0860627"
+                }
+            },
+            {
+                "_id": "6470d83ada4a243eb0860628",
+                "barcode": "66318",
+                "supermarket": {
+                    "supermarketID": 94,
+                    "name": "סופר פארם",
+                    "address": "קינג ג'ורג' 27",
+                    "city": "ירושלים",
+                    "_id": "6470d83ada4a243eb0860629"
+                },
+                "price": 6.9,
+                "hasDiscount": true,
+                "discount": {
+                    "units": 3,
+                    "priceForUnit": 4.3,
+                    "totalPrice": 12.899999999999999,
+                    "_id": "6470d83ada4a243eb086062a"
+                }
+            },
+            {
+                "_id": "6470d83ada4a243eb0860646",
+                "barcode": "66318",
+                "supermarket": {
+                    "supermarketID": 153,
+                    "name": "yellow",
+                    "address": "דרך הנרייטה סאלד",
+                    "city": "ירושלים",
+                    "_id": "6470d83ada4a243eb0860647"
+                },
+                "price": 8.5,
+                "hasDiscount": true,
+                "discount": {
+                    "units": 3,
+                    "priceForUnit": 6,
+                    "totalPrice": 18,
+                    "_id": "6470d83ada4a243eb0860648"
+                }
+            },
+            {
+                "_id": "6470d83ada4a243eb086065e",
+                "barcode": "66318",
+                "supermarket": {
+                    "supermarketID": 160,
+                    "name": "yellow",
+                    "address": "19 המלך דוד",
+                    "city": "ירושלים",
+                    "_id": "6470d83ada4a243eb086065f"
+                },
+                "price": 8.5,
+                "hasDiscount": true,
+                "discount": {
+                    "units": 3,
+                    "priceForUnit": 6,
+                    "totalPrice": 18,
+                    "_id": "6470d83ada4a243eb0860660"
+                }
+            },
+            {
+                "_id": "6470d83ada4a243eb08605e0",
+                "barcode": "66318",
+                "supermarket": {
+                    "supermarketID": 42,
+                    "name": "מחסני השוק בשבילך",
+                    "address": "שי עגנון 20 ",
+                    "city": "ירושלים",
+                    "_id": "6470d83ada4a243eb08605e1"
+                },
+                "price": 5.2,
+                "hasDiscount": true,
+                "discount": {
+                    "units": 9,
+                    "priceForUnit": 3.22,
+                    "totalPrice": 28.98,
+                    "_id": "6470d83ada4a243eb08605e2"
+                }
+            },
+            {
+                "_id": "6470d83ada4a243eb0860607",
+                "barcode": "66318",
+                "supermarket": {
+                    "supermarketID": 86,
+                    "name": "סופר פארם",
+                    "address": "קניון ירושלים",
+                    "city": "ירושלים",
+                    "_id": "6470d83ada4a243eb0860608"
+                },
+                "price": 6.9,
+                "hasDiscount": true,
+                "discount": {
+                    "units": 3,
+                    "priceForUnit": 4.3,
+                    "totalPrice": 12.899999999999999,
+                    "_id": "6470d83ada4a243eb0860609"
+                }
+            },
+            {
+                "_id": "6470d83ada4a243eb086063d",
+                "barcode": "66318",
+                "supermarket": {
+                    "supermarketID": 147,
+                    "name": "yellow",
+                    "address": "שד משה דיין- גבעת זאב",
+                    "city": "ירושלים",
+                    "_id": "6470d83ada4a243eb086063e"
+                },
+                "price": 8.5,
+                "hasDiscount": true,
+                "discount": {
+                    "units": 3,
+                    "priceForUnit": 6,
+                    "totalPrice": 18,
+                    "_id": "6470d83ada4a243eb086063f"
+                }
+            },
+            {
+                "_id": "6470d83ada4a243eb086064c",
+                "barcode": "66318",
+                "supermarket": {
+                    "supermarketID": 152,
+                    "name": "yellow",
+                    "address": "איזור תעשיה תלפיות",
+                    "city": "ירושלים",
+                    "_id": "6470d83ada4a243eb086064d"
+                },
+                "price": 8.5,
+                "hasDiscount": true,
+                "discount": {
+                    "units": 3,
+                    "priceForUnit": 6,
+                    "totalPrice": 18,
+                    "_id": "6470d83ada4a243eb086064e"
+                }
+            },
+            {
+                "_id": "6470d83ada4a243eb0860589",
+                "barcode": "66318",
+                "supermarket": {
+                    "supermarketID": 99,
+                    "name": "רמי לוי",
+                    "address": "איזור תעשיה עטרות",
+                    "city": "ירושלים",
+                    "_id": "6470d83ada4a243eb086058a"
+                },
+                "price": 3.9,
+                "hasDiscount": true,
+                "discount": {
+                    "units": 10,
+                    "priceForUnit": 3,
+                    "totalPrice": 30,
+                    "_id": "6470d83ada4a243eb086058b"
+                }
+            },
+            {
+                "_id": "6470d83ada4a243eb086058f",
+                "barcode": "66318",
+                "supermarket": {
+                    "supermarketID": 138,
+                    "name": "Carrefour city (קרפור סיטי)",
+                    "address": "אבי זהר",
+                    "city": "ירושלים",
+                    "_id": "6470d83ada4a243eb0860590"
+                },
+                "price": 4.3,
+                "hasDiscount": true,
+                "discount": {
+                    "units": 5,
+                    "priceForUnit": 4,
+                    "totalPrice": 20,
+                    "_id": "6470d83ada4a243eb0860591"
+                }
+            },
+            {
+                "_id": "6470d83ada4a243eb0860598",
+                "barcode": "66318",
+                "supermarket": {
+                    "supermarketID": 111,
+                    "name": "שופרסל דיל",
+                    "address": "שח\"ל 79",
+                    "city": "ירושלים",
+                    "_id": "6470d83ada4a243eb0860599"
+                },
+                "price": 4.3,
+                "hasDiscount": true,
+                "discount": {
+                    "units": 6,
+                    "priceForUnit": 3.33,
+                    "totalPrice": 19.98,
+                    "_id": "6470d83ada4a243eb086059a"
+                }
+            },
+            {
+                "_id": "6470d83ada4a243eb08605ad",
+                "barcode": "66318",
+                "supermarket": {
+                    "supermarketID": 37,
+                    "name": "יש בשכונה",
+                    "address": "פארן 7 רמת אשכול",
+                    "city": "ירושלים",
+                    "_id": "6470d83ada4a243eb08605ae"
+                },
+                "price": 4.5,
+                "hasDiscount": true,
+                "discount": {
+                    "units": 10,
+                    "priceForUnit": 3.2,
+                    "totalPrice": 32,
+                    "_id": "6470d83ada4a243eb08605af"
+                }
+            },
+            {
+                "_id": "6470d83ada4a243eb08605dd",
+                "barcode": "66318",
+                "supermarket": {
+                    "supermarketID": 48,
+                    "name": "מחסני השוק בשבילך",
+                    "address": "דיסקין 7",
+                    "city": "ירושלים",
+                    "_id": "6470d83ada4a243eb08605de"
+                },
+                "price": 5.2,
+                "hasDiscount": true,
+                "discount": {
+                    "units": 9,
+                    "priceForUnit": 3.22,
+                    "totalPrice": 28.98,
+                    "_id": "6470d83ada4a243eb08605df"
+                }
+            },
+            {
+                "_id": "6470d83ada4a243eb08605f5",
+                "barcode": "66318",
+                "supermarket": {
+                    "supermarketID": 91,
+                    "name": "סופר פארם",
+                    "address": "רח' עמק רפאים 24",
+                    "city": "ירושלים",
+                    "_id": "6470d83ada4a243eb08605f6"
+                },
+                "price": 6.9,
+                "hasDiscount": true,
+                "discount": {
+                    "units": 3,
+                    "priceForUnit": 4.3,
+                    "totalPrice": 12.899999999999999,
+                    "_id": "6470d83ada4a243eb08605f7"
+                }
+            },
+            {
+                "_id": "6470d83ada4a243eb0860604",
+                "barcode": "66318",
+                "supermarket": {
+                    "supermarketID": 79,
+                    "name": "סופר פארם",
+                    "address": "רח' אסתר רזיאל 2",
+                    "city": "ירושלים",
+                    "_id": "6470d83ada4a243eb0860605"
+                },
+                "price": 6.9,
+                "hasDiscount": true,
+                "discount": {
+                    "units": 3,
+                    "priceForUnit": 4.3,
+                    "totalPrice": 12.899999999999999,
+                    "_id": "6470d83ada4a243eb0860606"
+                }
+            },
+            {
+                "_id": "6470d83ada4a243eb0860613",
+                "barcode": "66318",
+                "supermarket": {
+                    "supermarketID": 87,
+                    "name": "סופר פארם",
+                    "address": "שלמה המלך 9",
+                    "city": "ירושלים",
+                    "_id": "6470d83ada4a243eb0860614"
+                },
+                "price": 6.9,
+                "hasDiscount": true,
+                "discount": {
+                    "units": 3,
+                    "priceForUnit": 4.3,
+                    "totalPrice": 12.899999999999999,
+                    "_id": "6470d83ada4a243eb0860615"
+                }
+            },
+            {
+                "_id": "6470d83ada4a243eb0860640",
+                "barcode": "66318",
+                "supermarket": {
+                    "supermarketID": 148,
+                    "name": "yellow",
+                    "address": "עקיבא אזולאי 1את גבעת שאול",
+                    "city": "ירושלים",
+                    "_id": "6470d83ada4a243eb0860641"
+                },
+                "price": 8.5,
+                "hasDiscount": true,
+                "discount": {
+                    "units": 3,
+                    "priceForUnit": 6,
+                    "totalPrice": 18,
+                    "_id": "6470d83ada4a243eb0860642"
+                }
+            },
+            {
+                "_id": "6470d83ada4a243eb0860595",
+                "barcode": "66318",
+                "supermarket": {
+                    "supermarketID": 12,
+                    "name": "ויקטורי",
+                    "address": "דרך אגודת הספורט מכבי 1",
+                    "city": "ירושלים",
+                    "_id": "6470d83ada4a243eb0860596"
+                },
+                "price": 4.3,
+                "hasDiscount": true,
+                "discount": {
+                    "units": 6,
+                    "priceForUnit": 3.33,
+                    "totalPrice": 19.98,
+                    "_id": "6470d83ada4a243eb0860597"
+                }
+            },
+            {
+                "_id": "6470d83ada4a243eb08605b0",
+                "barcode": "66318",
+                "supermarket": {
+                    "supermarketID": 116,
+                    "name": "שופרסל שלי",
+                    "address": "אורוגאי 3",
+                    "city": "ירושלים",
+                    "_id": "6470d83ada4a243eb08605b1"
+                },
+                "price": 4.9,
+                "hasDiscount": true,
+                "discount": {
+                    "units": 5,
+                    "priceForUnit": 4,
+                    "totalPrice": 20,
+                    "_id": "6470d83ada4a243eb08605b2"
+                }
+            },
+            {
+                "_id": "6470d83ada4a243eb08605ec",
+                "barcode": "66318",
+                "supermarket": {
+                    "supermarketID": 49,
+                    "name": "מחסני השוק בשבילך",
+                    "address": "הפלמ\"ח 42 ",
+                    "city": "ירושלים",
+                    "_id": "6470d83ada4a243eb08605ed"
+                },
+                "price": 5.2,
+                "hasDiscount": true,
+                "discount": {
+                    "units": 9,
+                    "priceForUnit": 3.22,
+                    "totalPrice": 28.98,
+                    "_id": "6470d83ada4a243eb08605ee"
+                }
+            },
+            {
+                "_id": "6470d83ada4a243eb08605f2",
+                "barcode": "66318",
+                "supermarket": {
+                    "supermarketID": 77,
+                    "name": "סופר פארם",
+                    "address": "שד' גולדה-מאיר פינת הקונגרס-הציוני",
+                    "city": "ירושלים",
+                    "_id": "6470d83ada4a243eb08605f3"
+                },
+                "price": 5.9,
+                "hasDiscount": true,
+                "discount": {
+                    "units": 3,
+                    "priceForUnit": 4.3,
+                    "totalPrice": 12.899999999999999,
+                    "_id": "6470d83ada4a243eb08605f4"
+                }
+            },
+            {
+                "_id": "6470d83ada4a243eb086055c",
+                "barcode": "66318",
+                "supermarket": {
+                    "supermarketID": 1,
+                    "name": "אושר עד",
+                    "address": "בית הדפוס 29",
+                    "city": "ירושלים",
+                    "_id": "6470d83ada4a243eb086055d"
+                },
+                "price": 3,
+                "hasDiscount": true,
+                "discount": {
+                    "units": 1,
+                    "priceForUnit": 1.9,
+                    "totalPrice": 1.9,
+                    "_id": "6470d83ada4a243eb086055e"
+                }
+            },
+            {
+                "_id": "6470d83ada4a243eb08605bc",
+                "barcode": "66318",
+                "supermarket": {
+                    "supermarketID": 117,
+                    "name": "שופרסל שלי",
+                    "address": "אגרון 1",
+                    "city": "ירושלים",
+                    "_id": "6470d83ada4a243eb08605bd"
+                },
+                "price": 4.9,
+                "hasDiscount": true,
+                "discount": {
+                    "units": 5,
+                    "priceForUnit": 4,
+                    "totalPrice": 20,
+                    "_id": "6470d83ada4a243eb08605be"
+                }
+            },
+            {
+                "_id": "6470d83ada4a243eb08605cb",
+                "barcode": "66318",
+                "supermarket": {
+                    "supermarketID": 107,
+                    "name": "שופרסל אקספרס",
+                    "address": "קרן היסוד 27",
+                    "city": "ירושלים",
+                    "_id": "6470d83ada4a243eb08605cc"
+                },
+                "price": 4.9,
+                "hasDiscount": true,
+                "discount": {
+                    "units": 5,
+                    "priceForUnit": 4,
+                    "totalPrice": 20,
+                    "_id": "6470d83ada4a243eb08605cd"
+                }
+            },
+            {
+                "_id": "6470d83ada4a243eb08605d7",
+                "barcode": "66318",
+                "supermarket": {
+                    "supermarketID": 47,
+                    "name": "מחסני השוק בשבילך",
+                    "address": "כיכר דניה",
+                    "city": "ירושלים",
+                    "_id": "6470d83ada4a243eb08605d8"
+                },
+                "price": 5.2,
+                "hasDiscount": true,
+                "discount": {
+                    "units": 9,
+                    "priceForUnit": 3.22,
+                    "totalPrice": 28.98,
+                    "_id": "6470d83ada4a243eb08605d9"
+                }
+            },
+            {
+                "_id": "6470d83ada4a243eb0860601",
+                "barcode": "66318",
+                "supermarket": {
+                    "supermarketID": 81,
+                    "name": "סופר פארם",
+                    "address": "ההסתדרות 3 ירושלים",
+                    "city": "ירושלים",
+                    "_id": "6470d83ada4a243eb0860602"
+                },
+                "price": 6.9,
+                "hasDiscount": true,
+                "discount": {
+                    "units": 3,
+                    "priceForUnit": 4.3,
+                    "totalPrice": 12.899999999999999,
+                    "_id": "6470d83ada4a243eb0860603"
+                }
+            },
+            {
+                "_id": "6470d83ada4a243eb086062b",
+                "barcode": "66318",
+                "supermarket": {
+                    "supermarketID": 88,
+                    "name": "סופר פארם",
+                    "address": "מתחם ישפרו סנטר הדסה עין כרם",
+                    "city": "ירושלים",
+                    "_id": "6470d83ada4a243eb086062c"
+                },
+                "price": 6.9,
+                "hasDiscount": true,
+                "discount": {
+                    "units": 3,
+                    "priceForUnit": 4.3,
+                    "totalPrice": 12.899999999999999,
+                    "_id": "6470d83ada4a243eb086062d"
+                }
+            },
+            {
+                "_id": "6470d83ada4a243eb0860631",
+                "barcode": "66318",
+                "supermarket": {
+                    "supermarketID": 143,
+                    "name": "yellow",
+                    "address": "כביש 60 ביציאה הדרומית מירושלים",
+                    "city": "ירושלים",
+                    "_id": "6470d83ada4a243eb0860632"
+                },
+                "price": 8.5,
+                "hasDiscount": true,
+                "discount": {
+                    "units": 3,
+                    "priceForUnit": 6,
+                    "totalPrice": 18,
+                    "_id": "6470d83ada4a243eb0860633"
+                }
+            },
+            {
+                "_id": "6470d83ada4a243eb0860649",
+                "barcode": "66318",
+                "supermarket": {
+                    "supermarketID": 151,
+                    "name": "yellow",
+                    "address": "כביש בית שמש - ים",
+                    "city": "ירושלים",
+                    "_id": "6470d83ada4a243eb086064a"
+                },
+                "price": 8.5,
+                "hasDiscount": true,
+                "discount": {
+                    "units": 3,
+                    "priceForUnit": 6,
+                    "totalPrice": 18,
+                    "_id": "6470d83ada4a243eb086064b"
+                }
+            },
+            {
+                "_id": "6470d83ada4a243eb086055f",
+                "barcode": "66318",
+                "supermarket": {
+                    "supermarketID": 39,
+                    "name": "יש חסד",
+                    "address": "נאג'רה 2",
+                    "city": "ירושלים",
+                    "_id": "6470d83ada4a243eb0860560"
+                },
+                "price": 3.9,
+                "hasDiscount": true,
+                "discount": {
+                    "units": 10,
+                    "priceForUnit": 3.2,
+                    "totalPrice": 32,
+                    "_id": "6470d83ada4a243eb0860561"
+                }
+            },
+            {
+                "_id": "6470d83ada4a243eb086056e",
+                "barcode": "66318",
+                "supermarket": {
+                    "supermarketID": 3,
+                    "name": "אושר עד",
+                    "address": "פייר קניג 26",
+                    "city": "ירושלים",
+                    "_id": "6470d83ada4a243eb086056f"
+                },
+                "price": 3.9,
+                "hasDiscount": true,
+                "discount": {
+                    "units": 10,
+                    "priceForUnit": 3,
+                    "totalPrice": 30,
+                    "_id": "6470d83ada4a243eb0860570"
+                }
+            },
+            {
+                "_id": "6470d83ada4a243eb08605fb",
+                "barcode": "66318",
+                "supermarket": {
+                    "supermarketID": 84,
+                    "name": "סופר פארם",
+                    "address": "יהודה בורלא 5",
+                    "city": "ירושלים",
+                    "_id": "6470d83ada4a243eb08605fc"
+                },
+                "price": 6.9,
+                "hasDiscount": true,
+                "discount": {
+                    "units": 3,
+                    "priceForUnit": 4.3,
+                    "totalPrice": 12.899999999999999,
+                    "_id": "6470d83ada4a243eb08605fd"
+                }
+            },
+            {
+                "_id": "6470d83ada4a243eb0860622",
+                "barcode": "66318",
+                "supermarket": {
+                    "supermarketID": 92,
+                    "name": "סופר פארם",
+                    "address": "קניון עטרות",
+                    "city": "ירושלים",
+                    "_id": "6470d83ada4a243eb0860623"
+                },
+                "price": 6.9,
+                "hasDiscount": true,
+                "discount": {
+                    "units": 3,
+                    "priceForUnit": 4.3,
+                    "totalPrice": 12.899999999999999,
+                    "_id": "6470d83ada4a243eb0860624"
+                }
+            },
+            {
+                "_id": "6470d83ada4a243eb086057a",
+                "barcode": "66318",
+                "supermarket": {
+                    "supermarketID": 127,
+                    "name": "שערי רווחה",
+                    "address": "לואיס ברנדס 3",
+                    "city": "ירושלים",
+                    "_id": "6470d83ada4a243eb086057b"
+                },
+                "price": 3.9,
+                "hasDiscount": true,
+                "discount": {
+                    "units": 3,
+                    "priceForUnit": 3,
+                    "totalPrice": 9,
+                    "_id": "6470d83ada4a243eb086057c"
+                }
+            },
+            {
+                "_id": "6470d83ada4a243eb08605c2",
+                "barcode": "66318",
+                "supermarket": {
+                    "supermarketID": 140,
+                    "name": "good מרקט",
+                    "address": "אהליאב 21",
+                    "city": "ירושלים",
+                    "_id": "6470d83ada4a243eb08605c3"
+                },
+                "price": 4.9,
+                "hasDiscount": true,
+                "discount": {
+                    "units": 10,
+                    "priceForUnit": 3.5,
+                    "totalPrice": 35,
+                    "_id": "6470d83ada4a243eb08605c4"
+                }
+            },
+            {
+                "_id": "6470d83ada4a243eb08605e3",
+                "barcode": "66318",
+                "supermarket": {
+                    "supermarketID": 50,
+                    "name": "מחסני השוק בשבילך",
+                    "address": "ההגנה 19",
+                    "city": "ירושלים",
+                    "_id": "6470d83ada4a243eb08605e4"
+                },
+                "price": 5.2,
+                "hasDiscount": true,
+                "discount": {
+                    "units": 9,
+                    "priceForUnit": 3.22,
+                    "totalPrice": 28.98,
+                    "_id": "6470d83ada4a243eb08605e5"
+                }
+            },
+            {
+                "_id": "6470d83ada4a243eb08605f8",
+                "barcode": "66318",
+                "supermarket": {
+                    "supermarketID": 93,
+                    "name": "סופר פארם",
+                    "address": "שד' משה דיין 106 ירושלים",
+                    "city": "ירושלים",
+                    "_id": "6470d83ada4a243eb08605f9"
+                },
+                "price": 6.9,
+                "hasDiscount": true,
+                "discount": {
+                    "units": 3,
+                    "priceForUnit": 4,
+                    "totalPrice": 12,
+                    "_id": "6470d83ada4a243eb08605fa"
+                }
+            },
+            {
+                "_id": "6470d83ada4a243eb086061c",
+                "barcode": "66318",
+                "supermarket": {
+                    "supermarketID": 89,
+                    "name": "סופר פארם",
+                    "address": "דרך-חברון 101",
+                    "city": "ירושלים",
+                    "_id": "6470d83ada4a243eb086061d"
+                },
+                "price": 6.9,
+                "hasDiscount": true,
+                "discount": {
+                    "units": 3,
+                    "priceForUnit": 4.3,
+                    "totalPrice": 12.899999999999999,
+                    "_id": "6470d83ada4a243eb086061e"
+                }
+            },
+            {
+                "_id": "6470d83ada4a243eb0860643",
+                "barcode": "66318",
+                "supermarket": {
+                    "supermarketID": 142,
+                    "name": "yellow",
+                    "address": "שכונת נוף הריםמבשרת ציון",
+                    "city": "ירושלים",
+                    "_id": "6470d83ada4a243eb0860644"
+                },
+                "price": 8.5,
+                "hasDiscount": true,
+                "discount": {
+                    "units": 3,
+                    "priceForUnit": 6,
+                    "totalPrice": 18,
+                    "_id": "6470d83ada4a243eb0860645"
+                }
+            },
+            {
+                "_id": "6470d83ada4a243eb086065b",
+                "barcode": "66318",
+                "supermarket": {
+                    "supermarketID": 158,
+                    "name": "yellow",
+                    "address": "מחלף שער הגיא כביש ים תא",
+                    "city": "ירושלים",
+                    "_id": "6470d83ada4a243eb086065c"
+                },
+                "price": 8.5,
+                "hasDiscount": true,
+                "discount": {
+                    "units": 3,
+                    "priceForUnit": 6,
+                    "totalPrice": 18,
+                    "_id": "6470d83ada4a243eb086065d"
+                }
+            },
+            {
+                "_id": "6470d83ada4a243eb0860577",
+                "barcode": "66318",
+                "supermarket": {
+                    "supermarketID": 102,
+                    "name": "רמי לוי",
+                    "address": "דרך החורש 90",
+                    "city": "ירושלים",
+                    "_id": "6470d83ada4a243eb0860578"
+                },
+                "price": 3.9,
+                "hasDiscount": true,
+                "discount": {
+                    "units": 10,
+                    "priceForUnit": 3,
+                    "totalPrice": 30,
+                    "_id": "6470d83ada4a243eb0860579"
+                }
+            },
+            {
+                "_id": "6470d83ada4a243eb0860592",
+                "barcode": "66318",
+                "supermarket": {
+                    "supermarketID": 35,
+                    "name": "יוחננוף",
+                    "address": "האומן 10",
+                    "city": "ירושלים",
+                    "_id": "6470d83ada4a243eb0860593"
+                },
+                "price": 4.3,
+                "hasDiscount": true,
+                "discount": {
+                    "units": 6,
+                    "priceForUnit": 3.33,
+                    "totalPrice": 19.98,
+                    "_id": "6470d83ada4a243eb0860594"
+                }
+            },
+            {
+                "_id": "6470d83ada4a243eb08605a7",
+                "barcode": "66318",
+                "supermarket": {
+                    "supermarketID": 121,
+                    "name": "שוק העיר",
+                    "address": "קניון רמות",
+                    "city": "ירושלים",
+                    "_id": "6470d83ada4a243eb08605a8"
+                },
+                "price": 4.3,
+                "hasDiscount": true,
+                "discount": {
+                    "units": 8,
+                    "priceForUnit": 3.63,
+                    "totalPrice": 29.04,
+                    "_id": "6470d83ada4a243eb08605a9"
+                }
+            },
+            {
+                "_id": "6470d83ada4a243eb086060a",
+                "barcode": "66318",
+                "supermarket": {
+                    "supermarketID": 82,
+                    "name": "סופר פארם",
+                    "address": "כנפי נשרים 22 גבעת שאול ירושלים",
+                    "city": "ירושלים",
+                    "_id": "6470d83ada4a243eb086060b"
+                },
+                "price": 6.9,
+                "hasDiscount": true,
+                "discount": {
+                    "units": 3,
+                    "priceForUnit": 4.3,
+                    "totalPrice": 12.899999999999999,
+                    "_id": "6470d83ada4a243eb086060c"
+                }
+            },
+            {
+                "_id": "6470d83ada4a243eb0860619",
+                "barcode": "66318",
+                "supermarket": {
+                    "supermarketID": 136,
+                    "name": "BE",
+                    "address": "בית חולים שערי צדק",
+                    "city": "ירושלים",
+                    "_id": "6470d83ada4a243eb086061a"
+                },
+                "price": 6.9,
+                "hasDiscount": true,
+                "discount": {
+                    "units": 3,
+                    "priceForUnit": 4.33,
+                    "totalPrice": 12.99,
+                    "_id": "6470d83ada4a243eb086061b"
+                }
+            },
+            {
+                "_id": "6470d83ada4a243eb0860571",
+                "barcode": "66318",
+                "supermarket": {
+                    "supermarketID": 100,
+                    "name": "רמי לוי",
+                    "address": "האומן",
+                    "city": "ירושלים",
+                    "_id": "6470d83ada4a243eb0860572"
+                },
+                "price": 3.9,
+                "hasDiscount": true,
+                "discount": {
+                    "units": 10,
+                    "priceForUnit": 3,
+                    "totalPrice": 30,
+                    "_id": "6470d83ada4a243eb0860573"
+                }
+            },
+            {
+                "_id": "6470d83ada4a243eb086056b",
+                "barcode": "66318",
+                "supermarket": {
+                    "supermarketID": 2,
+                    "name": "אושר עד",
+                    "address": "שמגר 16",
+                    "city": "ירושלים",
+                    "_id": "6470d83ada4a243eb086056c"
+                },
+                "price": 3.9,
+                "hasDiscount": true,
+                "discount": {
+                    "units": 10,
+                    "priceForUnit": 3,
+                    "totalPrice": 30,
+                    "_id": "6470d83ada4a243eb086056d"
+                }
+            },
+            {
+                "_id": "6470d83ada4a243eb08605b6",
+                "barcode": "66318",
+                "supermarket": {
+                    "supermarketID": 124,
+                    "name": "שוק מהדרין",
+                    "address": "גדליה נוימן 6",
+                    "city": "ירושלים",
+                    "_id": "6470d83ada4a243eb08605b7"
+                },
+                "price": 4.9,
+                "hasDiscount": true,
+                "discount": {
+                    "units": 6,
+                    "priceForUnit": 3.33,
+                    "totalPrice": 19.98,
+                    "_id": "6470d83ada4a243eb08605b8"
+                }
+            },
+            {
+                "_id": "6470d83ada4a243eb08605e6",
+                "barcode": "66318",
+                "supermarket": {
+                    "supermarketID": 44,
+                    "name": "מחסני השוק בשבילך",
+                    "address": "שדרות משה דיין",
+                    "city": "ירושלים",
+                    "_id": "6470d83ada4a243eb08605e7"
+                },
+                "price": 5.2,
+                "hasDiscount": true,
+                "discount": {
+                    "units": 9,
+                    "priceForUnit": 3.22,
+                    "totalPrice": 28.98,
+                    "_id": "6470d83ada4a243eb08605e8"
+                }
+            },
+            {
+                "_id": "6470d83ada4a243eb08605fe",
+                "barcode": "66318",
+                "supermarket": {
+                    "supermarketID": 78,
+                    "name": "סופר פארם",
+                    "address": "גילה",
+                    "city": "ירושלים",
+                    "_id": "6470d83ada4a243eb08605ff"
+                },
+                "price": 6.9,
+                "hasDiscount": true,
+                "discount": {
+                    "units": 3,
+                    "priceForUnit": 4.3,
+                    "totalPrice": 12.899999999999999,
+                    "_id": "6470d83ada4a243eb0860600"
+                }
+            },
+            {
+                "_id": "6470d83ada4a243eb0860610",
+                "barcode": "66318",
+                "supermarket": {
+                    "supermarketID": 85,
+                    "name": "סופר פארם",
+                    "address": "פייר קניג 26 תלפיות ירושלים",
+                    "city": "ירושלים",
+                    "_id": "6470d83ada4a243eb0860611"
+                },
+                "price": 6.9,
+                "hasDiscount": true,
+                "discount": {
+                    "units": 3,
+                    "priceForUnit": 4.3,
+                    "totalPrice": 12.899999999999999,
+                    "_id": "6470d83ada4a243eb0860612"
+                }
+            },
+            {
+                "_id": "6470d83ada4a243eb0860562",
+                "barcode": "66318",
+                "supermarket": {
+                    "supermarketID": 45,
+                    "name": "מחסני השוק בשבילך",
+                    "address": "מרכז מסחרי",
+                    "city": "ירושלים",
+                    "_id": "6470d83ada4a243eb0860563"
+                },
+                "price": 3.9,
+                "hasDiscount": true,
+                "discount": {
+                    "units": 9,
+                    "priceForUnit": 3.22,
+                    "totalPrice": 28.98,
+                    "_id": "6470d83ada4a243eb0860564"
+                }
+            },
+            {
+                "_id": "6470d83ada4a243eb08605a1",
+                "barcode": "66318",
+                "supermarket": {
+                    "supermarketID": 114,
+                    "name": "שופרסל דיל",
+                    "address": "צביה ויצחק 17",
+                    "city": "ירושלים",
+                    "_id": "6470d83ada4a243eb08605a2"
+                },
+                "price": 4.3,
+                "hasDiscount": true,
+                "discount": {
+                    "units": 6,
+                    "priceForUnit": 3.33,
+                    "totalPrice": 19.98,
+                    "_id": "6470d83ada4a243eb08605a3"
+                }
+            },
+            {
+                "_id": "6470d83ada4a243eb08605da",
+                "barcode": "66318",
+                "supermarket": {
+                    "supermarketID": 51,
+                    "name": "מחסני השוק בשבילך",
+                    "address": "מאיר גרשון פ. יוסף נדבה 3/1 ",
+                    "city": "ירושלים",
+                    "_id": "6470d83ada4a243eb08605db"
+                },
+                "price": 5.2,
+                "hasDiscount": true,
+                "discount": {
+                    "units": 9,
+                    "priceForUnit": 3.22,
+                    "totalPrice": 28.98,
+                    "_id": "6470d83ada4a243eb08605dc"
+                }
+            },
+            {
+                "_id": "6470d83ada4a243eb08605ef",
+                "barcode": "66318",
+                "supermarket": {
+                    "supermarketID": 43,
+                    "name": "מחסני השוק בשבילך",
+                    "address": "רחוב דב גרונר",
+                    "city": "ירושלים",
+                    "_id": "6470d83ada4a243eb08605f0"
+                },
+                "price": 5.2,
+                "hasDiscount": true,
+                "discount": {
+                    "units": 9,
+                    "priceForUnit": 3.22,
+                    "totalPrice": 28.98,
+                    "_id": "6470d83ada4a243eb08605f1"
+                }
+            },
+            {
+                "_id": "6470d83ada4a243eb086060d",
+                "barcode": "66318",
+                "supermarket": {
+                    "supermarketID": 83,
+                    "name": "סופר פארם",
+                    "address": "יפו 234 ירושלים",
+                    "city": "ירושלים",
+                    "_id": "6470d83ada4a243eb086060e"
+                },
+                "price": 6.9,
+                "hasDiscount": true,
+                "discount": {
+                    "units": 3,
+                    "priceForUnit": 4.3,
+                    "totalPrice": 12.899999999999999,
+                    "_id": "6470d83ada4a243eb086060f"
+                }
+            },
+            {
+                "_id": "6470d83ada4a243eb086058c",
+                "barcode": "66318",
+                "supermarket": {
+                    "supermarketID": 40,
+                    "name": "יש חסד",
+                    "address": "ברכת אברהם 22",
+                    "city": "ירושלים",
+                    "_id": "6470d83ada4a243eb086058d"
+                },
+                "price": 3.9,
+                "hasDiscount": true,
+                "discount": {
+                    "units": 10,
+                    "priceForUnit": 3.2,
+                    "totalPrice": 32,
+                    "_id": "6470d83ada4a243eb086058e"
+                }
+            },
+            {
+                "_id": "6470d83ada4a243eb08605a4",
+                "barcode": "66318",
+                "supermarket": {
+                    "supermarketID": 115,
+                    "name": "שופרסל דיל",
+                    "address": "פייר קניג 35",
+                    "city": "ירושלים",
+                    "_id": "6470d83ada4a243eb08605a5"
+                },
+                "price": 4.3,
+                "hasDiscount": true,
+                "discount": {
+                    "units": 6,
+                    "priceForUnit": 3.33,
+                    "totalPrice": 19.98,
+                    "_id": "6470d83ada4a243eb08605a6"
+                }
+            },
+            {
+                "_id": "6470d83ada4a243eb08605aa",
+                "barcode": "66318",
+                "supermarket": {
+                    "supermarketID": 36,
+                    "name": "יש בשכונה",
+                    "address": "שאולזון 56",
+                    "city": "ירושלים",
+                    "_id": "6470d83ada4a243eb08605ab"
+                },
+                "price": 4.5,
+                "hasDiscount": true,
+                "discount": {
+                    "units": 10,
+                    "priceForUnit": 3.2,
+                    "totalPrice": 32,
+                    "_id": "6470d83ada4a243eb08605ac"
+                }
+            },
+            {
+                "_id": "6470d83ada4a243eb086062e",
+                "barcode": "66318",
+                "supermarket": {
+                    "supermarketID": 149,
+                    "name": "yellow",
+                    "address": "אונטרמן שכונת גילה",
+                    "city": "ירושלים",
+                    "_id": "6470d83ada4a243eb086062f"
+                },
+                "price": 8.5,
+                "hasDiscount": true,
+                "discount": {
+                    "units": 3,
+                    "priceForUnit": 6,
+                    "totalPrice": 18,
+                    "_id": "6470d83ada4a243eb0860630"
+                }
+            },
+            {
+                "_id": "6470d83ada4a243eb0860658",
+                "barcode": "66318",
+                "supermarket": {
+                    "supermarketID": 157,
+                    "name": "yellow",
+                    "address": "שד בן-צבי",
+                    "city": "ירושלים",
+                    "_id": "6470d83ada4a243eb0860659"
+                },
+                "price": 8.5,
+                "hasDiscount": true,
+                "discount": {
+                    "units": 3,
+                    "priceForUnit": 6,
+                    "totalPrice": 18,
+                    "_id": "6470d83ada4a243eb086065a"
+                }
+            },
+            {
+                "_id": "6470d83ada4a243eb0860664",
+                "barcode": "66318",
+                "supermarket": {
+                    "supermarketID": 141,
+                    "name": "yellow",
+                    "address": "שד ויצמן ביציאה מהעיר לתא",
+                    "city": "ירושלים",
+                    "_id": "6470d83ada4a243eb0860665"
+                },
+                "price": 8.5,
+                "hasDiscount": true,
+                "discount": {
+                    "units": 3,
+                    "priceForUnit": 6,
+                    "totalPrice": 18,
+                    "_id": "6470d83ada4a243eb0860666"
+                }
+            },
+            {
+                "_id": "6470d83ada4a243eb0860667",
+                "barcode": "66318",
+                "supermarket": {
+                    "supermarketID": 53,
+                    "name": "מיני סופר אלונית",
+                    "address": "היצירה 1",
+                    "city": "ירושלים",
+                    "_id": "6470d83ada4a243eb0860668"
+                },
+                "price": 8.5,
+                "hasDiscount": true,
+                "discount": {
+                    "units": 2,
+                    "priceForUnit": 7,
+                    "totalPrice": 14,
+                    "_id": "6470d83ada4a243eb0860669"
+                }
+            },
+            {
+                "_id": "6470d83ada4a243eb086066a",
+                "barcode": "66318",
+                "supermarket": {
+                    "supermarketID": 159,
+                    "name": "yellow",
+                    "address": "44 שבטי ישראל",
+                    "city": "ירושלים",
+                    "_id": "6470d83ada4a243eb086066b"
+                },
+                "price": 8.5,
+                "hasDiscount": true,
+                "discount": {
+                    "units": 3,
+                    "priceForUnit": 6,
+                    "totalPrice": 18,
+                    "_id": "6470d83ada4a243eb086066c"
+                }
+            },
+            {
+                "_id": "6470d83ada4a243eb08605b3",
+                "barcode": "66318",
+                "supermarket": {
+                    "supermarketID": 52,
+                    "name": "מחסני השוק מהדרין",
+                    "address": "מרכז מסחרי נווה יעקב",
+                    "city": "ירושלים",
+                    "_id": "6470d83ada4a243eb08605b4"
+                },
+                "price": 4.9,
+                "hasDiscount": true,
+                "discount": {
+                    "units": 9,
+                    "priceForUnit": 3.22,
+                    "totalPrice": 28.98,
+                    "_id": "6470d83ada4a243eb08605b5"
+                }
+            },
+            {
+                "_id": "6470d83ada4a243eb08605e9",
+                "barcode": "66318",
+                "supermarket": {
+                    "supermarketID": 46,
+                    "name": "מחסני השוק בשבילך",
+                    "address": "דהומי 6 ",
+                    "city": "ירושלים",
+                    "_id": "6470d83ada4a243eb08605ea"
+                },
+                "price": 5.2,
+                "hasDiscount": true,
+                "discount": {
+                    "units": 9,
+                    "priceForUnit": 3.22,
+                    "totalPrice": 28.98,
+                    "_id": "6470d83ada4a243eb08605eb"
+                }
+            },
+            {
+                "_id": "6470d83ada4a243eb0860637",
+                "barcode": "66318",
+                "supermarket": {
+                    "supermarketID": 145,
+                    "name": "yellow",
+                    "address": "חניון מוזיאון ישראל",
+                    "city": "ירושלים",
+                    "_id": "6470d83ada4a243eb0860638"
+                },
+                "price": 8.5,
+                "hasDiscount": true,
+                "discount": {
+                    "units": 3,
+                    "priceForUnit": 6,
+                    "totalPrice": 18,
+                    "_id": "6470d83ada4a243eb0860639"
+                }
+            },
+            {
+                "_id": "6470d83ada4a243eb086057d",
+                "barcode": "66318",
+                "supermarket": {
+                    "supermarketID": 103,
+                    "name": "רמי לוי",
+                    "address": "הפרסה 3",
+                    "city": "ירושלים",
+                    "_id": "6470d83ada4a243eb086057e"
+                },
+                "price": 3.9,
+                "hasDiscount": true,
+                "discount": {
+                    "units": 10,
+                    "priceForUnit": 3,
+                    "totalPrice": 30,
+                    "_id": "6470d83ada4a243eb086057f"
+                }
+            },
+            {
+                "_id": "6470d83ada4a243eb0860586",
+                "barcode": "66318",
+                "supermarket": {
+                    "supermarketID": 106,
+                    "name": "רמי לוי",
+                    "address": "כנפי נשרים 26",
+                    "city": "ירושלים",
+                    "_id": "6470d83ada4a243eb0860587"
+                },
+                "price": 3.9,
+                "hasDiscount": true,
+                "discount": {
+                    "units": 1,
+                    "priceForUnit": 1.9,
+                    "totalPrice": 1.9,
+                    "_id": "6470d83ada4a243eb0860588"
+                }
+            },
+            {
+                "_id": "6470d83ada4a243eb08605c8",
+                "barcode": "66318",
+                "supermarket": {
+                    "supermarketID": 109,
+                    "name": "שופרסל אקספרס",
+                    "address": "הדישון 1",
+                    "city": "ירושלים",
+                    "_id": "6470d83ada4a243eb08605c9"
+                },
+                "price": 4.9,
+                "hasDiscount": true,
+                "discount": {
+                    "units": 5,
+                    "priceForUnit": 4,
+                    "totalPrice": 20,
+                    "_id": "6470d83ada4a243eb08605ca"
+                }
+            },
+            {
+                "_id": "6470d83ada4a243eb08605d4",
+                "barcode": "66318",
+                "supermarket": {
+                    "supermarketID": 139,
+                    "name": "good מרקט",
+                    "address": "מאה שערים 42",
+                    "city": "ירושלים",
+                    "_id": "6470d83ada4a243eb08605d5"
+                },
+                "price": 4.9,
+                "hasDiscount": true,
+                "discount": {
+                    "units": 10,
+                    "priceForUnit": 3.5,
+                    "totalPrice": 35,
+                    "_id": "6470d83ada4a243eb08605d6"
+                }
+            },
+            {
+                "_id": "6470d83ada4a243eb0860616",
+                "barcode": "66318",
+                "supermarket": {
+                    "supermarketID": 90,
+                    "name": "סופר פארם",
+                    "address": "אבי זוהר 7 בית הכרם ירושלים",
+                    "city": "ירושלים",
+                    "_id": "6470d83ada4a243eb0860617"
+                },
+                "price": 6.9,
+                "hasDiscount": true,
+                "discount": {
+                    "units": 3,
+                    "priceForUnit": 4.3,
+                    "totalPrice": 12.899999999999999,
+                    "_id": "6470d83ada4a243eb0860618"
+                }
+            },
+            {
+                "_id": "6470d83ada4a243eb086063a",
+                "barcode": "66318",
+                "supermarket": {
+                    "supermarketID": 146,
+                    "name": "yellow",
+                    "address": "99 דרך חברון",
+                    "city": "ירושלים",
+                    "_id": "6470d83ada4a243eb086063b"
+                },
+                "price": 8.5,
+                "hasDiscount": true,
+                "discount": {
+                    "units": 3,
+                    "priceForUnit": 6,
+                    "totalPrice": 18,
+                    "_id": "6470d83ada4a243eb086063c"
+                }
+            },
+            {
+                "_id": "6470d83ada4a243eb086064f",
+                "barcode": "66318",
+                "supermarket": {
+                    "supermarketID": 154,
+                    "name": "yellow",
+                    "address": "1 פיקוד מרכז",
+                    "city": "ירושלים",
+                    "_id": "6470d83ada4a243eb0860650"
+                },
+                "price": 8.5,
+                "hasDiscount": true,
+                "discount": {
+                    "units": 3,
+                    "priceForUnit": 6,
+                    "totalPrice": 18,
+                    "_id": "6470d83ada4a243eb0860651"
+                }
+            },
+            {
+                "_id": "6470d83ada4a243eb0860565",
+                "barcode": "66318",
+                "supermarket": {
+                    "supermarketID": 38,
+                    "name": "יש חסד",
+                    "address": "כנפי נשרים 24",
+                    "city": "ירושלים",
+                    "_id": "6470d83ada4a243eb0860566"
+                },
+                "price": 3.9,
+                "hasDiscount": true,
+                "discount": {
+                    "units": 10,
+                    "priceForUnit": 3.2,
+                    "totalPrice": 32,
+                    "_id": "6470d83ada4a243eb0860567"
+                }
+            },
+            {
+                "_id": "6470d83ada4a243eb0860580",
+                "barcode": "66318",
+                "supermarket": {
+                    "supermarketID": 104,
+                    "name": "רמי לוי",
+                    "address": "איזור התעשיה שער בנימין",
+                    "city": "ירושלים",
+                    "_id": "6470d83ada4a243eb0860581"
+                },
+                "price": 3.9,
+                "hasDiscount": true,
+                "discount": {
+                    "units": 10,
+                    "priceForUnit": 3,
+                    "totalPrice": 30,
+                    "_id": "6470d83ada4a243eb0860582"
+                }
+            },
+            {
+                "_id": "6470d83ada4a243eb08605b9",
+                "barcode": "66318",
+                "supermarket": {
+                    "supermarketID": 125,
+                    "name": "שוק מהדרין",
+                    "address": "ריינס 6 שכונת קרית משה",
+                    "city": "ירושלים",
+                    "_id": "6470d83ada4a243eb08605ba"
+                },
+                "price": 4.9,
+                "hasDiscount": true,
+                "discount": {
+                    "units": 6,
+                    "priceForUnit": 3.33,
+                    "totalPrice": 19.98,
+                    "_id": "6470d83ada4a243eb08605bb"
+                }
+            },
+            {
+                "_id": "6470d83ada4a243eb08605d1",
+                "barcode": "66318",
+                "supermarket": {
+                    "supermarketID": 41,
+                    "name": "מגה בעיר",
+                    "address": "בית\"ר פינת ינובסקי",
+                    "city": "ירושלים",
+                    "_id": "6470d83ada4a243eb08605d2"
+                },
+                "price": 4.9,
+                "hasDiscount": true,
+                "discount": {
+                    "units": 5,
+                    "priceForUnit": 4,
+                    "totalPrice": 20,
+                    "_id": "6470d83ada4a243eb08605d3"
+                }
+            },
+            {
+                "_id": "6470d83ada4a243eb0860655",
+                "barcode": "66318",
+                "supermarket": {
+                    "supermarketID": 156,
+                    "name": "yellow",
+                    "address": "גולומב",
+                    "city": "ירושלים",
+                    "_id": "6470d83ada4a243eb0860656"
+                },
+                "price": 8.5,
+                "hasDiscount": true,
+                "discount": {
+                    "units": 3,
+                    "priceForUnit": 6,
+                    "totalPrice": 18,
+                    "_id": "6470d83ada4a243eb0860657"
+                }
+            },
+            {
+                "_id": "6470d83ada4a243eb0860574",
+                "barcode": "66318",
+                "supermarket": {
+                    "supermarketID": 101,
+                    "name": "רמי לוי",
+                    "address": "יד חרוצים 18",
+                    "city": "ירושלים",
+                    "_id": "6470d83ada4a243eb0860575"
+                },
+                "price": 3.9,
+                "hasDiscount": true,
+                "discount": {
+                    "units": 10,
+                    "priceForUnit": 3,
+                    "totalPrice": 30,
+                    "_id": "6470d83ada4a243eb0860576"
+                }
+            },
+            {
+                "_id": "6470d83ada4a243eb08605bf",
+                "barcode": "66318",
+                "supermarket": {
+                    "supermarketID": 122,
+                    "name": "שוק העיר",
+                    "address": "קדרון 10",
+                    "city": "ירושלים",
+                    "_id": "6470d83ada4a243eb08605c0"
+                },
+                "price": 4.9,
+                "hasDiscount": true,
+                "discount": {
+                    "units": 5,
+                    "priceForUnit": 4,
+                    "totalPrice": 20,
+                    "_id": "6470d83ada4a243eb08605c1"
+                }
+            },
+            {
+                "_id": "6470d83ada4a243eb08605c5",
+                "barcode": "66318",
+                "supermarket": {
+                    "supermarketID": 118,
+                    "name": "שופרסל שלי",
+                    "address": "בורלא 1 ",
+                    "city": "ירושלים",
+                    "_id": "6470d83ada4a243eb08605c6"
+                },
+                "price": 4.9,
+                "hasDiscount": true,
+                "discount": {
+                    "units": 5,
+                    "priceForUnit": 4,
+                    "totalPrice": 20,
+                    "_id": "6470d83ada4a243eb08605c7"
+                }
+            },
+            {
+                "_id": "6470d83ada4a243eb086061f",
+                "barcode": "66318",
+                "supermarket": {
+                    "supermarketID": 76,
+                    "name": "סופר פארם",
+                    "address": "רח' יפו 29",
+                    "city": "ירושלים",
+                    "_id": "6470d83ada4a243eb0860620"
+                },
+                "price": 6.9,
+                "hasDiscount": true,
+                "discount": {
+                    "units": 3,
+                    "priceForUnit": 4.3,
+                    "totalPrice": 12.899999999999999,
+                    "_id": "6470d83ada4a243eb0860621"
+                }
+            },
+            {
+                "_id": "6470d83ada4a243eb0860634",
+                "barcode": "66318",
+                "supermarket": {
+                    "supermarketID": 144,
+                    "name": "yellow",
+                    "address": "מישור אדומים",
+                    "city": "ירושלים",
+                    "_id": "6470d83ada4a243eb0860635"
+                },
+                "price": 8.5,
+                "hasDiscount": true,
+                "discount": {
+                    "units": 3,
+                    "priceForUnit": 6,
+                    "totalPrice": 18,
+                    "_id": "6470d83ada4a243eb0860636"
+                }
+            },
+            {
+                "_id": "6470d83ada4a243eb0860652",
+                "barcode": "66318",
+                "supermarket": {
+                    "supermarketID": 155,
+                    "name": "yellow",
+                    "address": "5 פארן",
+                    "city": "ירושלים",
+                    "_id": "6470d83ada4a243eb0860653"
+                },
+                "price": 8.5,
+                "hasDiscount": true,
+                "discount": {
+                    "units": 3,
+                    "priceForUnit": 6,
+                    "totalPrice": 18,
+                    "_id": "6470d83ada4a243eb0860654"
+                }
+            }
+        ]
+    }
+}

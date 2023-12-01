@@ -136,10 +136,10 @@
 .cart .product {
   display: flex;
   flex-direction: row;
-  align-items: center;
-  justify-content: center;
+  align-items: flex-start;
+  justify-content: flex-start;
   width: 100%;
-  margin: 1rem;
+  margin: 0.5rem;
   margin-left: 0;
   flex-direction: row-reverse;
 }
@@ -147,22 +147,29 @@
 .cart .product-details {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  width: 33%;
+  align-items: flex-start;
+  justify-content: flex-start;
+  width: 40%;
+  color: #2f416e;
 }
 
 .cart .product-details__name {
+  display: flex;
   font-size: 1rem;
   font-weight: bold;
   margin-bottom: 5px;
+  width: 100%;
+  justify-content: flex-end;
+}
+
+.cart .product-details__name span {
+  margin-right: 5px;
 }
 
 .cart .product-details__brand {
   font-size: 1rem;
   font-weight: bold;
   margin-bottom: 5px;
-  color: brown;
 }
 
 .cart .product-details__weight {
@@ -187,7 +194,22 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  width: 33%;
+  width: 30%;
+}
+
+.cart .product-price__amount {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  justify-content: center;
+}
+
+.cart .product-price__amount span {
+  margin-right: 2px;
+  margin-left: 2px;
+  font-size: 1.2rem;
+  color: #2f416e;
+  align-self: baseline;
 }
 
 .cart .product-image {
@@ -195,20 +217,27 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  width: 33%;
+  width: 30%;
+}
+
+.cart .product-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
 }
 
 .cart .product-price__total-price {
   background-color: rgb(183, 183, 183);
   border-radius: 7px;
-  margin-top: 0.8rem;
+  margin-top: 0.5rem;
+  padding: 3px;
 }
 
 .cart .update-amount {
   display: flex;
-  flex-direction: column;
+  flex-direction: row-reverse;
   align-items: center;
-  justify-content: center;
+  justify-content: space-between;
 }
 
 .cart .update-amount__new {
@@ -218,6 +247,7 @@
   justify-content: center;
   margin-top: 0.8rem;
   margin-bottom: 0.8rem;
+  margin-right: 1rem;
 }
 
 .cart .update-amount__amount-input {
@@ -241,12 +271,11 @@
 }
 
 .cart .update-amount__plus-button {
-  /*css for the pus button*/
   background-color: green;
   border-radius: 50%;
-  width: 40px;
-  height: 40px;
-  border: none;
+  width: 50px;
+  height: 50px;
+  border: 2px solid #ccc;
   color: white;
   font-size: 1rem;
   font-weight: bold;
@@ -254,7 +283,13 @@
   margin-right: 10px;
   margin-left: 10px;
   outline: none;
-  transition: transform 0.2s;
+  transition: transform 0.2s, box-shadow 0.2s;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.cart .update-amount__plus-button:hover {
+  background-color: darkgreen;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
 }
 
 .cart .update-amount__plus-button:active {
@@ -262,12 +297,11 @@
 }
 
 .cart .update-amount__minus-button {
-  /*css for the minus button*/
   background-color: red;
   border-radius: 50%;
-  width: 40px;
-  height: 40px;
-  border: none;
+  width: 50px;
+  height: 50px;
+  border: 2px solid #ccc;
   color: white;
   font-size: 1rem;
   font-weight: bold;
@@ -275,11 +309,40 @@
   margin-right: 10px;
   margin-left: 10px;
   outline: none;
-  transition: transform 0.2s;
+  transition: transform 0.2s, box-shadow 0.2s;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.cart .update-amount__minus-button:hover {
+  background-color: darkred;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
 }
 
 .cart .update-amount__minus-button:active {
   transform: scale(0.9);
+}
+
+.cart__delete-product {
+  display: flex;
+  margin-left: 1rem;
+}
+
+.cart__delete-product button {
+  background-color: rgb(193, 0, 0);
+  border: none;
+  cursor: pointer;
+  padding: 10px; /* Increased padding for a larger button */
+  border-radius: 5px;
+  width: 40px; /* Specify a width for the button */
+  height: 40px; /* Specify a height for the button */
+  display: flex; /* To center the icon inside the button */
+  justify-content: center; /* Center icon horizontally */
+  align-items: center; /* Center icon vertically */
+}
+
+.cart__delete-product button img {
+  width: 24px; /* Increase the width of the trash icon */
+  height: 24px; /* Increase the height of the trash icon */
 }
 
 .spinner-container {

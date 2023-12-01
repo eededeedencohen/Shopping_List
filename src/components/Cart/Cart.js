@@ -7,6 +7,7 @@ import "./Cart.css";
 import { Spin } from "antd";
 import Images from "../ProductList/Images";
 import SupermarketImage from "./supermarketImage";
+import trashIcon from './trash.png'; 
 
 export const convertWeightUnit = (weightUnit) => {
   weightUnit = weightUnit.toLowerCase();
@@ -172,7 +173,7 @@ export default function Cart() {
               try {
                 await updateSupermarketID(userId, supermarketID);
                 await loadCart(userId);
-                await loadProducts(); 
+                await loadProducts();
               } catch (error) {
                 console.error(
                   "Error updating supermarket ID or loading cart:",
@@ -192,31 +193,31 @@ export default function Cart() {
       </div>
 
       <div className="cart-optimization">
-  <button
-    className="cart-optimization__button"
-    onClick={() => {
-      const handleOptimizeCart = async () => {
-        setIsReplaceSupermarket(true); // Start loading
-        try {
-          // Code to optimize the cart goes here
-          await handleCheapestCart();
-        } catch (error) {
-          console.error("Error optimizing cart:", error);
-          // Optionally, handle the error
-        } finally {
-          setIsReplaceSupermarket(false); // Stop loading regardless of success or error
-        }
-      };
+        <button
+          className="cart-optimization__button"
+          onClick={() => {
+            const handleOptimizeCart = async () => {
+              setIsReplaceSupermarket(true); // Start loading
+              try {
+                // Code to optimize the cart goes here
+                await handleCheapestCart();
+              } catch (error) {
+                console.error("Error optimizing cart:", error);
+                // Optionally, handle the error
+              } finally {
+                setIsReplaceSupermarket(false); // Stop loading regardless of success or error
+              }
+            };
 
-      handleOptimizeCart();
-    }}
-    disabled={isReplaceSupermarket} // Disable the button when loading
-  >
-    מחיר הכי זול
-  </button>
-  {isReplaceSupermarket && <div>Loading...</div>} {/* Optional: Show a loading indicator */}
-</div>
-
+            handleOptimizeCart();
+          }}
+          disabled={isReplaceSupermarket} // Disable the button when loading
+        >
+          מחיר הכי זול
+        </button>
+        {isReplaceSupermarket && <div>Loading...</div>}{" "}
+        {/* Optional: Show a loading indicator */}
+      </div>
 
       <div className="supermarket">
         <div className="supermarket-title">
@@ -247,6 +248,10 @@ export default function Cart() {
       <div className="products">
         {cart &&
           cart.productsWithPrices.map((item, index) => (
+            // ===========================================
+            //  START FROM HERE TO ORGENIZE THE PRODUCTS
+            // ===========================================
+
             <div key={index}>
               <div
                 className="product"
@@ -256,33 +261,63 @@ export default function Cart() {
                 }}
               >
                 <div className="product-details">
-                  <h4 className="product-details__name">
-                    {item.product.name.split(" ").slice(0, 3).join(" ")}
-                  </h4>
-                  <h4 className="product-details__brand">
-                    {item.product.brand}
-                  </h4>
-                  <div className="product-details__weight">
-                    <h4 className="unit">
-                      {convertWeightUnit(item.product.unitWeight)}
-                    </h4>
-                    <h4 className="size">{item.product.weight}</h4>
+                  <div className="product-details__name">
+                    <span>
+                      {item.product.name.split(" ").slice(0, 3).join(" ")}
+                    </span>
+                  </div>
+                  <div
+                    style={{
+                      display: "flex",
+                      flexDirection: "row-reverse",
+                      alignItems: "center",
+                      paddingRight: "5px",
+                      width: "100%",
+                    }}
+                  >
+                    <div className="product-details__weight">
+                      <span>{convertWeightUnit(item.product.unitWeight)} </span>
+                      <span className="size">{item.product.weight}</span>
+                    </div>
+                    <span
+                      style={{
+                        paddingRight: "3px",
+                        paddingLeft: "3px",
+                        display: "flex",
+                        alignSelf: "normal",
+                      }}
+                    >
+                      {" "}
+                      |{" "}
+                    </span>
+                    <div className="product-details__brand">
+                      <span>{item.product.brand}</span>
+                    </div>
                   </div>
                 </div>
                 <div className="product-price">
-                  <h4 className="product-price__amount">
-                    {item.amount} :יחידות
-                  </h4>
-                  <h4 className="product-price__total-price">
-                    {parseFloat(item.totalPrice).toFixed(2)}
-                    {""}
-                    <b style={{ fontSize: "1.2em" }}>₪</b>{" "}
-                  </h4>
+                  <div className="product-price__amount">
+                    <span style={{ fontSize: "0.8rem", alignSelf: "baseline" }}>
+                      'יח
+                    </span>
+                    <span>{item.amount}</span>
+                  </div>
+                  <div className="product-price__total-price">
+                    <b style={{ fontSize: "1.2em" }}>₪</b>
+                    <span style={{ fontSize: "1.2rem" }}>
+                      {parseFloat(item.totalPrice).toFixed(2)}
+                    </span>
+                  </div>
                 </div>
                 <div className="product-image">
                   <Images barcode={item.product.barcode} />
                 </div>
               </div>
+
+              {/* =======================================
+              END HERE TO ORGENIZE THE PRODUCTS 
+              ===========================================*/}
+
               <div className="update-amount">
                 <div className="update-amount__new">
                   <button
@@ -302,23 +337,23 @@ export default function Cart() {
                       handleUpdate(item.product.barcode);
                     }}
                   />
-                  <button
-                  
-                    onClick={
-                      () => {
-                        setCurrentBarcode(item.product.barcode);
-                        console.log(currentBarcode);
-                        handleDelete(item.product.barcode);
-                      }
-                    }
-                  >
-                    מחק מוצר
-                  </button>
+
                   <button
                     className="update-amount__plus-button"
                     onClick={() => handleIncrement(item.product.barcode)}
                   >
                     +
+                  </button>
+                </div>
+                <div className="cart__delete-product">
+                  <button
+                    onClick={() => {
+                      setCurrentBarcode(item.product.barcode);
+                      console.log(currentBarcode);
+                      handleDelete(item.product.barcode);
+                    }}
+                  >
+                    <img src={trashIcon} alt="Delete" />
                   </button>
                 </div>
               </div>

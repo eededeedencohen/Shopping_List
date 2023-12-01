@@ -52,7 +52,7 @@ const HistoryPage = () => {
                   {cart.date &&
                     cart.date.split("T")[0].split("-").reverse().join("-")}
                 </h1>
-                <h2>תאריך</h2>
+                <h2>:תאריך</h2>
               </div>
               <div className="cart-details-summery__time">
                 {/* time in format of HH:MM: */}
@@ -65,14 +65,14 @@ const HistoryPage = () => {
                       .slice(0, 2)
                       .join(":")}
                 </h1>
-                <h2>שעה</h2>
+                <h2>:שעה</h2>
               </div>
               <div className="cart-details-summary__total-price">
                 <h1>
                   {/* total price in format of 0.00: */}₪
                   {cart.totalPrice && cart.totalPrice.toFixed(2)}
                 </h1>
-                <h2>סה"כ</h2>
+                <h2>:סה"כ</h2>
               </div>
             </div>
           </div>
