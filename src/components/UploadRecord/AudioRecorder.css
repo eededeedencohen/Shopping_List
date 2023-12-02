@@ -1,4 +1,4 @@
-.voice-assistant{
+.voice-assistant {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -8,26 +8,30 @@
   margin-top: -60px;
 }
 
-.message-area{
+.message-area {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start; /* Changed to flex-start to start messages from the top */
   width: 100%;
-  height: 80%;
-  background-color: rgb(213, 235, 227);
+  height: 85%; /* Height as per your existing setup */
+  background-color: rgb(235, 243, 240);
+  overflow-y: auto; /* Enables vertical scrolling */
+  padding: 10px; /* Optional, for inner spacing */
+  margin-top: 2.5rem;
 }
 
-.record-area{
+.record-area {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   width: 100%;
-  height: 20%;
-  background-color: rgb(58, 58, 196);
-  box-shadow: 0px 0px 20px 0px rgba(0,0,0,1);
-  border-radius:10px 10px  0px 0px ;
+  height: 15%;
+  /* background-color: rgb(58, 58, 196);
+  box-shadow: 0px 0px 20px 0px rgba(0, 0, 0, 1); */
+  background-color: rgb(235, 243, 240);
+  border-radius: 10px 10px 0px 0px;
 }
 
 @keyframes pulsate {
@@ -42,42 +46,106 @@
   }
 }
 
-.record-area__button{
-  width: 90px;
-  height: 90px;
+.record-area__button {
+  width: 80px;
+  height: 80px;
   border-radius: 50%;
-  background-color: rgb(223, 222, 222);
+  background-color: rgb(246, 246, 246);
   border: 3px solid rgb(105, 155, 230); /* TO DO: ADDING ANIMATION OF GLOWING AROUND THE BORDER WITH THE CLOCK DIRECTION*/
-  outline: none; 
+  outline: none;
   cursor: pointer;
   transition: all 0.5s ease;
 }
 
-.record-area__button img{
+.record-area__button img {
   width: 60%;
   height: 60%;
 }
 
 @keyframes rainbow {
-  0% {background-position: 100% 50%;}
-  100% {background-position: 0 50%;}
+  0% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0 50%;
+  }
 }
 
 @keyframes glowing {
   /*
   The first box-shadow is the main glow, the others are optional.
   */
-  0% { box-shadow: 0 0 5px #105bc2, 0 0 10px #3b6db4, 0 0 15px #6386b6, 0 0 20px #98a2af; }
+  0% {
+    box-shadow: 0 0 5px #105bc2, 0 0 10px #3b6db4, 0 0 15px #6386b6,
+      0 0 20px #98a2af;
+  }
 
   /*
   The last shadow is optional - this adds a subtle glow around the element.
   */
-  100% { box-shadow: 0 0 10px #105bc2, 0 0 20px #3b6db4, 0 0 30px #6386b6, 0 0 40px #98a2af; }
+  100% {
+    box-shadow: 0 0 10px #105bc2, 0 0 20px #3b6db4, 0 0 30px #6386b6,
+      0 0 40px #98a2af;
+  }
 }
 
-
 .record-area__button.recording {
-  background: radial-gradient(circle closest-corner at 50% 50%, green, blue, indigo);
+  background: radial-gradient(
+    circle closest-corner at 50% 50%,
+    green,
+    blue,
+    indigo
+  );
   background-size: 200% 200%;
-  animation: rainbow 10s linear infinite, pulsate 1.5s ease infinite, glowing 2s infinite;
+  animation: rainbow 10s linear infinite, pulsate 1.5s ease infinite,
+    glowing 2s infinite;
+}
+
+@keyframes slideInFromLeft {
+  from {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideInFromRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* Additional CSS for message styling */
+.message {
+  padding: 10px;
+  margin: 5px;
+  border-radius: 10px;
+  max-width: 60%;
+  word-wrap: break-word;
+}
+
+.user-message {
+  align-self: flex-end;
+  background-color: #007bff;
+  color: white;
+  margin-left: auto;
+  text-align: right;
+  animation: slideInFromLeft 0.5s ease-out;
+}
+
+.assistant-message {
+  align-self: flex-start;
+  background-color: #e9ecef;
+  color: black;
+  margin-right: auto;
+  text-align: left;
+  animation: slideInFromRight 0.5s ease-out;
 }

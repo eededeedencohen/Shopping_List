@@ -33,7 +33,7 @@ function Toolbar() {
           <img src={cartIcon} alt="CartIcon" />
         </div>
       </Link>
-     
+
       <div className={`drawer ${isOpen ? "open" : ""}`}>
         <div className="routes-icons">
           <Link to="/" onClick={closeDrawer}>
@@ -77,7 +77,7 @@ function Toolbar() {
               <h1>Statistics</h1>
             </div>
           </Link>
-          <Link to="/upload-record" onClick={closeDrawer}>
+          <Link to="/audio-recorder" onClick={closeDrawer}>
             <div className="nav-item">
               <div className="nav-icon">
                 <img src={voiceAssistantIcon} alt="Grocery" />
