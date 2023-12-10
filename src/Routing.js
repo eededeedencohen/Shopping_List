@@ -10,6 +10,7 @@ import HistoryPage from "./components/History/HistoryPage";
 import HistoryList from "./components/History/HistoryList";
 import CategoryList from "./components/Cart/Category/CategoryList";
 import { Stats } from "./components/Stats/Stats";
+import TouchDirection from "./components/Finger/TouchDirection";
 
 function Routing() {
   return (
@@ -25,6 +26,7 @@ function Routing() {
       <Route path="/history" element={<HistoryPage />} />
       <Route path="/history/:id" element={<HistoryList />} />
       <Route path="/category" element={<CategoryList />} />
+      <Route path="/finger" element={<TouchDirection />} />
     </Routes>
   );
 }

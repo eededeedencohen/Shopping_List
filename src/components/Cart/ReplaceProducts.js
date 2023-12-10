@@ -39,14 +39,6 @@ function ReplaceProducts({ barcode, closeModal, loadCart, userId }) {
         });
         console.log(replaceProducts);
         setProducts(replaceProducts);
-        // End new code
-
-        // Start old code
-        // const result = await axios(
-        //   `${DOMAIN}/api/v1/products/replacement-products/${barcode}`
-        // );
-        // setProducts(result.data.data.products.products);
-        // End old code
 
         setLoading(false);
       } catch (error) {
@@ -58,24 +50,7 @@ function ReplaceProducts({ barcode, closeModal, loadCart, userId }) {
     fetchData();
   }, [barcode, cart.supermarket.supermarketID]);
 
-  // const handleProductClick = async (newBarcode) => {
-  //   try {
-  //     const response = await axios.post(
-  //       `http://localhost:8000/api/v1/carts/replace/${userId}`,
-  //       {
-  //         oldBarcode: barcode,
-  //         newBarcode: newBarcode,
-  //       }
-  //     );
-  //     console.log(response.data.data.cart);
-  //     closeModal();
-  //     loadCart(userId); // Add this line to update the cart after replacing a product
-  //   } catch (error) {
-  //     console.error("Error posting data: ", error);
-  //     closeModal();
-  //   }
-  // };
-
+  
   const handleProductClick = async (newBarcode) => {
     setIsReplacing(true); // Start spinner for replacement process
     try {

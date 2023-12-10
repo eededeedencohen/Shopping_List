@@ -20,6 +20,9 @@ export const convertWeightUnit = (weightUnit) => {
   if (weightUnit === "l") {
     return "ליטר";
   }
+  if (weightUnit === "u") {
+    return "יחידות";
+  }
   return weightUnit;
 };
 
