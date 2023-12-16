@@ -1,10 +1,12 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useProducts } from "../../context/ProductContext";
 import { useCart } from "../../context/CartContext";
-import "./ProductsListNew.css";
+import "./ProductsList.css";
 import { useNavigate } from "react-router";
 import { addProductToCart } from "../../network/cartService";
 import Image from "./Images";
+// import SearchBar from "../SearchBar/SearchBar";
+import CategoryNavigation from "./CategoryNavigation";
 
 export const convertWeightUnit = (weightUnit) => {
   weightUnit = weightUnit.toLowerCase();
@@ -60,57 +62,86 @@ const discountPriceFormat = (price) => {
   );
 };
 
-const SearchBar = ({ onQuery }) => {
-  const [lastInputTime, setLastInputTime] = useState(Date.now());
-  const [isFocused, setIsFocused] = useState(false);
-  const [hasText, setHasText] = useState(false);
-  const inputRef = useRef();
-  
 
-  useEffect(() => {
-    // Only trigger the search if there is text in the input field
-    if (inputRef.current.value.trim() !== "") {
-      const timer = setTimeout(() => {
-        onQuery(inputRef.current);
-      }, 500);
-      return () => clearTimeout(timer);
-    }
-  }, [lastInputTime, onQuery]);
 
-  const handleFocus = () => {
-    setIsFocused(true);
-  };
-
-  const handleBlur = () => {
-    setIsFocused(false);
-  };
-
-  const handleInput = (e) => {
-    setLastInputTime(Date.now());
-    setHasText(e.target.value.length > 0);
-  };
-
-  return (
-    <div className="search">
-      <input
-        ref={inputRef}
-        onFocus={handleFocus}
-        onBlur={handleBlur}
-        onInput={handleInput}
-        className="search-input"
-        placeholder={!isFocused && !hasText ? "חיפוש..." : ""}
-      />
-    </div>
-  );
-};
-
-function ProductsListNew() {
+function ProductsList() {
   const { products, searchProducts } = useProducts();
+  const { allCategories, activeCategory, setActiveCategory } = useProducts();
+  const { loadCart } = useCart();
   const [searchResults, setSearchResults] = useState();
   const [productAmounts, setProductAmounts] = useState({});
-  const { loadCart } = useCart();
   const userId = "1"; // Replace with actual user ID
   const nav = useNavigate();
+
+  const [containerStyle, setContainerStyle] = useState({});
+  const startTouch = useRef({ x: 0 });
+  const swipeDirection = useRef(null); // To store the swipe direction
+
+  const handleTouchStart = (event) => {
+    const x = event.touches[0].clientX;
+    startTouch.current = { x };
+    swipeDirection.current = null; // Reset swipe direction on new touch
+    setContainerStyle({});
+  };
+
+  const handleTouchMove = (event) => {
+    const moveX = event.touches[0].clientX;
+    const deltaX = moveX - startTouch.current.x;
+
+    if (Math.abs(deltaX) > 150) {
+      // Threshold for swipe recognition
+      swipeDirection.current = deltaX > 0 ? "right" : "left";
+    }
+  };
+
+  const handleTouchEnd = () => {
+    if (swipeDirection.current === "right") {
+      // Swipe right - previous category
+      const currentIndex = allCategories.indexOf(activeCategory);
+      const prevIndex =
+        (currentIndex - 1 + allCategories.length) % allCategories.length;
+      setActiveCategory(allCategories[prevIndex]);
+
+      // Apply the middleToRight animation for 1 second
+      setContainerStyle({ animation: "middleToRight 0.2s ease" });
+
+      // After 1 second, apply the RightToLeft animation for 1 millisecond (in one step)
+      setTimeout(() => {
+        setContainerStyle({ animation: "rightToLeft 1ms steps(1) forwards" });
+      }, 200);
+
+      // After RightToLeft animation, apply the RightToMiddle animation for 1 second
+      setTimeout(() => {
+        setContainerStyle({ animation: "leftToMiddle 0.3s ease" });
+      }, 201);
+
+      // up to the top of the page:
+      window.scrollTo(0, 0);
+    } else if (swipeDirection.current === "left") {
+      // Swipe left - next category
+      const currentIndex = allCategories.indexOf(activeCategory);
+      const nextIndex = (currentIndex + 1) % allCategories.length;
+      setActiveCategory(allCategories[nextIndex]);
+
+      // Apply the middleToLeft animation for 1 second
+      setContainerStyle({ animation: "middleToLeft 0.2s ease" });
+
+      // After 1 second, apply the LeftToRight animation for 1 millisecond (in one step)
+      setTimeout(() => {
+        setContainerStyle({ animation: "leftToRight 1ms steps(1) forwards" });
+      }, 200);
+
+      // After LeftToRight animation, apply the LeftToMiddle animation for 1 second
+      setTimeout(() => {
+        setContainerStyle({ animation: "rightToMiddle 0.3s ease" });
+      }, 201);
+
+      // up to the top of the page:
+      window.scrollTo(0, 0);
+    } else {
+      setContainerStyle({}); // Reset the container's position after the swipe
+    }
+  };
 
   const moveToPriceList = (productBarcode) => {
     nav(`/priceList/${productBarcode}`);
@@ -131,102 +162,109 @@ function ProductsListNew() {
   };
 
   const addToCart = async (barcode) => {
-    // Replace '1' with actual user ID, consider passing it as a prop or context
     const response = await addProductToCart(
-      1, // Replace with actual user ID
+      userId,
       barcode,
       productAmounts[barcode] || 0
     );
     console.log(response);
-    // Consider handling the response (e.g., displaying a message to the user)
     await loadCart(userId);
-
   };
+
+  const filteredProducts =
+    searchResults ||
+    products.filter((product) => product.category === activeCategory);
 
   return (
     <div className="list__product-list">
-      <SearchBar
-        onQuery={async (searchInput) => {
-          const results = await searchProducts(searchInput.value);
-          setSearchResults(results?.length > 0 ? results : null);
-          searchInput.placeholder =
-            results?.length > 0 ? "Search something.." : "No matches found";
-        }}
-      />
-      {(searchResults || products)?.map((product) => (
-        <div className="list__product-card" key={product.barcode}>
-          {product.price && product.price.discount && (
-            <div className="list__product-badge">מבצע</div>
-          )}
-          <div className="list__product-details">
-            <div className="list__product-data">
-              <div className="list__product-name">
-                <p>{max18Characters(product.name)}</p>
-              </div>
-              <div className="list__product-info">
-                <div className="list__product-weight">
-                  <p>{product.weight}</p>
-                  <p>{convertWeightUnit(product.unitWeight)}</p>
+      {/* <div className="list__search-bar-container">
+        <SearchBar />
+      </div> */}
+      <CategoryNavigation />
+      <div className="list__products-wrapper">
+        <div
+          className="list__products-container"
+          style={containerStyle}
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd} // Added onTouchEnd event
+        >
+          {filteredProducts.map((product) => (
+            <div className="list__product-card" key={product.barcode}>
+              {product.price && product.price.discount && (
+                <div className="list__product-badge">מבצע</div>
+              )}
+              <div className="list__product-details">
+                <div className="list__product-data">
+                  <div className="list__product-name">
+                    <p>{max18Characters(product.name)}</p>
+                  </div>
+                  <div className="list__product-info">
+                    <div className="list__product-weight">
+                      <p>{product.weight}</p>
+                      <p>{convertWeightUnit(product.unitWeight)}</p>
+                    </div>
+                    <div className="list__separator">|</div>
+                    <div className="list__product-brand">
+                      <p>{product.brand}</p>
+                    </div>
+                  </div>
+                  <div className="list__product-price">
+                    <p>{product.price && priceFormat(product.price.price)}</p>
+                    {product.price && <p style={{ fontSize: "1.4rem" }}>₪</p>}
+                    {!product.hasPrice && <p>מחיר לא זמין בסופר</p>}
+                  </div>
+                  <div className="discount-price">
+                    {product.price && product.price.discount && (
+                      <>{discountPriceFormat(product.price)}</>
+                    )}
+                  </div>
                 </div>
-                <div className="list__separator">|</div>
-                <div className="list__product-brand">
-                  <p>{product.brand}</p>
+                <div
+                  className="list__product-image"
+                  onClick={() => moveToPriceList(product.barcode)}
+                >
+                  <Image barcode={product.barcode} />
                 </div>
               </div>
-              <div className="list__product-price">
-                <p>{product.price && priceFormat(product.price.price)}</p>
-                {/* <p style={{ fontSize: "1.4rem" }}>₪</p> */}
-                {product.price && <p style={{ fontSize: "1.4rem" }}>₪</p>}
-                {!product.hasPrice && <p>מחיר לא זמין בסופר</p>}
+              <div className="list__product-operations">
+                <div
+                  className="list__product-operations__confirm"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    addToCart(product.barcode);
+                  }}
+                >
+                  הוסף לסל
+                </div>
+                <div
+                  className="list__product-operations__add"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    incrementAmount(product.barcode);
+                  }}
+                >
+                  +
+                </div>
+                <div className="list__product-operations__quantity">
+                  <span>{productAmounts[product.barcode] || 0}</span>
+                </div>
+                <div
+                  className="list__product-operations__reduce"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    decrementAmount(product.barcode);
+                  }}
+                >
+                  -
+                </div>
               </div>
-              <div className="discount-price">
-                {product.price && product.price.discount && (
-                  <>{discountPriceFormat(product.price)}</>
-                )}
-              </div>
             </div>
-            <div
-              className="list__product-image"
-              onClick={() => moveToPriceList(product.barcode)}
-            >
-              <Image barcode={product.barcode} />
-            </div>
-          </div>
-          <div className="list__product-operations">
-            <div
-              className="list__product-operations__confirm"
-              onClick={(e) => {
-                e.stopPropagation();
-                addToCart(product.barcode);
-              }}
-            >
-              הוסף לסל
-            </div>
-            <div
-              className="list__product-operations__add"
-              onClick={(e) => {
-                e.stopPropagation();
-                incrementAmount(product.barcode);
-              }}
-            >
-              +
-            </div>
-            <div className="list__product-operations__quantity">
-              <span>{productAmounts[product.barcode] || 0}</span>
-            </div>
-            <div
-              className="list__product-operations__reduce"
-              onClick={(e) => {
-                e.stopPropagation();
-                decrementAmount(product.barcode);
-              }}
-            >
-              -
-            </div>
-          </div>
+          ))}
         </div>
-      ))}
+      </div>
     </div>
   );
 }
-export default ProductsListNew;
+
+export default ProductsList;

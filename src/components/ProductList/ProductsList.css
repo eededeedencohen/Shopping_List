@@ -1,42 +1,86 @@
-/* General Style for the Search Container */
-.search {
+.list__search-bar-container{
   display: flex;
-  justify-content: center;
   align-items: center;
-  margin: 10px;
-  padding: 5px;
+  justify-content: center;
+  margin: 0.5rem 0;
+  margin-left: 3rem;
+  margin-right: 3rem;
 }
 
-/* Style for the Input Field */
-.search-input {
-  width: 100%;
-  padding: 10px 15px;
-  border: 2px solid #ccc;
-  border-radius: 25px;
-  outline: none;
-  font-size: 1rem;
-  color: #333;
-  background-color: #fff;
-  transition: border-color 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
 
-  /* Right-to-left text direction */
-  direction: rtl;
-  text-align: right;
+@keyframes middleToRight {
+  from {
+    transform: translateX(0%);
+  }
+  to {
+    transform: translateX(100%);
+  }
 }
 
-/* Hover and Focus Effects */
-.search-input:hover,
-.search-input:focus {
-  border-color: #007bff;
-  box-shadow: 0 0 8px rgba(0, 123, 255, 0.2);
+@keyframes middleToLeft {
+  from {
+    transform: translateX(0%);
+  }
+  to {
+    transform: translateX(-100%);
+  }
 }
 
-/* Placeholder Style */
-.search-input::placeholder {
-  color: #aaa;
-  /* Right align placeholder text */
-  text-align: right;
-  direction: rtl;
+@keyframes leftToRight {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(100%);
+  }
+  
+}
+
+@keyframes rightToMiddle {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0%);
+  }
+}
+
+@keyframes rightToLeft {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(-100%);
+  }
+}
+
+@keyframes leftToMiddle {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0%);
+  }
+}
+
+.list__products-wrapper {
+  overflow-x: hidden; /* Add this to hide horizontal overflow */
+}
+
+.list__products-container {
+  overflow-x: hidden;
+  position: relative;
+  min-height: calc(100vh - var(--offset-top));
+  overflow-y: auto;
+  /* transition: transform 1s ease, background-color 0.5s ease; */
+  /* background-color: #ffffff; Base color */
+  /* transform: translateX(100%);
+  transform: translateX(50%); */
+}
+
+/* Additional CSS to calculate the offset from the top */
+:root {
+  --offset-top: 100px; /* Adjust this value based on the actual offset from the top */
 }
 
 .list__product-card {
@@ -216,3 +260,7 @@
   justify-content: center;
   background-color: #f2f2f2;
 }
+
+
+
+

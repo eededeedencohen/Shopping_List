@@ -1,7 +1,6 @@
 import { Route, Routes } from "react-router";
 import Home from "./pages/Home";
 import PriceList from "./components/PriceList/PriceList";
-import ProductsListNew from "./components/ProductList/ProductsListNew";
 import Cart from "./components/Cart/Cart";
 import ImageParser from "./components/ImageParser/ImageParser";
 import UploadRecord from "./components/UploadRecord/UploadRecord";
@@ -11,12 +10,12 @@ import HistoryList from "./components/History/HistoryList";
 import CategoryList from "./components/Cart/Category/CategoryList";
 import { Stats } from "./components/Stats/Stats";
 import TouchDirection from "./components/Finger/TouchDirection";
+import SearchBar from "./components/SearchBar/SearchBar";
 
 function Routing() {
   return (
     <Routes>
       <Route path="/" element={<Home />} />
-      <Route path="/products" element={<ProductsListNew />} />
       <Route path="/priceList/:barcode" element={<PriceList />} />
       <Route path="/cart" element={<Cart />} />
       <Route path="/stats" element={<Stats />} />
@@ -27,6 +26,7 @@ function Routing() {
       <Route path="/history/:id" element={<HistoryList />} />
       <Route path="/category" element={<CategoryList />} />
       <Route path="/finger" element={<TouchDirection />} />
+      <Route path="/search" element={<SearchBar />} />
     </Routes>
   );
 }

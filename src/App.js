@@ -5,7 +5,7 @@ import Toolbar from "./components/Toolbar/Toolbar";
 function App() {
   return (
     <div className="App">
-      <Toolbar />
+      <Toolbar /> 
       <Routing />
     </div>
   );

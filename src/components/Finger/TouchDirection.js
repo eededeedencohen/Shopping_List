@@ -59,3 +59,10 @@ const TouchDirection = () => {
 };
 
 export default TouchDirection;
+
+
+
+
+
+
+

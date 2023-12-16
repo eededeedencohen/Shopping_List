@@ -3,13 +3,29 @@
   justify-content: flex-start;
   background-color: #106c53;
   padding: 10px;
-  position: fixed; /* Add this */
-  width: 100%; /* Add this */
-  top: 0; /* Add this */
-  z-index: 3; /* Add this to ensure the navbar is above other content */
+  position: fixed;
+  width: 100%;
+  top: 0;
+  z-index: 3;
   border-radius: 0px 0px 10px 10px;
   box-shadow: 0px 0px 20px 0px rgba(0, 0, 0, 1);
 }
+
+
+.toolbar .search-icon {
+  position: absolute;
+  left: 2.5rem; /* Move the icon 3rem to the right */
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  padding-top: 6px;
+}
+
+.toolbar .search-icon img {
+  width: 20px;
+  height: 20px;
+}
+
 
 .toolbar .cart-icon {
   position: absolute; /* use absolute positioning */
@@ -20,8 +36,8 @@
 }
 
 .toolbar .cart-icon img {
-  width: 40px; /* control the size of the image */
-  height: 40px;
+  width: 35px; /* control the size of the image */
+  height: 35px;
 }
 
 .overlay {

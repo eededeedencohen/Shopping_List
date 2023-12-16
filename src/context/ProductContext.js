@@ -13,6 +13,21 @@ export const ProductContextProvider = ({ children }) => {
   const [productByBarcode, setProductByBarcode] = useState(null);
   const [loading, setLoading] = useState(false);
 
+  const allCategories = [
+    "פירות וירקות",
+    "בשר עוף, ודגים",
+    "מוצרי חלב וביצים",
+    "לחמים ומאפים",
+    "משקאות, יין ואלכוהול",
+    "מוצרים קפואים",
+    "בישול ואפייה",
+    "שימורים",
+    "חטיפים, מתוקים ודגנים",
+    "ניקיון וחד פעמי",
+    "פארם ותינוקות",
+  ];
+  const [activeCategory, setActiveCategory] = useState(allCategories[0]);
+
   useEffect(() => {
     const getProducts = async () => {
       setLoading(true);
@@ -74,6 +89,11 @@ export const ProductContextProvider = ({ children }) => {
         productByBarcode, // exposing the state
         searchProducts,
         loading, // exposing the loading state
+
+        // for category navigation
+        allCategories,
+        activeCategory, 
+        setActiveCategory
       }}
     >
       {children}

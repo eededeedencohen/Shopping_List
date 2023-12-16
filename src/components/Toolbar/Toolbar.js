@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
+import SearchBar from "../SearchBar/SearchBar";
+import SearchModal from "../SearchBar/SearchModal";
 import "./Toolbar.css";
 import groceryIcon from "./grocery.svg";
 import receiptIcon from "./receipt.svg";
@@ -9,9 +11,11 @@ import statisticIcon from "./statistics.svg";
 import voiceAssistantIcon from "./voice-assistant.svg";
 import aiIcon from "./ai.svg";
 import cartIcon from "./cart.svg";
+import SearchIcon from "./search.svg";
 
 function Toolbar() {
   const [isOpen, setIsOpen] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const toggleDrawer = () => {
     setIsOpen(!isOpen);
@@ -23,8 +27,22 @@ function Toolbar() {
     }
   };
 
+  const openModal = () => {
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+  };
+
   return (
     <nav className="toolbar">
+      <div className="search-icon" >
+        <img src={SearchIcon} alt="SearchIcon" onClick={openModal}/>
+      </div>
+      <SearchModal isOpen={isModalOpen} onClose={closeModal}>
+        <SearchBar closeModal={closeModal}/>
+      </SearchModal>
       <div className="hamburger-menu" onClick={toggleDrawer}>
         &#9776;
       </div>
@@ -112,3 +130,4 @@ function Toolbar() {
 }
 
 export default Toolbar;
+
