@@ -1,6 +1,7 @@
 import { createContext, useCallback, useContext, useState } from "react";
 import {
   getActiveCartByUserID,
+  getProductsAmountInCartByUserID,
   updateProductInCart,
   deleteProductFromCart,
 } from "../network/cartService";
@@ -17,6 +18,11 @@ export const CartContextProvider = ({ children }) => {
   const loadCart = useCallback(async (id) => {
     const { data } = await getActiveCartByUserID(id);
     setCart(data);
+  }, []);
+
+  const getProductsAmountInCart = useCallback(async (id) => {
+    const { data } = await getProductsAmountInCartByUserID(id);
+    return data;
   }, []);
 
   const updateProductAmount = async (userId, barcode) => {
@@ -64,6 +70,7 @@ export const CartContextProvider = ({ children }) => {
       value={{
         cart,
         loadCart,
+        getProductsAmountInCart,
         updateAmount,
         updateProductAmount,
         removeProductFromCart,

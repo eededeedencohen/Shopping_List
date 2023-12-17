@@ -8,6 +8,10 @@ const getActiveCartByUserID = async (id) => {
   return JSON.parse(Cart.data);
 };
 
+const getProductsAmountInCartByUserID = async (id) => {
+  const Cart = await httpClient.get(`/carts/active/${id}`);
+  return JSON.parse(Cart.data);
+};
 
 const addProductToCart = async (userId, barcode, amount) => {
   const response = await axios.post(
@@ -34,16 +38,19 @@ const updateProductInCart = async (userId, barcode, amount) => {
 };
 
 const deleteProductFromCart = async (userId, barcode) => {
-  await axios.delete(
-    `${DOMAIN}/api/v1/carts/product/${userId}`,
-    {
-      data: {
-        barcode,
-      },
-    }
-  );
+  await axios.delete(`${DOMAIN}/api/v1/carts/product/${userId}`, {
+    data: {
+      barcode,
+    },
+  });
   console.log("deleted", barcode);
   return;
 };
 
-export { getActiveCartByUserID, addProductToCart, updateProductInCart, deleteProductFromCart };
+export {
+  getActiveCartByUserID,
+  getProductsAmountInCartByUserID,
+  addProductToCart,
+  updateProductInCart,
+  deleteProductFromCart,
+};

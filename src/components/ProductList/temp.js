@@ -1,11 +1,13 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useProducts } from "../../context/ProductContext";
 import { useCart } from "../../context/CartContext";
 import "./ProductsList.css";
 import { useNavigate } from "react-router";
 import { addProductToCart } from "../../network/cartService";
 import Image from "./Images";
+// import SearchBar from "../SearchBar/SearchBar";
 import CategoryNavigation from "./CategoryNavigation";
+import { a } from "react-spring";
 
 export const convertWeightUnit = (weightUnit) => {
   weightUnit = weightUnit.toLowerCase();
@@ -61,12 +63,11 @@ const discountPriceFormat = (price) => {
   );
 };
 
-
-
 function ProductsList() {
-  const { products} = useProducts();
+  const { products, setProducts, searchProducts } = useProducts();
   const { allCategories, activeCategory, setActiveCategory } = useProducts();
-  const { loadCart } = useCart();
+  const { cart, loadCart } = useCart();
+  const [isLoadingCart, setIsLoadingCart] = useState(true); // Add loading state
   const [productAmounts, setProductAmounts] = useState({});
   const userId = "1"; // Replace with actual user ID
   const nav = useNavigate();
@@ -169,7 +170,27 @@ function ProductsList() {
     await loadCart(userId);
   };
 
-  const filteredProducts = products.filter((product) => product.category === activeCategory);
+  useEffect(() => {
+    // Load cart when the component mounts
+    const loadUserCart = async () => {
+      setIsLoadingCart(true);
+      await loadCart(userId);
+      setIsLoadingCart(false);
+    };
+    loadUserCart();
+  }, [userId, loadCart]);
+
+  const filteredProducts = products.filter(
+    (product) => product.category === activeCategory
+  );
+
+  const productsWithAmounts = filteredProducts.map((filteredProduct) => {
+    const cartItem = cart?.productsWithPrices?.find(
+      (cartItem) => cartItem.product._id === filteredProduct._id
+    );
+    const amount = cartItem ? cartItem.amount : 0; // Set amount to 0 if the product is not in the cart
+    return { ...filteredProduct, amount };
+  });
 
   return (
     <div className="list__product-list">
@@ -185,7 +206,8 @@ function ProductsList() {
           onTouchMove={handleTouchMove}
           onTouchEnd={handleTouchEnd} // Added onTouchEnd event
         >
-          {filteredProducts.map((product) => (
+          {/* {filteredProducts.map((product) => ( */}
+          {productsWithAmounts.map((product) => (
             <div className="list__product-card" key={product.barcode}>
               {product.price && product.price.discount && (
                 <div className="list__product-badge">מבצע</div>
@@ -242,8 +264,15 @@ function ProductsList() {
                 >
                   +
                 </div>
+                {/* <div className="list__product-operations__quantity">
+                  <span>{productAmounts[product.barcode] || product.amount}</span>
+                </div> */}
                 <div className="list__product-operations__quantity">
-                  <span>{productAmounts[product.barcode] || 0}</span>
+                  <span>
+                    {productAmounts[product.barcode] !== undefined
+                      ? productAmounts[product.barcode]
+                      : product.amount}
+                  </span>
                 </div>
                 <div
                   className="list__product-operations__reduce"
@@ -264,3 +293,5 @@ function ProductsList() {
 }
 
 export default ProductsList;
+
+
