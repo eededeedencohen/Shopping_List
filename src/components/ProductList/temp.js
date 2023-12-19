@@ -1,297 +1,301 @@
-import React, { useEffect, useRef, useState } from "react";
-import { useProducts } from "../../context/ProductContext";
-import { useCart } from "../../context/CartContext";
-import "./ProductsList.css";
-import { useNavigate } from "react-router";
-import { addProductToCart } from "../../network/cartService";
-import Image from "./Images";
-// import SearchBar from "../SearchBar/SearchBar";
-import CategoryNavigation from "./CategoryNavigation";
-import { a } from "react-spring";
+// import React, { useEffect, useRef, useState } from "react";
+// import { useProducts } from "../../context/ProductContext";
+// import { useCart } from "../../context/CartContext";
+// import "./ProductsList.css";
+// import { useNavigate } from "react-router";
+// import { addProductToCart } from "../../network/cartService";
+// import Image from "./Images";
+// // import SearchBar from "../SearchBar/SearchBar";
+// import CategoryNavigation from "./CategoryNavigation";
+// import { a } from "react-spring";
 
-export const convertWeightUnit = (weightUnit) => {
-  weightUnit = weightUnit.toLowerCase();
-  if (weightUnit === "g") {
-    return "גרם";
-  }
-  if (weightUnit === "kg") {
-    return 'ק"ג';
-  }
-  if (weightUnit === "ml") {
-    return 'מ"ל';
-  }
-  if (weightUnit === "l") {
-    return "ליטר";
-  }
-  if (weightUnit === "u") {
-    return "יחידות";
-  }
-  return weightUnit;
-};
+// export const convertWeightUnit = (weightUnit) => {
+//   weightUnit = weightUnit.toLowerCase();
+//   if (weightUnit === "g") {
+//     return "גרם";
+//   }
+//   if (weightUnit === "kg") {
+//     return 'ק"ג';
+//   }
+//   if (weightUnit === "ml") {
+//     return 'מ"ל';
+//   }
+//   if (weightUnit === "l") {
+//     return "ליטר";
+//   }
+//   if (weightUnit === "u") {
+//     return "יחידות";
+//   }
+//   return weightUnit;
+// };
 
-const max18Characters = (str) => {
-  if (str.length > 18) {
-    return "..." + str.substring(0, 16);
-  }
-  return str;
-};
+// const max18Characters = (str) => {
+//   if (str.length > 18) {
+//     return "..." + str.substring(0, 16);
+//   }
+//   return str;
+// };
 
-const priceFormat = (price) => {
-  return price.toFixed(2);
-};
+// const priceFormat = (price) => {
+//   return price.toFixed(2);
+// };
 
-const discountPriceFormat = (price) => {
-  const units = price.discount.units;
-  const totalPrice = price.discount.totalPrice;
-  return (
-    <div
-      className="list__discount-price"
-      style={{
-        display: "flex",
-        flexDirection: "row-reverse",
-        alignItems: "center",
-        color: "#ff0000",
-        fontWeight: "bold",
-      }}
-    >
-      <p style={{ marginLeft: "0.3rem" }}>{units}</p>
-      <p>{"יחידות ב"}</p>
-      <p>{" - "}</p>
-      <p>{priceFormat(totalPrice)}</p>
-      <p style={{ fontWeight: "bold" }}>{"₪"}</p>
-    </div>
-  );
-};
+// const discountPriceFormat = (price) => {
+//   const units = price.discount.units;
+//   const totalPrice = price.discount.totalPrice;
+//   return (
+//     <div
+//       className="list__discount-price"
+//       style={{
+//         display: "flex",
+//         flexDirection: "row-reverse",
+//         alignItems: "center",
+//         color: "#ff0000",
+//         fontWeight: "bold",
+//       }}
+//     >
+//       <p style={{ marginLeft: "0.3rem" }}>{units}</p>
+//       <p>{"יחידות ב"}</p>
+//       <p>{" - "}</p>
+//       <p>{priceFormat(totalPrice)}</p>
+//       <p style={{ fontWeight: "bold" }}>{"₪"}</p>
+//     </div>
+//   );
+// };
 
-function ProductsList() {
-  const { products, setProducts, searchProducts } = useProducts();
-  const { allCategories, activeCategory, setActiveCategory } = useProducts();
-  const { cart, loadCart } = useCart();
-  const [isLoadingCart, setIsLoadingCart] = useState(true); // Add loading state
-  const [productAmounts, setProductAmounts] = useState({});
-  const userId = "1"; // Replace with actual user ID
-  const nav = useNavigate();
+// function ProductsList() {
+//   const { products, setProducts, searchProducts } = useProducts();
+//   const { allCategories, activeCategory, setActiveCategory } = useProducts();
+//   const { cart, loadCart } = useCart();
+//   const [isLoadingCart, setIsLoadingCart] = useState(true); // Add loading state
+//   const [productAmounts, setProductAmounts] = useState({});
+//   const userId = "1"; // Replace with actual user ID
+//   const nav = useNavigate();
 
-  const [containerStyle, setContainerStyle] = useState({});
-  const startTouch = useRef({ x: 0 });
-  const swipeDirection = useRef(null); // To store the swipe direction
+//   const [containerStyle, setContainerStyle] = useState({});
+//   const startTouch = useRef({ x: 0 });
+//   const swipeDirection = useRef(null); // To store the swipe direction
 
-  const handleTouchStart = (event) => {
-    const x = event.touches[0].clientX;
-    startTouch.current = { x };
-    swipeDirection.current = null; // Reset swipe direction on new touch
-    setContainerStyle({});
-  };
+//   const handleTouchStart = (event) => {
+//     const x = event.touches[0].clientX;
+//     startTouch.current = { x };
+//     swipeDirection.current = null; // Reset swipe direction on new touch
+//     setContainerStyle({});
+//   };
 
-  const handleTouchMove = (event) => {
-    const moveX = event.touches[0].clientX;
-    const deltaX = moveX - startTouch.current.x;
+//   const handleTouchMove = (event) => {
+//     const moveX = event.touches[0].clientX;
+//     const deltaX = moveX - startTouch.current.x;
 
-    if (Math.abs(deltaX) > 150) {
-      // Threshold for swipe recognition
-      swipeDirection.current = deltaX > 0 ? "right" : "left";
-    }
-  };
+//     if (Math.abs(deltaX) > 150) {
+//       // Threshold for swipe recognition
+//       swipeDirection.current = deltaX > 0 ? "right" : "left";
+//     }
+//   };
 
-  const handleTouchEnd = () => {
-    if (swipeDirection.current === "right") {
-      // Swipe right - previous category
-      const currentIndex = allCategories.indexOf(activeCategory);
-      const prevIndex =
-        (currentIndex - 1 + allCategories.length) % allCategories.length;
-      setActiveCategory(allCategories[prevIndex]);
+//   const handleTouchEnd = () => {
+//     if (swipeDirection.current === "right") {
+//       // Swipe right - previous category
+//       const currentIndex = allCategories.indexOf(activeCategory);
+//       const prevIndex =
+//         (currentIndex - 1 + allCategories.length) % allCategories.length;
+//       setActiveCategory(allCategories[prevIndex]);
 
-      // Apply the middleToRight animation for 1 second
-      setContainerStyle({ animation: "middleToRight 0.2s ease" });
+//       // Apply the middleToRight animation for 1 second
+//       setContainerStyle({ animation: "middleToRight 0.2s ease" });
 
-      // After 1 second, apply the RightToLeft animation for 1 millisecond (in one step)
-      setTimeout(() => {
-        setContainerStyle({ animation: "rightToLeft 1ms steps(1) forwards" });
-      }, 200);
+//       // After 1 second, apply the RightToLeft animation for 1 millisecond (in one step)
+//       setTimeout(() => {
+//         setContainerStyle({ animation: "rightToLeft 1ms steps(1) forwards" });
+//       }, 200);
 
-      // After RightToLeft animation, apply the RightToMiddle animation for 1 second
-      setTimeout(() => {
-        setContainerStyle({ animation: "leftToMiddle 0.3s ease" });
-      }, 201);
+//       // After RightToLeft animation, apply the RightToMiddle animation for 1 second
+//       setTimeout(() => {
+//         setContainerStyle({ animation: "leftToMiddle 0.3s ease" });
+//       }, 201);
 
-      // up to the top of the page:
-      window.scrollTo(0, 0);
-    } else if (swipeDirection.current === "left") {
-      // Swipe left - next category
-      const currentIndex = allCategories.indexOf(activeCategory);
-      const nextIndex = (currentIndex + 1) % allCategories.length;
-      setActiveCategory(allCategories[nextIndex]);
+//       // up to the top of the page:
+//       window.scrollTo(0, 0);
+//     } else if (swipeDirection.current === "left") {
+//       // Swipe left - next category
+//       const currentIndex = allCategories.indexOf(activeCategory);
+//       const nextIndex = (currentIndex + 1) % allCategories.length;
+//       setActiveCategory(allCategories[nextIndex]);
 
-      // Apply the middleToLeft animation for 1 second
-      setContainerStyle({ animation: "middleToLeft 0.2s ease" });
+//       // Apply the middleToLeft animation for 1 second
+//       setContainerStyle({ animation: "middleToLeft 0.2s ease" });
 
-      // After 1 second, apply the LeftToRight animation for 1 millisecond (in one step)
-      setTimeout(() => {
-        setContainerStyle({ animation: "leftToRight 1ms steps(1) forwards" });
-      }, 200);
+//       // After 1 second, apply the LeftToRight animation for 1 millisecond (in one step)
+//       setTimeout(() => {
+//         setContainerStyle({ animation: "leftToRight 1ms steps(1) forwards" });
+//       }, 200);
 
-      // After LeftToRight animation, apply the LeftToMiddle animation for 1 second
-      setTimeout(() => {
-        setContainerStyle({ animation: "rightToMiddle 0.3s ease" });
-      }, 201);
+//       // After LeftToRight animation, apply the LeftToMiddle animation for 1 second
+//       setTimeout(() => {
+//         setContainerStyle({ animation: "rightToMiddle 0.3s ease" });
+//       }, 201);
 
-      // up to the top of the page:
-      window.scrollTo(0, 0);
-    } else {
-      setContainerStyle({}); // Reset the container's position after the swipe
-    }
-  };
+//       // up to the top of the page:
+//       window.scrollTo(0, 0);
+//     } else {
+//       setContainerStyle({}); // Reset the container's position after the swipe
+//     }
+//   };
 
-  const moveToPriceList = (productBarcode) => {
-    nav(`/priceList/${productBarcode}`);
-  };
+//   const moveToPriceList = (productBarcode) => {
+//     nav(`/priceList/${productBarcode}`);
+//   };
 
-  const incrementAmount = (barcode) => {
-    setProductAmounts({
-      ...productAmounts,
-      [barcode]: (productAmounts[barcode] || 0) + 1,
-    });
-  };
+//   const incrementAmount = (barcode) => {
+//     setProductAmounts({
+//       ...productAmounts,
+//       [barcode]: (productAmounts[barcode] || 0) + 1,
+//     });
+//   };
 
-  const decrementAmount = (barcode) => {
-    setProductAmounts({
-      ...productAmounts,
-      [barcode]: Math.max(0, (productAmounts[barcode] || 0) - 1),
-    });
-  };
+//   const decrementAmount = (barcode) => {
+//     setProductAmounts({
+//       ...productAmounts,
+//       [barcode]: Math.max(0, (productAmounts[barcode] || 0) - 1),
+//     });
+//   };
 
-  const addToCart = async (barcode) => {
-    const response = await addProductToCart(
-      userId,
-      barcode,
-      productAmounts[barcode] || 0
-    );
-    console.log(response);
-    await loadCart(userId);
-  };
+//   const addToCart = async (barcode) => {
+//     const response = await addProductToCart(
+//       userId,
+//       barcode,
+//       productAmounts[barcode] || 0
+//     );
+//     console.log(response);
+//     await loadCart(userId);
+//   };
 
-  useEffect(() => {
-    // Load cart when the component mounts
-    const loadUserCart = async () => {
-      setIsLoadingCart(true);
-      await loadCart(userId);
-      setIsLoadingCart(false);
-    };
-    loadUserCart();
-  }, [userId, loadCart]);
+//   useEffect(() => {
+//     // Load cart when the component mounts
+//     const loadUserCart = async () => {
+//       setIsLoadingCart(true);
+//       await loadCart(userId);
+//       setIsLoadingCart(false);
+//     };
+//     loadUserCart();
+//   }, [userId, loadCart]);
 
-  const filteredProducts = products.filter(
-    (product) => product.category === activeCategory
-  );
+//   if (isLoadingCart) {
+//     return <div>Loading...</div>;
+//   }
 
-  const productsWithAmounts = filteredProducts.map((filteredProduct) => {
-    const cartItem = cart?.productsWithPrices?.find(
-      (cartItem) => cartItem.product._id === filteredProduct._id
-    );
-    const amount = cartItem ? cartItem.amount : 0; // Set amount to 0 if the product is not in the cart
-    return { ...filteredProduct, amount };
-  });
+//   const filteredProducts = products.filter(
+//     (product) => product.category === activeCategory
+//   );
 
-  return (
-    <div className="list__product-list">
-      {/* <div className="list__search-bar-container">
-        <SearchBar />
-      </div> */}
-      <CategoryNavigation />
-      <div className="list__products-wrapper">
-        <div
-          className="list__products-container"
-          style={containerStyle}
-          onTouchStart={handleTouchStart}
-          onTouchMove={handleTouchMove}
-          onTouchEnd={handleTouchEnd} // Added onTouchEnd event
-        >
-          {/* {filteredProducts.map((product) => ( */}
-          {productsWithAmounts.map((product) => (
-            <div className="list__product-card" key={product.barcode}>
-              {product.price && product.price.discount && (
-                <div className="list__product-badge">מבצע</div>
-              )}
-              <div className="list__product-details">
-                <div className="list__product-data">
-                  <div className="list__product-name">
-                    <p>{max18Characters(product.name)}</p>
-                  </div>
-                  <div className="list__product-info">
-                    <div className="list__product-weight">
-                      <p>{product.weight}</p>
-                      <p>{convertWeightUnit(product.unitWeight)}</p>
-                    </div>
-                    <div className="list__separator">|</div>
-                    <div className="list__product-brand">
-                      <p>{product.brand}</p>
-                    </div>
-                  </div>
-                  <div className="list__product-price">
-                    <p>{product.price && priceFormat(product.price.price)}</p>
-                    {product.price && <p style={{ fontSize: "1.4rem" }}>₪</p>}
-                    {!product.hasPrice && <p>מחיר לא זמין בסופר</p>}
-                  </div>
-                  <div className="discount-price">
-                    {product.price && product.price.discount && (
-                      <>{discountPriceFormat(product.price)}</>
-                    )}
-                  </div>
-                </div>
-                <div
-                  className="list__product-image"
-                  onClick={() => moveToPriceList(product.barcode)}
-                >
-                  <Image barcode={product.barcode} />
-                </div>
-              </div>
-              <div className="list__product-operations">
-                <div
-                  className="list__product-operations__confirm"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    addToCart(product.barcode);
-                  }}
-                >
-                  הוסף לסל
-                </div>
-                <div
-                  className="list__product-operations__add"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    incrementAmount(product.barcode);
-                  }}
-                >
-                  +
-                </div>
-                {/* <div className="list__product-operations__quantity">
-                  <span>{productAmounts[product.barcode] || product.amount}</span>
-                </div> */}
-                <div className="list__product-operations__quantity">
-                  <span>
-                    {productAmounts[product.barcode] !== undefined
-                      ? productAmounts[product.barcode]
-                      : product.amount}
-                  </span>
-                </div>
-                <div
-                  className="list__product-operations__reduce"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    decrementAmount(product.barcode);
-                  }}
-                >
-                  -
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-}
+//   const productsWithAmounts = filteredProducts.map((filteredProduct) => {
+//     const cartItem = cart?.productsWithPrices?.find(
+//       (cartItem) => cartItem.product._id === filteredProduct._id
+//     );
+//     const amount = cartItem ? cartItem.amount : 0; // Set amount to 0 if the product is not in the cart
+//     return { ...filteredProduct, amount };
+//   });
 
-export default ProductsList;
+//   return (
+//     <div className="list__product-list">
+//       {/* <div className="list__search-bar-container">
+//         <SearchBar />
+//       </div> */}
+//       <CategoryNavigation />
+//       <div className="list__products-wrapper">
+//         <div
+//           className="list__products-container"
+//           style={containerStyle}
+//           onTouchStart={handleTouchStart}
+//           onTouchMove={handleTouchMove}
+//           onTouchEnd={handleTouchEnd} // Added onTouchEnd event
+//         >
+//           {/* {filteredProducts.map((product) => ( */}
+//           {productsWithAmounts.map((product) => (
+//             <div className="list__product-card" key={product.barcode}>
+//               {product.price && product.price.discount && (
+//                 <div className="list__product-badge">מבצע</div>
+//               )}
+//               <div className="list__product-details">
+//                 <div className="list__product-data">
+//                   <div className="list__product-name">
+//                     <p>{max18Characters(product.name)}</p>
+//                   </div>
+//                   <div className="list__product-info">
+//                     <div className="list__product-weight">
+//                       <p>{product.weight}</p>
+//                       <p>{convertWeightUnit(product.unitWeight)}</p>
+//                     </div>
+//                     <div className="list__separator">|</div>
+//                     <div className="list__product-brand">
+//                       <p>{product.brand}</p>
+//                     </div>
+//                   </div>
+//                   <div className="list__product-price">
+//                     <p>{product.price && priceFormat(product.price.price)}</p>
+//                     {product.price && <p style={{ fontSize: "1.4rem" }}>₪</p>}
+//                     {!product.hasPrice && <p>מחיר לא זמין בסופר</p>}
+//                   </div>
+//                   <div className="discount-price">
+//                     {product.price && product.price.discount && (
+//                       <>{discountPriceFormat(product.price)}</>
+//                     )}
+//                   </div>
+//                 </div>
+//                 <div
+//                   className="list__product-image"
+//                   onClick={() => moveToPriceList(product.barcode)}
+//                 >
+//                   <Image barcode={product.barcode} />
+//                 </div>
+//               </div>
+//               <div className="list__product-operations">
+//                 <div
+//                   className="list__product-operations__confirm"
+//                   onClick={(e) => {
+//                     e.stopPropagation();
+//                     addToCart(product.barcode);
+//                   }}
+//                 >
+//                   הוסף לסל
+//                 </div>
+//                 <div
+//                   className="list__product-operations__add"
+//                   onClick={(e) => {
+//                     e.stopPropagation();
+//                     incrementAmount(product.barcode);
+//                   }}
+//                 >
+//                   +
+//                 </div>
+//                 {/* <div className="list__product-operations__quantity">
+//                   <span>{productAmounts[product.barcode] || product.amount}</span>
+//                 </div> */}
+//                 <div className="list__product-operations__quantity">
+//                   <span>
+//                     {productAmounts[product.barcode] !== undefined
+//                       ? productAmounts[product.barcode]
+//                       : product.amount}
+//                   </span>
+//                 </div>
+//                 <div
+//                   className="list__product-operations__reduce"
+//                   onClick={(e) => {
+//                     e.stopPropagation();
+//                     decrementAmount(product.barcode);
+//                   }}
+//                 >
+//                   -
+//                 </div>
+//               </div>
+//             </div>
+//           ))}
+//         </div>
+//       </div>
+//     </div>
+//   );
+// }
+
+// export default ProductsList;
 
 

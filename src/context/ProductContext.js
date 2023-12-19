@@ -33,7 +33,20 @@ export const ProductContextProvider = ({ children }) => {
       setLoading(true);
       try {
         const response = await getAllProducts();
-        setProducts(JSON.parse(response.data).data.products);
+        const productsAmount = response.productsAmount;
+        const products = JSON.parse(response.products.data).data.products;
+
+        const productsWithAmount = products.map((product) => {
+          // Find the product amount using the barcode
+          const amountInfo = productsAmount.find(
+            (p) => p.barcode === product.barcode
+          );
+          // Add the amount to the product object
+          return { ...product, amount: amountInfo ? amountInfo.amount : 0 };
+        });
+
+        console.log(productsWithAmount);
+        setProducts(JSON.parse(response.products.data).data.products);
       } catch (e) {
         setError(e);
       } finally {
@@ -48,7 +61,20 @@ export const ProductContextProvider = ({ children }) => {
     setLoading(true);
     try {
       const response = await getAllProducts();
-      setProducts(JSON.parse(response.data).data.products);
+      const productsAmount = response.productsAmount;
+      const products = JSON.parse(response.products.data).data.products;
+
+      const productsWithAmount = products.map((product) => {
+        // Find the product amount using the barcode
+        const amountInfo = productsAmount.find(
+          (p) => p.barcode === product.barcode
+        );
+        // Add the amount to the product object
+        return { ...product, amount: amountInfo ? amountInfo.amount : 0 };
+      });
+
+      console.log(productsWithAmount);
+      setProducts(JSON.parse(response.products.data).data.products);
     } catch (e) {
       setError(e);
     } finally {
@@ -92,8 +118,8 @@ export const ProductContextProvider = ({ children }) => {
 
         // for category navigation
         allCategories,
-        activeCategory, 
-        setActiveCategory
+        activeCategory,
+        setActiveCategory,
       }}
     >
       {children}
