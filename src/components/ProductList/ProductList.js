@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useProducts } from "../../context/ProductContext";
 import { useCart } from "../../context/CartContext";
 import "./ProductsList.css";
