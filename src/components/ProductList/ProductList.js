@@ -61,15 +61,16 @@ const discountPriceFormat = (price) => {
   );
 };
 
-
-
 function ProductsList() {
-  const { products} = useProducts();
+  const { products } = useProducts();
   const { allCategories, activeCategory, setActiveCategory } = useProducts();
-  const { getProductsAmountInCart, loadAmounts, loadCart} = useCart();
+  const { getProductsAmountInCart, loadAmounts, loadCart } = useCart();
   const [productAmounts, setProductAmounts] = useState({});
+  const [oldProductAmounts, setOldProductAmounts] = useState({});
   const userId = "1"; // Replace with actual user ID
-  
+
+  const [isLoadData, setIsLoadData] = useState(false);
+
   const nav = useNavigate();
 
   const [containerStyle, setContainerStyle] = useState({});
@@ -79,18 +80,31 @@ function ProductsList() {
   // Load the product-amount in the cart
   useEffect(() => {
     const loadAmounts = async () => {
+      setIsLoadData(true);
       const amounts = await getProductsAmountInCart(userId);
-      setProductAmounts(amounts);
+      const amountsObject = {};
+      amounts.cart.products.forEach((product) => {
+        amountsObject[product.barcode] = product.amount;
+      });
+      setProductAmounts(amountsObject);
+      setOldProductAmounts(amountsObject);
+      setIsLoadData(false);
     };
     loadAmounts();
   }, [getProductsAmountInCart]);
 
-  if (loadAmounts) {
+  if (isLoadData) {
     console.log("loading amounts");
     return <div>Loading Amounts...</div>;
   }
-  
-  
+
+  // if (!isLoadData)
+  // {
+  //   console.log("productAmounts" , productAmounts[4132231])
+  //   // console.log("products" , productAmounts.cart.products[0])
+  //   // instead of productAmounts.cart.products[0], pring the one who the barcode is 7312040017683:
+  //   // console.log("products" , productAmounts.cart.products.find((product) => product.barcode === "7312040017683"))
+  // }
 
   const handleTouchStart = (event) => {
     const x = event.touches[0].clientX;
@@ -162,19 +176,135 @@ function ProductsList() {
     nav(`/priceList/${productBarcode}`);
   };
 
+  //============================================================
+  //============================================================
   const incrementAmount = (barcode) => {
+    const newAmount = (productAmounts[barcode] || 0) + 1;
+    const button = document.querySelector(`#add-to-cart-${barcode}`);
     setProductAmounts({
       ...productAmounts,
-      [barcode]: (productAmounts[barcode] || 0) + 1,
+      [barcode]: newAmount,
     });
+
+    // case there is no oldProductAmounts and the newAmount is 0: - gray button
+    if (!oldProductAmounts[barcode] && newAmount === 0) {
+      console.log("gray button -> is the old = active");
+      button.style.backgroundColor = 'gray';
+    } else if (!oldProductAmounts[barcode] && newAmount !== 0) {
+      console.log("green button -> is the old = active");
+      button.style.backgroundColor = 'green';
+    } else if (oldProductAmounts[barcode] === newAmount) {
+      console.log("gray button -> is the old = active");
+      button.style.backgroundColor = 'gray';
+    } else if (
+      oldProductAmounts[barcode] !== newAmount &&
+      oldProductAmounts[barcode] !== 0 &&
+      newAmount !== 0
+    ) {
+      console.log("blue button -> old != active and old != 0 and active != 0");
+      button.style.backgroundColor = 'blue';
+    } else if (oldProductAmounts[barcode] === 0 && newAmount > 0) {
+      console.log("green button -> old = 0 and active > 0");
+      button.style.backgroundColor = 'green';
+    } else if (oldProductAmounts[barcode] > 0 && newAmount === 0) {
+      console.log("red button -> old > 0 and active = 0");
+      button.style.backgroundColor = 'red';
+    }
   };
 
+  // const incrementAmount = (barcode) => {
+  //   setProductAmounts({
+  //     ...productAmounts,
+  //     [barcode]: (productAmounts[barcode] || 0) + 1,
+  //   });
+
+  //   if (oldProductAmounts[barcode] === productAmounts[barcode]) {
+  //     // gray button -> is the old = active
+  //     console.log("gray button -> is the old = active");
+  //   } else if (
+  //     oldProductAmounts[barcode] !== productAmounts[barcode] &&
+  //     oldProductAmounts[barcode] !== 0 &&
+  //     productAmounts[barcode] !== 0
+  //   ) {
+  //     // blue button -> old != active and old != 0 and active != 0
+  //     console.log("blue button -> old != active and old != 0 and active != 0");
+  //   } else if (
+  //     oldProductAmounts[barcode] === 0 &&
+  //     productAmounts[barcode] > 0
+  //   ) {
+  //     // green button -> old = 0 and active > 0
+  //     console.log("green button -> old = 0 and active > 0");
+  //   } else if
+  //     (oldProductAmounts[barcode] > 0 &&
+  //     productAmounts[barcode] === 0)
+  //     // red button -> old > 0 and active = 0
+  //     console.log("red button -> old > 0 and active = 0");
+  // };
+
+  // const decrementAmount = (barcode) => {
+  //   setProductAmounts({
+  //     ...productAmounts,
+  //     [barcode]: Math.max(0, (productAmounts[barcode] || 0) - 1),
+  //   });
+
+  //   if (oldProductAmounts[barcode] === productAmounts[barcode]) {
+  //     // gray button -> is the old = active
+  //     console.log("gray button -> is the old = active");
+  //   } else if (
+  //     oldProductAmounts[barcode] !== productAmounts[barcode] &&
+  //     oldProductAmounts[barcode] !== 0 &&
+  //     productAmounts[barcode] !== 0
+  //   ) {
+  //     // blue button -> old != active and old != 0 and active != 0
+  //     console.log("blue button -> old != active and old != 0 and active != 0");
+  //   } else if (
+  //     oldProductAmounts[barcode] === 0 &&
+  //     productAmounts[barcode] > 0
+  //   ) {
+  //     // green button -> old = 0 and active > 0
+  //     console.log("green button -> old = 0 and active > 0");
+  //   } else if
+  //     (oldProductAmounts[barcode] > 0 &&
+  //     productAmounts[barcode] === 0)
+  //     // red button -> old > 0 and active = 0
+  //     console.log("red button -> old > 0 and active = 0");
+  // };
+
   const decrementAmount = (barcode) => {
+    const newAmount = Math.max(0, (productAmounts[barcode] || 0) - 1);
+    const button = document.querySelector(`#add-to-cart-${barcode}`);
     setProductAmounts({
       ...productAmounts,
-      [barcode]: Math.max(0, (productAmounts[barcode] || 0) - 1),
+      [barcode]: newAmount,
     });
+
+    if (!oldProductAmounts[barcode] && newAmount === 0) {
+      console.log("gray button -> is the old = active");
+      button.style.backgroundColor = 'gray';
+    } else if (!oldProductAmounts[barcode] && newAmount !== 0) {
+      console.log("green button -> is the old = active");
+      button.style.backgroundColor = 'green';
+    } else if (oldProductAmounts[barcode] === newAmount) {
+      console.log("gray button -> is the old = active");
+      button.style.backgroundColor = 'gray';
+    } else if (
+      oldProductAmounts[barcode] !== newAmount &&
+      oldProductAmounts[barcode] !== 0 &&
+      newAmount !== 0
+    ) {
+      console.log("blue button -> old != active and old != 0 and active != 0");
+      button.style.backgroundColor = 'blue';
+    } else if (oldProductAmounts[barcode] === 0 && newAmount > 0) {
+      console.log("green button -> old = 0 and active > 0");
+      button.style.backgroundColor = 'green';
+    } else if (oldProductAmounts[barcode] > 0 && newAmount === 0) {
+      console.log("red button -> old > 0 and active = 0");
+      button.style.backgroundColor = 'red';
+    }
   };
+
+  //============================================================
+  //============================================================
 
   const addToCart = async (barcode) => {
     const response = await addProductToCart(
@@ -186,9 +316,11 @@ function ProductsList() {
     await loadCart(userId);
   };
 
-  const filteredProducts = products.filter((product) => product.category === activeCategory);
-
+  const filteredProducts = products.filter(
+    (product) => product.category === activeCategory
+  );
   return (
+    // console.log(productAmounts),
     <div className="list__product-list">
       {/* <div className="list__search-bar-container">
         <SearchBar />
@@ -242,6 +374,7 @@ function ProductsList() {
               </div>
               <div className="list__product-operations">
                 <div
+                  id={`add-to-cart-${product.barcode}`}
                   className="list__product-operations__confirm"
                   onClick={(e) => {
                     e.stopPropagation();
