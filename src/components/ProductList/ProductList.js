@@ -98,14 +98,6 @@ function ProductsList() {
     return <div>Loading Amounts...</div>;
   }
 
-  // if (!isLoadData)
-  // {
-  //   console.log("productAmounts" , productAmounts[4132231])
-  //   // console.log("products" , productAmounts.cart.products[0])
-  //   // instead of productAmounts.cart.products[0], pring the one who the barcode is 7312040017683:
-  //   // console.log("products" , productAmounts.cart.products.find((product) => product.barcode === "7312040017683"))
-  // }
-
   const handleTouchStart = (event) => {
     const x = event.touches[0].clientX;
     startTouch.current = { x };
@@ -176,7 +168,6 @@ function ProductsList() {
     nav(`/priceList/${productBarcode}`);
   };
 
-
   const incrementAmount = (barcode) => {
     const newAmount = (productAmounts[barcode] || 0) + 1;
     const button = document.querySelector(`#add-to-cart-${barcode}`);
@@ -187,27 +178,28 @@ function ProductsList() {
     // case !old:
     if (!oldProductAmounts[barcode]) {
       console.log("green button -> is the old = active");
-      button.style.backgroundColor = 'green';
-    }
-    else { // case old:
+      button.style.backgroundColor = "green";
+    } else {
+      // case old:
       // case new === 0: -> red and remove from the object:
       if (newAmount === 0) {
         console.log("red button -> is the old = active");
-        button.style.backgroundColor = 'red';
+        button.style.backgroundColor = "red";
       }
       // case new = old:
       else if (newAmount === oldProductAmounts[barcode]) {
         console.log("gray button -> is the old = active");
-        button.style.backgroundColor = 'gray';
+        button.style.backgroundColor = "gray";
       }
       // else (new > 0 && new != old):
       else {
-        console.log("blue button -> old != active and old != 0 and active != 0");
-        button.style.backgroundColor = 'blue';
+        console.log(
+          "blue button -> old != active and old != 0 and active != 0"
+        );
+        button.style.backgroundColor = "blue";
       }
     }
   };
-
 
   const decrementAmount = (barcode) => {
     const newAmount = Math.max(0, (productAmounts[barcode] || 0) - 1);
@@ -219,15 +211,16 @@ function ProductsList() {
 
     // case !old:
     if (!oldProductAmounts[barcode]) {
-      // case new === 0: 
+      // case new === 0:
       if (newAmount === 0) {
         console.log("gray button -> is the old = active");
-        button.style.backgroundColor = 'gray';
+        button.style.backgroundColor = "gray";
       }
       // case new > 0:
-      else { // new > 0
+      else {
+        // new > 0
         console.log("green button -> is the old = active");
-        button.style.backgroundColor = 'green';
+        button.style.backgroundColor = "green";
       }
     }
     // case old:
@@ -235,22 +228,33 @@ function ProductsList() {
       // case new === 0:
       if (newAmount === 0) {
         console.log("red button -> is the old = active");
-        button.style.backgroundColor = 'red';
+        button.style.backgroundColor = "red";
       }
       // case new === old:
       else if (newAmount === oldProductAmounts[barcode]) {
         console.log("gray button -> is the old = active");
-        button.style.backgroundColor = 'gray';
+        button.style.backgroundColor = "gray";
       }
       // else (new > 0 && new != old):
       else {
-        console.log("blue button -> old != active and old != 0 and active != 0");
-        button.style.backgroundColor = 'blue';
+        console.log(
+          "blue button -> old != active and old != 0 and active != 0"
+        );
+        button.style.backgroundColor = "blue";
       }
     }
   };
 
   const addToCart = async (barcode) => {
+    // if the new amount is 0 -> alert "delete from cart" and return:
+    if (productAmounts[barcode] === 0 || !productAmounts[barcode]) {
+      alert("delete from cart");
+      return;
+    }
+    const button = document.querySelector(`#add-to-cart-${barcode}`);
+    // gray button:
+    console.log("gray button");
+    button.style.backgroundColor = "gray";
     const response = await addProductToCart(
       userId,
       barcode,
@@ -258,6 +262,13 @@ function ProductsList() {
     );
     console.log(response);
     await loadCart(userId);
+
+    // update the oldProductAmounts:
+    setOldProductAmounts({
+      ...oldProductAmounts,
+      [barcode]: productAmounts[barcode] || 0,
+    });
+    console.log("updated oldProductAmounts");
   };
 
   const filteredProducts = products.filter(
