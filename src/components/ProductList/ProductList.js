@@ -3,7 +3,11 @@ import { useProducts } from "../../context/ProductContext";
 import { useCart } from "../../context/CartContext";
 import "./ProductsList.css";
 import { useNavigate } from "react-router";
-import { addProductToCart } from "../../network/cartService";
+import {
+  updateProductInCart,
+  addProductToCart,
+  deleteProductFromCart,
+} from "../../network/cartService";
 import Image from "./Images";
 import CategoryNavigation from "./CategoryNavigation";
 
@@ -61,10 +65,40 @@ const discountPriceFormat = (price) => {
   );
 };
 
+const makeVisible = (button) => {
+  button.classList.add("visible");
+};
+
+const makeInvisible = (button) => {
+  button.classList.remove("visible");
+};
+
+const changeButtonToAddProductButton = (button) => {
+  button.style.backgroundColor = "#00c200";
+  makeVisible(button);
+  button.innerText = "הוסף לסל";
+};
+
+const changeButtonToNoChangeAmountButton = (button) => {
+  makeInvisible(button);
+};
+
+const changeButtonToUpdateAmountButton = (button) => {
+  button.style.backgroundColor = "#008cba";
+  makeVisible(button);
+  button.innerText = "עדכן כמות";
+};
+
+const changeButtonToDeleteProductButton = (button) => {
+  button.style.backgroundColor = "#ff0000";
+  makeVisible(button);
+  button.innerText = "הסר מהסל";
+};
+
 function ProductsList() {
   const { products } = useProducts();
   const { allCategories, activeCategory, setActiveCategory } = useProducts();
-  const { getProductsAmountInCart, loadAmounts, loadCart } = useCart();
+  const { getProductsAmountInCart, loadCart } = useCart();
   const [productAmounts, setProductAmounts] = useState({});
   const [oldProductAmounts, setOldProductAmounts] = useState({});
   const userId = "1"; // Replace with actual user ID
@@ -178,25 +212,25 @@ function ProductsList() {
     // case !old:
     if (!oldProductAmounts[barcode]) {
       console.log("green button -> is the old = active");
-      button.style.backgroundColor = "green";
+      changeButtonToAddProductButton(button);
     } else {
       // case old:
       // case new === 0: -> red and remove from the object:
       if (newAmount === 0) {
         console.log("red button -> is the old = active");
-        button.style.backgroundColor = "red";
+        changeButtonToDeleteProductButton(button);
       }
       // case new = old:
       else if (newAmount === oldProductAmounts[barcode]) {
         console.log("gray button -> is the old = active");
-        button.style.backgroundColor = "gray";
+        changeButtonToNoChangeAmountButton(button);
       }
       // else (new > 0 && new != old):
       else {
         console.log(
           "blue button -> old != active and old != 0 and active != 0"
         );
-        button.style.backgroundColor = "blue";
+        changeButtonToUpdateAmountButton(button);
       }
     }
   };
@@ -214,13 +248,13 @@ function ProductsList() {
       // case new === 0:
       if (newAmount === 0) {
         console.log("gray button -> is the old = active");
-        button.style.backgroundColor = "gray";
+        changeButtonToNoChangeAmountButton(button);
       }
       // case new > 0:
       else {
         // new > 0
         console.log("green button -> is the old = active");
-        button.style.backgroundColor = "green";
+        changeButtonToAddProductButton(button);
       }
     }
     // case old:
@@ -228,34 +262,74 @@ function ProductsList() {
       // case new === 0:
       if (newAmount === 0) {
         console.log("red button -> is the old = active");
-        button.style.backgroundColor = "red";
+        changeButtonToDeleteProductButton(button);
       }
       // case new === old:
       else if (newAmount === oldProductAmounts[barcode]) {
         console.log("gray button -> is the old = active");
-        button.style.backgroundColor = "gray";
+        changeButtonToNoChangeAmountButton(button);
       }
       // else (new > 0 && new != old):
       else {
         console.log(
           "blue button -> old != active and old != 0 and active != 0"
         );
-        button.style.backgroundColor = "blue";
+        changeButtonToUpdateAmountButton(button);
       }
     }
   };
 
-  const addToCart = async (barcode) => {
+  const updateAmount = async (barcode) => {
     // if the new amount is 0 -> alert "delete from cart" and return:
+
     if (productAmounts[barcode] === 0 || !productAmounts[barcode]) {
-      alert("delete from cart");
+      const button = document.querySelector(`#add-to-cart-${barcode}`);
+      // gray button:
+      console.log("gray button");
+      changeButtonToNoChangeAmountButton(button);
+      const response = await deleteProductFromCart(userId, barcode);
+      console.log(response);
+      await loadCart(userId);
+
+      // update the oldProductAmounts:
+      setOldProductAmounts({
+        ...oldProductAmounts,
+        [barcode]: productAmounts[barcode] || 0,
+      });
+      console.log("updated oldProductAmounts");
       return;
     }
+
+    // case the old amount is 0 -> add to cart:
+
+    if (!oldProductAmounts[barcode]) {
+      // add to cart:
+      const button = document.querySelector(`#add-to-cart-${barcode}`);
+      // gray button:
+      console.log("gray button");
+      changeButtonToNoChangeAmountButton(button);
+      const response = await addProductToCart(
+        userId,
+        barcode,
+        productAmounts[barcode] || 0
+      );
+      console.log(response);
+      await loadCart(userId);
+
+      // update the oldProductAmounts:
+      setOldProductAmounts({
+        ...oldProductAmounts,
+        [barcode]: productAmounts[barcode] || 0,
+      });
+      console.log("updated oldProductAmounts");
+      return;
+    }
+
     const button = document.querySelector(`#add-to-cart-${barcode}`);
     // gray button:
     console.log("gray button");
-    button.style.backgroundColor = "gray";
-    const response = await addProductToCart(
+    changeButtonToNoChangeAmountButton(button);
+    const response = await updateProductInCart(
       userId,
       barcode,
       productAmounts[barcode] || 0
@@ -329,10 +403,10 @@ function ProductsList() {
                   className="list__product-operations__confirm"
                   onClick={(e) => {
                     e.stopPropagation();
-                    addToCart(product.barcode);
+                    updateAmount(product.barcode);
                   }}
                 >
-                  הוסף לסל
+                  אין שינוי
                 </div>
                 <div
                   className="list__product-operations__add"

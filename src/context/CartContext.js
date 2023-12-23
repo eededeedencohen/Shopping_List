@@ -2,6 +2,7 @@ import { createContext, useCallback, useContext, useState } from "react";
 import {
   getActiveCartByUserID,
   getProductsAmountInCartByUserID,
+  addProductToCart,
   updateProductInCart,
   deleteProductFromCart,
 } from "../network/cartService";
@@ -9,6 +10,7 @@ import {
 import confirmSupermarketCart from "../network/confirmSupermarketCart";
 import updateSupermarketID from "../network/updateSupermarketID";
 import getCheapestSupermarket from "../network/cheapestSupermarket";
+// import { a } from "react-spring";
 
 export const CartContext = createContext();
 
@@ -27,6 +29,10 @@ export const CartContextProvider = ({ children }) => {
     setLoadAmounts(false);
     return data;
   }, []);
+
+  const addNewProduct = async (userId, barcode, amount) => {
+    await addProductToCart(userId, barcode, amount);
+  };
 
   const updateProductAmount = async (userId, barcode) => {
     const cartItem = cart.productsWithPrices.find(
@@ -76,6 +82,7 @@ export const CartContextProvider = ({ children }) => {
         getProductsAmountInCart,
         loadAmounts, 
         updateAmount,
+        addNewProduct,
         updateProductAmount,
         removeProductFromCart,
         confirmCart: handleConfirmCart,

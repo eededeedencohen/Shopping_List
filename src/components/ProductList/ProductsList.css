@@ -72,10 +72,6 @@
   position: relative;
   min-height: calc(100vh - var(--offset-top));
   overflow-y: auto;
-  /* transition: transform 1s ease, background-color 0.5s ease; */
-  /* background-color: #ffffff; Base color */
-  /* transform: translateX(100%);
-  transform: translateX(50%); */
 }
 
 /* Additional CSS to calculate the offset from the top */
@@ -221,12 +217,25 @@
   padding-bottom: 1rem;
 }
 
+
 .list__product-operations__confirm {
-  background-color: #008cba; /* Blue background for confirm */
+  background-color: #808080; /* Blue background for confirm */
   width: 6rem;
   padding: 10px 7px;
   margin-right: 2rem;
+  
+  visibility: hidden;
+  transition: background-color 0.5s ease;
+  opacity: 0; /* start with invisible */
+  transition: background-color 0.5s ease, opacity 0.5s ease, visibility 0s linear 0.5s; /* Animate both background color and opacity */
 }
+
+.visible {
+  opacity: 1;
+  visibility: visible;
+  transition-delay: 0s;
+}
+
 
 .list__product-operations__confirm:hover {
   background-color: #007b9a; /* Darker blue on hover */
