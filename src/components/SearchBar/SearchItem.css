@@ -1,0 +1,160 @@
+.search-item {
+  display: flex;
+  flex-direction: column;
+
+  width: 100%;
+  height: 100%;
+}
+
+.search__product-card {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+}
+
+.search__product-image {
+  height: 100%;
+  width: 30%;
+}
+
+.search__product-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.search__product-details {
+  display: flex;
+  flex-direction: column;
+  width: 70%;
+  height: 100%;
+  justify-content: space-between;
+}
+
+.search__product-name {
+  font-size: 0.8rem;
+  font-weight: bold;
+  color: #333;
+}
+
+.search__procuct-unique-detail {
+  display: flex;
+  flex-direction: row-reverse;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.search__procuct-brand {
+  font-size: 0.8rem;
+  color: #333;
+  margin-left: 0.5rem;
+}
+
+.search__procuct-weight {
+  font-size: 0.8rem;
+  color: #333;
+}
+
+.search__procuct-unitWeight {
+  font-size: 0.8rem;
+  color: #333;
+}
+
+.search__procuct-price {
+  font-size: 0.8rem;
+  color: #333;
+}
+
+.search__procuct-discount {
+  font-size: 0.8rem;
+  color: #333;
+}
+
+.search__product-amount {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin-top: 0.5rem;
+  justify-content: space-between;
+}
+
+.search__product-update-amount {
+  display: flex;
+  flex-direction: row-reverse;
+  justify-content: flex-end;
+  align-items: center;
+  margin-right: 0.5rem;
+}
+
+.search__product-confirm-button,
+.search__product-decrease-amount,
+.search__product-increase-amount {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 5px;
+  padding: 10px 15px;
+  border: 2px solid #ccc;
+  border-radius: 30px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  color: white; /* Text color */
+}
+
+.search__product-decrease-amount,
+.search__product-increase-amount {
+  width: 2rem;
+  height: 2rem;
+  font-size: 1.5rem;
+  padding-bottom: 1rem;
+}
+
+.search__product-increase-amount {
+  background-color: #4caf50; /* Green background for add */
+  margin-right: 0.5rem;
+}
+
+.search__product-amount-number {
+  font-size: 1rem;
+  padding: 5px 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f2f2f2;
+}
+
+.search__product-decrease-amount {
+  background-color: #f44336; /* Red background for reduce */
+  margin-left: 0.5rem;
+}
+
+.search__product-confirm-button {
+  background-color: #808080; /* Blue background for confirm */
+  width: 6rem;
+  padding: 5px 3px;
+  margin-right: 2rem;
+  
+  visibility: hidden;
+  transition: background-color 0.5s ease;
+  opacity: 0; /* start with invisible */
+  transition: background-color 0.5s ease, opacity 0.5s ease, visibility 0s linear 0.5s; /* Animate both background color and opacity */
+}
+
+.visible {
+  opacity: 1;
+  visibility: visible;
+  transition-delay: 0s;
+}
+
+.search__line {
+  height: 2px; /* Defines the thickness of the line */
+  background-color: #ddd; /* Sets the color of the line */
+  margin-bottom: 0.8rem;
+  margin-top: 0.8rem;
+  margin-left: 1rem;
+  margin-right: 1rem;
+}

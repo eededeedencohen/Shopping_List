@@ -41,6 +41,10 @@ export const CartContextProvider = ({ children }) => {
     await updateProductInCart(userId, barcode, cartItem.amount);
   };
 
+  const updateProductAmountInCart = async (userId, barcode, amount) => {
+    await updateProductInCart(userId, barcode, amount);
+  };
+
   const removeProductFromCart = async (userId, barcode) => {
     await deleteProductFromCart(userId, barcode);
   };
@@ -83,8 +87,9 @@ export const CartContextProvider = ({ children }) => {
         loadAmounts, 
         updateAmount,
         addNewProduct,
-        updateProductAmount,
+        updateProductAmountInCart,
         removeProductFromCart,
+        updateProductAmount,
         confirmCart: handleConfirmCart,
         updateSupermarketID: handleSupermarketUpdate,
         getCheapestSupermarketCart: handleCheapestSupermarket,
