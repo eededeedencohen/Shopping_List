@@ -97,6 +97,7 @@ export const ProductContextProvider = ({ children }) => {
   const searchProducts = async (query) => {
     try {
       const response = await getProductByQuery(query);
+      console.log(JSON.parse(response.data).data.products);
       return JSON.parse(response.data).data.products;
     } catch (e) {
       // Do something with error

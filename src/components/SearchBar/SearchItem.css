@@ -1,7 +1,6 @@
 .search-item {
   display: flex;
   flex-direction: column;
-
   width: 100%;
   height: 100%;
 }
@@ -11,7 +10,7 @@
   flex-direction: row;
   width: 100%;
   height: 100%;
-  align-items: center;
+  align-items: flex-start;
 }
 
 .search__product-image {
@@ -31,12 +30,13 @@
   width: 70%;
   height: 100%;
   justify-content: space-between;
+  margin-right: 0.5rem;
 }
 
 .search__product-name {
-  font-size: 0.8rem;
+  font-size: 1rem;
   font-weight: bold;
-  color: #333;
+  color: #2f416e;
 }
 
 .search__procuct-unique-detail {
@@ -47,29 +47,36 @@
 }
 
 .search__procuct-brand {
-  font-size: 0.8rem;
-  color: #333;
+  font-size: 0.9rem;
+  color: #2f416e;
   margin-left: 0.5rem;
+  font-weight: bold;
 }
 
 .search__procuct-weight {
-  font-size: 0.8rem;
-  color: #333;
+  font-size: 0.9rem;
+  color: #2f416e;
 }
 
 .search__procuct-unitWeight {
-  font-size: 0.8rem;
-  color: #333;
+  font-size: 0.9rem;
+  color: #2f416e;
+  margin-right: 0.2rem;
 }
 
 .search__procuct-price {
-  font-size: 0.8rem;
-  color: #333;
+  display: flex;
+  flex-direction: row;
+  font-size: 0.9rem;
+  color: #a0a0a0;
 }
 
 .search__procuct-discount {
-  font-size: 0.8rem;
-  color: #333;
+  display: flex;
+  flex-direction: row;
+  font-size: 0.9rem;
+  color: #ff0000;
+  font-weight: bold;
 }
 
 .search__product-amount {

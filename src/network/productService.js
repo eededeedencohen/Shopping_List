@@ -30,7 +30,9 @@ const getByBarcode = async (barcode) => {
 
 const getProductByQuery = async (query) => {
   const product = await httpClient.get(
-    "/products/search" + encodeURI("?q=" + query)
+    // "/products/search" + encodeURI("?q=" + query)
+    // products/search/:supermarketID - the supermarketID is 1 for now
+    "/products/search/1" + encodeURI("?q=" + query)
   );
   return product;
 };
