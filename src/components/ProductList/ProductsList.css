@@ -120,15 +120,16 @@
   flex-direction: column;
   justify-content: flex-start;
   align-items: flex-end;
-  width: 60%;
+  width: 70%;
   padding-right: 5px;
 }
 
 .list__product-name {
-  font-size: 1.2rem;
+  font-size: 1.1rem;
   font-weight: bold;
   color: #2f416e;
   margin: 0;
+  margin-bottom: 2px;
 }
 
 .list__product-info {
@@ -175,11 +176,22 @@
   margin: 0;
 }
 
+
 .list__product-image {
-  width: 40%;
+  width: 30%;
+  position: relative; /* Position set to relative for aspect ratio */
+}
+
+.list__product-image::before {
+  content: '';
+  display: block;
+  padding-top: 100%; 
 }
 
 .list__product-image img {
+  position: absolute;
+  top: 0;
+  left: 0;
   width: 100%;
   height: 100%;
   object-fit: contain;

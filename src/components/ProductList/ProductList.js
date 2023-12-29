@@ -32,8 +32,8 @@ export const convertWeightUnit = (weightUnit) => {
 };
 
 const max18Characters = (str) => {
-  if (str.length > 18) {
-    return "..." + str.substring(0, 16);
+  if (str.length > 23) {
+    return "..." + str.substring(0, 21);
   }
   return str;
 };
