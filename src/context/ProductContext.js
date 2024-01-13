@@ -45,7 +45,7 @@ export const ProductContextProvider = ({ children }) => {
           return { ...product, amount: amountInfo ? amountInfo.amount : 0 };
         });
 
-        console.log(productsWithAmount);
+        // console.log(productsWithAmount);
         setProducts(JSON.parse(response.products.data).data.products);
       } catch (e) {
         setError(e);
@@ -73,7 +73,7 @@ export const ProductContextProvider = ({ children }) => {
         return { ...product, amount: amountInfo ? amountInfo.amount : 0 };
       });
 
-      console.log(productsWithAmount);
+      // console.log(productsWithAmount);
       setProducts(JSON.parse(response.products.data).data.products);
     } catch (e) {
       setError(e);
@@ -97,7 +97,7 @@ export const ProductContextProvider = ({ children }) => {
   const searchProducts = async (query, supermarketID) => {
     try {
       const response = await getProductByQuery(query, supermarketID);
-      console.log(JSON.parse(response.data).data.products);
+      // console.log(JSON.parse(response.data).data.products);
       return JSON.parse(response.data).data.products;
     } catch (e) {
       // Do something with error

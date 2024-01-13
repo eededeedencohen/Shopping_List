@@ -11,6 +11,7 @@ import CategoryList from "./components/Cart/Category/CategoryList";
 import { Stats } from "./components/Stats/Stats";
 import TouchDirection from "./components/Finger/TouchDirection";
 import SearchBar from "./components/SearchBar/SearchBar";
+import Test from "./components/Test/Test";
 
 function Routing() {
   return (
@@ -27,6 +28,7 @@ function Routing() {
       <Route path="/category" element={<CategoryList />} />
       <Route path="/finger" element={<TouchDirection />} />
       <Route path="/search" element={<SearchBar />} />
+      <Route path="/test" element={<Test />} />
     </Routes>
   );
 }

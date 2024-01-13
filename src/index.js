@@ -6,17 +6,20 @@ import { BrowserRouter } from "react-router-dom";
 import { ProductContextProvider } from "./context/ProductContext";
 import { PriceContextProvider } from "./context/PriceContext";
 import { CartContextProvider } from "./context/CartContext";
+import { CartOptimizationContextProvider } from "./context/cart-optimizationContext";
 
 const root = createRoot(document.getElementById("root"));
 
 root.render(
   <BrowserRouter>
-      <ProductContextProvider>
-        <PriceContextProvider>
-          <CartContextProvider>
+    <ProductContextProvider>
+      <PriceContextProvider>
+        <CartContextProvider>
+          <CartOptimizationContextProvider>
             <App />
-          </CartContextProvider>
-        </PriceContextProvider>
-      </ProductContextProvider>
+          </CartOptimizationContextProvider>
+        </CartContextProvider>
+      </PriceContextProvider>
+    </ProductContextProvider>
   </BrowserRouter>
 );
