@@ -17,11 +17,13 @@ const SearchBar = ({ closeModal }) => {
   const [typingTimeout, setTypingTimeout] = useState(null); // timeout for user typing
   const {
     getProductsAmountInCart,
+    cart,
     loadCart,
     // addNewProduct, // (userId, barcode, amount)
     // updateProductAmountInCart, // (userId, barcode, amount)
     // removeProductFromCart, // (userId, barcode)
   } = useCart();
+  const [supermarketID, setSupermarketID] = useState(null); 
   const [productAmounts, setProductAmounts] = useState({});
   const [oldProductAmounts, setOldProductAmounts] = useState({});
   const [isLoading, setIsLoading] = useState(true);
@@ -49,6 +51,22 @@ const SearchBar = ({ closeModal }) => {
     loadProductAmounts();
   }, [loadCart, userId, getProductsAmountInCart]);
 
+  // load the supermarketID from the cart:
+  useEffect(() => {
+    const loadSupermarketID = async () => {
+      try {
+        setIsLoading(true);
+        const supermarketID = cart.supermarket.supermarketID;
+        setSupermarketID(supermarketID);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    loadSupermarketID();
+  }, [loadCart, cart]);
+
   const onChangeQuery = (event) => {
     let query = event.target.value;
     setSearchQuery(query);
@@ -70,7 +88,7 @@ const SearchBar = ({ closeModal }) => {
 
   const requestSearchResults = async (query) => {
     try {
-      const products = await searchProducts(query);
+      const products = await searchProducts(query, supermarketID);
       setSearchResults(products);
     } catch (error) {
       console.error(error);

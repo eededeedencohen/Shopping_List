@@ -28,11 +28,13 @@ const getByBarcode = async (barcode) => {
   return product;
 };
 
-const getProductByQuery = async (query) => {
+const getProductByQuery = async (query, supermarketID) => {
   const product = await httpClient.get(
     // "/products/search" + encodeURI("?q=" + query)
     // products/search/:supermarketID - the supermarketID is 1 for now
-    "/products/search/1" + encodeURI("?q=" + query)
+    
+    // "/products/search/1" + encodeURI("?q=" + query)
+    `/products/search/${supermarketID}` + encodeURI("?q=" + query)
   );
   return product;
 };

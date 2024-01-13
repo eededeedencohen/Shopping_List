@@ -23,6 +23,7 @@ export const CartContextProvider = ({ children }) => {
     setCart(data);
   }, []);
 
+
   const getProductsAmountInCart = useCallback(async (id) => {
     setLoadAmounts(true);
     const { data } = await getProductsAmountInCartByUserID(id);
@@ -84,7 +85,7 @@ export const CartContextProvider = ({ children }) => {
         cart,
         loadCart,
         getProductsAmountInCart,
-        loadAmounts, 
+        loadAmounts,
         updateAmount,
         addNewProduct,
         updateProductAmountInCart,

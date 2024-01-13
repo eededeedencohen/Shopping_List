@@ -94,9 +94,9 @@ export const ProductContextProvider = ({ children }) => {
     }
   };
 
-  const searchProducts = async (query) => {
+  const searchProducts = async (query, supermarketID) => {
     try {
-      const response = await getProductByQuery(query);
+      const response = await getProductByQuery(query, supermarketID);
       console.log(JSON.parse(response.data).data.products);
       return JSON.parse(response.data).data.products;
     } catch (e) {
