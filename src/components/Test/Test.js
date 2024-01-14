@@ -8,32 +8,21 @@ export default function Test() {
     isDataUploaded,
     supermarketIDs,
     setSupermarketIDs,
-    setProducts,
-    setIsDataUploaded,
+
+    productsSettings,
+    isProductsSettingsUploaded,
+
+    changeCanReplaceAll,
   } = useCartOptimizationContext();
-  const products = [
-    {
-      barcode: "7290100850916", // Doritos Spicy Sour 70g
-      quantity: 2,
-      generalName: "Doritos",
-      weight: 70,
-      productSettings: {
-        maxWeightLoss: 0,
-        maxWeightGain: 0,
-        blackListBrands: [""],
-        canRoundUp: true,
-        canReplace: true,
-      },
-    },
-  ];
 
   const onClickHandler = () => {
     // check the biggest number in the array and add item that bigger than it by 1
     const biggestNum = Math.max(...supermarketIDs);
     setSupermarketIDs([...supermarketIDs, biggestNum + 1]);
+    changeCanReplaceAll(false);
   };
 
-  if (!isDataUploaded) {
+  if (!isDataUploaded || !isProductsSettingsUploaded) {
     return (
       <div>
         <h1>Loading Data...</h1>
@@ -71,6 +60,11 @@ export default function Test() {
         </div>
       ))}
       {console.log(optimalSupermarkets)}
+      {
+        console.log(
+          productsSettings
+        ) /** empty array instead of the full active cart */
+      }
     </div>
   );
 }

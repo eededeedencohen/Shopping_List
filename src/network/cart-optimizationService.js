@@ -14,10 +14,10 @@ const getOptimalSupermarketCarts = async (supermarketIDs, products) => {
   }
 };
 
-const getFullActiveCart = async (supermarketID) => {
+const getFullActiveCart = async (userID) => {
   try {
     const response = await axios.get(
-      `${DOMAIN}/api/v1/supermarket/full-cart/${supermarketID}`
+      `${DOMAIN}/api/v1/supermarket/full-cart/${userID}`
     );
     return response.data;
   } catch (error) {
