@@ -12,6 +12,7 @@ import { Stats } from "./components/Stats/Stats";
 import TouchDirection from "./components/Finger/TouchDirection";
 import SearchBar from "./components/SearchBar/SearchBar";
 import Test from "./components/Test/Test";
+import ListProductsSettings from "./components/CartOptimization/ListProductsSettings";
 
 function Routing() {
   return (
@@ -29,6 +30,7 @@ function Routing() {
       <Route path="/finger" element={<TouchDirection />} />
       <Route path="/search" element={<SearchBar />} />
       <Route path="/test" element={<Test />} />
+      <Route path="/products-settings" element={<ListProductsSettings />} />
     </Routes>
   );
 }

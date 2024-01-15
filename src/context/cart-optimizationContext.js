@@ -33,7 +33,6 @@ export const CartOptimizationContextProvider = ({ children }) => {
     useState(false);
 
   useEffect(() => {
-    console.log("first useEffect");
     const fetchData = async () => {
       try {
         const response = await getOptimalSupermarketCarts(
@@ -58,7 +57,6 @@ export const CartOptimizationContextProvider = ({ children }) => {
     const fetchFullActiveCart = async () => {
       try {
         const response = await getFullActiveCart("1"); // Assuming "1" is a placeholder
-        console.log("response", response);
         if (response && response.data && response.data.productsWithPrices) {
           const newProductSettings = response.data.productsWithPrices.map(
             (product) => ({
@@ -66,6 +64,7 @@ export const CartOptimizationContextProvider = ({ children }) => {
               quantity: product.amount,
               generalName: product.product.generalName,
               weight: product.product.weight,
+              productDetails: product.product,
               productSettings: {
                 maxWeightLoss: 0,
                 maxWeightGain: 0,

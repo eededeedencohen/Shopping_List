@@ -4,7 +4,6 @@ import { useCartOptimizationContext } from "../../context/cart-optimizationConte
 export default function Test() {
   const {
     optimalSupermarkets,
-    // handleOptimize,
     isDataUploaded,
     supermarketIDs,
     setSupermarketIDs,
