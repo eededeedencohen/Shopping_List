@@ -1,0 +1,53 @@
+.product-settings {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #aeaeae;
+  border-radius: 8px;
+  background-color: #f9f9f9;
+  box-shadow: 0px 1px 8px 0px rgba(0, 0, 0, 0.5);
+  padding: 10px 3px 10px 3px;
+  margin: 5px;
+  margin-bottom: 1rem;
+}
+
+.product-settings .can-round-up {
+  display: flex;
+  flex-direction: row-reverse;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+.product-settings .can-round-up .explanation {
+  font-size: 1rem;
+  color: #54006c;
+  margin-right: 3px;
+  font-weight: bold;
+}
+
+.product-settings .checkbox {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.product-settings .checkbox input[type="checkbox"] {
+  width: 1.2rem;
+  height: 1.2rem;
+}
+
+.product-settings .can-replace {
+  display: flex;
+  flex-direction: row-reverse;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.product-settings .can-replace .explanation {
+  font-size: 1rem;
+  color: #54006c;
+  margin-right: 3px;
+  font-weight: bold;
+}

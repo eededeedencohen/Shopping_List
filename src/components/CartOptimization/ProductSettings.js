@@ -1,19 +1,46 @@
 import React from "react";
 import ProductDetails from "./ProductDetails";
 import WeightAccuracy from "./WeightAccuracy";
-// import { useCartOptimizationContext } from "../../context/cart-optimizationContext";
+import "./ProductSettings.css";
+import { useCartOptimizationContext } from "../../context/cart-optimizationContext";
 
 export default function ProductSettings({ product }) {
-  // return the name of the product and the amount - for testing:
+  const { changeCanRoundUp, changeCanReplace } = useCartOptimizationContext();
   return (
-    <div>
-      <h1>---------</h1>
-      <ProductDetails productDetails={product.productDetails } quantity={product.quantity}/>
-      <h1>{product.barcode}</h1>
-      <h1>{product.generalName}</h1>
-      <h1>{product.productSettings.canReplace && "canReplace"}</h1>
-      <WeightAccuracy productSettings={product.productSettings} />
-      <h1>---------</h1>
+    <div className="product-settings">
+      <ProductDetails
+        productDetails={product.productDetails}
+        quantity={product.quantity}
+      />
+      <div className="can-round-up">
+        <div className="explanation">לעגל כמות של המוצר במקרה שקיים מבצע</div>
+        <div className="checkbox">
+          <input
+            type="checkbox"
+            checked={product.productSettings.canRoundUp}
+            onChange={() => changeCanRoundUp(product.barcode)}
+          />
+        </div>
+      </div>
+      <div className="can-replace">
+        <div className="explanation">
+          להחליף במקרה של מוצר חלופי משתלם יותר
+        </div>
+        <div className="checkbox">
+          <input
+            type="checkbox"
+            checked={product.productSettings.canReplace}
+            onChange={() => changeCanReplace(product.barcode)}
+          />
+        </div>
+      </div>
+      {product.productSettings.canReplace && (
+        <WeightAccuracy
+          barcode={product.barcode}
+          productWeight={product.productDetails.weight}
+          productUnitWeight={product.productDetails.unitWeight}
+        />
+      )}
     </div>
   );
 }

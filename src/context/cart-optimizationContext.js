@@ -66,8 +66,8 @@ export const CartOptimizationContextProvider = ({ children }) => {
               weight: product.product.weight,
               productDetails: product.product,
               productSettings: {
-                maxWeightLoss: 0,
-                maxWeightGain: 0,
+                maxWeightLoss: 0, //product.product.weight,
+                maxWeightGain: 0, //product.product.weight,
                 blackListBrands: [""],
                 canRoundUp: true,
                 canReplace: true,
@@ -84,10 +84,82 @@ export const CartOptimizationContextProvider = ({ children }) => {
     fetchFullActiveCart();
   }, []); // Empty array ensures this runs once after initial render
 
+  const changeCanReplace = (barcode) => {
+    const newProductsSettings = productsSettings.map((product) => {
+      if (product.barcode === barcode) {
+        return {
+          ...product,
+          productSettings: {
+            ...product.productSettings,
+            canReplace: !product.productSettings.canReplace,
+          },
+        };
+      }
+      return product;
+    });
+    setProductsSettings(newProductsSettings);
+  };
+
   const changeCanReplaceAll = (canReplace) => {
     const newProductsSettings = productsSettings.map((product) => ({
       ...product,
       productSettings: { ...product.productSettings, canReplace },
+    }));
+    setProductsSettings(newProductsSettings);
+  };
+
+  const changeCanRoundUp = (barcode) => {
+    const newProductsSettings = productsSettings.map((product) => {
+      if (product.barcode === barcode) {
+        return {
+          ...product,
+          productSettings: {
+            ...product.productSettings,
+            canRoundUp: !product.productSettings.canRoundUp,
+          },
+        };
+      }
+      return product;
+    });
+    setProductsSettings(newProductsSettings);
+  };
+
+  const changeMaxWeightGain = (barcode, newMaxWeightGain) => {
+    const newProductsSettings = productsSettings.map((product) => {
+      if (product.barcode === barcode) {
+        return {
+          ...product,
+          productSettings: {
+            ...product.productSettings,
+            maxWeightGain: newMaxWeightGain,
+          },
+        };
+      }
+      return product;
+    });
+    setProductsSettings(newProductsSettings);
+  };
+
+  const changeMaxWeightLoss = (barcode, newMaxWeightLoss) => {
+    const newProductsSettings = productsSettings.map((product) => {
+      if (product.barcode === barcode) {
+        return {
+          ...product,
+          productSettings: {
+            ...product.productSettings,
+            maxWeightLoss: newMaxWeightLoss,
+          },
+        };
+      }
+      return product;
+    });
+    setProductsSettings(newProductsSettings);
+  };
+
+  const changeCanRoundUpAll = (canRoundUp) => {
+    const newProductsSettings = productsSettings.map((product) => ({
+      ...product,
+      productSettings: { ...product.productSettings, canRoundUp },
     }));
     setProductsSettings(newProductsSettings);
   };
@@ -104,6 +176,11 @@ export const CartOptimizationContextProvider = ({ children }) => {
         productsSettings,
         isProductsSettingsUploaded,
         changeCanReplaceAll,
+        changeCanRoundUpAll,
+        changeCanReplace,
+        changeCanRoundUp,
+        changeMaxWeightGain,
+        changeMaxWeightLoss,
       }}
     >
       {children}
