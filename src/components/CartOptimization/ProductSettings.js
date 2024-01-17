@@ -39,6 +39,8 @@ export default function ProductSettings({ product }) {
           barcode={product.barcode}
           productWeight={product.productDetails.weight}
           productUnitWeight={product.productDetails.unitWeight}
+          currentWeightGain={product.productSettings.maxWeightGain}
+          currentWeightLoss={product.productSettings.maxWeightLoss}
         />
       )}
       {product.productSettings.canReplace && (
@@ -47,6 +49,7 @@ export default function ProductSettings({ product }) {
           barcode={product.barcode}
         />
       )}
+      {console.log(product)}
     </div>
   );
 }

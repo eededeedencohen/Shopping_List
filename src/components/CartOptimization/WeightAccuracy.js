@@ -10,14 +10,16 @@ export default function WeightAccuracy({
   barcode,
   productWeight,
   productUnitWeight,
+  currentWeightGain,
+  currentWeightLoss,
 }) {
   const { changeMaxWeightGain, changeMaxWeightLoss } =
     useCartOptimizationContext();
   const [tempWeightGain, setTempWeightGain] = useState(
-    formatProductWeight(productWeight, productUnitWeight)
+    formatProductWeight(productWeight + currentWeightGain, productUnitWeight)
   );
   const [tempWeightLoss, setTempWeightLoss] = useState(
-    formatProductWeight(productWeight, productUnitWeight)
+    formatProductWeight(productWeight - currentWeightLoss, productUnitWeight)
   );
 
   const handleWeightGainChange = (event) => {
