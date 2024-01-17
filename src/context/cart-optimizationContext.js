@@ -2,6 +2,8 @@ import React, { createContext, useState, useContext, useEffect } from "react";
 import {
   getOptimalSupermarketCarts,
   getFullActiveCart,
+  getAllBrands,
+  getAllSupermarkets,
 } from "../network/cart-optimizationService";
 
 export const CartOptimizationContext = createContext();
@@ -68,7 +70,7 @@ export const CartOptimizationContextProvider = ({ children }) => {
               productSettings: {
                 maxWeightLoss: 0, //product.product.weight,
                 maxWeightGain: 0, //product.product.weight,
-                blackListBrands: [""],
+                blackListBrands: [],
                 canRoundUp: true,
                 canReplace: true,
               },
@@ -83,6 +85,91 @@ export const CartOptimizationContextProvider = ({ children }) => {
     };
     fetchFullActiveCart();
   }, []); // Empty array ensures this runs once after initial render
+
+  // all supermarkets - will be uploaded with useEffect:  without dependency - will be uploaded once
+  const [allSupermarkets, setAllSupermarkets] = useState([]);
+  const [isAllSupermarketsUploaded, setIsAllSupermarketsUploaded] =
+    useState(false);
+
+  useEffect(() => {
+    const fetchAllSupermarkets = async () => {
+      try {
+        const response = await getAllSupermarkets();
+        if (response && response.data && response.data.allSupermarkets) {
+          setAllSupermarkets(response.data.allSupermarkets);
+          setIsAllSupermarketsUploaded(true);
+        }
+      } catch (error) {
+        console.error("Error in fetching all supermarkets: ", error);
+        setIsAllSupermarketsUploaded(false);
+      }
+    };
+    fetchAllSupermarkets();
+  }, []);
+
+  /**
+   * ===============================================
+   * Brands black list management methods:
+   * ===============================================
+   */
+  const [allBrands, setAllBrands] = useState([]);
+  const [isAllBrandsUploaded, setIsAllBrandsUploaded] = useState(false);
+  useEffect(() => {
+    const fetchAllBrands = async () => {
+      try {
+        const response = await getAllBrands();
+        if (response) {
+          setAllBrands(response.data.brands);
+          setIsAllBrandsUploaded(true);
+        }
+      } catch (error) {
+        console.error("Error in fetching all brands: ", error);
+        setIsAllBrandsUploaded(false);
+      }
+    };
+    fetchAllBrands();
+  }, []);
+
+  const getBlackListBrands = (barcode) => {
+    const product = productsSettings.find(
+      (product) => product.barcode === barcode
+    );
+    return product.productSettings.blackListBrands;
+  };
+
+  const insertBrandToBlackList = (barcode, brand) => {
+    const newProductsSettings = productsSettings.map((product) => {
+      if (product.barcode === barcode) {
+        return {
+          ...product,
+          productSettings: {
+            ...product.productSettings,
+            blackListBrands: [...product.productSettings.blackListBrands, brand],
+          },
+        };
+      }
+      return product;
+    });
+    setProductsSettings(newProductsSettings);
+  };
+
+  const removeBrandFromBlackList = (barcode, brand) => {
+    const newProductsSettings = productsSettings.map((product) => {
+      if (product.barcode === barcode) {
+        return {
+          ...product,
+          productSettings: {
+            ...product.productSettings,
+            blackListBrands: product.productSettings.blackListBrands.filter(
+              (b) => b !== brand
+            ),
+          },
+        };
+      }
+      return product;
+    });
+    setProductsSettings(newProductsSettings);
+  };
 
   const changeCanReplace = (barcode) => {
     const newProductsSettings = productsSettings.map((product) => {
@@ -181,6 +268,17 @@ export const CartOptimizationContextProvider = ({ children }) => {
         changeCanRoundUp,
         changeMaxWeightGain,
         changeMaxWeightLoss,
+
+        // brands:
+        allBrands,
+        isAllBrandsUploaded,
+        getBlackListBrands,
+        insertBrandToBlackList,
+        removeBrandFromBlackList,
+
+        // supermarkets:
+        allSupermarkets,
+        isAllSupermarketsUploaded,
       }}
     >
       {children}

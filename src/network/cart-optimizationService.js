@@ -26,4 +26,46 @@ const getFullActiveCart = async (userID) => {
   }
 };
 
-export { getOptimalSupermarketCarts, getFullActiveCart };
+const getAllBrands = async () => {
+  try {
+    const response = await axios.get(
+      `${DOMAIN}/api/v1/cart-optimization/allBrands`
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error in fetching all brands: ", error);
+    throw error;
+  }
+};
+
+const getAllBrandsByGeneralName = async (generalName) => {
+  try {
+    const response = await axios.get(
+      `${DOMAIN}/api/v1/cart-optimization/allBrandsByGeneralName/${generalName}`
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error in fetching all brands by general name: ", error);
+    throw error;
+  }
+};
+
+const getAllSupermarkets = async () => {
+  try {
+    const response = await axios.get(
+      `${DOMAIN}/api/v1/cart-optimization/allSupermarkets`
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error in fetching all supermarkets: ", error);
+    throw error;
+  }
+};
+
+export {
+  getOptimalSupermarketCarts,
+  getFullActiveCart,
+  getAllBrands,
+  getAllBrandsByGeneralName,
+  getAllSupermarkets,
+};

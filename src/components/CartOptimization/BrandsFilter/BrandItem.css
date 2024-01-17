@@ -1,0 +1,32 @@
+.brand-item {
+  display: flex;
+  flex-direction: row-reverse;
+  margin-top: 1rem;
+}
+
+.brand-item .brand-item__brand-name {
+    width: 80%;
+    font-size: 1.2rem;
+    font-weight: 500;
+    color: #000;
+    text-align: right;
+    padding-right: 1rem;
+    transition: all 0.3s ease-in-out;
+}
+
+.brand-item .brand-item__checkbox {
+    width: 20%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: all 0.3s ease-in-out;
+}
+
+.brand-item .brand-item__checkbox input[type="checkbox"] {
+    width: 1.5rem;
+    height: 1.5rem;
+    border: 1px solid #000;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+}
