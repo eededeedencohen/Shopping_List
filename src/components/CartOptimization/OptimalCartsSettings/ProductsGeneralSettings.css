@@ -1,0 +1,128 @@
+.products-general-settings {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  padding: 0 0 0 0;
+  margin: 0 0 0 0;
+  font-size: 0.9rem;
+  font-weight: bold;
+}
+
+.can-replace-general-settings {
+  display: flex;
+  flex-direction: row-reverse;
+  justify-content: space-around;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  padding: 0 0 0 0;
+  margin: 1rem 0 1rem 0;
+}
+
+.can-round-up-general-settings .all-products,
+.can-replace-general-settings .all-products {
+  display: flex;
+  flex-direction: row-reverse;
+  justify-content: center;
+  align-items: center;
+  background-color: #d1ffd1;
+  width: 100px;
+  height: 100px;
+  border-radius: 5px;
+  border: 1px solid black;
+  margin: 0 0 0 0;
+  padding: 0 0 0 0;
+  text-align: center;
+}
+
+.can-round-up-general-settings .some-products,
+.can-replace-general-settings .some-products {
+  display: flex;
+  flex-direction: row-reverse;
+  justify-content: center;
+  align-items: center;
+  background-color: #bcddff;
+  width: 100px;
+  height: 100px;
+  border-radius: 5px;
+  border: 1px solid black;
+  margin: 0 0 0 0;
+  padding: 0 0 0 0;
+  text-align: center;
+}
+
+.can-round-up-general-settings .no-products,
+.can-replace-general-settings .no-products {
+  display: flex;
+  flex-direction: row-reverse;
+  justify-content: center;
+  align-items: center;
+  background-color: #ffc3c3;
+  width: 100px;
+  height: 100px;
+  border-radius: 5px;
+  border: 1px solid black;
+  margin: 0 0 0 0;
+  padding: 0 0 0 0;
+  text-align: center;
+}
+
+.can-round-up-general-settings {
+  display: flex;
+  flex-direction: row-reverse;
+  justify-content: space-around;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  padding: 0 0 0 0;
+  margin: 0 0 0 0;
+  margin: 0 0 1rem 0;
+}
+
+.all-products,
+.some-products,
+.no-products {
+  box-shadow: 0 0 2px 4px #666;
+  transition: transform 0.2s linear, box-shadow 0.2s linear;
+}
+
+.active {
+  transform: translateY(2px);
+  color: #ffffff !important;
+}
+
+.can-replace-general-settings .some-products.active,
+.can-round-up-general-settings .some-products.active {
+  background-color: #0091ff !important;
+  box-shadow: 0 0 15px 1px #00bfff !important;
+}
+
+.can-replace-general-settings .no-products.active,
+.can-round-up-general-settings .no-products.active {
+  background-color: #ff3434 !important;
+  box-shadow: 0 0 15px 1px #ff0000 !important;
+}
+
+.can-replace-general-settings .all-products.active,
+.can-round-up-general-settings .all-products.active {
+  background-color: #00cb00 !important;
+  box-shadow: 0 0 15px 1px #00ff00 !important;
+}
+
+/*
+Keyframes to the box-shadow
+When the button is pressed these things happen:
+- the blur goes from 5px to 0px
+- the spread goes from 8px to 0px
+*/
+@keyframes pressed {
+  0% {
+    box-shadow: 0 0 5px 8px #666;
+  }
+  100% {
+    box-shadow: 0 0 0px 0px #666;
+  }
+}

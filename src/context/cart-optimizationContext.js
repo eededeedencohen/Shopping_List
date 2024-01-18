@@ -9,50 +9,38 @@ import {
 export const CartOptimizationContext = createContext();
 
 export const CartOptimizationContextProvider = ({ children }) => {
-  const [isDataUploaded, setIsDataUploaded] = useState(false);
+  const [canReplaceSettings, setCanReplaceSettings] = useState("bySelect"); // bySelect, all, none
+  const [canRoundUpSettings, setCanRoundUpSettings] = useState("bySelect"); // bySelect, all, none
+
+  const changeCanReplaceSettings = (newCanReplaceSettings) => {
+    setCanReplaceSettings(newCanReplaceSettings);
+  };
+
+  const changeCanRoundUpSettings = (newCanRoundUpSettings) => {
+    setCanRoundUpSettings(newCanRoundUpSettings);
+  };
+
   const [supermarketIDs, setSupermarketIDs] = useState(
     [...Array(3).keys()].map((num) => num + 1)
   );
-  const [products, setProducts] = useState([
-    {
-      barcode: "7290100850916", // Doritos Spicy Sour 70g
-      quantity: 2,
-      generalName: "Doritos",
-      weight: 70,
-      productSettings: {
-        maxWeightLoss: 0,
-        maxWeightGain: 0,
-        blackListBrands: [""],
-        canRoundUp: true,
-        canReplace: true,
-      },
-    },
-  ]);
-  const [optimalSupermarkets, setOptimalSupermarkets] = useState([]);
 
   const [productsSettings, setProductsSettings] = useState([]);
   const [isProductsSettingsUploaded, setIsProductsSettingsUploaded] =
     useState(false);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await getOptimalSupermarketCarts(
-          supermarketIDs,
-          products
-        );
-        if (response && response.data && response.data.optimalCarts) {
-          setOptimalSupermarkets(response.data.optimalCarts);
-          setIsDataUploaded(true);
-        }
-      } catch (error) {
-        console.error("Error in fetching data: ", error);
-        setIsDataUploaded(false);
+  const getOptimalsCarts = async () => {
+    try {
+      const response = await getOptimalSupermarketCarts(
+        supermarketIDs,
+        productsSettings
+      );
+      if (response && response.data && response.data.optimalCarts) {
+        return response.data.optimalCarts;
       }
-    };
-
-    fetchData();
-  }, [supermarketIDs, products]);
+    } catch (error) {
+      console.error("Error in fetching data: ", error);
+    }
+  };
 
   // useEffect to fetch full active cart and then set product settings
   useEffect(() => {
@@ -68,8 +56,8 @@ export const CartOptimizationContextProvider = ({ children }) => {
               weight: product.product.weight,
               productDetails: product.product,
               productSettings: {
-                maxWeightLoss: 0, //product.product.weight,
-                maxWeightGain: 0, //product.product.weight,
+                maxWeightLoss: 0,
+                maxWeightGain: 0,
                 blackListBrands: [],
                 canRoundUp: true,
                 canReplace: true,
@@ -144,7 +132,10 @@ export const CartOptimizationContextProvider = ({ children }) => {
           ...product,
           productSettings: {
             ...product.productSettings,
-            blackListBrands: [...product.productSettings.blackListBrands, brand],
+            blackListBrands: [
+              ...product.productSettings.blackListBrands,
+              brand,
+            ],
           },
         };
       }
@@ -194,6 +185,17 @@ export const CartOptimizationContextProvider = ({ children }) => {
     }));
     setProductsSettings(newProductsSettings);
   };
+  // wrapp with callback:
+  // const changeCanReplaceAll = useCallback(
+  //   (canReplace) => {
+  //     const newProductsSettings = productsSettings.map((product) => ({
+  //       ...product,
+  //       productSettings: { ...product.productSettings, canReplace },
+  //     }));
+  //     setProductsSettings(newProductsSettings);
+  //   },
+  //   [productsSettings]
+  // );
 
   const changeCanRoundUp = (barcode) => {
     const newProductsSettings = productsSettings.map((product) => {
@@ -210,6 +212,26 @@ export const CartOptimizationContextProvider = ({ children }) => {
     });
     setProductsSettings(newProductsSettings);
   };
+
+  const changeCanRoundUpAll = (canRoundUp) => {
+    const newProductsSettings = productsSettings.map((product) => ({
+      ...product,
+      productSettings: { ...product.productSettings, canRoundUp },
+    }));
+    setProductsSettings(newProductsSettings);
+  };
+  // wrapp with callback:
+  // const changeCanRoundUpAll = useCallback(
+  //   (canRoundUp) => {
+  //     const newProductsSettings = productsSettings.map((product) => ({
+  //       ...product,
+  //       productSettings: { ...product.productSettings, canRoundUp },
+  //     }));
+  //     setProductsSettings(newProductsSettings);
+  //   },
+  //   [productsSettings]
+  // );
+
 
   const changeMaxWeightGain = (barcode, newMaxWeightGain) => {
     const newProductsSettings = productsSettings.map((product) => {
@@ -243,27 +265,13 @@ export const CartOptimizationContextProvider = ({ children }) => {
     setProductsSettings(newProductsSettings);
   };
 
-  const changeCanRoundUpAll = (canRoundUp) => {
-    const newProductsSettings = productsSettings.map((product) => ({
-      ...product,
-      productSettings: { ...product.productSettings, canRoundUp },
-    }));
-    setProductsSettings(newProductsSettings);
-  };
-
   return (
     <CartOptimizationContext.Provider
       value={{
-        optimalSupermarkets,
-        isDataUploaded,
         supermarketIDs,
         setSupermarketIDs,
-        products,
-        setProducts,
         productsSettings,
         isProductsSettingsUploaded,
-        changeCanReplaceAll,
-        changeCanRoundUpAll,
         changeCanReplace,
         changeCanRoundUp,
         changeMaxWeightGain,
@@ -279,6 +287,17 @@ export const CartOptimizationContextProvider = ({ children }) => {
         // supermarkets:
         allSupermarkets,
         isAllSupermarketsUploaded,
+
+        // Oprtimal Carts:
+        getOptimalsCarts,
+
+        // main page of settings:
+        canReplaceSettings,
+        canRoundUpSettings,
+        changeCanReplaceSettings,
+        changeCanRoundUpSettings,
+        changeCanReplaceAll,
+        changeCanRoundUpAll,
       }}
     >
       {children}
