@@ -20,9 +20,7 @@ export const CartOptimizationContextProvider = ({ children }) => {
     setCanRoundUpSettings(newCanRoundUpSettings);
   };
 
-  const [supermarketIDs, setSupermarketIDs] = useState(
-    [...Array(3).keys()].map((num) => num + 1)
-  );
+  const [supermarketIDs, setSupermarketIDs] = useState([]);
 
   const [productsSettings, setProductsSettings] = useState([]);
   const [isProductsSettingsUploaded, setIsProductsSettingsUploaded] =
@@ -83,8 +81,22 @@ export const CartOptimizationContextProvider = ({ children }) => {
     const fetchAllSupermarkets = async () => {
       try {
         const response = await getAllSupermarkets();
-        if (response && response.data && response.data.allSupermarkets) {
-          setAllSupermarkets(response.data.allSupermarkets);
+        if (response && response.data && response.data.supermarkets) {
+          // remove duplicates by the supermarketID field:
+          const supermarketsNoDuplicated = response.data.supermarkets.reduce(
+            (acc, current) => {
+              const x = acc.find(
+                (item) => item.supermarketID === current.supermarketID
+              );
+              if (!x) {
+                return acc.concat([current]);
+              } else {
+                return acc;
+              }
+            },
+            []
+          );
+          setAllSupermarkets(supermarketsNoDuplicated);
           setIsAllSupermarketsUploaded(true);
         }
       } catch (error) {
@@ -162,6 +174,23 @@ export const CartOptimizationContextProvider = ({ children }) => {
     setProductsSettings(newProductsSettings);
   };
 
+  /**
+   * ===============================================
+   * Supermarkets management methods:
+   * ===============================================
+   */
+  const insertSupermarketID = (supermarketID) => {
+    if (!supermarketIDs.includes(supermarketID)) {
+      setSupermarketIDs([...supermarketIDs, supermarketID]);
+    }
+  };
+
+  const removeSupermarketID = (supermarketID) => {
+    if (supermarketIDs.includes(supermarketID)) {
+      setSupermarketIDs(supermarketIDs.filter((id) => id !== supermarketID));
+    }
+  };
+
   const changeCanReplace = (barcode) => {
     const newProductsSettings = productsSettings.map((product) => {
       if (product.barcode === barcode) {
@@ -185,17 +214,6 @@ export const CartOptimizationContextProvider = ({ children }) => {
     }));
     setProductsSettings(newProductsSettings);
   };
-  // wrapp with callback:
-  // const changeCanReplaceAll = useCallback(
-  //   (canReplace) => {
-  //     const newProductsSettings = productsSettings.map((product) => ({
-  //       ...product,
-  //       productSettings: { ...product.productSettings, canReplace },
-  //     }));
-  //     setProductsSettings(newProductsSettings);
-  //   },
-  //   [productsSettings]
-  // );
 
   const changeCanRoundUp = (barcode) => {
     const newProductsSettings = productsSettings.map((product) => {
@@ -220,18 +238,6 @@ export const CartOptimizationContextProvider = ({ children }) => {
     }));
     setProductsSettings(newProductsSettings);
   };
-  // wrapp with callback:
-  // const changeCanRoundUpAll = useCallback(
-  //   (canRoundUp) => {
-  //     const newProductsSettings = productsSettings.map((product) => ({
-  //       ...product,
-  //       productSettings: { ...product.productSettings, canRoundUp },
-  //     }));
-  //     setProductsSettings(newProductsSettings);
-  //   },
-  //   [productsSettings]
-  // );
-
 
   const changeMaxWeightGain = (barcode, newMaxWeightGain) => {
     const newProductsSettings = productsSettings.map((product) => {
@@ -287,6 +293,8 @@ export const CartOptimizationContextProvider = ({ children }) => {
         // supermarkets:
         allSupermarkets,
         isAllSupermarketsUploaded,
+        insertSupermarketID,
+        removeSupermarketID,
 
         // Oprtimal Carts:
         getOptimalsCarts,

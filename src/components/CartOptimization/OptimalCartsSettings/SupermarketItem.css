@@ -1,0 +1,55 @@
+.supermarket-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+}
+
+.supermarket-item .supermarket-item-name{
+    font-size: 1.2rem;
+    font-weight: 500;
+    color: #208a00;
+    text-align: center;
+    transition: all 0.3s ease-in-out;
+}
+
+
+.supermarket-item .supermarket-item-address{
+    font-size: 1rem;
+    font-weight: 500;
+    color: #424242;
+    text-align: center;
+    transition: all 0.3s ease-in-out;
+}
+
+.supermarket-item .supermarket-item-city{
+    font-size: 1rem;
+    font-weight: 500;
+    color: #424242;
+    text-align: center;
+    transition: all 0.3s ease-in-out;
+}
+
+
+.supermarket-item .supermarket-item-checkbox {
+    width: 30%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: all 0.3s ease-in-out;
+    align-self: flex-start;
+}
+
+.supermarket-item .supermarket-item-checkbox input[type="checkbox"] {
+    width: 1.5rem;  /* Increased from 2rem to 3rem */
+    height: 1.5rem; /* Increased from 2rem to 3rem */
+    border: 1px solid #000;
+    border-radius: 50%; /* Keeps it circular */
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+}
+
+
+

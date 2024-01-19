@@ -14,7 +14,7 @@ const OptimalCartsSettings = () => {
 
   return (
     <div className="optimal-carts-settings">
-      <div 
+      <div
         className="products-settings-button"
         // Correct usage of navigate function
         onClick={() => navigate("/products-settings")}
@@ -22,8 +22,8 @@ const OptimalCartsSettings = () => {
         Products Settings
       </div>
       <ProductsGeneralSettings />
-      <CalculationOptimalCarts />
       <SupermarketsFilter />
+      <CalculationOptimalCarts />
     </div>
   );
 };
