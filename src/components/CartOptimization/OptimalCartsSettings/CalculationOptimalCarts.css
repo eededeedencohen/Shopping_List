@@ -1,0 +1,101 @@
+.calculation-optimal-carts {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+.swipe-area {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  /* Align children to the start (left) */
+  width: 90%;
+  height: 3rem;
+  background-color: rgb(0, 0, 0);
+  border-radius: 25px;
+  margin-top: 5rem;
+  position: relative;
+  /* Added to position the circle relative to this container */
+}
+
+.swipe-area .swipe-moving-circle {
+  width: 3rem;
+  height: 3rem;
+  background-color: rgb(123, 255, 0);
+  border-radius: 50%;
+  position: absolute;
+  /* Positioning the circle absolutely within its parent */
+  left: 0;
+  /* Align to the left edge */
+  transition: all 0.3s ease 0s;
+  cursor: pointer;
+}
+
+.swipe-area .swipe-label {
+  font-size: 1.5rem;
+  color: rgb(255, 255, 255);
+  font-weight: 700;
+  transition: all 0.3s ease 0s;
+}
+
+.div {
+  display: block;
+  width: 98%;
+  height: 68px;
+  text-align: center;
+  background: #2e2e2e;
+  border-radius: 500px;
+  text-align: center;
+  margin: 2rem auto;
+  margin-top: 5rem;
+  position: relative;
+  /* border: 5px solid #8e8e8e; */
+}
+
+span.swipe {
+  display: inline-block;
+  width: 64px;
+  height: 64px;
+  border-radius: 100%;
+  background-color: #1ca603;
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  transition: left 0.3s ease; /* Add this line for transition */
+}
+
+span.text {
+  line-height: 64px;
+  font-family: sans-serif;
+  font-size: 1.3rem;
+  background: -webkit-linear-gradient(
+    58deg,
+    rgba(51, 51, 51, 1) 40%,
+    rgba(238, 238, 238, 1) 50%,
+    rgba(51, 51, 51, 1) 60%
+  );
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-size: 450px 64px;
+  animation-name: animate;
+  animation-iteration-count: infinite;
+  animation-duration: 3s;
+  animation-timing-function: ease;
+}
+
+@keyframes animate {
+  from {
+    background-position: right;
+  }
+  to {
+    background-position: left;
+  }
+}
