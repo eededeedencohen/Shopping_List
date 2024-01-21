@@ -14,6 +14,7 @@ import SearchBar from "./components/SearchBar/SearchBar";
 import Test from "./components/Test/Test";
 import ListProductsSettings from "./components/CartOptimization/ListProductsSettings";
 import OptimalCartsSettings from "./components/CartOptimization/OptimalCartsSettings/OptimalCartsSettings";
+import OptimalsSupermarketCarts from "./components/CartOptimization/OptimalsSupermarketCarts/OptimalsSupermarketCarts";
 
 function Routing() {
   return (
@@ -33,6 +34,7 @@ function Routing() {
       <Route path="/test" element={<Test />} />
       <Route path="/products-settings" element={<ListProductsSettings />} />
       <Route path="/optimal-carts-settings" element={<OptimalCartsSettings />} />
+      <Route path="/optimal-supermarket-carts" element={<OptimalsSupermarketCarts />} />
     </Routes>
   );
 }

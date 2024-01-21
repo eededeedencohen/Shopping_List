@@ -13,13 +13,14 @@
 // };
 
 import React, { useState, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import "./CalculationOptimalCarts.css";
 
 const CalculationOptimalCarts = () => {
   const [position, setPosition] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
   const containerRef = useRef(null);
-  
+  const navigate = useNavigate();
 
   const startDragging = () => {
     setIsDragging(true);
@@ -48,6 +49,7 @@ const CalculationOptimalCarts = () => {
       setPosition(0); // Reset position to left side with animation
     } else {
       console.log("Reached the right side");
+      navigate("/optimal-supermarket-carts");
     }
   };
 

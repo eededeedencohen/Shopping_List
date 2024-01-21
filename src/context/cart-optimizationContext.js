@@ -26,17 +26,33 @@ export const CartOptimizationContextProvider = ({ children }) => {
   const [isProductsSettingsUploaded, setIsProductsSettingsUploaded] =
     useState(false);
 
+  const [isOptimalCartsUploaded, setIsOptimalCartsUploaded] = useState(false);
   const getOptimalsCarts = async () => {
+    // try {
+    //   const response = await getOptimalSupermarketCarts(
+    //     supermarketIDs,
+    //     productsSettings
+    //   );
+    //   if (response && response.data && response.data.optimalCarts) {
+    //     return response.data.optimalCarts;
+    //   }
+    // } catch (error) {
+    //   console.error("Error in fetching data: ", error);
+    // }
+
+    // same but with update the useState:
     try {
       const response = await getOptimalSupermarketCarts(
         supermarketIDs,
         productsSettings
       );
       if (response && response.data && response.data.optimalCarts) {
+        setIsOptimalCartsUploaded(true);
         return response.data.optimalCarts;
       }
     } catch (error) {
       console.error("Error in fetching data: ", error);
+      setIsOptimalCartsUploaded(false);
     }
   };
 
@@ -298,6 +314,7 @@ export const CartOptimizationContextProvider = ({ children }) => {
 
         // Oprtimal Carts:
         getOptimalsCarts,
+        isOptimalCartsUploaded,
 
         // main page of settings:
         canReplaceSettings,
