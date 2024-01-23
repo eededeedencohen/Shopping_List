@@ -57,11 +57,13 @@ export const CartOptimizationContextProvider = ({ children }) => {
   };
 
   // useEffect to fetch full active cart and then set product settings
+  const [fullCart, setFullCart] = useState([]);
   useEffect(() => {
     const fetchFullActiveCart = async () => {
       try {
         const response = await getFullActiveCart("1"); // Assuming "1" is a placeholder
         if (response && response.data && response.data.productsWithPrices) {
+          setFullCart(response.data);
           const newProductSettings = response.data.productsWithPrices.map(
             (product) => ({
               barcode: product.product.barcode,
@@ -315,6 +317,7 @@ export const CartOptimizationContextProvider = ({ children }) => {
         // Oprtimal Carts:
         getOptimalsCarts,
         isOptimalCartsUploaded,
+        fullCart,
 
         // main page of settings:
         canReplaceSettings,

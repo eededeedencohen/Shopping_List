@@ -57,6 +57,11 @@ export const ProductContextProvider = ({ children }) => {
     getProducts();
   }, []);
 
+  // get product by barcode from the products useState (asume that the products useState is already loaded):
+  const getProductDetailsByBarcode = (barcode) => {
+    return products.find((product) => product.barcode === barcode);
+  };
+
   const loadProducts = async () => {
     setLoading(true);
     try {
@@ -121,6 +126,9 @@ export const ProductContextProvider = ({ children }) => {
         allCategories,
         activeCategory,
         setActiveCategory,
+
+        // get product fron the useState:
+        getProductDetailsByBarcode,
       }}
     >
       {children}

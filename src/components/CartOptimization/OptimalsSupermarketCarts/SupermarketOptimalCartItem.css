@@ -1,0 +1,107 @@
+.supermarket-optimal-cart-item {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 1rem;
+  background-color: #f0f0f0;
+  border-radius: 10px;
+  padding: 5px;
+}
+
+.optimal-cart-details {
+  display: flex;
+  flex-direction: row-reverse;
+}
+
+.supermarket-details {
+  display: flex;
+  flex-direction: column;
+  width: 50%;
+}
+
+.supermarket-name {
+  width: 100%; /* Full width of the supermarket-details */
+  height: 0; /* Initially set to 0 */
+  padding-top: 30%; /* Adjust this percentage to control the height */
+  position: relative; /* positioned relative to the supermarket-details div */
+  overflow: hidden; /* Hide the overflowing image */
+}
+
+.supermarket-name img {
+  position: absolute; 
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain; /* Maintains the aspect ratio */
+}
+
+.supermarket-address {
+  text-align: center;
+  font-size: 1rem;
+  color: #101010;
+  font-weight: bold;
+}
+
+.supermarket-city {
+  text-align: center;
+  font-size: 1rem;
+  color: #101010;
+  font-weight: bold;
+}
+
+.total-price-details {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  flex-direction: row-reverse;
+  width: 50%;
+}
+
+.total-price-text {
+  text-align: center;
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #004008;
+  margin-left: 4px;
+}
+
+.total-price-number {
+  text-align: center;
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #004008;
+}
+
+.non-exists-products {
+  display: flex;
+  flex-direction: column;
+  margin-right: 1rem;
+  margin-top: 0.5rem;
+}
+
+.non-exists-products-text {
+  display: flex;
+  flex-direction: row-reverse;
+
+  font-size: 1rem;
+  font-weight: bold;
+  color: #630000;
+  margin-left: 4px;
+}
+
+.non-exists-products-names {
+  display: flex;
+  flex-direction: row-reverse;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  align-content: flex-start;
+}
+
+.non-exists-product {
+  text-align: center;
+  font-size: 1rem;
+  color: #630000;
+  margin-left: 4px; /* Adjust if necessary for spacing */
+  margin-bottom: 4px; /* Add this for vertical spacing between rows */
+}

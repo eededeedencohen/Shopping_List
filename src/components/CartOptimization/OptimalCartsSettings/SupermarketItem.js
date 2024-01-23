@@ -16,7 +16,6 @@ const SupermarketItem = ({ supermarketObject }) => {
 
   return (
     <div className="supermarket-item">
-      {console.log("supermarketIDs: ", supermarketIDs)}
       <div className="supermarket-item-name">{supermarketObject.name}</div>
       <div className="supermarket-item-address">
         ,{supermarketObject.address}
