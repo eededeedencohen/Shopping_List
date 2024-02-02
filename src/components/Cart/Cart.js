@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { useCart } from "../../context/CartContext";
 import { useProducts } from "../../context/ProductContext";
 import Modal from "./Modal";
@@ -7,7 +8,7 @@ import "./Cart.css";
 import { Spin } from "antd";
 import Images from "../ProductList/Images";
 import SupermarketImage from "./supermarketImage";
-import trashIcon from './trash.png'; 
+import trashIcon from "./trash.png";
 
 export const convertWeightUnit = (weightUnit) => {
   weightUnit = weightUnit.toLowerCase();
@@ -38,6 +39,7 @@ export default function Cart() {
     updateSupermarketID,
     getCheapestSupermarketCart,
   } = useCart();
+  const navigate = useNavigate();
   const { loadProducts } = useProducts();
   const userId = "1"; // Replace this with the actual userId.
   const [isLoading, setIsLoading] = useState(false);
@@ -217,6 +219,11 @@ export default function Cart() {
         </button>
         {isReplaceSupermarket && <div>Loading...</div>}{" "}
         {/* Optional: Show a loading indicator */}
+      </div>
+      <div className="cart-optimization-settings">
+        <button onClick={() => navigate("/optimal-carts-settings")}>
+          מעבר לאופטימיזציית עגלות
+        </button>
       </div>
 
       <div className="supermarket">

@@ -2,6 +2,7 @@ import React from "react";
 import "./SupermarketOptimalCartItem.css";
 import SupermarketImage from "../../Images/SupermarketImage";
 import { useProducts } from "../../../context/ProductContext";
+import { useNavigate } from "react-router-dom";
 
 const SupermarketOptimalCartItem = ({
   optimalCart,
@@ -21,8 +22,23 @@ const SupermarketOptimalCartItem = ({
     );
   });
 
+  const navigate = useNavigate();
+
+  const handleNavigateToOptimalCart = () => {
+    navigate(`/optimal-supermarket-carts/${supermarketDetails.supermarketID}`, {
+      state: {
+        optimalCart,
+        supermarketDetails,
+        originalCart,
+      },
+    });
+  };
+
   return (
-    <div className="supermarket-optimal-cart-item">
+    <div
+      className="supermarket-optimal-cart-item"
+      onClick={handleNavigateToOptimalCart}
+    >
       {console.log("optimalCart: ", optimalCart)}
       <div className="optimal-cart-details">
         <div className="supermarket-details">
