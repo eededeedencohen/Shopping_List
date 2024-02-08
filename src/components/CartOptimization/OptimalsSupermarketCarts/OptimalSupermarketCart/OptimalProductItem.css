@@ -1,14 +1,3 @@
-/* .optimal-product-item {
-  display: flex;
-  flex-direction: column;
-  margin-bottom: 2rem;
-  background-color: white;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-  border-radius: 10px;
-  margin-right: 0.2rem;
-  margin-left: 0.2rem;
-} */
-
 .optimal-product-item {
   display: flex;
   flex-direction: column;
@@ -25,7 +14,6 @@
   flex-direction: row-reverse;
   transform: translateY(3rem);
   margin-top: -2rem;
-
 }
 
 .optimal-product-item__image {
@@ -34,7 +22,6 @@
   padding-top: 35%;
   position: relative;
   overflow: hidden;
-
 }
 
 .optimal-product-item__image img {
@@ -73,11 +60,6 @@
   font-size: 1rem;
   margin-left: 0.2rem;
 }
-
-/* .optimal-product-item__separator-line {
-  color: #2f416e;
-  padding-bottom: 0.4rem;
-} */
 
 .optimal-product-item__separator-line {
   color: #2f416e;
@@ -277,10 +259,29 @@
 }
 
 .optimal-product-item__summary {
-  font-size: 1.2rem;
+  margin: 0.5rem 1rem;
+}
+
+.product-exists-in-both-carts {
+  display: flex;
+  flex-direction: column;
+  background-color: #f2f2f2;
+  padding: 0.5rem;
+  border-radius: 10px;
+}
+
+.product-exists-in-both-carts .price-difference {
+  color: rgb(252, 109, 0);
+  font-size: 1rem;
   font-weight: bold;
-  color: #004008;
-  text-align: center;
+  text-align: right;
+}
+
+.product-exists-in-both-carts .price-difference-for-100-gram-or-ml {
+  color: rgb(122, 0, 94);
+  font-size: 1rem;
+  font-weight: bold;
+  text-align: right;
 }
 
 .optimal-product-item__edit-buttons {

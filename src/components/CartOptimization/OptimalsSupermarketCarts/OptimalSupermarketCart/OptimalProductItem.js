@@ -5,6 +5,7 @@ import {
   getUnitWeightLabelForOne,
   getConvertedUnitWeight,
   isExistsInOriginalCart,
+  getSummaryElement,
 } from "./OptimalProductItemHelpers";
 import deleteIcon from "./delete.svg";
 import editIcon from "./edit.svg";
@@ -17,6 +18,12 @@ const OptimalProductItem = ({
   isExistsInOptimalCart,
 }) => {
   const originalProductExists = isExistsInOriginalCart(detailsOriginProduct);
+
+  const summaryElement = getSummaryElement(
+    DetailsOptimalProduct,
+    detailsOriginProduct,
+    isExistsInOptimalCart
+  );
 
   return (
     <div className="optimal-product-item">
@@ -60,7 +67,10 @@ const OptimalProductItem = ({
             <div className="total-price-current-product">
               <div className="label">:סה"כ</div>
               <div className="value">
-                {"₪" + ((Math.round(DetailsOptimalProduct.totalPrice * 10) / 10).toFixed(2))}
+                {"₪" +
+                  (
+                    Math.round(DetailsOptimalProduct.totalPrice * 10) / 10
+                  ).toFixed(2)}
               </div>
             </div>
             <div className="price-for-one-current-product">
@@ -97,7 +107,9 @@ const OptimalProductItem = ({
                 <div className="label">:סה"כ</div>
               </div>
               <div className="value">
-                {((Math.round(detailsOriginProduct.totalPrice * 10) / 10).toFixed(2))}
+                {(
+                  Math.round(detailsOriginProduct.totalPrice * 10) / 10
+                ).toFixed(2)}
               </div>
             </div>
             <div className="price-for-one-original-product">
@@ -126,7 +138,8 @@ const OptimalProductItem = ({
       <div className="red-arrow-left">
         <img src={downLeftIcon} alt="down-left" />
       </div>
-      <div className="optimal-product-item__summary">TEMP SUMMARY</div>
+      {/* <div className="optimal-product-item__summary"></div> */}
+      <div className="optimal-product-item__summary">{summaryElement}</div>
 
       <div className="optimal-product-item__edit-buttons">
         <div className="delete-optimal-product">
