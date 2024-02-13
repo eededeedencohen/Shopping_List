@@ -28,19 +28,6 @@ export const CartOptimizationContextProvider = ({ children }) => {
 
   const [isOptimalCartsUploaded, setIsOptimalCartsUploaded] = useState(false);
   const getOptimalsCarts = async () => {
-    // try {
-    //   const response = await getOptimalSupermarketCarts(
-    //     supermarketIDs,
-    //     productsSettings
-    //   );
-    //   if (response && response.data && response.data.optimalCarts) {
-    //     return response.data.optimalCarts;
-    //   }
-    // } catch (error) {
-    //   console.error("Error in fetching data: ", error);
-    // }
-
-    // same but with update the useState:
     try {
       const response = await getOptimalSupermarketCarts(
         supermarketIDs,
@@ -53,6 +40,31 @@ export const CartOptimizationContextProvider = ({ children }) => {
     } catch (error) {
       console.error("Error in fetching data: ", error);
       setIsOptimalCartsUploaded(false);
+    }
+  };
+
+  //-----------------------------------------------------------------------------
+  const [optimalCarts, setOptimalCarts] = useState([]);
+  const [isOptimalCartsCalculated, setIsOptimalCartsCalculated] =
+    useState(false);
+  /**
+   * @summary - Update the useStates of the optimal carts
+   */
+  const calculateOptimalsCarts = async () => {
+    setOptimalCarts([]);
+    // step 1: using getOptimalSupermarketCarts to get the optimal carts. ofcourse using try and catch:
+    try {
+      const response = await getOptimalSupermarketCarts(
+        supermarketIDs,
+        productsSettings
+      );
+      if (response && response.data && response.data.optimalCarts) {
+        setOptimalCarts(response.data.optimalCarts);
+        setIsOptimalCartsCalculated(true);
+      }
+    } catch (error) {
+      console.error("Error in fetching data: ", error);
+      setIsOptimalCartsCalculated(false);
     }
   };
 
@@ -318,6 +330,10 @@ export const CartOptimizationContextProvider = ({ children }) => {
         getOptimalsCarts,
         isOptimalCartsUploaded,
         fullCart,
+        optimalCarts, // A new useState
+        setOptimalCarts, // A new useState
+        isOptimalCartsCalculated, // A new useState
+        calculateOptimalsCarts, // A new Function
 
         // main page of settings:
         canReplaceSettings,

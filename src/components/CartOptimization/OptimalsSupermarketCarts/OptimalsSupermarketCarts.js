@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
+// import {useEffect } from "react";
 import LoadingCart from "./LoadingCart";
 import CartsFilter from "./CartsFilter";
 import SupermarketOptimalCartItem from "./SupermarketOptimalCartItem";
@@ -6,29 +7,27 @@ import "./OptimalsSupermarketCarts.css";
 import { useCartOptimizationContext } from "../../../context/cart-optimizationContext";
 
 const OptimalsSupermarketCarts = () => {
-  const { getOptimalsCarts, allSupermarkets, fullCart } = useCartOptimizationContext();
+  const {
+    allSupermarkets,
+    fullCart,
+    optimalCarts,
+    isOptimalCartsCalculated,
+    // calculateOptimalsCarts,
+  } = useCartOptimizationContext();
 
-  const [calculationOptimalCarts, setCalculationOptimalCarts] = useState([]);
-  const [isCalculationOptimalCarts, setIsCalculationOptimalCarts] =
-    useState(false);
+  // useEffect(() => {
+  //   const handleCalculateOptimalSupermarketCarts = async () => {
+  //     try {
+  //       await calculateOptimalsCarts();
+  //     } catch (error) {
+  //       console.error("Error in fetching data: ", error);
+  //     }
+  //   };
+  //   handleCalculateOptimalSupermarketCarts();
+  // }, [allSupermarkets]);
 
-  useEffect(() => {
-    const handleCalculateOptimalSupermarketCarts = async () => {
-      try {
-        const optimalCarts = await getOptimalsCarts();
-        setCalculationOptimalCarts(optimalCarts);
-        setIsCalculationOptimalCarts(true);
-      } catch (error) {
-        console.error("Error in fetching data: ", error);
-        setIsCalculationOptimalCarts(false);
-      }
-    };
-    handleCalculateOptimalSupermarketCarts();
-  }, [getOptimalsCarts]);
-
-  // let cartsWithAllProducts = [];
-
-  if (!isCalculationOptimalCarts) {
+  // if (!isCalculationOptimalCarts || !isOptimalCartsCalculated) {
+  if (!isOptimalCartsCalculated) {
     return <LoadingCart />;
   } else {
     // filter carts with all products and sort by total price
@@ -40,10 +39,9 @@ const OptimalsSupermarketCarts = () => {
   return (
     <div>
       {console.log("fullCart: ", fullCart)}
+      {console.log("optimalCartNew: ", optimalCarts)}
       <CartsFilter />
-      {calculationOptimalCarts.map((cart) => (
-        // {cartsWithAllProducts.map((cart) => (
-        // cart.nonExistsProducts.length === 0 &&
+      {optimalCarts.map((cart) => (
         <SupermarketOptimalCartItem
           key={cart.supermarketID}
           optimalCart={cart}

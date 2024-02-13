@@ -1,26 +1,15 @@
-// import React from "react";
-// import "./CalculationOptimalCarts.css";
-
-// const CalculationOptimalCarts = () => {
-//   return (
-//     <div className="calculation-optimal-carts">
-//       <div className="swipe-area">
-//         <div className="swipe-moving-circle"></div>
-//         <div className="swipe-label">החלק לחישוב העגלות</div>
-//       </div>
-//     </div>
-//   );
-// };
-
 import React, { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import "./CalculationOptimalCarts.css";
+import { useCartOptimizationContext } from "../../../context/cart-optimizationContext";
 
 const CalculationOptimalCarts = () => {
   const [position, setPosition] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
   const containerRef = useRef(null);
   const navigate = useNavigate();
+
+  const { calculateOptimalsCarts } = useCartOptimizationContext();
 
   const startDragging = () => {
     setIsDragging(true);
@@ -49,6 +38,7 @@ const CalculationOptimalCarts = () => {
       setPosition(0); // Reset position to left side with animation
     } else {
       console.log("Reached the right side");
+      calculateOptimalsCarts();
       navigate("/optimal-supermarket-carts");
     }
   };
