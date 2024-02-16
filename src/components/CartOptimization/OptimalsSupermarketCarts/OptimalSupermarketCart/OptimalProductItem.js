@@ -7,6 +7,7 @@ import {
   isExistsInOriginalCart,
   getSummaryElement,
 } from "./OptimalProductItemHelpers";
+import { useCartOptimizationContext } from "../../../../context/cart-optimizationContext";
 import deleteIcon from "./delete.svg";
 import editIcon from "./edit.svg";
 import upRightIcon from "./up-right.svg";
@@ -16,7 +17,9 @@ const OptimalProductItem = ({
   detailsOriginProduct,
   DetailsOptimalProduct,
   isExistsInOptimalCart,
+  supermarketID,
 }) => {
+  const { deleteProductFromOptimalCart } = useCartOptimizationContext();
   const originalProductExists = isExistsInOriginalCart(detailsOriginProduct);
 
   const summaryElement = getSummaryElement(
@@ -142,7 +145,15 @@ const OptimalProductItem = ({
       <div className="optimal-product-item__summary">{summaryElement}</div>
 
       <div className="optimal-product-item__edit-buttons">
-        <div className="delete-optimal-product">
+        <div 
+        className="delete-optimal-product"
+        onClick={() =>
+          deleteProductFromOptimalCart(
+            DetailsOptimalProduct.barcode,
+            supermarketID
+          )
+        }
+        >
           <img src={deleteIcon} alt="Delete" />
         </div>
         <div className="edit-optimal-product">

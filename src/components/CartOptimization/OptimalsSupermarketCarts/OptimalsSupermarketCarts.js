@@ -12,21 +12,8 @@ const OptimalsSupermarketCarts = () => {
     fullCart,
     optimalCarts,
     isOptimalCartsCalculated,
-    // calculateOptimalsCarts,
   } = useCartOptimizationContext();
 
-  // useEffect(() => {
-  //   const handleCalculateOptimalSupermarketCarts = async () => {
-  //     try {
-  //       await calculateOptimalsCarts();
-  //     } catch (error) {
-  //       console.error("Error in fetching data: ", error);
-  //     }
-  //   };
-  //   handleCalculateOptimalSupermarketCarts();
-  // }, [allSupermarkets]);
-
-  // if (!isCalculationOptimalCarts || !isOptimalCartsCalculated) {
   if (!isOptimalCartsCalculated) {
     return <LoadingCart />;
   } else {
@@ -56,4 +43,4 @@ const OptimalsSupermarketCarts = () => {
 };
 
 export default OptimalsSupermarketCarts;
-//
+

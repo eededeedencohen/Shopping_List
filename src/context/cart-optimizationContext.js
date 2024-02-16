@@ -51,7 +51,7 @@ export const CartOptimizationContextProvider = ({ children }) => {
    * @summary - Update the useStates of the optimal carts
    */
   const calculateOptimalsCarts = async () => {
-    setOptimalCarts([]);
+    setOptimalCarts([]); // Clear the optimal carts
     // step 1: using getOptimalSupermarketCarts to get the optimal carts. ofcourse using try and catch:
     try {
       const response = await getOptimalSupermarketCarts(
@@ -59,7 +59,11 @@ export const CartOptimizationContextProvider = ({ children }) => {
         productsSettings
       );
       if (response && response.data && response.data.optimalCarts) {
-        setOptimalCarts(response.data.optimalCarts);
+        const listOfOptimalCarts = response.data.optimalCarts;
+        listOfOptimalCarts.forEach((cart) => {
+          cart.deletedProducts = [];
+        });
+        setOptimalCarts(listOfOptimalCarts);
         setIsOptimalCartsCalculated(true);
       }
     } catch (error) {
@@ -301,6 +305,72 @@ export const CartOptimizationContextProvider = ({ children }) => {
     setProductsSettings(newProductsSettings);
   };
 
+  /**=========================
+   *  OPPERATIONS ON THE CART:
+   ===========================*/
+  // Update amount of the product in the optimal cart:
+
+  // // Delete the product form the optimal cart:
+  // const deleteProductFromOptimalCart = (barcode, supermarketID) => {
+
+  //   console.log("optimalCartsTest: ", optimalCarts);
+
+  //   // step 1:
+  //   const optimalCartIndex = optimalCarts.findIndex(
+  //     (cart) => cart.supermarketID === supermarketID
+  //   );
+  //   const optimalCart = optimalCarts[optimalCartIndex];
+
+  //   // step 2:
+  //   const newOptimalCart = { ...optimalCart };
+  //   newOptimalCart.deletedProducts = [
+  //     ...newOptimalCart.deletedProducts,
+  //     barcode,
+  //   ];
+
+  //   // step 3:
+  //   newOptimalCart.existsProducts = newOptimalCart.existsProducts.filter(
+  //     (product) => product.oldBarcode !== barcode
+  //   );
+  //   newOptimalCart.nonExistsProducts = newOptimalCart.nonExistsProducts.filter(
+  //     (product) => product.oldBarcode !== barcode
+  //   );
+
+  //   // step 4:
+  //   const newOptimalCarts = [...optimalCarts];
+
+  //   newOptimalCarts[optimalCartIndex] = newOptimalCart;
+
+  //   setOptimalCarts(newOptimalCarts);
+
+  //   console.log("optimalCartsTest: ", optimalCarts);
+  // };
+  const deleteProductFromOptimalCart = (barcode, supermarketID) => {
+    // Step 1: Find the optimal cart
+    const cartIndex = optimalCarts.findIndex(cart => cart.supermarketID === supermarketID);
+    if (cartIndex === -1) return; // If no cart found, exit early
+
+    // Step 2: Deep clone the optimalCarts to ensure we're not mutating the state directly
+    const newOptimalCarts = [...optimalCarts].map(cart => ({
+        ...cart,
+        existsProducts: [...cart.existsProducts],
+        nonExistsProducts: [...cart.nonExistsProducts],
+        deletedProducts: [...cart.deletedProducts],
+    }));
+
+    // Step 3: Update the deletedProducts list and filter out the deleted product from existsProducts and nonExistsProducts
+    const cartToUpdate = newOptimalCarts[cartIndex];
+    cartToUpdate.deletedProducts = [...cartToUpdate.deletedProducts, barcode];
+    cartToUpdate.existsProducts = cartToUpdate.existsProducts.filter(product => product.oldBarcode !== barcode);
+    cartToUpdate.nonExistsProducts = cartToUpdate.nonExistsProducts.filter(product => product.oldBarcode !== barcode);
+
+    // Step 4: Update the state with the new array to trigger a re-render
+    setOptimalCarts(newOptimalCarts);
+};
+
+
+  // change the product self in the optimal cart:
+
   return (
     <CartOptimizationContext.Provider
       value={{
@@ -342,6 +412,9 @@ export const CartOptimizationContextProvider = ({ children }) => {
         changeCanRoundUpSettings,
         changeCanReplaceAll,
         changeCanRoundUpAll,
+
+        // optimal cart operations:
+        deleteProductFromOptimalCart,
       }}
     >
       {children}
