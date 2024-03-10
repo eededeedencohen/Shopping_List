@@ -1,5 +1,8 @@
 import React from "react";
+import { useState } from "react";
 import ProductsImages from "../../../Images/ProductsImages";
+import EditOptimalProductModal from "./EditOptimalProduct/EditOptimalProductModal";
+import EditOptimalProduct from "./EditOptimalProduct/EditOptimalProduct";
 import "./OptimalProductItem.css";
 import {
   getUnitWeightLabelForOne,
@@ -21,6 +24,16 @@ const OptimalProductItem = ({
 }) => {
   const { deleteProductFromOptimalCart } = useCartOptimizationContext();
   const originalProductExists = isExistsInOriginalCart(detailsOriginProduct);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const openModal = () => {
+    setIsModalOpen(true);
+  }
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+  }
+
 
   const summaryElement = getSummaryElement(
     DetailsOptimalProduct,
@@ -30,6 +43,14 @@ const OptimalProductItem = ({
 
   return (
     <div className="optimal-product-item">
+      <EditOptimalProductModal isOpen={isModalOpen} onClose={closeModal}>
+        <EditOptimalProduct 
+        productDetails={detailsOriginProduct}
+        optimalProductDetails={DetailsOptimalProduct}
+        supermarketID={supermarketID}
+        /> 
+      </EditOptimalProductModal>
+
       {console.log("=========================================================")}
       {console.log("detailsOriginProduct", detailsOriginProduct)}
       {console.log("DetailsOptimalProduct", DetailsOptimalProduct)}
@@ -156,8 +177,10 @@ const OptimalProductItem = ({
         >
           <img src={deleteIcon} alt="Delete" />
         </div>
-        <div className="edit-optimal-product">
-          <img src={editIcon} alt="Edit" />
+        <div className="edit-optimal-product-button">
+          <img 
+          onClick={openModal}
+          src={editIcon} alt="Edit" />
         </div>
       </div>
     </div>

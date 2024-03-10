@@ -306,7 +306,7 @@
   filter: invert(100%);
 }
 
-.edit-optimal-product {
+.edit-optimal-product-button {
   display: flex;
   flex-direction: column;
   background-color: #1783d6;
@@ -314,7 +314,7 @@
   border-radius: 10px;
 }
 
-.edit-optimal-product img {
+.edit-optimal-product-button img {
   width: 2rem;
   height: 2rem;
   cursor: pointer;
