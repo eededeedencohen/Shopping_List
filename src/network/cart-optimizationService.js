@@ -62,10 +62,26 @@ const getAllSupermarkets = async () => {
   }
 };
 
+const getPriceObjectByProductBarcodeAndSupermarketID = async (
+  barcode,
+  supermarketID
+) => {
+  try {
+    const response = await axios.get(
+      `${DOMAIN}/api/v1/cart-optimization/priceBySupermarketIDAndBarcode/${supermarketID}/${barcode}`
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error in fetching price by product barcode and supermarket ID: ", error);
+    throw error;
+  }
+};
+
 export {
   getOptimalSupermarketCarts,
   getFullActiveCart,
   getAllBrands,
   getAllBrandsByGeneralName,
   getAllSupermarkets,
+  getPriceObjectByProductBarcodeAndSupermarketID,
 };

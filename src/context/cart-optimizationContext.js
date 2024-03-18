@@ -4,7 +4,10 @@ import {
   getFullActiveCart,
   getAllBrands,
   getAllSupermarkets,
+  getPriceObjectByProductBarcodeAndSupermarketID,
 } from "../network/cart-optimizationService";
+
+import { getByBarcode } from "../network/productService";
 
 export const CartOptimizationContext = createContext();
 
@@ -305,9 +308,85 @@ export const CartOptimizationContextProvider = ({ children }) => {
     setProductsSettings(newProductsSettings);
   };
 
+  /**
+   * get the price of the product in the specific supermarket
+   */
+  const getPriceByProductBarcodeAndSupermarketID = async (
+    barcode,
+    supermarketID
+  ) => {
+    try {
+      const response = await getPriceObjectByProductBarcodeAndSupermarketID(
+        barcode,
+        supermarketID
+      );
+      if (response && response.data && response.data.price) {
+        return response.data.price;
+      }
+    } catch (error) {
+      console.error(
+        "Error in fetching price by product barcode and supermarket ID: ",
+        error
+      );
+    }
+  };
+
+  /**
+   * Get the product by barcode
+   */
+  const getProductByBarcode = async (barcode) => {
+    try {
+      const response = await getByBarcode(barcode);
+      const products = JSON.parse(response.data).data.products;
+      if (products && products.length > 0) {
+        const product = products[0]; 
+        return product;
+      }
+    } catch (error) {
+      console.error("Error in fetching product by barcode: ", error);
+    }
+  };
+  
+
+  /**
+   * change the optimal product quantity and the total price. also update the optimal cart Total price
+   */
+  const changeOptimalProductQuantity = (
+    barcode,
+    supermarketID,
+    newQuantity,
+    newTotalPrice
+  ) => {
+    const optimalCartIndex = optimalCarts.findIndex(
+      (cart) => cart.supermarketID === supermarketID
+    );
+    const optimalCart = optimalCarts[optimalCartIndex];
+    const newOptimalCart = { ...optimalCart };
+    newOptimalCart.existsProducts = newOptimalCart.existsProducts.map(
+      (product) => {
+        if (product.oldBarcode === barcode) {
+          return {
+            ...product,
+            quantity: newQuantity,
+            totalPrice: newTotalPrice,
+          };
+        }
+        return product;
+      }
+    );
+    newOptimalCart.totalPrice = newOptimalCart.existsProducts.reduce(
+      (acc, product) => acc + product.totalPrice,
+      0
+    );
+    const newOptimalCarts = [...optimalCarts];
+    newOptimalCarts[optimalCartIndex] = newOptimalCart;
+    setOptimalCarts(newOptimalCarts);
+  };
+
   /**=========================
    *  OPPERATIONS ON THE CART:
    ===========================*/
+
   // Update amount of the product in the optimal cart:
 
   // // Delete the product form the optimal cart:
@@ -347,27 +426,38 @@ export const CartOptimizationContextProvider = ({ children }) => {
   // };
   const deleteProductFromOptimalCart = (barcode, supermarketID) => {
     // Step 1: Find the optimal cart
-    const cartIndex = optimalCarts.findIndex(cart => cart.supermarketID === supermarketID);
+    const cartIndex = optimalCarts.findIndex(
+      (cart) => cart.supermarketID === supermarketID
+    );
     if (cartIndex === -1) return; // If no cart found, exit early
 
     // Step 2: Deep clone the optimalCarts to ensure we're not mutating the state directly
-    const newOptimalCarts = [...optimalCarts].map(cart => ({
-        ...cart,
-        existsProducts: [...cart.existsProducts],
-        nonExistsProducts: [...cart.nonExistsProducts],
-        deletedProducts: [...cart.deletedProducts],
+    const newOptimalCarts = [...optimalCarts].map((cart) => ({
+      ...cart,
+      existsProducts: [...cart.existsProducts],
+      nonExistsProducts: [...cart.nonExistsProducts],
+      deletedProducts: [...cart.deletedProducts],
     }));
 
     // Step 3: Update the deletedProducts list and filter out the deleted product from existsProducts and nonExistsProducts
     const cartToUpdate = newOptimalCarts[cartIndex];
     cartToUpdate.deletedProducts = [...cartToUpdate.deletedProducts, barcode];
-    cartToUpdate.existsProducts = cartToUpdate.existsProducts.filter(product => product.oldBarcode !== barcode);
-    cartToUpdate.nonExistsProducts = cartToUpdate.nonExistsProducts.filter(product => product.oldBarcode !== barcode);
+    cartToUpdate.existsProducts = cartToUpdate.existsProducts.filter(
+      (product) => product.oldBarcode !== barcode
+    );
+    cartToUpdate.nonExistsProducts = cartToUpdate.nonExistsProducts.filter(
+      (product) => product.oldBarcode !== barcode
+    );
 
-    // Step 4: Update the state with the new array to trigger a re-render
+    // step 4: Update the optimal cart total price:
+    cartToUpdate.totalPrice = cartToUpdate.existsProducts.reduce(
+      (acc, product) => acc + product.totalPrice,
+      0
+    );
+
+    // Step 5: Update the state with the new array to trigger a re-render
     setOptimalCarts(newOptimalCarts);
-};
-
+  };
 
   // change the product self in the optimal cart:
 
@@ -414,6 +504,9 @@ export const CartOptimizationContextProvider = ({ children }) => {
         changeCanRoundUpAll,
 
         // optimal cart operations:
+        getPriceByProductBarcodeAndSupermarketID,
+        getProductByBarcode,
+        changeOptimalProductQuantity,
         deleteProductFromOptimalCart,
       }}
     >

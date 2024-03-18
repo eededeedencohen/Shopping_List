@@ -48,14 +48,15 @@ const OptimalProductItem = ({
         productDetails={detailsOriginProduct}
         optimalProductDetails={DetailsOptimalProduct}
         supermarketID={supermarketID}
+        closeModal={closeModal}
         /> 
       </EditOptimalProductModal>
 
-      {console.log("=========================================================")}
+      {/* {console.log("=========================================================")}
       {console.log("detailsOriginProduct", detailsOriginProduct)}
       {console.log("DetailsOptimalProduct", DetailsOptimalProduct)}
       {console.log("isExistsInOptimalCart", isExistsInOptimalCart)}
-      {console.log("=========================================================")}
+      {console.log("=========================================================")} */}
       <div className="optimal-product-item__product-details">
         <div className="optimal-product-item__image">
           <ProductsImages barcode={DetailsOptimalProduct.barcode} />
