@@ -21,7 +21,7 @@ const OptimalProductsList = ({ optimalCart, originalCart }) => {
   optimalCart.nonExistsProducts.forEach((product) => {
     optimalCartProducts[product.oldBarcode] = {
       detailsOptimalProduct: product,
-      isExistsInOptimalCart: false,
+      isExistsnOpItimalCart: false,
     };
   });
 
@@ -52,7 +52,7 @@ const OptimalProductsList = ({ optimalCart, originalCart }) => {
               isExistsInOptimalCart={
                 optimalCartProducts[key].isExistsInOptimalCart
               }
-              superMarketID={optimalCart.supermarketID}
+              supermarketID={optimalCart.supermarketID}
             />
           );
         } else {

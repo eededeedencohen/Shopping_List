@@ -28,12 +28,11 @@ const OptimalProductItem = ({
 
   const openModal = () => {
     setIsModalOpen(true);
-  }
+  };
 
   const closeModal = () => {
     setIsModalOpen(false);
-  }
-
+  };
 
   const summaryElement = getSummaryElement(
     DetailsOptimalProduct,
@@ -44,12 +43,14 @@ const OptimalProductItem = ({
   return (
     <div className="optimal-product-item">
       <EditOptimalProductModal isOpen={isModalOpen} onClose={closeModal}>
-        <EditOptimalProduct 
-        productDetails={detailsOriginProduct}
-        optimalProductDetails={DetailsOptimalProduct}
-        supermarketID={supermarketID}
-        closeModal={closeModal}
-        /> 
+        <EditOptimalProduct
+          productDetails={detailsOriginProduct}
+          optimalProductDetails={DetailsOptimalProduct}
+          supermarketID={supermarketID}
+          isReplace={false}
+          replaceProductDetails={null}
+          closeModal={closeModal}
+        />
       </EditOptimalProductModal>
 
       {/* {console.log("=========================================================")}
@@ -167,21 +168,19 @@ const OptimalProductItem = ({
       <div className="optimal-product-item__summary">{summaryElement}</div>
 
       <div className="optimal-product-item__edit-buttons">
-        <div 
-        className="delete-optimal-product"
-        onClick={() =>
-          deleteProductFromOptimalCart(
-            DetailsOptimalProduct.barcode,
-            supermarketID
-          )
-        }
+        <div
+          className="delete-optimal-product"
+          onClick={() =>
+            deleteProductFromOptimalCart(
+              DetailsOptimalProduct.barcode,
+              supermarketID
+            )
+          }
         >
           <img src={deleteIcon} alt="Delete" />
         </div>
         <div className="edit-optimal-product-button">
-          <img 
-          onClick={openModal}
-          src={editIcon} alt="Edit" />
+          <img onClick={openModal} src={editIcon} alt="Edit" />
         </div>
       </div>
     </div>

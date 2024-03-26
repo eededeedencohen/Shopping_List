@@ -188,11 +188,11 @@
   align-items: center;
   justify-content: flex-start;
   margin-top: 5px;
+  width: 100%;
 }
 
 .edit-amount__operations .quantity-reduction-button {
   background-color: #f44336;
-  margin-left: 0.5rem;
   width: 3rem;
   height: 3rem;
   font-size: 1.5rem;
@@ -200,6 +200,7 @@
   align-items: center;
   justify-content: center;
   margin: 5px;
+  margin-left: 1rem;
   padding: 10px 15px;
   border: 2px solid #ccc;
   border-radius: 30px;
@@ -207,7 +208,6 @@
   transition: background-color 0.3s ease;
   color: white;
   padding-bottom: 1rem;
-  margin-left: 1rem;
 }
 
 .edit-amount__operations .display-editing-quantity {
@@ -219,17 +219,20 @@
   align-items: center;
   justify-content: center;
   background-color: #f2f2f2;
+  min-width: 40px;
+  text-align: center;
 }
 
 .edit-amount__operations .quantity-unit-label {
   font-size: 0.8rem;
   font-weight: bold;
   padding-top: 0.5rem;
+
+  margin-left: 0.5rem;
 }
 
 .edit-amount__operations .quantity-increase-button {
   background-color: #4caf50;
-  margin-left: 0.5rem;
   width: 3rem;
   height: 3rem;
   font-size: 1.5rem;
@@ -260,4 +263,12 @@
   cursor: pointer;
   color: white;
   align-self: flex-end;
+  margin-left: 3px;
+}
+
+.edit-amount__edited-total-price {
+  text-align: right;
+  margin: 0.5rem;
+  color: #28639e;
+  font-size: 1.2rem;
 }
