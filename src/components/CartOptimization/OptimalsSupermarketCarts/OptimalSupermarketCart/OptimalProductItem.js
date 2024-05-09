@@ -3,6 +3,7 @@ import { useState } from "react";
 import ProductsImages from "../../../Images/ProductsImages";
 import EditOptimalProductModal from "./EditOptimalProduct/EditOptimalProductModal";
 import EditOptimalProduct from "./EditOptimalProduct/EditOptimalProduct";
+import EditAlternativeProduct from "./EditOptimalProduct/EditAlternativeProduct";
 import "./OptimalProductItem.css";
 import {
   getUnitWeightLabelForOne,
@@ -25,6 +26,7 @@ const OptimalProductItem = ({
   const { deleteProductFromOptimalCart } = useCartOptimizationContext();
   const originalProductExists = isExistsInOriginalCart(detailsOriginProduct);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isModalOpen2, setIsModalOpen2] = useState(false);
 
   const openModal = () => {
     setIsModalOpen(true);
@@ -32,6 +34,14 @@ const OptimalProductItem = ({
 
   const closeModal = () => {
     setIsModalOpen(false);
+  };
+
+  const openModal2 = () => {
+    setIsModalOpen2(true);
+  };
+
+  const closeModal2 = () => {
+    setIsModalOpen2(false);
   };
 
   const summaryElement = getSummaryElement(
@@ -42,6 +52,9 @@ const OptimalProductItem = ({
 
   return (
     <div className="optimal-product-item">
+      {console.log("DetailsOptimalProduct", DetailsOptimalProduct)}
+      {console.log("detailsOriginProduct", detailsOriginProduct)}
+      {console.log("supermarketID", supermarketID)}
       <EditOptimalProductModal isOpen={isModalOpen} onClose={closeModal}>
         <EditOptimalProduct
           productDetails={detailsOriginProduct}
@@ -50,6 +63,14 @@ const OptimalProductItem = ({
           isReplace={false}
           replaceProductDetails={null}
           closeModal={closeModal}
+        />
+      </EditOptimalProductModal>
+
+      <EditOptimalProductModal isOpen={isModalOpen2} onClose={closeModal2}>
+        <EditAlternativeProduct
+          oldBarcode={DetailsOptimalProduct.barcode}
+          generalName={detailsOriginProduct.product.generalName}
+          supermarketID={supermarketID}
         />
       </EditOptimalProductModal>
 
@@ -182,6 +203,10 @@ const OptimalProductItem = ({
         <div className="edit-optimal-product-button">
           <img onClick={openModal} src={editIcon} alt="Edit" />
         </div>
+        <button
+          className="edit-optimal-product-button"
+          onClick={openModal2}
+        ></button>
       </div>
     </div>
   );

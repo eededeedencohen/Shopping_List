@@ -77,6 +77,23 @@ const getPriceObjectByProductBarcodeAndSupermarketID = async (
   }
 };
 
+const getListReplecementProductsByGeneralNameAndSupermarketID = async (
+  generalName,
+  supermarketID
+) => {
+  // exampale for url: http://localhost:8000/api/v1/cart-optimization/allReplacementProductsBySupermarketIDAndGeneralName/4/Milk
+  try {
+    const response = await axios.get(
+      `${DOMAIN}/api/v1/cart-optimization/allReplacementProductsBySupermarketIDAndGeneralName/${supermarketID}/${generalName}`
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error in fetching all replacement products by general name and supermarket ID: ", error);
+    throw error;
+  }
+};
+
+
 export {
   getOptimalSupermarketCarts,
   getFullActiveCart,
@@ -84,4 +101,5 @@ export {
   getAllBrandsByGeneralName,
   getAllSupermarkets,
   getPriceObjectByProductBarcodeAndSupermarketID,
+  getListReplecementProductsByGeneralNameAndSupermarketID,
 };

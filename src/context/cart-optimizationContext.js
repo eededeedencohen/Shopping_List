@@ -5,6 +5,7 @@ import {
   getAllBrands,
   getAllSupermarkets,
   getPriceObjectByProductBarcodeAndSupermarketID,
+  getListReplecementProductsByGeneralNameAndSupermarketID,
 } from "../network/cart-optimizationService";
 
 import { getByBarcode } from "../network/productService";
@@ -332,6 +333,29 @@ export const CartOptimizationContextProvider = ({ children }) => {
   };
 
   /**
+   * get the list of recommended products by general name and supermarket ID
+   */
+  const getReplacementProductsByGeneralNameAndSupermarketID = async (
+    generalName,
+    supermarketID) => {
+    try {
+      const response = await getListReplecementProductsByGeneralNameAndSupermarketID(
+        generalName,
+        supermarketID
+      );
+      if (response && response.data && response.data.products) {
+        return response.data.products;
+      }
+    } catch (error) {
+      console.error(
+        "Error in fetching list of recommended products by general name and supermarket ID: ",
+        error
+      );
+    }
+
+  };
+
+  /**
    * Get the product by barcode
    */
   const getProductByBarcode = async (barcode) => {
@@ -505,9 +529,11 @@ export const CartOptimizationContextProvider = ({ children }) => {
 
         // optimal cart operations:
         getPriceByProductBarcodeAndSupermarketID,
+        getReplacementProductsByGeneralNameAndSupermarketID,
         getProductByBarcode,
         changeOptimalProductQuantity,
         deleteProductFromOptimalCart,
+        
       }}
     >
       {children}
