@@ -3,8 +3,15 @@ import Image from "../../../../Images/Images";
 import { useCartOptimizationContext } from "../../../../../context/cart-optimizationContext";
 import "./EditAlternativeProduct.css";
 
-function EditAlternativeProduct({ oldBarcode, generalName, supermarketID }) {
-  const { getReplacementProductsByGeneralNameAndSupermarketID } =
+function EditAlternativeProduct({
+  oldBarcode,
+  generalName,
+  supermarketID,
+  DetailsOptimalProduct,
+  quantity,
+  isExistsInOptimalCart,
+}) {
+  const { getReplacementProductsByGeneralNameAndSupermarketID, replaceProductInOptimalCart } =
     useCartOptimizationContext();
   const [realProducts, setRealProducts] = useState([]);
   const [isLoadingRealProducts, setIsLoadingRealProducts] = useState(true);
@@ -18,6 +25,7 @@ function EditAlternativeProduct({ oldBarcode, generalName, supermarketID }) {
             generalName,
             supermarketID
           );
+
         setRealProducts(response);
         setIsLoadingRealProducts(false);
       } catch (error) {
@@ -82,20 +90,53 @@ function EditAlternativeProduct({ oldBarcode, generalName, supermarketID }) {
     );
   };
 
+  const getProductTotalPrice = (priceObj, quantity) => {
+    const hasDiscount = priceObj && priceObj.discount;
+    if (hasDiscount) {
+      const units = priceObj.discount.units;
+      const totalPrice = priceObj.discount.totalPrice;
+      return (
+        (quantity % units) * priceObj.price +
+        Math.floor(quantity / units) * totalPrice
+      );
+    } else {
+      return priceObj ? priceObj.price * quantity : 0;
+    }
+  };
+
+  const tempFunctionPrintData = (product) => {
+    console.log("====================================================");
+    console.log("oldBarcode: ", oldBarcode); // the barcode of the product that we want to replace (not the original product)
+    console.log("newBarcode: ", product.product.barcode); // the product that we want to replace with
+    console.log("priceobj: ", product.price);
+    console.log("quantity", quantity);
+    console.log("oldTotalPrice: ", DetailsOptimalProduct.totalPrice);
+    console.log("newTotalPrice: ", getProductTotalPrice(product.price, quantity));
+    console.log("supermarketID: ", supermarketID);
+    console.log("- - - - - - - - - - - - - - - - - - - - - -");
+    console.log("isExistsInOptimalCart: ", isExistsInOptimalCart);
+    console.log("====================================================");
+    replaceProductInOptimalCart(
+      oldBarcode, // the old barcode
+      product.product.barcode, // the new barcode
+      DetailsOptimalProduct.totalPrice, // the old total price
+      getProductTotalPrice(product.price, quantity), // the new total price of the product only
+      supermarketID, // the supermarket id
+    );
+  };
+
   if (isLoadingRealProducts) {
     return <div>Loading...</div>;
   }
 
   return (
     <div className="replace-products">
-      {console.log("oldBarcode", oldBarcode)}
-      {console.log("generalName", generalName)}
-      {console.log("supermarketID", supermarketID)}
-      {console.log("realProducts", realProducts)}
-
       {realProducts.map((product) => (
         <React.Fragment key={product.product._id}>
-          <div className="replace-product">
+          <div
+            className="replace-product"
+            onClick={() => tempFunctionPrintData(product)}
+          >
             <div className="replace-product-image">
               <Image barcode={product.product.barcode} />
             </div>

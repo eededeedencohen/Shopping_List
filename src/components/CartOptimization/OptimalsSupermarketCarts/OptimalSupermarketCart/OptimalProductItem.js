@@ -71,6 +71,9 @@ const OptimalProductItem = ({
           oldBarcode={DetailsOptimalProduct.barcode}
           generalName={detailsOriginProduct.product.generalName}
           supermarketID={supermarketID}
+          DetailsOptimalProduct={DetailsOptimalProduct}
+          quantity={DetailsOptimalProduct.quantity}
+          isExistsInOptimalCart={isExistsInOptimalCart}
         />
       </EditOptimalProductModal>
 

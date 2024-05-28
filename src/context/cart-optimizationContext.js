@@ -337,12 +337,14 @@ export const CartOptimizationContextProvider = ({ children }) => {
    */
   const getReplacementProductsByGeneralNameAndSupermarketID = async (
     generalName,
-    supermarketID) => {
+    supermarketID
+  ) => {
     try {
-      const response = await getListReplecementProductsByGeneralNameAndSupermarketID(
-        generalName,
-        supermarketID
-      );
+      const response =
+        await getListReplecementProductsByGeneralNameAndSupermarketID(
+          generalName,
+          supermarketID
+        );
       if (response && response.data && response.data.products) {
         return response.data.products;
       }
@@ -352,7 +354,6 @@ export const CartOptimizationContextProvider = ({ children }) => {
         error
       );
     }
-
   };
 
   /**
@@ -363,14 +364,13 @@ export const CartOptimizationContextProvider = ({ children }) => {
       const response = await getByBarcode(barcode);
       const products = JSON.parse(response.data).data.products;
       if (products && products.length > 0) {
-        const product = products[0]; 
+        const product = products[0];
         return product;
       }
     } catch (error) {
       console.error("Error in fetching product by barcode: ", error);
     }
   };
-  
 
   /**
    * change the optimal product quantity and the total price. also update the optimal cart Total price
@@ -483,7 +483,191 @@ export const CartOptimizationContextProvider = ({ children }) => {
     setOptimalCarts(newOptimalCarts);
   };
 
-  // change the product self in the optimal cart:
+  // const replaceProductInOptimalCart = (
+  //   supermarketID, // The supermarket ID
+  //   oldOptimalProductBarcode, // the old product barcode that we want to replace
+  //   newProductBarcode, // The new product barcode that we want to replace with
+  //   productQuantity, // The quantity of the product
+  //   totalPriceOldOptimalProduct, // The total price of the old product
+  //   newTotalPrice, // The total price of the new product
+  //   isExistsInOptimalCart // A boolean that indicates if the product exists in the optimal cart
+  // ) =>{
+  //   // step 1: get the optimal cart index by the supermarket ID:
+  //   const optimalCartIndex = optimalCarts.findIndex(
+  //     (cart) => cart.supermarketID === supermarketID
+  //   );
+
+  //   // step 2: get the optimal cart by the index:
+  //   const optimalCart = optimalCarts[optimalCartIndex];
+
+  //   // step 3: create a new optimal cart:
+  //   const newOptimalCart = { ...optimalCart };
+  //   const barcode = newProductBarcode;
+  //   const quantity = productQuantity;
+  //   const totalPrice = newTotalPrice;
+  //   const oldBarcode = oldOptimalProductBarcode;
+  //   const oldQuantity = productQuantity;
+
+  //   // step 4: create a new product:
+  //   const newProduct = {
+  //     barcode,
+  //     quantity,
+  //     totalPrice,
+  //     oldBarcode,
+  //     oldQuantity,
+  //   };
+
+  //   // step 5: update the existsProducts array:
+  //   newOptimalCart.existsProducts = newOptimalCart.existsProducts.map(
+  //     (product) => {
+  //       if (product.oldBarcode === oldOptimalProductBarcode) {
+  //         return newProduct;
+  //       }
+  //       return product;
+  //     }
+  //   );
+
+  //   // step 6: update the total price of the optimal cart:
+  //   newOptimalCart.totalPrice = newOptimalCart.existsProducts.reduce(
+  //     (acc, product) => acc + product.totalPrice,
+  //     0
+  //   );
+
+  //   // step 7: update the optimal carts array:
+  //   const newOptimalCarts = [...optimalCarts];
+  //   newOptimalCarts[optimalCartIndex] = newOptimalCart;
+  //   setOptimalCarts(newOptimalCarts);
+
+  // };
+  //--------------------------------------------------------------------------------
+  // const replaceProductInOptimalCart = (
+  //   oldBarcode,
+  //   newBarcode,
+  //   price,
+  //   quantity,
+  //   oldTotalPrice,
+  //   newTotalPrice,
+  //   supermarketID,
+  //   isExistsInOptimalCart
+  // ) => {
+  //   const optimalCartIndex = optimalCarts.findIndex(
+  //     (cart) => cart.supermarketID === supermarketID
+  //   );
+
+  //   if (optimalCartIndex === -1) return;
+
+  //   const optimalCart = optimalCarts[optimalCartIndex];
+  //   const newOptimalCart = { ...optimalCart };
+
+  //   const updatedExistsProducts = (optimalCart.existsProducts || []).map(
+  //     (product) => {
+  //       if (product.oldBarcode === oldBarcode) {
+  //         return {
+  //           ...product,
+  //           barcode: newBarcode,
+  //           price,
+  //           quantity,
+  //           totalPrice: newTotalPrice,
+  //         };
+  //       }
+  //       return product;
+  //     }
+  //   );
+
+  //   newOptimalCart.existsProducts = updatedExistsProducts;
+
+  //   const newOptimalCarts = [...optimalCarts];
+  //   newOptimalCarts[optimalCartIndex] = newOptimalCart;
+  //   setOptimalCarts(newOptimalCarts);
+  // };
+  //================================================================================================
+  const replaceProductInOptimalCart = (
+    oldBarcode, // the barcode of the product that we want to replace
+    newBarcode, // the barcode of the new product that we want to replace with
+    oldTotalPrice, // the total price of the old product
+    newTotalPrice, // the total price of the new product
+    supermarketID // the supermarket ID
+  ) => {
+    const optimalCartIndex = optimalCarts.findIndex(
+      (cart) => cart.supermarketID === supermarketID
+    );
+
+    if (optimalCartIndex === -1) return;
+
+    const optimalCart = optimalCarts[optimalCartIndex];
+    console.log("optimalCart: ", optimalCart);
+
+    // calculate the new total price:
+    const oldTotalPriceOfCart = optimalCart.totalPrice;
+    console.log("++++++++++++++++++++++++++++++++++++++++++++++++++++");
+    console.log("oldTotalPriceOfCart: ", oldTotalPriceOfCart);
+    const newTotalPriceOfCart =
+      oldTotalPriceOfCart - oldTotalPrice + newTotalPrice;
+    console.log("newTotalPriceOfCart: ", newTotalPriceOfCart);
+    console.log("++++++++++++++++++++++++++++++++++++++++++++++++++++");
+
+    //==================================
+    // saving the new optimal cart:
+    //==================================
+    let newOptimalCart;
+    // case the product exists in the optimal cart:
+    if (oldTotalPrice !== 0) {
+      newOptimalCart = {
+        ...optimalCart,
+        totalPrice: newTotalPriceOfCart,
+        existsProducts: optimalCart.existsProducts.map((product) => {
+          if (product.barcode === oldBarcode) {
+            return {
+              ...product,
+              barcode: newBarcode,
+              totalPrice: newTotalPrice,
+            };
+          }
+          return product;
+        }),
+      };
+    }
+    // case the product does not exist in the optimal cart:
+    else {
+      // get thge quantity of the product and the old quantity:
+      const product = productsSettings.find(
+        (product) => product.barcode === oldBarcode
+      );
+      const quantity = product.quantity;
+      const oldQuantity = product.quantity;
+
+
+      // delete the product fron the nonExistsProducts array and add it to the existsProducts array:
+      const newNonExistsProducts = optimalCart.nonExistsProducts.filter(
+        (product) => product.oldBarcode !== oldBarcode
+      );
+      const productToAdd = {
+        barcode: newBarcode,
+        totalPrice: newTotalPrice,
+        oldBarcode,
+        quantity,
+        oldQuantity,
+      };
+      const newExistsProducts = [...optimalCart.existsProducts, productToAdd];
+      newOptimalCart = {
+        ...optimalCart,
+        totalPrice: newTotalPriceOfCart,
+        existsProducts: newExistsProducts,
+        nonExistsProducts: newNonExistsProducts,
+        
+      };
+    }
+
+    console.log("newOptimalCart: ", newOptimalCart);
+
+    // create a new array with the updated cart:
+    const newOptimalCarts = optimalCarts.map((cart, index) =>
+      index === optimalCartIndex ? newOptimalCart : cart
+    );
+
+    // save it in the useState:
+    setOptimalCarts(newOptimalCarts);
+  };
 
   return (
     <CartOptimizationContext.Provider
@@ -533,7 +717,7 @@ export const CartOptimizationContextProvider = ({ children }) => {
         getProductByBarcode,
         changeOptimalProductQuantity,
         deleteProductFromOptimalCart,
-        
+        replaceProductInOptimalCart,
       }}
     >
       {children}
