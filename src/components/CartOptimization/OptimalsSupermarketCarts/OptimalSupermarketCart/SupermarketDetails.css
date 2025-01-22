@@ -1,0 +1,43 @@
+.optimal-cart {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: box-shadow 0.3s ease-in-out;
+  }
+  
+  .optimal-cart:hover {
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  }
+  
+  .optimal-cart__supermarket-logo {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 15px;
+  }
+  
+  .optimal-cart__supermarket-logo img {
+    height: 100px;
+  }
+  
+  .optimal-cart__supermarket-info {
+    text-align: center;
+  }
+  
+  .optimal-cart__supermarket-address {
+    font-size: 16px;
+    margin-bottom: 5px;
+    color: #333;
+    font-weight: bold;
+  }
+  
+  .optimal-cart__supermarket-city {
+    font-size: 14px;
+    color: #666;
+  }
+  

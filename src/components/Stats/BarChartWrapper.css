@@ -1,0 +1,89 @@
+.chart-container {
+  display: flex;
+  flex-direction: row; /* פריסה אופקית */
+  justify-content: space-between; /* ריווח שווה בין התרשים לרשימה */
+  align-items: flex-start; /* יישור אנכי */
+  width: 100%; /* מניעת גלילה מיותרת */
+  height: auto; /* התאמה לגובה */
+  box-sizing: border-box;
+}
+
+.chart-section {
+  flex: 0 0 60%; /* תופס 60% מהרוחב */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.total-expenses {
+  position: absolute;
+  font-size: 20px;
+  font-weight: bold;
+  text-align: center;
+}
+
+.category-list {
+  flex: 0 0 40%; /* תופס 40% מהרוחב */
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  overflow-y: auto; /* גלילה אנכית */
+  padding: 10px;
+  box-sizing: border-box;
+  height: 100%; /* מוודא התאמה לגובה */
+}
+
+.category-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 5px;
+  border-bottom: 1px solid #ddd;
+  transition: all 0.3s ease-in-out;
+  cursor: pointer;
+}
+
+.category-item:hover {
+  background-color: #f0f8ff;
+}
+
+.category-item.selected {
+  background-color: #008080;
+  color: #fff;
+  font-weight: bold;
+}
+
+.category-color {
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+}
+
+.category-name {
+  flex: 1;
+  margin-left: 10px;
+  font-size: 14px;
+}
+
+.category-value {
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.category-icon {
+  width: 30px;
+  height: 30px;
+  margin-right: 10px;
+}
+
+@media (max-width: 768px) {
+  .chart-container {
+    flex-direction: column; /* פריסה אנכית במובייל */
+  }
+
+  .chart-section,
+  .category-list {
+    flex: 1 1 auto; /* כל רכיב יתפוס מקום */
+  }
+}

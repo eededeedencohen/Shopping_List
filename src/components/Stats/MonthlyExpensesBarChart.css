@@ -1,0 +1,39 @@
+
+.bar-chart-container {
+  display: flex;
+  flex-direction: row; /* הצגת המקלות מימין לשמאל */
+  overflow-x: auto; /* גלילה אופקית */
+  gap: 20px; /* רווחים בין המקלות */
+  padding: 10px;
+  white-space: nowrap;
+  background-color: #f9f9f9;
+  border-radius: 10px;
+  border: 1px solid #ddd;
+  scroll-behavior: smooth; /* גלילה חלקה */
+  direction: ltr; /* כיוון התוכן משמאל לימין */
+}
+
+.bar-chart-container {
+    display: flex;
+    flex-direction: row; /* הופך את סדר ההצגה */
+    align-items: flex-end; /* מוודא שהמקלות יתחילו מהחלק התחתון */
+    overflow-x: auto;
+    gap: 20px;
+    padding: 10px;
+    white-space: nowrap;
+    background-color: #f9f9f9;
+    border-radius: 10px;
+    border: 1px solid #ddd;
+    scroll-behavior: smooth; /* גלילה חלקה */
+    direction: ltr; /* כיוון התוכן משמאל לימין */
+  }
+  
+
+.bar-chart-container::-webkit-scrollbar {
+  display: none; /* הסתרת פס הגלילה */
+}
+@media (max-width: 768px) {
+  .bar-chart-container {
+    gap: 20px; /* צמצום הרווחים בניידים */
+  }
+}
