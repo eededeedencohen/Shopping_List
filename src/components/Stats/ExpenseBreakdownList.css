@@ -1,22 +1,21 @@
 .expense-breakdown-list h2 {
-  text-align: center; /* כותרת במרכז */
-  margin: 10px 0; /* מרווחים למעלה ולמטה */
-  font-size: 1.5rem; /* גודל גופן */
-  color: #333; /* צבע טקסט */
+  text-align: center;
+  margin: 10px 0;
+  font-size: 1.5rem;
+  color: #333;
   font-weight: bold;
 }
-
 
 .ebl_product_details {
   display: flex;
   justify-content: space-between;
-  align-items: stretch; /* ימתח את כל האייטמים לאותו גובה */
+  align-items: stretch;
   background-color: #f0f8ff;
   border-radius: 5px;
   padding: 2px;
   transition: background-color 0.3s ease-in-out;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  min-height: 80px; /* גובה אחיד לכל השורות */
+  min-height: 80px;
 }
 
 .ebl_product_details:hover {
@@ -29,7 +28,7 @@
 .ebl_product,
 .ebl_category_logo {
   display: flex;
-  align-items: center; /* ממרכז את התוכן האנכי */
+  align-items: center;
   justify-content: center;
   text-align: center;
 }
@@ -63,19 +62,13 @@
   color: #333;
 }
 
-.ebl_product_brand {
-  font-size: 0.8rem;
-  color: #777;
-}
-
 .ebl_category_logo {
   flex: 0 0 10%;
   color: #999;
 }
 
 .ebl_logo_image {
-  width: 20px; /* קובע את הרוחב של הלוגו */
-  height: 20px; /* קובע את הגובה של הלוגו */
-  object-fit: contain; /* שומר על יחס הגובה-רוחב */
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
 }
-

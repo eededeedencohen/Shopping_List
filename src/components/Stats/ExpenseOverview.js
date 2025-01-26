@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
-import MonthlyExpensesBarChart from './MonthlyExpensesBarChart';
-import CategoryExpensesChart from './CategoryExpensesChart';
-import ExpenseBreakdownList from './ExpenseBreakdownList';
-import './ExpenseOverview.css';
+import React, { useState } from "react";
+import MonthlyExpensesBarChart from "./MonthlyExpensesBarChart";
+import CategoryExpensesChart from "./CategoryExpensesChart";
+import ExpenseBreakdownList from "./ExpenseBreakdownList";
+import "./ExpenseOverview.css";
 
 // היסטוריית ההוצאות
 const data = [
@@ -1903,49 +1903,41 @@ const data = [
     }
 ];
 
+
 const getLastDate = (data) => {
-    // from the last element in the array, get the date and return it in the format of 'YYYY-MM'
-    return data[data.length - 1].date.slice(0, 7);
+  return data[data.length - 1].date.slice(0, 7);
 };
 
 const ExpenseOverview = () => {
   const [selectedMonthYear, setSelectedMonthYear] = useState(getLastDate(data));
-  const [selectedCategory, setSelectedCategory] = useState('All Categories');
+  const [selectedCategory, setSelectedCategory] = useState("All Categories");
 
-  // פילטור נתונים לפי חודש ושנה
   const filteredDataByMonth = data.filter((item) =>
     item.date.includes(selectedMonthYear)
   );
 
-  // שינוי הקטגוריה לפי הקליק בגרף
   const handleCategorySelect = (category) => {
     setSelectedCategory(category);
   };
 
-  // שינוי חודש+שנה לפי הקליק בגרף המקלות
   const handleMonthSelect = (monthYear) => {
     setSelectedMonthYear(monthYear);
-    setSelectedCategory('All Categories'); // מאפס את הקטגוריה
+    setSelectedCategory("All Categories");
   };
 
   return (
     <div className="expense-overview">
       <h1>סקירת הוצאות חודשיות</h1>
-      {/* תרשים מקלות */}
       <MonthlyExpensesBarChart
         data={data}
         selectedMonthYear={selectedMonthYear}
         onMonthSelect={handleMonthSelect}
       />
-
-      {/* תרשים דונאט */}
       <CategoryExpensesChart
         data={filteredDataByMonth}
         selectedCategory={selectedCategory}
         onCategorySelect={handleCategorySelect}
       />
-
-      {/* פירוט הוצאות */}
       <ExpenseBreakdownList
         data={filteredDataByMonth}
         selectedCategory={selectedCategory}
