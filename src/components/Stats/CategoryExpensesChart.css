@@ -2,12 +2,12 @@
   display: flex;
   flex-direction: row;
   align-items: flex-start;
-  gap: 5px; /* רווח בין התרשים לרשימה */
+  gap: 5px; 
   background-color: #ffffff;
   border: 1px solid #ddd;
   border-radius: 10px;
   padding: 5px;
-  max-width: 100%; /* מגביל את הרוחב */
+  max-width: 100%;
 }
 
 .chart-section {
@@ -17,78 +17,16 @@
   align-items: center;
 }
 
-.total-expenses {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  font-size: 16px;
-  font-weight: bold;
-  color: #333;
-}
+.category-list-container {
+  /* כדי לאפשר גלילה כאשר יש הרבה קטגוריות */
+  max-height: 200px; /* אתה יכול לבחור גובה אחר */
+  overflow-y: auto;
 
-.category-list-wrapper {
-  flex: 1;
-  overflow-y: auto; /* גלילה אנכית בלבד */
-  overflow-x: hidden; /* מניעת גלילה אופקית */
-  max-height: 300px; /* מגביל את גובה הרשימה */
-  width: 100%; /* התאמת הרוחב להורה */
-  box-sizing: border-box; /* חישוב גבולות נכון */
-}
-
-.category-list {
+  /* תצוגת Flex בעמודה */
   display: flex;
   flex-direction: column;
   gap: 15px;
-  max-width: 100%; /* מונע חריגה של התוכן */
-  overflow-x: hidden; /* מוודא שאין גלילה אופקית */
-}
 
-.category-list li {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  border: 2px solid transparent;
-  border-radius: 5px;
-  padding: 10px;
-  transition: all 0.3s ease-in-out;
-  cursor: pointer;
-  box-sizing: border-box; /* חישוב גבולות נכון */
-}
-
-.category-list li:hover {
-  border-color: #888;
-  background-color: #f0f8ff;
-}
-
-.category-list li.selected {
-  background-color: #008080;
-  color: #fff;
-  font-weight: bold;
-}
-
-.category-icon {
-  width: 30px;
-  height: 30px;
-  margin-right: 10px;
-}
-
-.category-info {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-}
-
-button {
-  padding: 10px 20px;
-  background-color: #008080;
-  color: #fff;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
-
-button:hover {
-  background-color: #006666;
+  max-width: 100%;
+  box-sizing: border-box;
 }

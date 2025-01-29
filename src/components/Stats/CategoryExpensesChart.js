@@ -1,31 +1,38 @@
-import React from "react";
+import React, { useRef } from "react";
 import "./CategoryExpensesChart.css";
 import { PieChart, Pie, Cell, Tooltip } from "recharts";
+import CategoryExpensesChartCategory from "./CategoryExpensesChartCategory";
 
 const CategoryExpensesChart = ({ data, selectedCategory, onCategorySelect }) => {
-  const categoryTotals = data.flatMap((item) => item.products).reduce((acc, product) => {
-    acc[product.category] = (acc[product.category] || 0) + product.totalPrice;
-    console.log(data);
-    console.log(selectedCategory);
-    return acc;
-  }, {});
+  // חישוב סך המחירים לפי קטגוריה
+  const categoryTotals = data
+    .flatMap((item) => item.products)
+    .reduce((acc, product) => {
+      acc[product.category] = (acc[product.category] || 0) + product.totalPrice;
+      return acc;
+    }, {});
 
+  // הגדרת צבעים לסירוגין
   const COLORS = ["#FF8042", "#FFBB28", "#0088FE", "#00C49F", "#FF6666"];
 
+  // הכנת המערך לתרשים הפאי
   const chartData = Object.entries(categoryTotals).map(([category, total], index) => ({
     name: category,
     value: total,
     color: COLORS[index % COLORS.length],
   }));
 
+  // חישוב סך כל ההוצאות
+  const totalExpenses = chartData
+    .reduce((sum, item) => sum + item.value, 0)
+    .toFixed(2);
 
-
-  const totalExpenses = chartData.reduce((sum, item) => sum + item.value, 0).toFixed(2);
+  // נגדיר רפרנס לקונטיינר של הרשימה
+  const containerRef = useRef(null);
 
   return (
     <div className="category-chart-container">
-
-      {/* ההתחלה של החלק שעוטף את התרשים פאי */} 
+      {/* תרשים הפאי */}
       <div className="chart-section">
         <PieChart width={150} height={150}>
           <Pie
@@ -52,26 +59,22 @@ const CategoryExpensesChart = ({ data, selectedCategory, onCategorySelect }) => 
           </text>
         </PieChart>
         <Tooltip />
-      </div> 
-      {/* הסוף של החלק שעוטף את התרשים פאי */} 
-      
-
-      <div className="category-list-container">
-      <ul className="category-list">
-        {chartData.map(({ name, value, color }) => (
-          <li
-            key={name}
-            className={name === selectedCategory ? "selected" : ""}
-            onClick={() => onCategorySelect(name)}
-            style={{ borderColor: color }}
-          >
-            <div>{name}</div>
-            <div>₪{value.toFixed(2)}</div>
-          </li>
-        ))}
-      </ul>
       </div>
 
+      {/* הרשימה של הקטגוריות */}
+      <div className="category-list-container" ref={containerRef}>
+        {chartData.map(({ name, value, color }) => (
+          <CategoryExpensesChartCategory
+            key={name}
+            name={name}
+            value={value}
+            color={color}
+            isSelected={name === selectedCategory}
+            onClick={() => onCategorySelect(name)}
+            containerRef={containerRef}
+          />
+        ))}
+      </div>
     </div>
   );
 };
