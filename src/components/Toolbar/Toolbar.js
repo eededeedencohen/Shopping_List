@@ -87,7 +87,7 @@ function Toolbar() {
               <h1>Receipt To History</h1>
             </div>
           </Link>
-          <Link to="/stats" onClick={closeDrawer} className="link-nav">
+          <Link to="/expense-overview" onClick={closeDrawer} className="link-nav">
             <div className="nav-item">
               <div className="nav-icon">
                 <img src={statisticIcon} alt="Grocery" />
