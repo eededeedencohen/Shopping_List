@@ -1,6 +1,34 @@
 import React, { useRef, useEffect } from "react";
 import "./CategoryExpensesChartCategory.css";
-import Dairy from "./Dairy.png";
+
+import dairyLogo from "./Dairy.png";
+import frozenLogo from "./Frozen.png";
+import snacksLogo from "./Snacks.png";
+import beveragesLogo from "./Beverages.png";
+import cannedLogo from "./Canned.png";
+import cleaningLogo from "./Cleaning.png";
+import pharmacyLogo from "./Pharmacy.png";
+import otherLogo from "./Other.png";
+import bakingLogo from "./Baking.png";
+
+const categoryIcons = {
+  "מוצרי חלב וביצים": dairyLogo,
+  "מוצרים קפואים": frozenLogo,
+  "חטיפים, מתוקים ודגנים": snacksLogo,
+  "משקאות, יין ואלכוהול": beveragesLogo,
+  "שימורים": cannedLogo,
+  "ניקיון וחד פעמי": cleaningLogo,
+  "פארם ותינוקות": pharmacyLogo,
+  "בישול ואפייה": bakingLogo,
+  Other: otherLogo,
+};
+
+function getCategoryIcon(category) {
+  return categoryIcons[category] || otherLogo;
+}
+
+
+
 
 const CategoryExpensesChartCategory = ({
   name,
@@ -46,7 +74,7 @@ const CategoryExpensesChartCategory = ({
         behavior: "smooth",
       });
     }
-  },  [isSelected, containerRef]);
+  }, [isSelected, containerRef]);
 
   return (
     <div
@@ -62,7 +90,8 @@ const CategoryExpensesChartCategory = ({
         </div>
       </div>
       <div className="category-list-item-image">
-        <img src={Dairy} alt={name} />
+        <img src={getCategoryIcon(name)} 
+         alt={name} />
       </div>
     </div>
   );
