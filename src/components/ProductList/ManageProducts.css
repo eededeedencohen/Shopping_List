@@ -1,0 +1,130 @@
+/* עטוף לרשימת המוצרים */
+.mp_products-wrapper {
+  overflow-x: hidden;
+}
+
+/* הקונטיינר שמחזיק את כרטיסי המוצרים */
+.mp_products-container {
+  position: relative;
+  overflow-x: hidden;
+  overflow-y: auto;
+  min-height: calc(100vh - var(--offset-top, 100px));
+}
+
+/* כרטיס מוצר - תצוגה בשורה */
+.mp_product-card {
+  display: flex;
+  flex-direction: row-reverse; /* שתי עמודות: טקסט (ימין), תמונה (שמאל) */
+  align-items: center;
+
+  margin: 10px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-shadow: 0 0 10px #ccc;
+  background-color: #fff;
+
+  position: relative;
+  overflow: hidden;
+}
+
+/* אם יש תגית "מבצע" אלכסונית (לא חובה) */
+.mp_product-badge {
+  position: absolute;
+  top: 3px;
+  left: -27px;
+  background-color: #af4c4c90;
+  color: #fff;
+  padding: 5px;
+  border-radius: 5px;
+  font-size: 0.9rem;
+  text-align: center;
+  transform: rotate(-45deg);
+  width: 90px;
+  font-weight: bold;
+}
+
+/* העמודה הימנית (טקסט/פרטים) */
+.mp_product-data {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end; 
+  justify-content: center;
+
+  width: 70%;
+  padding: 0 10px;
+}
+
+/* שם המוצר */
+.mp_product-name {
+  margin: 0;
+  margin-bottom: 0.4rem;
+  font-size: 1rem;
+  font-weight: bold;
+  color: #2f416e;
+  direction: rtl;
+}
+
+/* מידע משלים: משקל, מותג וכו' */
+.mp_product-info {
+  display: flex;
+  flex-direction: row-reverse;
+  align-items: center;
+  font-size: 0.9rem;
+  color: #2f416e;
+  margin: 0;
+}
+
+/* מפריד אנכי */
+.mp_separator {
+  margin: 0 0.4rem;
+  color: #888;
+}
+
+/* תמונת מוצר (משמאל) */
+.mp_product-image {
+  width: 30%;
+  position: relative;
+  cursor: pointer; 
+}
+.mp_product-image::before {
+  content: '';
+  display: block;
+  padding-top: 100%;
+}
+.mp_product-image img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* ------------------------------------------------------ */
+/* Keyframes לאנימציות ההחלקה (קטגוריות/תתי קטגוריות)    */
+/* ------------------------------------------------------ */
+@keyframes middleToRight {
+  from { transform: translateX(0%); }
+  to   { transform: translateX(100%); }
+}
+@keyframes middleToLeft {
+  from { transform: translateX(0%); }
+  to   { transform: translateX(-100%); }
+}
+@keyframes leftToRight {
+  from { transform: translateX(-100%); }
+  to   { transform: translateX(100%); }
+}
+@keyframes rightToLeft {
+  from { transform: translateX(100%); }
+  to   { transform: translateX(-100%); }
+}
+@keyframes rightToMiddle {
+  from { transform: translateX(100%); }
+  to   { transform: translateX(0%); }
+}
+@keyframes leftToMiddle {
+  from { transform: translateX(-100%); }
+  to   { transform: translateX(0%); }
+}

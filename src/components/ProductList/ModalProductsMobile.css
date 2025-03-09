@@ -1,0 +1,103 @@
+/* עיצוב כללי לרשימת פריטים במודאל */
+.modal-products-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    background-color: #fff;
+    border-radius: 5px;
+  }
+  
+  /* פריט בודד (מוצר / קבוצה) בשורה */
+  .modal-product {
+    display: flex;
+    flex-direction: row-reverse;
+    align-items: center;
+    justify-content: space-between;
+    width: 90%;
+    margin: 10px 0;
+  }
+  
+  /* אזור התמונה משמאל */
+  .modal-product-image {
+    width: 35%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .modal-product-image img {
+    width: 80px;
+    height: 80px;
+    object-fit: contain;
+  }
+  
+  /* אזור הפרטים (מימין) */
+  .modal-product-details {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end; /* יישור לימין לטקסט בעברית */
+    justify-content: center;
+    width: 65%;
+  }
+  
+  .modal-product-details__name {
+    font-size: 1rem;
+    color: #2f416e;
+    font-weight: bold;
+    margin-bottom: 0.2rem;
+  }
+  
+  .modal-product-details__info {
+    display: flex;
+    flex-direction: row-reverse;
+    color: #2f416e;
+    font-size: 0.85rem;
+  }
+  .modal-product-details__info p {
+    margin-left: 5px;
+  }
+  
+  /* קו מפריד בין פריטים */
+  .modal-product-separator {
+    width: 80%;
+    height: 1px;
+    background-color: #ccc;
+    margin: 0 auto;
+  }
+  
+  /* כפתורים כלליים */
+  .nice-button {
+    background-color: #2f416e;
+    color: #fff;
+    border: none;
+    padding: 0.5rem 0.8rem;
+    border-radius: 5px;
+    margin: 0.2rem;
+    cursor: pointer;
+    font-size: 0.9rem;
+  }
+  .nice-button:hover {
+    background-color: #3e4d7b;
+  }
+  .nice-button:active {
+    background-color: #1f315e;
+  }
+  
+  /* כפתור מחיקה / אזהרה */
+  .danger-button {
+    background-color: #d9534f;
+    color: #fff;
+    border: none;
+    padding: 0.5rem 0.8rem;
+    border-radius: 5px;
+    margin: 0.2rem;
+    cursor: pointer;
+    font-size: 0.9rem;
+  }
+  .danger-button:hover {
+    background-color: #c9302c;
+  }
+  .danger-button:active {
+    background-color: #ac2925;
+  }
+  

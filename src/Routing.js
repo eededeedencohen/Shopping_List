@@ -17,6 +17,9 @@ import OptimalCartsSettings from "./components/CartOptimization/OptimalCartsSett
 import OptimalsSupermarketCarts from "./components/CartOptimization/OptimalsSupermarketCarts/OptimalsSupermarketCarts";
 import OptimalCart from "./components/CartOptimization/OptimalsSupermarketCarts/OptimalSupermarketCart/OptimalCart";
 import ExpenseOverview from "./components/Stats/ExpenseOverview";
+import ProductListManager from "./components/ProductList/ProductListManager";
+import ProductListManagerAlternativeProductsGroups from "./components/ProductList/ProductListManagerAlternativeProductsGroups";
+import EditProducts from "./components/ProductList/EditProducts";
 
 function Routing() {
   return (
@@ -39,6 +42,9 @@ function Routing() {
       <Route path="/optimal-supermarket-carts" element={<OptimalsSupermarketCarts />} />
       <Route path="/optimal-supermarket-carts/:supermarketID" element={<OptimalCart />} />
       <Route path="/expense-overview" element={<ExpenseOverview />} />
+      <Route path="/product-list" element={<ProductListManager />} />
+      <Route path="/alternative-products-groups"element={<ProductListManagerAlternativeProductsGroups />} />
+      <Route path="/edit-products" element={<EditProducts />} />
     </Routes>
   );
 }

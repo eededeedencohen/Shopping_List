@@ -1,0 +1,213 @@
+/* עטוף לרשימת המוצרים */
+.mp_products-wrapper {
+  overflow-x: hidden;
+}
+
+/* הקונטיינר שמחזיק את כרטיסי המוצרים */
+.mp_products-container {
+  position: relative;
+  overflow-x: hidden;
+  overflow-y: auto;
+  min-height: calc(100vh - var(--offset-top, 100px));
+}
+
+/* כרטיס מוצר - תצוגה בשורה */
+.mp_product-card {
+  display: flex;
+  flex-direction: row-reverse; /* שתי עמודות: טקסט (ימין), תמונה (שמאל) */
+  align-items: center;
+
+  margin: 10px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-shadow: 0 0 10px #ccc;
+  background-color: #fff;
+
+  position: relative;
+  overflow: hidden;
+}
+
+/* אם יש תגית "מבצע" אלכסונית */
+.mp_product-badge {
+  position: absolute;
+  top: 3px;
+  left: -27px;
+  background-color: #af4c4c90;
+  color: #fff;
+  padding: 5px;
+  border-radius: 5px;
+  font-size: 0.9rem;
+  text-align: center;
+  transform: rotate(-45deg);
+  width: 90px;
+  font-weight: bold;
+}
+
+/* העמודה הימנית (טקסט/פרטים) */
+.mp_product-data {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end; /* יישור לימין */
+  justify-content: center;
+
+  width: 70%;
+  padding: 0 10px;
+}
+
+/* שם המוצר */
+.mp_product-name {
+  margin: 0;
+  margin-bottom: 0.4rem;
+  font-size: 1rem;
+  font-weight: bold;
+  color: #2f416e;
+  direction: rtl;
+}
+
+/* מידע משלים: משקל, מותג וכו' */
+.mp_product-info {
+  display: flex;
+  flex-direction: row-reverse;
+  align-items: center;
+  font-size: 0.9rem;
+  color: #2f416e;
+  margin: 0;
+}
+
+/* מפריד אנכי (לפני/אחרי מותג) */
+.mp_separator {
+  margin: 0 0.4rem;
+  color: #888;
+}
+
+/* תמונת מוצר (העמודה השמאלית) */
+.mp_product-image {
+  width: 30%;
+  position: relative;
+  cursor: pointer; /* אם רוצים שהמשתמש ילחץ */
+}
+.mp_product-image::before {
+  content: "";
+  display: block;
+  padding-top: 100%; /* יחס 1:1 */
+}
+.mp_product-image img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* אזור כפתורים (למטה או מתחת לטקסט) */
+.mp_product-operations {
+  display: flex;
+  flex-direction: row-reverse;
+  align-items: center;
+  margin-top: 0.5rem;
+}
+
+.mp_product-operations button {
+  margin: 0 0.3rem;
+  padding: 0.4rem 0.8rem;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  color: #fff;
+}
+.mp_product-operations .btn-edit {
+  background-color: #008cba; /* כפתור עדכון/פתיחה */
+}
+.mp_product-operations .btn-save {
+  background-color: #4caf50; /* כפתור שמירה */
+}
+.mp_product-operations .btn-delete {
+  background-color: #f44336; /* כפתור מחיקה */
+}
+
+/* דוגמה לשורת כמות ואנימציה: (לא חובה) */
+.apg_product-amounts {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin-top: 0.5rem;
+}
+.mp_product-amounts__plus,
+.mp_product-amounts__minus {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  border: 2px solid #ccc;
+  background-color: #4caf50;
+  color: #fff;
+  font-size: 1.2rem;
+  text-align: center;
+  line-height: 2.2rem;
+  cursor: pointer;
+  margin: 0 0.3rem;
+}
+.mp_product-amounts__minus {
+  background-color: #f44336;
+}
+.mp_product-amounts__quantity {
+  font-size: 1rem;
+  width: 2.5rem;
+  text-align: center;
+  margin: 0 0.3rem;
+  color: #333;
+}
+
+/* ------------------------------------------------------ */
+/*    Keyframes לאנימציות ההחלקה                         */
+/* ------------------------------------------------------ */
+@keyframes middleToRight {
+  from {
+    transform: translateX(0%);
+  }
+  to {
+    transform: translateX(100%);
+  }
+}
+@keyframes middleToLeft {
+  from {
+    transform: translateX(0%);
+  }
+  to {
+    transform: translateX(-100%);
+  }
+}
+@keyframes leftToRight {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(100%);
+  }
+}
+@keyframes rightToLeft {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(-100%);
+  }
+}
+@keyframes rightToMiddle {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0%);
+  }
+}
+@keyframes leftToMiddle {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0%);
+  }
+}

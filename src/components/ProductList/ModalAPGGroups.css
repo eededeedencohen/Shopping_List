@@ -1,0 +1,101 @@
+/* עטיפת תוכן המודאל */
+.apg-modal-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* מרכז תוכן */
+  padding: 1rem;
+  /* רקע וכו' מגיע לרוב מ-Modal עצמו */
+}
+
+.apg-modal-title {
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+  color: #2f416e; /* צבע כותרת */
+  text-align: center;
+}
+
+/* רשימת הכפתורים (קבוצות) */
+.apg-modal-groups-list {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  margin-bottom: 1rem;
+}
+
+.apg-modal-groups-list__button {
+  background-color: #f0f0f0;
+  border: none;
+  color: #333;
+  font-size: 1rem;
+  padding: 0.6rem 0.8rem;
+  margin: 0.3rem 0;
+  border-radius: 5px;
+  cursor: pointer;
+  text-align: center;
+}
+.apg-modal-groups-list__button:hover {
+  background-color: #e0e0e0;
+}
+.apg-modal-groups-list__empty {
+  color: #666;
+  font-size: 0.95rem;
+  text-align: center;
+}
+
+/* כפתור "יצירת קבוצה חדשה" */
+.create-btn {
+  background-color: #4caf50; /* ירוק */
+  color: #fff;
+  border: none;
+  padding: 0.6rem 1rem;
+  border-radius: 5px;
+  margin-bottom: 1rem;
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+.create-btn:hover {
+  background-color: #43a047;
+}
+
+/* אזור יצירת קבוצה */
+.apg-modal-create-group {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1rem;
+  gap: 0.5rem;
+}
+.apg-modal-create-group__input {
+  padding: 0.4rem;
+  font-size: 0.9rem;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  width: 160px;
+}
+.confirm-btn {
+  background-color: #008cba;
+  color: #fff;
+  border: none;
+  padding: 0.6rem 0.8rem;
+  border-radius: 5px;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+.confirm-btn:hover {
+  background-color: #007aa1;
+}
+
+/* כפתור ביטול */
+.cancel-btn {
+  background-color: #e57373; /* אדום בהיר */
+  color: #fff;
+  border: none;
+  padding: 0.6rem 1rem;
+  border-radius: 5px;
+  cursor: pointer;
+}
+.cancel-btn:hover {
+  background-color: #d32f2f;
+}

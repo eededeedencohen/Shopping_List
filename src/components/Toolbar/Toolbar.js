@@ -37,11 +37,11 @@ function Toolbar() {
 
   return (
     <nav className="toolbar">
-      <div className="search-icon" >
-        <img src={SearchIcon} alt="SearchIcon" onClick={openModal}/>
+      <div className="search-icon">
+        <img src={SearchIcon} alt="SearchIcon" onClick={openModal} />
       </div>
       <SearchModal isOpen={isModalOpen} onClose={closeModal}>
-        <SearchBar closeModal={closeModal}/>
+        <SearchBar closeModal={closeModal} />
       </SearchModal>
       <div className="hamburger-menu" onClick={toggleDrawer}>
         &#9776;
@@ -60,6 +60,30 @@ function Toolbar() {
                 <img src={groceryIcon} alt="Grocery" />
               </div>
               <h1>Products</h1>
+            </div>
+          </Link>
+          <Link to="/product-list" onClick={closeDrawer}>
+            <div className="nav-item">
+              <div className="nav-icon">
+                <img src={groceryIcon} alt="Grocery" />
+              </div>
+              <h1>ProductsList</h1>
+            </div>
+          </Link>
+          <Link to="/alternative-products-groups" onClick={closeDrawer}>
+            <div className="nav-item">
+              <div className="nav-icon">
+                <img src={groceryIcon} alt="Grocery" />
+              </div>
+              <h1>AlternativeProductsGroups</h1>
+            </div>
+          </Link>
+          <Link to="/edit-products" onClick={closeDrawer}>
+            <div className="nav-item">
+              <div className="nav-icon">
+                <img src={groceryIcon} alt="Grocery" />
+              </div>
+              <h1>EditProducts</h1>
             </div>
           </Link>
           <Link to="/image-parser" onClick={closeDrawer}>
@@ -87,7 +111,11 @@ function Toolbar() {
               <h1>Receipt To History</h1>
             </div>
           </Link>
-          <Link to="/expense-overview" onClick={closeDrawer} className="link-nav">
+          <Link
+            to="/expense-overview"
+            onClick={closeDrawer}
+            className="link-nav"
+          >
             <div className="nav-item">
               <div className="nav-icon">
                 <img src={statisticIcon} alt="Grocery" />
@@ -130,4 +158,3 @@ function Toolbar() {
 }
 
 export default Toolbar;
-
