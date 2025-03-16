@@ -1,0 +1,42 @@
+/* מכולת הפריטים – תצוגת Flex, שתי פריטים בשורה */
+.smn_container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+  }
+  
+  /* כל פריט תופס בערך 50% מהרוחב (עם מרווחים) ומרכז את התוכן */
+  .smn_item {
+    flex: 0 0 calc(50% - 20px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+  }
+  
+  /* רקע עיגול עבור הלוגו, בגודל 40% מרוחב הפריט.
+     הגדרת padding-top ב-40% יוצרת תיבה ריבועית בהתאם לרוחב, ולאחר מכן border-radius:50% הופך אותה לעיגול.
+  */
+  .smn_circle {
+    width: 40%;
+    padding-top: 40%;
+    border-radius: 50%;
+    background-color: #f0f0f0; /* ניתן לשנות לצבע אחר או ל-transparent */
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  /* הלוגו עצמו יושם בתוך העיגול ויתאים לממדים שלו בלי לעוות (ביחס 3:5) */
+  .smn_image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+  

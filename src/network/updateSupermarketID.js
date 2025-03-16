@@ -8,4 +8,5 @@ const updateSupermarketID = async (userId, supermarketID) => {
   return response.data;
 };
 
+
 export default updateSupermarketID;

@@ -47,10 +47,17 @@ const deleteProductFromCart = async (userId, barcode) => {
   return;
 };
 
+// localhost:8000/api/v1/prices/supermarkets
+const getAllSupermarkets = async () => {
+  const supermarkets = await httpClient.get(`/prices/supermarkets`);
+  return supermarkets.data;
+};
+
 export {
   getActiveCartByUserID,
   getProductsAmountInCartByUserID,
   addProductToCart,
   updateProductInCart,
   deleteProductFromCart,
+  getAllSupermarkets,
 };

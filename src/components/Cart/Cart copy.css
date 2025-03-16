@@ -27,10 +27,23 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   background-color: #ffffff8a;
   border-radius: 10px;
   box-shadow: 0px 0px 10px 0px rgb(255, 255, 255);
   overflow-x: hidden;
+}
+
+.cart-operations {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  width: 100%;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  gap: 1rem; /* מרווח בין הכפתורים */
 }
 
 .cart-operations {
@@ -79,17 +92,6 @@
 
 .cart-operations_optimal-carts-settings {
   background: linear-gradient(135deg, #1e88e5, #1565c0);
-}
-
-.cart .supermarket {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  background-color: #ffffff8a;
-  border-radius: 10px;
-  box-shadow: 0px 0px 10px 0px rgb(255, 255, 255);
-  margin-right: 10px;
-  margin-left: 10px;
 }
 
 .cart .supermarket-title {

@@ -2,7 +2,7 @@ import beImage from "./supermarketsImages/BE.png";
 import carrefoutImage from "./supermarketsImages/Carrefour city (קרפור סיטי).png";
 import yellowImage from "./supermarketsImages/yellow.png";
 import osherAdImage from "./supermarketsImages/אושר עד.png";
-import barcolImage from "./supermarketsImages/ברכל.png";
+// import barcolImage from "./supermarketsImages/ברכל.png";
 
 import victoryImage from "./supermarketsImages/ויקטורי.png";
 import bigAndCheapImage from "./supermarketsImages/זול ובגדול.png";
@@ -27,34 +27,6 @@ import shaareRevahaImage from "./supermarketsImages/שערי רווחה.png";
 import plentyBlessingOfTheNameNearHomeImage from "./supermarketsImages/שפע ברכת השם קרוב לבית.png";
 import marketGoodImage from "./supermarketsImages/good מרקט.png";
 
-// "BE",
-// "Carrefour city (קרפור סיטי)",
-// "yellow",
-// "אושר עד",
-// "ברכל",
-// "ויקטורי",
-// "זול ובגדול",
-// "יוחננוף",
-// "יש בשכונה",
-// "יש חסד",
-// "מגה בעיר",
-// "מחסני השוק בשבילך",
-// "מחסני השוק מהדרין",
-// "מיני סופר אלונית",
-// "מעיין 2000",
-// "סופר פארם",
-// "קינג סטור",
-// "רמי לוי",
-// "שופרסל אקספרס",
-// "שופרסל דיל",
-// "שופרסל שלי",
-// "שוק העיר",
-// "שוק מהדרין",
-// "שירה מרקט",
-// "שערי רווחה",
-// "שפע ברכת השם קרוב לבית"
-// "good מרקט",
-
 const getSupermarketImage = (supermarketName) => {
   switch (supermarketName) {
     case "BE":
@@ -65,8 +37,8 @@ const getSupermarketImage = (supermarketName) => {
       return yellowImage;
     case "אושר עד":
       return osherAdImage;
-    case "ברכל":
-      return barcolImage;
+    // case "ברכל":
+    //   return barcolImage;
     case "ויקטורי":
       return victoryImage;
     case "זול ובגדול":
@@ -116,9 +88,13 @@ const getSupermarketImage = (supermarketName) => {
   }
 };
 
-const SupermarketImage = ({ supermarketName }) => {
+const SupermarketImage = ({ supermarketName, className }) => {
   return (
-    <img src={getSupermarketImage(supermarketName)} alt={supermarketName} />
+    <img
+      src={getSupermarketImage(supermarketName)}
+      alt={supermarketName}
+      className={className} // מאפשר להעביר ClassName חיצוני
+    />
   );
 };
 

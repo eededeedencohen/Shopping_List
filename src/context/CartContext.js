@@ -5,6 +5,7 @@ import {
   addProductToCart,
   updateProductInCart,
   deleteProductFromCart,
+  getAllSupermarkets,
 } from "../network/cartService";
 // import confirmCart from "../network/confirmCart";
 import confirmSupermarketCart from "../network/confirmSupermarketCart";
@@ -56,13 +57,15 @@ export const CartContextProvider = ({ children }) => {
     setCart(confirmedCart);
   };
 
-  const updateAmount = (productBarcode, type) => {
+  const updateAmount = (productBarcode, type, newAmount=0) => {
     const productsWithPrices = cart.productsWithPrices.map((cartItem) => {
       if (cartItem.product.barcode === productBarcode) {
         if (type === "increment") {
           return { ...cartItem, amount: cartItem.amount + 1 };
         } else if (type === "decrement" && cartItem.amount > 0) {
           return { ...cartItem, amount: cartItem.amount - 1 };
+        } else if (type === "set") {
+          return { ...cartItem, amount: newAmount };
         }
       }
       return cartItem;
@@ -79,6 +82,11 @@ export const CartContextProvider = ({ children }) => {
     return cheapestSupermarket;
   };
 
+  const getSupermarkets = async () => {
+    const supermarkets = await getAllSupermarkets();
+    return supermarkets;
+  }
+
   return (
     <CartContext.Provider
       value={{
@@ -94,6 +102,7 @@ export const CartContextProvider = ({ children }) => {
         confirmCart: handleConfirmCart,
         updateSupermarketID: handleSupermarketUpdate,
         getCheapestSupermarketCart: handleCheapestSupermarket,
+        getAllSupermarkets: getSupermarkets,
       }}
     >
       {children}

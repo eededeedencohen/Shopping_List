@@ -4,6 +4,7 @@ import { useCart } from "../../context/CartContext";
 import { useProducts } from "../../context/ProductContext";
 import Modal from "./Modal";
 import ReplaceProducts from "./ReplaceProducts";
+import ReplaceSupermarket from "./ReplaceSupermarket/ReplaceSupermarket";
 import "./Cart.css";
 import { Spin } from "antd";
 import Images from "../ProductList/Images";
@@ -45,10 +46,12 @@ export default function Cart() {
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [isModalOpen, setModalOpen] = useState(false);
+  const [isReplaceSupermarketOpen, setIsReplaceSupermarketOpen] =
+    useState(false);
+
   const [currentBarcode, setCurrentBarcode] = useState(null);
 
   //=============================================
-  const [supermarketID, setSupermarketID] = useState(1);
   const [isReplaceSupermarket, setIsReplaceSupermarket] = useState(false);
 
   useEffect(() => {
@@ -118,6 +121,24 @@ export default function Cart() {
     }
   };
 
+  const handleUpdateAndLoad = async (supermarketID) => {
+    setIsReplaceSupermarket(true); // מתחיל לטעון
+    try {
+      await updateSupermarketID(userId, supermarketID);
+      await loadCart(userId);
+      await loadProducts();
+    } catch (error) {
+      console.error("Error updating supermarket ID or loading cart:", error);
+    } finally {
+      setIsReplaceSupermarket(false); // סיים לטעון
+      setIsReplaceSupermarketOpen(false); // סגירת המודל
+    }
+  };
+
+  const handleUpdateSupermarket = async (supermarketID) => {
+    await handleUpdateAndLoad(supermarketID);
+  };
+
   const handleCheapestCart = async () => {
     await getCheapestSupermarketCart(userId);
     await loadCart(userId);
@@ -161,42 +182,31 @@ export default function Cart() {
         />
       </Modal>
 
-      <div className="filter">
-        {/**text box: */}
-        <input
-          type="number"
-          value={supermarketID}
-          onChange={(event) => setSupermarketID(event.target.value)}
-        />
-        <button
-          onClick={() => {
-            const handleUpdateAndLoad = async () => {
-              setIsReplaceSupermarket(true); // Start loading
-              try {
-                await updateSupermarketID(userId, supermarketID);
-                await loadCart(userId);
-                await loadProducts();
-              } catch (error) {
-                console.error(
-                  "Error updating supermarket ID or loading cart:",
-                  error
-                );
-                // Optionally, handle the error
-              } finally {
-                setIsReplaceSupermarket(false); // Stop loading regardless of success or error
-              }
-            };
+      <ReplaceSupermarket
+        isOpen={isReplaceSupermarketOpen}
+        closeModal={() => setIsReplaceSupermarketOpen(false)}
+        onSelectBranch={handleUpdateSupermarket}
+      />
 
-            handleUpdateAndLoad();
-          }}
+      {/* ///////////////////////////////////////////////////////////////////////////////////////////*/}
+      {/* ///////////////////////////////////////////////////////////////////////////////////////////*/}
+      {/* ///////////////////////////////////////////////////////////////////////////////////////////*/}
+      {/* ///////////////////////////////////////////////////////////////////////////////////////////*/}
+      {/* ///////////////////////////////////////////////////////////////////////////////////////////*/}
+
+      <div className="cart-operations">
+        {/* =============================================cart-operations_replace-supermarket START============================================= */}
+        <div
+          className="cart-operations_replace-supermarket"
+          onClick={() => setIsReplaceSupermarketOpen(true)}
         >
-          אישור
-        </button>
-      </div>
+          החלפת סופרמרקט{" "}
+        </div>
+        {/* =============================================cart-operations_replace-supermarket END============================================= */}
 
-      <div className="cart-optimization">
-        <button
-          className="cart-optimization__button"
+        {/* ////////////////////////////////////////cart-operations_cheapest-supermarket START//////////////////////////////////////// */}
+        <div
+          className="cart-operations_cheapest-supermarket"
           onClick={() => {
             const handleOptimizeCart = async () => {
               setIsReplaceSupermarket(true); // Start loading
@@ -213,18 +223,31 @@ export default function Cart() {
 
             handleOptimizeCart();
           }}
-          disabled={isReplaceSupermarket} // Disable the button when loading
+          disabled={isReplaceSupermarket} // Disable the button when loading>
         >
           מחיר הכי זול
-        </button>
-        {isReplaceSupermarket && <div>Loading...</div>}{" "}
-        {/* Optional: Show a loading indicator */}
-      </div>
-      <div className="cart-optimization-settings">
-        <button onClick={() => navigate("/optimal-carts-settings")}>
+          {isReplaceSupermarket && <div>Loading...</div>}{" "}
+          {/* Optional: Show a loading indicator */}
+        </div>
+
+        {/* ////////////////////////////////////////cart-operations_cheapest-supermarket END//////////////////////////////////////// */}
+
+        {/* +++++++++++++++++++++++++++++++++++++cart-operations_optimal-carts-settings START++++++++++++++++++++++++++++++++++++++++ */}
+        <div
+          className="cart-operations_optimal-carts-settings"
+          onClick={() => navigate("/optimal-carts-settings")}
+        >
           מעבר לאופטימיזציית עגלות
-        </button>
+        </div>
       </div>
+
+      {/* +++++++++++++++++++++++++++++++++++++cart-operations_optimal-carts-settings END++++++++++++++++++++++++++++++++++++++++ */}
+
+      {/* ///////////////////////////////////////////////////////////////////////////////////////////*/}
+      {/* ///////////////////////////////////////////////////////////////////////////////////////////*/}
+      {/* ///////////////////////////////////////////////////////////////////////////////////////////*/}
+      {/* ///////////////////////////////////////////////////////////////////////////////////////////*/}
+      {/* ///////////////////////////////////////////////////////////////////////////////////////////*/}
 
       <div className="supermarket">
         <div className="supermarket-title">
@@ -325,6 +348,8 @@ export default function Cart() {
               END HERE TO ORGENIZE THE PRODUCTS 
               ===========================================*/}
 
+              {/*========================= UPDATE AMOUNT SECTION ========================= */}
+
               <div className="update-amount">
                 <div className="update-amount__new">
                   <button
@@ -333,7 +358,7 @@ export default function Cart() {
                   >
                     -
                   </button>
-                  <input
+                  {/* <input
                     type="text"
                     value={item.amount}
                     readOnly
@@ -343,7 +368,7 @@ export default function Cart() {
                       console.log(currentBarcode);
                       handleUpdate(item.product.barcode);
                     }}
-                  />
+                  /> */}
 
                   <button
                     className="update-amount__plus-button"
@@ -351,6 +376,28 @@ export default function Cart() {
                   >
                     +
                   </button>
+                </div>
+                <div className="update-amount__update_and_cencal">
+                  <div className="update-amount__update-button">
+                    <button
+                      onClick={() => {
+                        setCurrentBarcode(item.product.barcode);
+                        console.log(currentBarcode);
+                        handleUpdate(item.product.barcode);
+                      }}
+                    >
+                      עדכן
+                    </button>
+                  </div>
+                  <div className="update-amount__cancel-button">
+                    <button
+                      onClick={() => {
+                        console.log("ביטול");
+                      }}
+                    >
+                      בטל
+                    </button>
+                  </div>
                 </div>
                 <div className="cart__delete-product">
                   <button
@@ -364,6 +411,8 @@ export default function Cart() {
                   </button>
                 </div>
               </div>
+
+              {/*======================= UPDATE AMOUNT SECTION =========================== */}
               <hr />
             </div>
           ))}
