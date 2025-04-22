@@ -1,0 +1,27 @@
+/* כל הודעה מוצגת כבלוק גמיש עם מרווחים */
+.message-item {
+  display: flex;
+  padding: 0.5rem 0.75rem;
+  margin: 0.5rem 0;
+  border-radius: 10px;
+  max-width: 90%;
+  word-wrap: break-word; /* שבירת טקסט ארוך */
+}
+
+/* הודעת המשתמש – מיושרת לימין, רקע כחול */
+.message-item.user {
+  background-color: #007bff;
+  color: #fff;
+  align-self: flex-end;
+}
+
+/* הגדרת טקסט */
+.message-item p {
+  margin: 0;
+  font-size: 1rem;
+}
+
+/* יישור טקסט להודעת משתמש */
+.message-item.user p {
+  text-align: right;
+}

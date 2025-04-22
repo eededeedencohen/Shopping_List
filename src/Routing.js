@@ -20,6 +20,7 @@ import ExpenseOverview from "./components/Stats/ExpenseOverview";
 import ProductListManager from "./components/ProductList/ProductListManager";
 import ProductListManagerAlternativeProductsGroups from "./components/ProductList/ProductListManagerAlternativeProductsGroups";
 import EditProducts from "./components/ProductList/EditProducts";
+import AI from "./components/AI/AI";
 
 function Routing() {
   return (
@@ -38,13 +39,26 @@ function Routing() {
       <Route path="/search" element={<SearchBar />} />
       <Route path="/test" element={<Test />} />
       <Route path="/products-settings" element={<ListProductsSettings />} />
-      <Route path="/optimal-carts-settings" element={<OptimalCartsSettings />} />
-      <Route path="/optimal-supermarket-carts" element={<OptimalsSupermarketCarts />} />
-      <Route path="/optimal-supermarket-carts/:supermarketID" element={<OptimalCart />} />
+      <Route
+        path="/optimal-carts-settings"
+        element={<OptimalCartsSettings />}
+      />
+      <Route
+        path="/optimal-supermarket-carts"
+        element={<OptimalsSupermarketCarts />}
+      />
+      <Route
+        path="/optimal-supermarket-carts/:supermarketID"
+        element={<OptimalCart />}
+      />
       <Route path="/expense-overview" element={<ExpenseOverview />} />
       <Route path="/product-list" element={<ProductListManager />} />
-      <Route path="/alternative-products-groups"element={<ProductListManagerAlternativeProductsGroups />} />
+      <Route
+        path="/alternative-products-groups"
+        element={<ProductListManagerAlternativeProductsGroups />}
+      />
       <Route path="/edit-products" element={<EditProducts />} />
+      <Route path="/ai" element={<AI />} />
     </Routes>
   );
 }

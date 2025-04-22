@@ -1,0 +1,24 @@
+/* כל הודעה מוצגת כבלוק גמיש עם מרווחים */
+.message-item {
+  display: flex;
+  padding: 0.5rem 0.75rem;
+  margin: 0.5rem 0;
+  border-radius: 10px;
+  max-width: 90%;
+  word-wrap: break-word; /* שבירת טקסט ארוך */
+}
+
+/* הגדרת טקסט */
+.message-item p {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.message-item.operation {
+  padding: 0;
+  max-width: 100%;
+  background-color: #c5d8c6;
+  color: #fff;
+  text-align: center;
+  align-self: center;
+}

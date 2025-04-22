@@ -5265,8 +5265,10 @@ const getProductImage = (barcode) => {
   }
 };
 
-const ProductsImages = ({ barcode }) => {
-  return <img src={getProductImage(barcode)} alt="Product" />;
+const ProductsImages = ({ barcode, className }) => {
+  return (
+    <img src={getProductImage(barcode)} alt="Product" className={className} />
+  );
 };
 
 export default ProductsImages;

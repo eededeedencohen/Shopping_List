@@ -116,9 +116,13 @@ const getSupermarketImage = (supermarketName) => {
   }
 };
 
-const SupermarketImage = ({ supermarketName }) => {
+const SupermarketImage = ({ supermarketName, className }) => {
   return (
-    <img src={getSupermarketImage(supermarketName)} alt={supermarketName} />
+    <img
+      src={getSupermarketImage(supermarketName)}
+      alt={supermarketName}
+      className={className}
+    />
   );
 };
 

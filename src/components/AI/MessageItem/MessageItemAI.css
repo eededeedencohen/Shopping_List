@@ -1,0 +1,23 @@
+.message-item {
+  display: flex;
+  padding: 0.5rem 0.75rem;
+  margin: 0.5rem 0;
+  border-radius: 10px;
+  max-width: 90%;
+  word-wrap: break-word; /* שבירת טקסט ארוך */
+}
+
+.message-item.assistant {
+  background-color: #e9e9e9;
+  color: #333;
+  align-self: flex-start;
+}
+
+.message-item p {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.message-item.assistant p {
+  text-align: left;
+}

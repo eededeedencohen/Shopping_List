@@ -1,0 +1,93 @@
+/* .message-item {
+  display: flex;
+  padding: 0.5rem 0.75rem;
+  margin: 0.5rem 0;
+  border-radius: 10px;
+  max-width: 90%;
+  word-wrap: break-word;
+}
+
+.message-item p {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.message-item.loading {
+  max-width: 50%;
+  background-color: #797979;
+  color: #fff;
+  text-align: center;
+  align-self: center;
+} */
+
+/* כל הודעה מוצגת כבלוק גמיש עם מרווחים */
+.message-item {
+  display: flex;
+  flex-direction: column; /* כדי שהטקסט יהיה מעל האנימציה */
+  padding: 0.5rem 0.75rem;
+  margin: 0.5rem 0;
+  border-radius: 10px;
+  max-width: 90%;
+  word-wrap: break-word; /* שבירת טקסט ארוך */
+}
+
+/* הגדרת טקסט */
+.message-item p {
+  margin: 0;
+  font-size: 1rem;
+}
+
+/* הודעת טעינה */
+.message-item.loading {
+  max-width: 50%;
+  background-color: #e2e2e2;
+  color: #406f3b;
+  text-align: center;
+  align-self: center;
+}
+
+.message-item.loading p {
+  font-size: 0.9rem;
+  font-style: italic;
+  opacity: 0.85;
+  margin-bottom: 0.5rem;
+}
+
+
+/* האנימציה עצמה */
+.loader {
+  width: 50px;
+  aspect-ratio: 1; /* יחס 1:1 */
+  display: grid;
+  margin: 0.5rem auto; /* מרכז את האנימציה אופקית */
+}
+
+/* האלמנטים שמרכיבים את האנימציה (לפני/אחרי) */
+.loader::before,
+.loader::after {
+  content: "";
+  grid-area: 1/1;
+  --c: no-repeat radial-gradient(farthest-side, #25b09b 92%, #0000);
+  background: 
+    var(--c) 50% 0,
+    var(--c) 50% 100%,
+    var(--c) 100% 50%,
+    var(--c) 0 50%;
+  background-size: 12px 12px;
+  animation: l12 1s infinite;
+}
+
+/* מאפיינים נוספים לאלמנט before */
+.loader::before {
+  margin: 4px;
+  filter: hue-rotate(45deg);
+  background-size: 8px 8px;
+  animation-timing-function: linear;
+}
+
+/* האנימציה של הסיבוב */
+@keyframes l12 {
+  100% {
+    transform: rotate(0.5turn);
+  }
+}

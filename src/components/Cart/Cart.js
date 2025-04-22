@@ -43,8 +43,13 @@ export default function Cart() {
   const navigate = useNavigate();
   const { loadProducts } = useProducts();
   const userId = "1"; // Replace this with the actual userId.
+
+  // Loading state
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [isReplaceSupermarket, setIsReplaceSupermarket] = useState(false);
+
+  // Modals
   const [isModalOpen, setModalOpen] = useState(false);
   const [isReplaceSupermarketOpen, setIsReplaceSupermarketOpen] =
     useState(false);
@@ -52,7 +57,6 @@ export default function Cart() {
   const [currentBarcode, setCurrentBarcode] = useState(null);
 
   //=============================================
-  const [isReplaceSupermarket, setIsReplaceSupermarket] = useState(false);
 
   useEffect(() => {
     loadCart(userId);
@@ -173,6 +177,7 @@ export default function Cart() {
   }
   return (
     <div className="cart">
+      {console.log(cart)}
       <Modal isOpen={isModalOpen} onClose={() => setModalOpen(false)}>
         <ReplaceProducts
           barcode={currentBarcode}
@@ -358,17 +363,6 @@ export default function Cart() {
                   >
                     -
                   </button>
-                  {/* <input
-                    type="text"
-                    value={item.amount}
-                    readOnly
-                    className="update-amount__amount-input"
-                    onClick={() => {
-                      setCurrentBarcode(item.product.barcode);
-                      console.log(currentBarcode);
-                      handleUpdate(item.product.barcode);
-                    }}
-                  /> */}
 
                   <button
                     className="update-amount__plus-button"
