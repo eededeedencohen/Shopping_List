@@ -1,11 +1,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
-import {
-  getAllProducts,
-  getByBarcode,
-  getProductByQuery,
-} from "../network/productService";
+import { getAllProducts } from "../services/productService";
 
-const ProductContext = createContext(null);
+const ProductContext2 = createContext(null);
 
 /**
  * רשימת הקטגוריות הראשיות במערך, לפי הסדר הרצוי
@@ -164,135 +160,49 @@ const all_sub_categories = allCategories.map(
 
 export const ProductContextProvider = ({ children }) => {
   const [products, setProducts] = useState([]);
-  const [error, setError] = useState(null);
-  const [productByBarcode, setProductByBarcode] = useState(null);
   const [loading, setLoading] = useState(false);
-
-  // במקום activeCategory (מחרוזת), נשמור אינדקסים:
+  const [error, setError] = useState(null);
   const [activeCategoryIndex, setActiveCategoryIndex] = useState(0);
   const [activeSubCategoryIndex, setActiveSubCategoryIndex] = useState(0);
 
-  // טוענים את המוצרים עם ה-Mount הראשוני
   useEffect(() => {
-    const getProducts = async () => {
+    const fetchProducts = async () => {
       setLoading(true);
       try {
         const response = await getAllProducts();
-        const productsAmount = response.productsAmount;
-        const productsData = JSON.parse(response.products.data).data.products;
-
-        // כאן אפשר לחבר מידע על amount וכדומה, כרצונך
-        const productsWithAmount = productsData.map((product) => {
-          const amountInfo = productsAmount.find(
-            (p) => p.barcode === product.barcode
-          );
-          return { ...product, amount: amountInfo ? amountInfo.amount : 0 };
-        });
-
-        setProducts(productsWithAmount);
-      } catch (e) {
-        setError(e);
+        const productsData = JSON.parse(response.data).data.products;
+        setProducts(productsData);
+      } catch (err) {
+        setError(err);
       } finally {
         setLoading(false);
       }
     };
 
-    getProducts();
+    fetchProducts();
   }, []);
 
-  // פונקציה לטעינת מוצרים (אם נרצה לרענן)
-  const loadProducts = async () => {
-    setLoading(true);
-    try {
-      const response = await getAllProducts();
-      const productsAmount = response.productsAmount;
-      const productsData = JSON.parse(response.products.data).data.products;
-
-      const productsWithAmount = productsData.map((product) => {
-        const amountInfo = productsAmount.find(
-          (p) => p.barcode === product.barcode
-        );
-        return { ...product, amount: amountInfo ? amountInfo.amount : 0 };
-      });
-
-      setProducts(productsWithAmount);
-    } catch (e) {
-      setError(e);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // הפונקציה הקיימת להוצאת מוצר לפי ברקוד (מהשרת)
-  const getProductByBarcode = async (barcode) => {
-    setLoading(true);
-    try {
-      const response = await getByBarcode(barcode);
-      setProductByBarcode(JSON.parse(response.data).data.product);
-    } catch (e) {
-      setError(e);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // חיפוש מוצרים בשרת
-  const searchProducts = async (query, supermarketID) => {
-    try {
-      const response = await getProductByQuery(query, supermarketID);
-      return JSON.parse(response.data).data.products;
-    } catch (e) {
-      console.error(e);
-      return [];
-    }
-  };
-
-  // להחזיר מוצר מתוך ה־useState המקומי (לא משרת) לפי ברקוד
-  const getProductDetailsByBarcode = (barcode) => {
-    return products.find((product) => product.barcode === barcode);
-  };
-
-  // פונקציות עזר להחזרת שמות של הקטגוריה/תת-קטגוריה הפעילה
-  const getActiveCategory = () => allCategories[activeCategoryIndex];
-  const getActiveSubCategory = () => {
-    const subs = all_sub_categories[activeCategoryIndex];
-    return subs && subs[activeSubCategoryIndex];
-  };
-
   return (
-    <ProductContext.Provider
+    <ProductContext2.Provider
       value={{
         products,
-        loadProducts,
-        error,
-        getProductByBarcode,
-        productByBarcode,
-        searchProducts,
         loading,
-
-        // קטגוריות ותתי קטגוריות
-        allCategories,
-        all_sub_categories,
-
+        error,
         activeCategoryIndex,
         setActiveCategoryIndex,
         activeSubCategoryIndex,
         setActiveSubCategoryIndex,
-
-        getActiveCategory,
-        getActiveSubCategory,
-
-        // פונקציה לשליפת מוצר מ-useState
-        getProductDetailsByBarcode,
+        allCategories,
+        all_sub_categories,
       }}
     >
       {children}
-    </ProductContext.Provider>
+    </ProductContext2.Provider>
   );
 };
 
 export const useProducts = () => {
-  const context = useContext(ProductContext);
+  const context = useContext(ProductContext2);
   if (!context) throw new Error("ProductContext was not provided correctly");
   return context;
 };
