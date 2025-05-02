@@ -1,15 +1,18 @@
 import { useCart } from "../../context/CartContext2";
 
-export const useUpdateProductAmount = () => {
+const useUpdateProductAmount = () => {
   const { cart, setCart } = useCart();
 
   return (barcode, newAmount) => {
     if (!cart) return;
 
-    const updatedProducts = cart.products.map((p) =>
+    const updated = cart.products.map((p) =>
       p.barcode === barcode ? { ...p, amount: newAmount } : p
     );
 
-    setCart({ ...cart, products: updatedProducts });
+    setCart({ ...cart, products: updated });
   };
 };
+
+export { useUpdateProductAmount };
+export default useUpdateProductAmount;

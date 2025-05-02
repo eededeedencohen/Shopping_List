@@ -7,6 +7,9 @@ import { ProductContextProvider } from "./context/ProductContext";
 import { PriceContextProvider } from "./context/PriceContext";
 import { CartContextProvider } from "./context/CartContext";
 import { CartOptimizationContextProvider } from "./context/cart-optimizationContext";
+import { CartContextProvider2 } from "./context/CartContext2";
+import { PriceContextProvider2 } from "./context/PriceContext2";
+import { ProductContextProvider2 } from "./context/ProductContext2";
 
 const root = createRoot(document.getElementById("root"));
 
@@ -15,9 +18,15 @@ root.render(
     <ProductContextProvider>
       <PriceContextProvider>
         <CartContextProvider>
-          <CartOptimizationContextProvider>
-            <App />
-          </CartOptimizationContextProvider>
+          <CartContextProvider2>
+            <PriceContextProvider2>
+              <ProductContextProvider2>
+                <CartOptimizationContextProvider>
+                  <App />
+                </CartOptimizationContextProvider>
+              </ProductContextProvider2>
+            </PriceContextProvider2>
+          </CartContextProvider2>
         </CartContextProvider>
       </PriceContextProvider>
     </ProductContextProvider>

@@ -1,12 +1,14 @@
+// products/useProductsWithPriceAndAmount.js
+
 import useProducts from "./useProducts";
 import { useCart } from "../../context/CartContext2";
-import { usePriceContext } from "../../context/PriceContext";
+import { usePrices } from "../../context/PriceContext2";  // ✅ שינוי נכון
 import { calculateTotalPrice } from "../../utils/priceCalculations";
 
 const useProductsWithPriceAndAmount = () => {
   const { products } = useProducts();
   const { cart } = useCart();
-  const { pricesBySupermarket } = usePriceContext();
+  const { pricesBySupermarket } = usePrices();  // ✅ שינוי נכון
 
   const activeSupermarketID = cart?.supermarketID;
   const priceList = pricesBySupermarket?.[activeSupermarketID] || [];

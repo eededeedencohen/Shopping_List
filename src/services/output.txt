@@ -1,0 +1,71 @@
+cartService.js:
+
+import httpClient from "../network/index";
+
+/**
+ * Fetches the active cart of a user.
+ * @returns {Promise<Object>} The active cart object
+ */
+export const getActiveCart = async () => {
+  const response = await httpClient.get("/carts/active/1");
+  return response.data.data.cart;
+};
+
+/**
+ * Updates the cart on the server.
+ * @param {string} cartID The cart ID to update
+ * @param {Object} updatedCart The modified cart to save
+ * @returns {Promise<Object>} The updated cart from the server
+ */
+export const updateCartData = async (cartID, updatedCart) => {
+  const response = await httpClient.patch(`/carts/${cartID}`, updatedCart);
+  return response.data.data.cart;
+};
+
+
+
+priceService.js:
+
+import httpClient from "../network/index";
+
+/**
+ * Retrieves a list of prices for a given product barcode across all supermarkets.
+ * 
+ * @param {string} barcode - The product barcode.
+ * @returns {Promise<Array>} A list of price entries for the given barcode.
+ */
+export const getPriceListByBarcode = async (barcode) => {
+  const response = await httpClient.get(`/prices/?barcode=${barcode}`);
+  return response.data.data.prices;
+};
+
+/**
+ * Retrieves a list of prices for all products in a specific supermarket.
+ * 
+ * @param {string|number} supermarketID - The ID of the supermarket.
+ * @returns {Promise<Array>} A list of price entries for the given supermarket.
+ */
+export const getPricesBySupermarketID = async (supermarketID) => {
+  const response = await httpClient.get(`/prices/?supermarket.supermarketID=${supermarketID}`);
+  return response.data.data.prices;
+};
+
+
+
+productService.js:
+
+import httpClient from "../network/index";
+
+// מביא את כל המוצרים מהשרת
+export const getAllProducts = async () => {
+  try {
+    const response = await httpClient.get("/products");
+    return response.data?.data?.products || [];
+  } catch (error) {
+    console.error("Failed to fetch products:", error);
+    throw error;
+  }
+};
+
+
+

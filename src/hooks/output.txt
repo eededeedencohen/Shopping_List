@@ -1,0 +1,293 @@
+cart\useAddProductToCart.js:
+
+import { useCart } from "../../context/CartContext2";
+
+export const useAddProductToCart = () => {
+  const { cart, setCart } = useCart();
+
+  return (barcode, amount = 1) => {
+    if (!cart) return;
+
+    const existingProduct = cart.products.find((p) => p.barcode === barcode);
+    let updatedProducts;
+
+    if (existingProduct) {
+      updatedProducts = cart.products.map((p) =>
+        p.barcode === barcode ? { ...p, amount: p.amount + amount } : p
+      );
+    } else {
+      updatedProducts = [...cart.products, { barcode, amount }];
+    }
+
+    setCart({ ...cart, products: updatedProducts });
+  };
+};
+
+
+
+cart\useCartState.js:
+
+import { useCart } from "../../context/CartContext2";
+
+export const useCartState = () => {
+  const { cart, setCart, isLoadingCartData } = useCart();
+  return { cart, setCart, isLoadingCartData };
+};
+
+
+
+cart\useReloadCart.js:
+
+import { useCart } from "../../context/CartContext2";
+import { getActiveCart } from "../../services/cartService";
+
+export const useReloadCart = () => {
+  const { setCart } = useCart();
+
+  return async () => {
+    try {
+      const cartData = await getActiveCart();
+      setCart(cartData);
+    } catch (err) {
+      console.error("Failed to reload cart from server", err);
+    }
+  };
+};
+
+
+
+cart\useRemoveProductFromCart.js:
+
+import { useCart } from "../../context/CartContext2";
+
+export const useRemoveProductFromCart = () => {
+  const { cart, setCart } = useCart();
+
+  return (barcode) => {
+    if (!cart) return;
+
+    const updatedProducts = cart.products.filter((p) => p.barcode !== barcode);
+    setCart({ ...cart, products: updatedProducts });
+  };
+};
+
+
+
+cart\useReplaceSupermarket.js:
+
+import { useCart } from "../../context/CartContext2";
+import { usePrices } from "../../context/PriceContext2";
+
+export const useReplaceSupermarket = () => {
+  const { cart, setCart } = useCart();
+  const { loadPricesForSupermarket } = usePrices();
+
+  return async (newSupermarketID) => {
+    if (!cart) return;
+
+    // עדכון הסופרמרקט בעגלה
+    setCart({ ...cart, supermarketID: newSupermarketID });
+
+    // טעינת מחירים מחדש עבור הסופרמרקט החדש
+    await loadPricesForSupermarket(newSupermarketID);
+  };
+};
+
+
+
+cart\useSyncCart.js:
+
+import { useCart } from "../../context/CartContext2";
+
+export const useSyncCart = () => {
+  const { syncCartToServer } = useCart();
+  return syncCartToServer;
+};
+
+
+
+cart\useUpdateProductAmount.js:
+
+import { useCart } from "../../context/CartContext2";
+
+const useUpdateProductAmount = () => {
+  const { cart, setCart } = useCart();
+
+  return (barcode, newAmount) => {
+    if (!cart) return;
+
+    const updated = cart.products.map((p) =>
+      p.barcode === barcode ? { ...p, amount: newAmount } : p
+    );
+
+    setCart({ ...cart, products: updated });
+  };
+};
+
+export { useUpdateProductAmount };
+export default useUpdateProductAmount;
+
+
+
+prices\usePriceList.js:
+
+// hooks/prices/usePriceList.js
+import { usePrices } from "../../context/PriceContext2";
+
+const usePriceList = () => {
+  const { getPriceListByBarcodeCached } = usePrices();
+
+  /**
+   * מקבל ברקוד ומחזיר את רשימת המחירים מהשרת או מהקאש.
+   * @param {string} barcode
+   * @returns {Promise<Array>}
+   */
+  const getPriceList = async (barcode) => {
+    if (!barcode) return [];
+    return await getPriceListByBarcodeCached(barcode);
+  };
+
+  return getPriceList;
+};
+
+export default usePriceList;
+
+
+
+prices\useSupermarketPrices.js:
+
+// hooks/prices/useSupermarketPrices.js
+import { usePrices } from "../../context/PriceContext2";
+
+const useSupermarketPrices = () => {
+  const { pricesBySupermarket, isLoadingPrices, loadPricesForSupermarket } =
+    usePrices();
+
+  /**
+   * טוען מחירים לפי מזהה סופרמרקט.
+   * @param {string|number} supermarketID
+   */
+  const loadPrices = async (supermarketID) => {
+    if (!supermarketID) return;
+    await loadPricesForSupermarket(supermarketID);
+  };
+
+  return {
+    prices: pricesBySupermarket,
+    isLoadingPrices,
+    loadPrices,
+  };
+};
+
+export default useSupermarketPrices;
+
+
+
+products\useProducts.js:
+
+import { useProducts as useProductsContext } from "../../context/ProductContext2";
+
+const useProducts = () => {
+  const {
+    products,
+    loading,
+    error,
+    allCategories,
+    all_sub_categories,
+    activeCategoryIndex,
+    setActiveCategoryIndex,
+    activeSubCategoryIndex,
+    setActiveSubCategoryIndex,
+  } = useProductsContext();
+
+  return {
+    products,
+    loading,
+    error,
+    allCategories,
+    all_sub_categories,
+    activeCategoryIndex,
+    setActiveCategoryIndex,
+    activeSubCategoryIndex,
+    setActiveSubCategoryIndex,
+  };
+};
+
+export default useProducts;
+
+
+
+products\useProductsWithPriceAndAmount.js:
+
+// products/useProductsWithPriceAndAmount.js
+
+import useProducts from "./useProducts";
+import { useCart } from "../../context/CartContext2";
+import { usePrices } from "../../context/PriceContext2";  // ✅ שינוי נכון
+import { calculateTotalPrice } from "../../utils/priceCalculations";
+
+const useProductsWithPriceAndAmount = () => {
+  const { products } = useProducts();
+  const { cart } = useCart();
+  const { pricesBySupermarket } = usePrices();  // ✅ שינוי נכון
+
+  const activeSupermarketID = cart?.supermarketID;
+  const priceList = pricesBySupermarket?.[activeSupermarketID] || [];
+
+  let cartTotalAmount = 0;
+  let cartTotalPrice = 0;
+
+  const mergedProducts = products.map((product) => {
+    const priceData = priceList.find((p) => p.barcode === product.barcode);
+    const amountInCart =
+      cart?.products?.find((item) => item.barcode === product.barcode)?.amount || 0;
+
+    const totalPrice = calculateTotalPrice(amountInCart, priceData);
+
+    cartTotalAmount += amountInCart;
+    cartTotalPrice += totalPrice;
+
+    return {
+      ...product,
+      price: priceData?.price || null,
+      hasDiscount: priceData?.hasDiscount || false,
+      discount: priceData?.discount || null,
+      amountInCart,
+      totalPrice,
+    };
+  });
+
+  return {
+    productsWithDetails: mergedProducts,
+    cartTotalAmount,
+    cartTotalPrice,
+  };
+};
+
+export default useProductsWithPriceAndAmount;
+
+
+
+products\useSearchProducts.js:
+
+import useProducts from "./useProducts";
+
+const useSearchProducts = () => {
+  const { products } = useProducts();
+
+  const search = (query) => {
+    const lowerQuery = query.toLowerCase();
+    return products.filter(
+      (product) =>
+        product.name.toLowerCase().includes(lowerQuery) ||
+        product.generalName?.toLowerCase().includes(lowerQuery) ||
+        product.brand?.toLowerCase().includes(lowerQuery)
+    );
+  };
+
+  return search;
+};
+
+export default useSearchProducts;
+
+

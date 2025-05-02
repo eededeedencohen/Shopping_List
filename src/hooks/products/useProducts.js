@@ -1,4 +1,4 @@
-import { useProducts as useProductsContext } from "../../context/ProductContext";
+import { useProducts as useProductsContext } from "../../context/ProductContext2";
 
 const useProducts = () => {
   const {

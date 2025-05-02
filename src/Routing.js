@@ -21,6 +21,9 @@ import ProductListManager from "./components/ProductList/ProductListManager";
 import ProductListManagerAlternativeProductsGroups from "./components/ProductList/ProductListManagerAlternativeProductsGroups";
 import EditProducts from "./components/ProductList/EditProducts";
 import AI from "./components/AI/AI";
+import ProductsListTest from "./components/HooksTest/ProductsListTest"; 
+import CartTest from "./components/HooksTest/CartTest";
+import SearchTest from "./components/HooksTest/SearchTest";
 
 function Routing() {
   return (
@@ -59,6 +62,9 @@ function Routing() {
       />
       <Route path="/edit-products" element={<EditProducts />} />
       <Route path="/ai" element={<AI />} />
+      <Route path="/products-list-test" element={<ProductsListTest />} />
+      <Route path="/cart-test" element={<CartTest />} />
+      <Route path="/search-test" element={<SearchTest />} />
     </Routes>
   );
 }

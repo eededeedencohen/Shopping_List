@@ -1,5 +1,158 @@
+CartContext2.js:
+
+import { createContext, useContext, useEffect, useState } from "react";
+import { getActiveCart, updateCartData } from "../services/cartService";
+
+const CartContext2 = createContext(null);
+
+export const CartContextProvider2 = ({ children }) => {
+  const [cart, setCart] = useState(null);
+  // const [supermarketID, setSupermarketID] = useState(null);
+  const [isLoadingCartData, setIsLoadingCartData] = useState(false);
+
+  useEffect(() => {
+    const loadCart = async () => {
+      setIsLoadingCartData(true);
+      try {
+        const cartData = await getActiveCart();
+        setCart(cartData);
+        // setSupermarketID(cartData.supermarketID);
+      } catch (error) {
+        console.error("Failed to load cart", error);
+      } finally {
+        setIsLoadingCartData(false);
+      }
+    };
+
+    loadCart();
+  }, []);
+
+  const supermarketID = cart?.supermarketID ?? null;   // ← כאן אין שגיאת scope
+
+  /**
+   * Syncs the current cart state with the server.
+   */
+  const syncCartToServer = async () => {
+    try {
+      if (!cart || !cart._id) throw new Error("No cart or ID found");
+      await updateCartData(cart._id, cart);
+    } catch (err) {
+      console.error("Failed to sync cart", err);
+    }
+  };
+
+  return (
+    <CartContext2.Provider
+      value={{
+        cart,
+        setCart,
+        isLoadingCartData,
+        supermarketID, 
+        // setSupermarketID,
+        syncCartToServer,
+      }}
+    >
+      {children}
+    </CartContext2.Provider>
+  );
+};
+
+export const useCart = () => {
+  const context = useContext(CartContext2);
+  if (!context) throw new Error("CartContext was not provided correctly");
+  return context;
+};
+
+
+PriceContext2.js:
+
+import { useCart } from "../context/CartContext2";
+import { useEffect, createContext, useContext, useState } from "react";
+import {
+  getPricesBySupermarketID,
+  getPriceListByBarcode,
+} from "../services/priceService";
+
+const PriceContext2 = createContext(null);
+
+export const PriceContextProvider2 = ({ children }) => {
+  const { supermarketID } = useCart();
+  const [pricesBySupermarket, setPricesBySupermarket] = useState([]);
+  const [isLoadingPrices, setIsLoadingPrices] = useState(false);
+  const [priceListMap, setPriceListMap] = useState(new Map()); // barcode -> list of prices
+
+  /**
+   * Loads all prices for a specific supermarket and stores them in context.
+   * @param {string|number} supermarketID
+   */
+  useEffect(() => {
+    if (supermarketID == null) return;           // עדין לא נטען cart
+    (async () => {
+      setIsLoadingPrices(true);
+      try {
+        const arr = await getPricesBySupermarketID(supermarketID);
+        setPricesBySupermarket(arr);
+      } catch (e) {
+        console.error("Failed to load prices:", e);
+        setPricesBySupermarket([]);
+      } finally {
+        setIsLoadingPrices(false);
+      }
+    })();
+  }, [supermarketID]);
+
+  /**
+   * Returns list of prices for a given barcode (from all supermarkets).
+   * Uses internal cache to prevent redundant server calls.
+   * @param {string} barcode
+   * @returns {Promise<Array>}
+   */
+  const getPriceListByBarcodeCached = async (barcode) => {
+    if (priceListMap.has(barcode)) {
+      return priceListMap.get(barcode);
+    }
+
+    try {
+      const prices = await getPriceListByBarcode(barcode);
+      priceListMap.set(barcode, prices);
+      setPriceListMap(new Map(priceListMap)); // force re-render
+      return prices;
+    } catch (error) {
+      console.error("Failed to load price list for barcode:", error);
+      return [];
+    }
+  };
+
+  return (
+    <PriceContext2.Provider
+      value={{
+        pricesBySupermarket,
+        isLoadingPrices,
+        // loadPricesForSupermarket,
+        getPriceListByBarcodeCached,
+      }}
+    >
+      {children}
+    </PriceContext2.Provider>
+  );
+};
+
+export const usePrices = () => {
+  const context = useContext(PriceContext2);
+  if (!context) {
+    throw new Error("PriceContext was not provided");
+  }
+  return context;
+};
+
+
+
+ProductContext2.js:
+
 import { createContext, useContext, useEffect, useState } from "react";
 import { getAllProducts } from "../services/productService";
+import { getActiveCart } from "../services/cartService";
+import { getPricesBySupermarketID } from "../services/priceService";
 
 const ProductContext2 = createContext(null);
 
@@ -160,8 +313,11 @@ const all_sub_categories = allCategories.map(
 
 export const ProductContextProvider2 = ({ children }) => {
   const [products, setProducts] = useState([]);
+  const [activeCart, setActiveCart] = useState(null);
+  const [pricesBySupermarket, setPricesBySupermarket] = useState({});
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+
   const [activeCategoryIndex, setActiveCategoryIndex] = useState(0);
   const [activeSubCategoryIndex, setActiveSubCategoryIndex] = useState(0);
 
@@ -172,7 +328,16 @@ export const ProductContextProvider2 = ({ children }) => {
       try {
         /* getAllProducts כבר מחזיר מערך של מוצרים */
         const productsData = await getAllProducts();
+        const cartData = await getActiveCart();
+        const pricesData = await getPricesBySupermarketID(
+          cartData.supermarketID
+        );
         setProducts(productsData);
+        setActiveCart(cartData);
+        setPricesBySupermarket(pricesData);
+        console.log("productsData", productsData);
+        console.log("cartData", cartData);
+        console.log("pricesData", pricesData);
       } catch (err) {
         setError(err);
       } finally {
@@ -207,3 +372,6 @@ export const useProducts = () => {
   if (!ctx) throw new Error("ProductContext was not provided correctly");
   return ctx;
 };
+
+
+

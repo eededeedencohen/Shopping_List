@@ -1,4 +1,5 @@
-import { createContext, useContext, useState } from "react";
+import { useCart } from "../context/CartContext2";
+import { useEffect, createContext, useContext, useState } from "react";
 import {
   getPricesBySupermarketID,
   getPriceListByBarcode,
@@ -6,7 +7,8 @@ import {
 
 const PriceContext2 = createContext(null);
 
-export const PriceContextProvider = ({ children }) => {
+export const PriceContextProvider2 = ({ children }) => {
+  const { supermarketID } = useCart();
   const [pricesBySupermarket, setPricesBySupermarket] = useState([]);
   const [isLoadingPrices, setIsLoadingPrices] = useState(false);
   const [priceListMap, setPriceListMap] = useState(new Map()); // barcode -> list of prices
@@ -15,18 +17,21 @@ export const PriceContextProvider = ({ children }) => {
    * Loads all prices for a specific supermarket and stores them in context.
    * @param {string|number} supermarketID
    */
-  const loadPricesForSupermarket = async (supermarketID) => {
-    setIsLoadingPrices(true);
-    try {
-      const prices = await getPricesBySupermarketID(supermarketID);
-      setPricesBySupermarket(prices);
-    } catch (error) {
-      console.error("Failed to load supermarket prices:", error);
-      setPricesBySupermarket([]);
-    } finally {
-      setIsLoadingPrices(false);
-    }
-  };
+  useEffect(() => {
+    if (supermarketID == null) return;           // עדין לא נטען cart
+    (async () => {
+      setIsLoadingPrices(true);
+      try {
+        const arr = await getPricesBySupermarketID(supermarketID);
+        setPricesBySupermarket(arr);
+      } catch (e) {
+        console.error("Failed to load prices:", e);
+        setPricesBySupermarket([]);
+      } finally {
+        setIsLoadingPrices(false);
+      }
+    })();
+  }, [supermarketID]);
 
   /**
    * Returns list of prices for a given barcode (from all supermarkets).
@@ -55,7 +60,7 @@ export const PriceContextProvider = ({ children }) => {
       value={{
         pricesBySupermarket,
         isLoadingPrices,
-        loadPricesForSupermarket,
+        // loadPricesForSupermarket,
         getPriceListByBarcodeCached,
       }}
     >
