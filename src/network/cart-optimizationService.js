@@ -98,7 +98,7 @@ export {
   getOptimalSupermarketCarts,
   getFullActiveCart,
   getAllBrands,
-  getAllBrandsByGeneralName,
+  getAllBrandsByGeneralName, // no use yet
   getAllSupermarkets,
   getPriceObjectByProductBarcodeAndSupermarketID,
   getListReplecementProductsByGeneralNameAndSupermarketID,

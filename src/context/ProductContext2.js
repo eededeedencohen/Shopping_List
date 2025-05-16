@@ -172,6 +172,7 @@ export const ProductContextProvider2 = ({ children }) => {
       try {
         /* getAllProducts כבר מחזיר מערך של מוצרים */
         const productsData = await getAllProducts();
+        console.log("Products loaded:", productsData);
         setProducts(productsData);
       } catch (err) {
         setError(err);

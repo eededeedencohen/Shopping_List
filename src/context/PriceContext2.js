@@ -3,6 +3,7 @@ import { useEffect, createContext, useContext, useState } from "react";
 import {
   getPricesBySupermarketID,
   getPriceListByBarcode,
+  getCheapestSupermarketIDsByCart,
 } from "../services/priceService";
 
 const PriceContext2 = createContext(null);
@@ -18,12 +19,15 @@ export const PriceContextProvider2 = ({ children }) => {
    * @param {string|number} supermarketID
    */
   useEffect(() => {
-    if (supermarketID == null) return;           // עדין לא נטען cart
+    if (supermarketID == null) return; // עדין לא נטען cart
     (async () => {
       setIsLoadingPrices(true);
       try {
-        const arr = await getPricesBySupermarketID(supermarketID);
-        setPricesBySupermarket(arr);
+        const pricesBySupermarket = await getPricesBySupermarketID(
+          supermarketID
+        );
+        console.log("Prices loaded:", pricesBySupermarket);
+        setPricesBySupermarket(pricesBySupermarket);
       } catch (e) {
         console.error("Failed to load prices:", e);
         setPricesBySupermarket([]);
@@ -55,6 +59,21 @@ export const PriceContextProvider2 = ({ children }) => {
     }
   };
 
+  /**
+   * Finds the cheapest supermarkets for a given list of cart products.
+   * @param {Array<{ barcode: string, amount: number }>} cartProducts
+   * @returns {Promise<number[]>}
+   */
+  const findCheapestSupermarketIDs = async (cartProducts) => {
+    try {
+      const result = await getCheapestSupermarketIDsByCart(cartProducts);
+      return result?.data?.supermarketIDs || [];
+    } catch (error) {
+      console.error("Failed to get cheapest supermarkets:", error);
+      return [];
+    }
+  };
+
   return (
     <PriceContext2.Provider
       value={{
@@ -62,6 +81,7 @@ export const PriceContextProvider2 = ({ children }) => {
         isLoadingPrices,
         // loadPricesForSupermarket,
         getPriceListByBarcodeCached,
+        findCheapestSupermarketIDs,
       }}
     >
       {children}

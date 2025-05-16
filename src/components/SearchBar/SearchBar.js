@@ -1,33 +1,54 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router";
-import { useProducts } from "../../context/ProductContext";
-import { useCart } from "../../context/CartContext";
-import SearchItem from "./SearchItem";
 import {
-  updateProductInCart,
-  addProductToCart,
-  deleteProductFromCart,
-} from "../../network/cartService";
+  useCartState,
+  useEnrichedProducts,
+  useCartActions,
+} from "../../hooks/appHooks";
+import SearchItem from "./SearchItem";
 import "./SearchBar.css";
 
+
+/*  דיבאונס קצר כדי שלא נבצע סינון בכל הקלדה  */
+const useDebounced = (value, delay = 300) => {
+  const [debounced, setDebounced] = useState(value);
+  useEffect(() => {
+    const id = setTimeout(() => setDebounced(value), delay);
+    return () => clearTimeout(id);
+  }, [value, delay]);
+  return debounced;
+};
+
 const SearchBar = ({ closeModal }) => {
-  const { searchProducts } = useProducts();
+  //================================================================
+
   const [searchQuery, setSearchQuery] = useState(""); // the text in the search bar
-  const [searchResults, setSearchResults] = useState([]); // the products from the search
   const [typingTimeout, setTypingTimeout] = useState(null); // timeout for user typing
-  const {
-    getProductsAmountInCart,
-    cart,
-    loadCart,
-    // addNewProduct, // (userId, barcode, amount)
-    // updateProductAmountInCart, // (userId, barcode, amount)
-    // removeProductFromCart, // (userId, barcode)
-  } = useCart();
-  const [supermarketID, setSupermarketID] = useState(null); 
+
+  //=================================================================
+  const { productsWithDetails } = useEnrichedProducts();
+  const { cart: cartState } = useCartState();
+  const { add, remove, update } = useCartActions();
+
+  const [queryNew, setQueryNew] = useState("");
+  const debouncedQuery = useDebounced(queryNew, 600);
+
+  /* סינון על‑גבי הרשימה המואשרת (כולל כמות ומחיר) */
+  const filtered = debouncedQuery
+    ? productsWithDetails.filter((p) =>
+        [p.name, p.generalName, p.brand]
+          .filter(Boolean)
+          .some((txt) =>
+            txt.toLowerCase().includes(debouncedQuery.toLowerCase())
+          )
+      )
+    : [];
+
+  //=================================================================
+
   const [productAmounts, setProductAmounts] = useState({});
   const [oldProductAmounts, setOldProductAmounts] = useState({});
   const [isLoading, setIsLoading] = useState(true);
-  const userId = "1";
   const navigate = useNavigate();
 
   // load the products-amounts:
@@ -35,9 +56,9 @@ const SearchBar = ({ closeModal }) => {
     const loadProductAmounts = async () => {
       try {
         setIsLoading(true);
-        const amounts = await getProductsAmountInCart(userId);
+        const amountsNew = cartState["products"];
         const amountsObject = {};
-        amounts.cart.products.forEach((product) => {
+        amountsNew.forEach((product) => {
           amountsObject[product.barcode] = product.amount;
         });
         setProductAmounts(amountsObject);
@@ -49,50 +70,20 @@ const SearchBar = ({ closeModal }) => {
       }
     };
     loadProductAmounts();
-  }, [loadCart, userId, getProductsAmountInCart]);
-
-  // load the supermarketID from the cart:
-  useEffect(() => {
-    const loadSupermarketID = async () => {
-      try {
-        setIsLoading(true);
-        const supermarketID = cart.supermarket.supermarketID;
-        setSupermarketID(supermarketID);
-      } catch (error) {
-        console.error(error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    loadSupermarketID();
-  }, [loadCart, cart]);
+  }, [cartState]);
 
   const onChangeQuery = (event) => {
     let query = event.target.value;
-    setSearchQuery(query);
+    setQueryNew(query); // New
+    setSearchQuery(query); // Old
 
     if (typingTimeout) {
       clearTimeout(typingTimeout);
     }
 
-    const newTimeout = setTimeout(() => {
-      if (query.trim() !== "") {
-        requestSearchResults(query);
-      } else {
-        setSearchResults([]);
-      }
-    }, 1000);
+    const newTimeout = setTimeout(() => {}, 1000);
 
     setTypingTimeout(newTimeout);
-  };
-
-  const requestSearchResults = async (query) => {
-    try {
-      const products = await searchProducts(query, supermarketID);
-      setSearchResults(products);
-    } catch (error) {
-      console.error(error);
-    }
   };
 
   const handleResultClick = (result) => {
@@ -104,7 +95,7 @@ const SearchBar = ({ closeModal }) => {
   const makeVisible = (button) => {
     button.classList.add("visible");
   };
-  
+
   const makeInvisible = (button) => {
     button.classList.remove("visible");
   };
@@ -140,31 +131,29 @@ const SearchBar = ({ closeModal }) => {
       const currentAmount = productAmounts[barcode] || 0;
       const newAmount = currentAmount + 1;
       const newAmounts = { ...productAmounts, [barcode]: newAmount };
-  
+
       setProductAmounts(newAmounts);
-  
+
       changeButton(barcode, oldProductAmounts[barcode] || 0, newAmount);
     } catch (error) {
       console.error(error);
     }
   };
-  
 
   const handleDecreaseAmount = (barcode) => {
     const currentAmount = productAmounts[barcode] || 0;
     let newAmount = currentAmount > 0 ? currentAmount - 1 : 0;
     const newAmounts = { ...productAmounts, [barcode]: newAmount };
-  
+
     // Delete the key if new amount is 0 to mimic the initial state
     if (newAmount === 0) {
       delete newAmounts[barcode];
     }
-  
+
     setProductAmounts(newAmounts);
-  
+
     changeButton(barcode, oldProductAmounts[barcode] || 0, newAmount);
   };
-  
 
   const handleConfirmChanges = async (barcode) => {
     // check if the operation is delete, update or add:
@@ -183,21 +172,18 @@ const SearchBar = ({ closeModal }) => {
 
     // case add: newAmount > oldAmount=0:
     if (newAmount > oldAmount && oldAmount === 0) {
-      const response = await addProductToCart(userId, barcode, newAmount);
-      console.log(response);
-      await loadCart(userId);
+      add(barcode, newAmount);
+      // const response = await adProdductToCart(userId, barcode, newAmount);
+      // console.log(response);
+      // await loadCart(userId);
     }
     // case delete: newAmount=0 and oldAmount>0:
     else if (newAmount === 0 && oldAmount > 0) {
-      const response = await deleteProductFromCart(userId, barcode);
-      console.log(response);
-      await loadCart(userId);
+      remove(barcode);
     }
     // case update: newAmount>0 and oldAmount>0 and newAmount!=oldAmount:
     else if (newAmount > 0 && oldAmount > 0 && newAmount !== oldAmount) {
-      const response = await updateProductInCart(userId, barcode, newAmount);
-      console.log(response);
-      await loadCart(userId);
+      update(barcode, newAmount);
     }
 
     // update the oldProductAmounts:
@@ -226,7 +212,7 @@ const SearchBar = ({ closeModal }) => {
         onChange={onChangeQuery}
       />
       <div className="search-results">
-        {searchResults.map((product) => (
+        {filtered.map((product) => (
           <SearchItem
             key={product.barcode}
             product={product}

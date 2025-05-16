@@ -61,7 +61,7 @@
 
 // SubCategoryNavigation.js
 import React, { useEffect, useRef } from 'react';
-import { useProducts } from '../../context/ProductContext';
+import { useProductList } from '../../hooks/appHooks';
 import './SubCategoryNavigation.css';
 
 /**
@@ -74,7 +74,7 @@ export default function SubCategoryNavigation() {
     activeCategoryIndex,
     activeSubCategoryIndex,
     setActiveSubCategoryIndex,
-  } = useProducts();
+  } = useProductList();
 
   const navigationRef = useRef(null);
 

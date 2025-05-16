@@ -50,7 +50,7 @@
 //========================================================================
 import React, { useEffect, useRef } from 'react';
 import './CategoryNavigation.css'; 
-import { useProducts } from '../../context/ProductContext';
+import { useProductList } from '../../hooks/appHooks';
 
 const CategoryNavigation = () => {
   const {
@@ -58,7 +58,7 @@ const CategoryNavigation = () => {
     activeCategoryIndex,
     setActiveCategoryIndex,
     setActiveSubCategoryIndex,
-  } = useProducts();
+  } = useProductList();
 
   const navigationRef = useRef(null);
 

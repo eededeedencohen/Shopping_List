@@ -1,0 +1,1671 @@
+Cart.js:
+
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { useCart } from "../../context/CartContext";
+import { useProducts } from "../../context/ProductContext";
+import Modal from "./Modal";
+import ReplaceProducts from "./ReplaceProducts";
+import ReplaceSupermarket from "./ReplaceSupermarket/ReplaceSupermarket";
+import "./Cart.css";
+import { Spin } from "antd";
+import Images from "../ProductList/Images";
+import SupermarketImage from "./supermarketImage";
+import trashIcon from "./trash.png";
+import { useFullCart } from "../../hooks/appHooks";
+
+export const convertWeightUnit = (weightUnit) => {
+  weightUnit = weightUnit.toLowerCase();
+  if (weightUnit === "g") {
+    return "גרם";
+  }
+  if (weightUnit === "kg") {
+    return "קילוגרם";
+  }
+  if (weightUnit === "ml") {
+    return "מיליליטר";
+  }
+  if (weightUnit === "l") {
+    return "ליטר";
+  }
+  return weightUnit;
+};
+// export the function convertWeightUnit:
+
+export default function Cart() {
+  const { fullCart } = useFullCart(); // ✅ מותר פה
+
+  const {
+    cart,
+    loadCart,
+    updateProductAmount,
+    removeProductFromCart,
+    confirmCart,
+    updateAmount,
+    updateSupermarketID,
+    getCheapestSupermarketCart,
+  } = useCart();
+  const navigate = useNavigate();
+  const { loadProducts } = useProducts();
+  const userId = "1"; // Replace this with the actual userId.
+
+  // Loading state
+  const [isLoading, setIsLoading] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [isReplaceSupermarket, setIsReplaceSupermarket] = useState(false);
+
+  // Modals
+  const [isModalOpen, setModalOpen] = useState(false);
+  const [isReplaceSupermarketOpen, setIsReplaceSupermarketOpen] =
+    useState(false);
+
+  const [currentBarcode, setCurrentBarcode] = useState(null);
+
+  //=============================================
+
+  useEffect(() => {
+    loadCart(userId);
+  }, [loadCart, userId]);
+
+  if (!cart) {
+    return (
+      <div className="cart">
+        <p>Loading...</p>
+      </div>
+    );
+  }
+
+  // TO DO: ADD BARCODE PARAMETER
+  const handleIncrement = (barcode) => {
+    updateAmount(barcode, "increment");
+  };
+
+  // TO DO: ADD BARCODE PARAMETER
+  const handleDecrement = (barcode) => {
+    updateAmount(barcode, "decrement");
+  };
+
+  const handleUpdate = async (barcode) => {
+    setIsLoading(true); // Start spinner before the update process
+    try {
+      await updateProductAmount(userId, barcode); // Await the server response
+      await loadCart(userId); // Reload cart data from the server
+    } catch (error) {
+      console.error("Error updating product amount:", error);
+      // Handle any errors here, such as showing a message to the user
+    } finally {
+      setIsLoading(false); // Stop spinner after the update process and handling any errors
+    }
+  };
+
+  const handleDelete = async (barcode) => {
+    setIsLoading(true); // Start spinner before the delete process
+    try {
+      await removeProductFromCart(userId, barcode); // Await the server response
+      await loadCart(userId); // Reload cart data from the server
+    } catch (error) {
+      console.error("Error deleting product from cart:", error);
+      // Handle any errors here, such as showing a message to the user
+    } finally {
+      setIsLoading(false); // Stop spinner after the delete process and handling any errors
+    }
+  };
+
+  // const handleConfirmCart = async () => {
+  //   await confirmCart(userId);
+  //   // Perform any additional actions or navigation after cart confirmation
+  //   // do do: add the load cart after this operation
+  // };
+
+  const handleConfirmCart = async () => {
+    setIsSaving(true); // Optionally, indicate loading state
+    try {
+      await confirmCart(userId); // Confirm the cart
+      await loadCart(userId); // Reload cart data to reflect changes
+    } catch (error) {
+      console.error("Error confirming the cart:", error);
+      // Optionally, handle the error, e.g., showing an error message
+    } finally {
+      setIsSaving(false); // Optionally, reset the loading state
+    }
+  };
+
+  const handleUpdateAndLoad = async (supermarketID) => {
+    setIsReplaceSupermarket(true); // מתחיל לטעון
+    try {
+      await updateSupermarketID(userId, supermarketID);
+      await loadCart(userId);
+      await loadProducts();
+    } catch (error) {
+      console.error("Error updating supermarket ID or loading cart:", error);
+    } finally {
+      setIsReplaceSupermarket(false); // סיים לטעון
+      setIsReplaceSupermarketOpen(false); // סגירת המודל
+    }
+  };
+
+  const handleUpdateSupermarket = async (supermarketID) => {
+    await handleUpdateAndLoad(supermarketID);
+  };
+
+  const handleCheapestCart = async () => {
+    await getCheapestSupermarketCart(userId);
+    await loadCart(userId);
+    await loadProducts();
+  };
+
+  if (isLoading || !cart) {
+    return (
+      <div className="spinner-container">
+        <Spin size="large"></Spin>
+        <p>מבצע עדכון כמות למוצר ומשווה שוב מחירים</p>
+      </div>
+    );
+  }
+
+  if (isSaving || !cart) {
+    return (
+      <div className="spinner-container">
+        <Spin size="large"></Spin>
+        <p>שומר את העגלה בהיסטוריית הקניות</p>
+      </div>
+    );
+  }
+
+  if (isReplaceSupermarket || !cart) {
+    return (
+      <div className="spinner-container">
+        <Spin size="large"></Spin>
+        <p>מחליף סופרמרקט</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="cart">
+      {console.log("cart in cart.js", cart)}
+      {console.log("cart from hooks:", fullCart)}
+      <Modal isOpen={isModalOpen} onClose={() => setModalOpen(false)}>
+        <ReplaceProducts
+          barcode={currentBarcode}
+          closeModal={() => setModalOpen(false)}
+          loadCart={loadCart}
+          userId={userId}
+        />
+      </Modal>
+
+      <ReplaceSupermarket
+        isOpen={isReplaceSupermarketOpen}
+        closeModal={() => setIsReplaceSupermarketOpen(false)}
+        onSelectBranch={handleUpdateSupermarket}
+      />
+
+      {/* ///////////////////////////////////////////////////////////////////////////////////////////*/}
+      {/* ///////////////////////////////////////////////////////////////////////////////////////////*/}
+      {/* ///////////////////////////////////////////////////////////////////////////////////////////*/}
+      {/* ///////////////////////////////////////////////////////////////////////////////////////////*/}
+      {/* ///////////////////////////////////////////////////////////////////////////////////////////*/}
+
+      <div className="cart-operations">
+        {/* =============================================cart-operations_replace-supermarket START============================================= */}
+        <div
+          className="cart-operations_replace-supermarket"
+          onClick={() => setIsReplaceSupermarketOpen(true)}
+        >
+          החלפת סופרמרקט{" "}
+        </div>
+        {/* =============================================cart-operations_replace-supermarket END============================================= */}
+
+        {/* ////////////////////////////////////////cart-operations_cheapest-supermarket START//////////////////////////////////////// */}
+        <div
+          className="cart-operations_cheapest-supermarket"
+          onClick={() => {
+            const handleOptimizeCart = async () => {
+              setIsReplaceSupermarket(true); // Start loading
+              try {
+                // Code to optimize the cart goes here
+                await handleCheapestCart();
+              } catch (error) {
+                console.error("Error optimizing cart:", error);
+                // Optionally, handle the error
+              } finally {
+                setIsReplaceSupermarket(false); // Stop loading regardless of success or error
+              }
+            };
+
+            handleOptimizeCart();
+          }}
+          disabled={isReplaceSupermarket} // Disable the button when loading>
+        >
+          מחיר הכי זול
+          {isReplaceSupermarket && <div>Loading...</div>}{" "}
+          {/* Optional: Show a loading indicator */}
+        </div>
+
+        {/* ////////////////////////////////////////cart-operations_cheapest-supermarket END//////////////////////////////////////// */}
+
+        {/* +++++++++++++++++++++++++++++++++++++cart-operations_optimal-carts-settings START++++++++++++++++++++++++++++++++++++++++ */}
+        <div
+          className="cart-operations_optimal-carts-settings"
+          onClick={() => navigate("/optimal-carts-settings")}
+        >
+          מעבר לאופטימיזציית עגלות
+        </div>
+      </div>
+
+      {/* +++++++++++++++++++++++++++++++++++++cart-operations_optimal-carts-settings END++++++++++++++++++++++++++++++++++++++++ */}
+
+      {/* ///////////////////////////////////////////////////////////////////////////////////////////*/}
+      {/* ///////////////////////////////////////////////////////////////////////////////////////////*/}
+      {/* ///////////////////////////////////////////////////////////////////////////////////////////*/}
+      {/* ///////////////////////////////////////////////////////////////////////////////////////////*/}
+      {/* ///////////////////////////////////////////////////////////////////////////////////////////*/}
+
+      <div className="supermarket">
+        <div className="supermarket-title">
+          <h3>הסופרמרקט הכי משתלם לעגלה שלך</h3>
+        </div>
+        <div className="supermarket-logo">
+          <SupermarketImage supermarketName={cart.supermarket.name} />
+        </div>
+        <div className="supermarket-address">
+          <div className="supermarket-address__city">
+            {cart && cart.supermarket.city}
+          </div>
+          <div className="supermarket-Street__street">
+            ,{cart && cart.supermarket.address}
+          </div>
+        </div>
+        <hr className="line" />
+      </div>
+      <div className="total-price">
+        <div className="total-price__title">
+          <h1>סכום כולל של העגלה שלך</h1>
+        </div>
+        <div className="total-price__price">
+          {cart && <h1>{cart.totalPrice}₪</h1>}
+        </div>
+      </div>
+      <hr className="line" />
+      <div className="products">
+        {cart &&
+          cart.productsWithPrices.map((item, index) => (
+            // ===========================================
+            //  START FROM HERE TO ORGENIZE THE PRODUCTS
+            // ===========================================
+
+            <div key={index}>
+              <div
+                className="product"
+                onClick={() => {
+                  setCurrentBarcode(item.product.barcode);
+                  setModalOpen(true);
+                }}
+              >
+                <div className="product-details">
+                  <div className="product-details__name">
+                    <span>
+                      {item.product.name.split(" ").slice(0, 3).join(" ")}
+                    </span>
+                  </div>
+                  <div
+                    style={{
+                      display: "flex",
+                      flexDirection: "row-reverse",
+                      alignItems: "center",
+                      paddingRight: "5px",
+                      width: "100%",
+                    }}
+                  >
+                    <div className="product-details__weight">
+                      <span>{convertWeightUnit(item.product.unitWeight)} </span>
+                      <span className="size">{item.product.weight}</span>
+                    </div>
+                    <span
+                      style={{
+                        paddingRight: "3px",
+                        paddingLeft: "3px",
+                        display: "flex",
+                        alignSelf: "normal",
+                      }}
+                    >
+                      {" "}
+                      |{" "}
+                    </span>
+                    <div className="product-details__brand">
+                      <span>{item.product.brand}</span>
+                    </div>
+                  </div>
+                </div>
+                <div className="product-price">
+                  <div className="product-price__amount">
+                    <span style={{ fontSize: "0.8rem", alignSelf: "baseline" }}>
+                      'יח
+                    </span>
+                    <span>{item.amount}</span>
+                  </div>
+                  <div className="product-price__total-price">
+                    <b style={{ fontSize: "1.2em" }}>₪</b>
+                    <span style={{ fontSize: "1.2rem" }}>
+                      {parseFloat(item.totalPrice).toFixed(2)}
+                    </span>
+                  </div>
+                </div>
+                <div className="product-image">
+                  <Images barcode={item.product.barcode} />
+                </div>
+              </div>
+
+              {/* =======================================
+              END HERE TO ORGENIZE THE PRODUCTS 
+              ===========================================*/}
+
+              {/*========================= UPDATE AMOUNT SECTION ========================= */}
+
+              <div className="update-amount">
+                <div className="update-amount__new">
+                  <button
+                    className="update-amount__minus-button"
+                    onClick={() => handleDecrement(item.product.barcode)}
+                  >
+                    -
+                  </button>
+
+                  <button
+                    className="update-amount__plus-button"
+                    onClick={() => handleIncrement(item.product.barcode)}
+                  >
+                    +
+                  </button>
+                </div>
+                <div className="update-amount__update_and_cencal">
+                  <div className="update-amount__update-button">
+                    <button
+                      onClick={() => {
+                        setCurrentBarcode(item.product.barcode);
+                        console.log(currentBarcode);
+                        handleUpdate(item.product.barcode);
+                      }}
+                    >
+                      עדכן
+                    </button>
+                  </div>
+                  <div className="update-amount__cancel-button">
+                    <button
+                      onClick={() => {
+                        console.log("ביטול");
+                      }}
+                    >
+                      בטל
+                    </button>
+                  </div>
+                </div>
+                <div className="cart__delete-product">
+                  <button
+                    onClick={() => {
+                      setCurrentBarcode(item.product.barcode);
+                      console.log(currentBarcode);
+                      handleDelete(item.product.barcode);
+                    }}
+                  >
+                    <img src={trashIcon} alt="Delete" />
+                  </button>
+                </div>
+              </div>
+
+              {/*======================= UPDATE AMOUNT SECTION =========================== */}
+              <hr />
+            </div>
+          ))}
+      </div>
+      <div className="green-button">
+        <button className="green-button__button" onClick={handleConfirmCart}>
+          Confirm Cart
+        </button>{" "}
+      </div>
+    </div>
+  );
+}
+
+
+// import React, { useState, useEffect } from "react";
+// import { useNavigate } from "react-router-dom";
+// import Modal from "./Modal";
+// import ReplaceProducts from "./ReplaceProducts";
+// import ReplaceSupermarket from "./ReplaceSupermarket/ReplaceSupermarket";
+// import "./Cart.css";
+// import { Spin } from "antd";
+// import Images from "../ProductList/Images";
+// import SupermarketImage from "./supermarketImage";
+// import trashIcon from "./trash.png";
+// import { useCartActions } from "../../hooks/appHooks";
+// import { useProducts } from "../../context/ProductContext";
+// import { useFullCart } from "../../hooks/appHooks";
+
+// export const convertWeightUnit = (weightUnit) => {
+//   weightUnit = weightUnit?.toLowerCase();
+//   if (weightUnit === "g") return "גרם";
+//   if (weightUnit === "kg") return "קילוגרם";
+//   if (weightUnit === "ml") return "מיליליטר";
+//   if (weightUnit === "l") return "ליטר";
+//   return weightUnit;
+// };
+
+// export default function Cart() {
+//   const { fullCart } = useFullCart();
+//   const {
+//     add,
+//     update,
+//     remove,
+//     replaceSupermarket,
+//     sync,
+//     isLoadingPrices,
+//   } = useCartActions();
+
+//   const { loadProducts } = useProducts();
+//   const navigate = useNavigate();
+
+//   const [isSaving, setIsSaving] = useState(false);
+//   const [isReplaceSupermarket, setIsReplaceSupermarket] = useState(false);
+//   const [isModalOpen, setModalOpen] = useState(false);
+//   const [isReplaceSupermarketOpen, setIsReplaceSupermarketOpen] = useState(false);
+//   const [currentBarcode, setCurrentBarcode] = useState(null);
+
+//   const handleIncrement = (barcode) => add(barcode);
+//   const handleDecrement = (barcode) => update(barcode, Math.max(1, fullCart.productsWithPrices.find(p => p.product.barcode === barcode)?.amount - 1));
+//   const handleUpdate = () => sync();
+//   const handleDelete = (barcode) => remove(barcode);
+
+//   const handleUpdateSupermarket = async (supermarketID) => {
+//     setIsReplaceSupermarket(true);
+//     try {
+//       replaceSupermarket(supermarketID);
+//       await loadProducts();
+//     } catch (err) {
+//       console.error(err);
+//     } finally {
+//       setIsReplaceSupermarket(false);
+//       setIsReplaceSupermarketOpen(false);
+//     }
+//   };
+
+//   if (isLoadingPrices || !fullCart) {
+//     return (
+//       <div className="spinner-container">
+//         <Spin size="large" />
+//         <p>טוען עגלה אופטימלית...</p>
+//       </div>
+//     );
+//   }
+
+//   return (
+//     <div className="cart">
+//       <Modal isOpen={isModalOpen} onClose={() => setModalOpen(false)}>
+//         <ReplaceProducts
+//           barcode={currentBarcode}
+//           closeModal={() => setModalOpen(false)}
+//         />
+//       </Modal>
+
+//       <ReplaceSupermarket
+//         isOpen={isReplaceSupermarketOpen}
+//         closeModal={() => setIsReplaceSupermarketOpen(false)}
+//         onSelectBranch={handleUpdateSupermarket}
+//       />
+
+//       <div className="cart-operations">
+//         <div
+//           className="cart-operations_replace-supermarket"
+//           onClick={() => setIsReplaceSupermarketOpen(true)}
+//         >
+//           החלפת סופרמרקט
+//         </div>
+
+//         <div
+//           className="cart-operations_optimal-carts-settings"
+//           onClick={() => navigate("/optimal-carts-settings")}
+//         >
+//           מעבר לאופטימיזציית עגלות
+//         </div>
+//       </div>
+
+//       <div className="supermarket">
+//         <div className="supermarket-title">
+//           <h3>הסופרמרקט הכי משתלם לעגלה שלך</h3>
+//         </div>
+//         <div className="supermarket-logo">
+//           <SupermarketImage supermarketName={fullCart.supermarket.name} />
+//         </div>
+//         <div className="supermarket-address">
+//           <div className="supermarket-address__city">{fullCart.supermarket.city}</div>
+//           <div className="supermarket-Street__street">,{fullCart.supermarket.address}</div>
+//         </div>
+//         <hr className="line" />
+//       </div>
+
+//       <div className="total-price">
+//         <div className="total-price__title">
+//           <h1>סכום כולל של העגלה שלך</h1>
+//         </div>
+//         <div className="total-price__price">
+//           <h1>{fullCart.totalPrice}₪</h1>
+//         </div>
+//       </div>
+//       <hr className="line" />
+
+//       <div className="products">
+//         {fullCart.productsWithPrices.map((item, index) => (
+//           <div key={index}>
+//             <div
+//               className="product"
+//               onClick={() => {
+//                 setCurrentBarcode(item.product.barcode);
+//                 setModalOpen(true);
+//               }}
+//             >
+//               <div className="product-details">
+//                 <div className="product-details__name">
+//                   <span>{item.product.name.split(" ").slice(0, 3).join(" ")}</span>
+//                 </div>
+//                 <div className="product-details__weight">
+//                   <span>{convertWeightUnit(item.product.unitWeight)} </span>
+//                   <span className="size">{item.product.weight}</span>
+//                 </div>
+//                 <div className="product-details__brand">
+//                   <span>{item.product.brand}</span>
+//                 </div>
+//               </div>
+//               <div className="product-price">
+//                 <div className="product-price__amount">
+//                   <span style={{ fontSize: "0.8rem", alignSelf: "baseline" }}>
+//                     'יח
+//                   </span>
+//                   <span>{item.amount}</span>
+//                 </div>
+//                 <div className="product-price__total-price">
+//                   <b style={{ fontSize: "1.2em" }}>₪</b>
+//                   <span style={{ fontSize: "1.2rem" }}>
+//                     {parseFloat(item.totalPrice).toFixed(2)}
+//                   </span>
+//                 </div>
+//               </div>
+//               <div className="product-image">
+//                 <Images barcode={item.product.barcode} />
+//               </div>
+//             </div>
+
+//             <div className="update-amount">
+//               <div className="update-amount__new">
+//                 <button
+//                   className="update-amount__minus-button"
+//                   onClick={() => handleDecrement(item.product.barcode)}
+//                 >
+//                   -
+//                 </button>
+//                 <button
+//                   className="update-amount__plus-button"
+//                   onClick={() => handleIncrement(item.product.barcode)}
+//                 >
+//                   +
+//                 </button>
+//               </div>
+//               <div className="update-amount__update_and_cencal">
+//                 <div className="update-amount__update-button">
+//                   <button onClick={handleUpdate}>עדכן</button>
+//                 </div>
+//                 <div className="update-amount__cancel-button">
+//                   <button onClick={() => console.log("ביטול")}>בטל</button>
+//                 </div>
+//               </div>
+//               <div className="cart__delete-product">
+//                 <button onClick={() => handleDelete(item.product.barcode)}>
+//                   <img src={trashIcon} alt="Delete" />
+//                 </button>
+//               </div>
+//             </div>
+//             <hr />
+//           </div>
+//         ))}
+//       </div>
+
+//       <div className="green-button">
+//         <button className="green-button__button" onClick={handleUpdate}>
+//           Confirm Cart
+//         </button>
+//       </div>
+//     </div>
+//   );
+// }
+
+
+
+Modal.js:
+
+// import React, { useEffect } from "react";
+import ReactDOM from "react-dom";
+import "./Modal.css";
+
+const Modal = ({ isOpen, children, onClose }) => {
+  if (!isOpen) {
+    return null;
+  }
+
+  const handleOverlayClick = (event) => {
+    // Check if the clicked target is the overlay itself and not the modal window
+    if (event.target.className === "modal-overlay") {
+      onClose();
+    }
+  };
+
+  return ReactDOM.createPortal(
+    <div className="modal-overlay" onClick={handleOverlayClick}>
+      <div className="modal-window">
+        {children}
+        <div className="close-button-container">
+          <button className="close-button" onClick={onClose}>
+            X
+          </button>
+        </div>
+      </div>
+    </div>,
+    document.getElementById("modal-root")
+  );
+};
+
+export default Modal;
+
+
+
+ProductQuantityEditorWithPrice.js:
+
+import React, { useState } from "react";
+
+const ProductQuantityEditorWithPrice = ({
+  originalQuantity,
+  originalTotalPrice,
+  onUpdate,
+}) => {
+  const [editedQuantity, setEditedQuantity] = useState(originalQuantity);
+
+  const handleIncrement = () => setEditedQuantity(editedQuantity + 1);
+  const handleDecrement = () => {
+    if (editedQuantity > 0) {
+      setEditedQuantity(editedQuantity - 1);
+    }
+  };
+
+  const handleCancel = () => {
+    setEditedQuantity(originalQuantity);
+  };
+
+  // חישוב מחיר ליחידה ומחיר כולל חדש
+  const unitPrice =
+    originalQuantity > 0 ? originalTotalPrice / originalQuantity : 0;
+  const newTotalPrice = editedQuantity * unitPrice;
+
+  return (
+    <div className="product-quantity-editor">
+      <div className="quantity-controls">
+        <button onClick={handleDecrement}>-</button>
+        <span style={{ margin: "0 10px" }}>{editedQuantity}</span>
+        <button onClick={handleIncrement}>+</button>
+      </div>
+      {editedQuantity !== originalQuantity && (
+        <div className="new-price-info" style={{ marginTop: "5px" }}>
+          <span style={{ textDecoration: "line-through" }}>
+            {originalTotalPrice.toFixed(2)}₪
+          </span>
+          <span style={{ color: "red", marginLeft: "10px" }}>
+            {newTotalPrice.toFixed(2)}₪
+          </span>
+        </div>
+      )}
+      {editedQuantity !== originalQuantity && (
+        <div className="update-cancel-buttons" style={{ marginTop: "5px" }}>
+          <button onClick={() => onUpdate(editedQuantity)}>עדכן</button>
+          <button onClick={handleCancel}>בטל</button>
+        </div>
+      )}
+    </div>
+  );
+};
+export default ProductQuantityEditorWithPrice;
+
+
+ReplaceProducts.js:
+
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import Image from "../ProductList/Images";
+import "./ReplaceProducts.css";
+import { Spin } from "antd";
+import { DOMAIN } from "../../constants";
+import { useCart } from "../../context/CartContext";
+
+function ReplaceProducts({ barcode, closeModal, loadCart, userId }) {
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [isReplacing, setIsReplacing] = useState(false);
+
+  const { cart } = useCart();
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      try {
+        // Start new code
+        const supermarketID = cart.supermarket.supermarketID;
+        let productDetails = await axios(
+          `${DOMAIN}/api/v1/products/supermarket/${supermarketID}/?barcode=${barcode}`
+        );
+        const generalName = productDetails.data.data.products[0].generalName;
+        const newResult = await axios(
+          `${DOMAIN}/api/v1/products/supermarket/${supermarketID}/?generalName=${generalName}`
+        );
+        const replaceProducts = newResult.data.data.products;
+        // sort by hasPrice: True first
+        replaceProducts.sort((a, b) => {
+          if (a.hasPrice && !b.hasPrice) {
+            return -1;
+          }
+          if (!a.hasPrice && b.hasPrice) {
+            return 1;
+          }
+          return 0;
+        });
+        console.log(replaceProducts);
+        setProducts(replaceProducts);
+
+        setLoading(false);
+      } catch (error) {
+        console.error("Error fetching data: ", error);
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [barcode, cart.supermarket.supermarketID]);
+
+  
+  const handleProductClick = async (newBarcode) => {
+    setIsReplacing(true); // Start spinner for replacement process
+    try {
+      const response = await axios.post(
+        `${DOMAIN}/api/v1/carts/replace/${userId}`,
+        {
+          oldBarcode: barcode,
+          newBarcode: newBarcode,
+        }
+      );
+      console.log(response.data.data.cart);
+      await loadCart(userId); // Reload cart data
+    } catch (error) {
+      console.error("Error posting data: ", error);
+    } finally {
+      setIsReplacing(false); // Stop spinner after the process
+      closeModal(); // Close the modal in any case
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="spinner-container">
+        <Spin size="large" />
+        <p>Loading...</p>
+      </div>
+    );
+  }
+
+  if (isReplacing) {
+    return (
+      <div className="spinner-container">
+        <Spin size="large" />
+        <p>isReplacing...</p>
+      </div>
+    );
+  }
+
+  const convertWeightUnit = (weightUnit) => {
+    weightUnit = weightUnit.toLowerCase();
+    if (weightUnit === "g") {
+      return "גרם";
+    }
+    if (weightUnit === "kg") {
+      return 'ק"ג';
+    }
+    if (weightUnit === "ml") {
+      return 'מ"ל';
+    }
+    if (weightUnit === "l") {
+      return "ליטר";
+    }
+    return weightUnit;
+  };
+
+  const max18Characters = (str) => {
+    if (str.length > 26) {
+      return "..." + str.substring(0, 21);
+    }
+    return str;
+  };
+
+  const priceFormat = (price) => {
+    return price.toFixed(2);
+  };
+
+  const discountPriceFormat = (price) => {
+    const units = price.discount.units;
+    const totalPrice = price.discount.totalPrice;
+    return (
+      <div
+        className="list__discount-price"
+        style={{
+          display: "flex",
+          flexDirection: "row-reverse",
+          alignItems: "center",
+          color: "#ff0000",
+          fontWeight: "bold",
+        }}
+      >
+        <p style={{ marginLeft: "0.3rem" }}>{units}</p>
+        <p>{"יחידות ב"}</p>
+        <p>{" - "}</p>
+        <p>{priceFormat(totalPrice)}</p>
+        <p style={{ fontWeight: "bold" }}>{"₪"}</p>
+      </div>
+    );
+  };
+
+  return (
+    <div className="replace-products">
+      {products.map((product) => (
+        <>
+        <div
+          key={product.barcode}
+          className="replace-product"
+          onClick={() => handleProductClick(product.barcode)}
+        >
+          <div className="replace-product-image">
+            <Image barcode={product.barcode} />
+          </div>
+          <div className="replace-product-details">
+            {/* take only the first 4 words from product.name  */}
+            <p className="replace-product-details__name">{`${
+              product.name && max18Characters(product.name)
+            }`}</p>
+            <div className="replace-product-details__information">
+              <p style={{ marginLeft: "0.3rem" }}>{product.weight}</p>
+              <p>{convertWeightUnit(product.unitWeight)}</p>
+              <p style={{ color: "black" }}>{"|"}</p>
+              <p className="replace-product-details__brand">{product.brand}</p>
+            </div>
+            <div className="replace-product-details__price">
+              {product.price && <p> {product.price.price}</p>}
+              {product.price && <p style={{ fontWeight: "bold" }}>{"₪"}</p>}
+              {!product.hasPrice && (
+                <p style={{ color: "#ff0000" }}>מחיר לא זמין בסופר</p>
+              )}
+            </div>
+            { product.price && product.price.discount && discountPriceFormat(product.price)}
+          </div>
+          
+        </div>
+        <div className="replace-product-separator"></div>
+        </>
+      ))}
+    </div>
+  );
+}
+
+export default ReplaceProducts;
+
+
+
+supermarketImage.js:
+
+import beImage from "./supermarketsImages/BE.png";
+import carrefoutImage from "./supermarketsImages/Carrefour city (קרפור סיטי).png";
+import yellowImage from "./supermarketsImages/yellow.png";
+import osherAdImage from "./supermarketsImages/אושר עד.png";
+// import barcolImage from "./supermarketsImages/ברכל.png";
+
+import victoryImage from "./supermarketsImages/ויקטורי.png";
+import bigAndCheapImage from "./supermarketsImages/זול ובגדול.png";
+import yohananofImage from "./supermarketsImages/יוחננוף.png";
+import thereInNeighborhoodImage from "./supermarketsImages/יש בשכונה.png";
+import chesedExistsImage from "./supermarketsImages/יש חסד.png";
+import megaInCityImage from "./supermarketsImages/מגה בעיר.png";
+import marketWarehouseForYouImage from "./supermarketsImages/מחסני השוק בשבילך.png";
+import marketWarehouseMehadrinImage from "./supermarketsImages/מחסני השוק מהדרין.png";
+import miniSuperAlonitImage from "./supermarketsImages/מיני סופר אלונית.png";
+import spring2000Image from "./supermarketsImages/מעיין 2000.png";
+import superPharmImage from "./supermarketsImages/סופר פארם.png";
+import kingStoreImage from "./supermarketsImages/קינג סטור.png";
+import ramiLeviImage from "./supermarketsImages/רמי לוי.png";
+import shufersalExpressImage from "./supermarketsImages/שופרסל אקספרס.png";
+import shufersalDealImage from "./supermarketsImages/שופרסל דיל.png";
+import myShufersalImage from "./supermarketsImages/שופרסל שלי.png";
+import cityMarketImage from "./supermarketsImages/שוק העיר.png";
+import mehadrinMarketImage from "./supermarketsImages/שוק מהדרין.png";
+import shiraMarketImage from "./supermarketsImages/שירה מרקט.png";
+import shaareRevahaImage from "./supermarketsImages/שערי רווחה.png";
+import plentyBlessingOfTheNameNearHomeImage from "./supermarketsImages/שפע ברכת השם קרוב לבית.png";
+import marketGoodImage from "./supermarketsImages/good מרקט.png";
+
+const getSupermarketImage = (supermarketName) => {
+  switch (supermarketName) {
+    case "BE":
+      return beImage;
+    case "Carrefour city (קרפור סיטי)":
+      return carrefoutImage;
+    case "yellow":
+      return yellowImage;
+    case "אושר עד":
+      return osherAdImage;
+    // case "ברכל":
+    //   return barcolImage;
+    case "ויקטורי":
+      return victoryImage;
+    case "זול ובגדול":
+      return bigAndCheapImage;
+    case "יוחננוף":
+      return yohananofImage;
+    case "יש בשכונה":
+      return thereInNeighborhoodImage;
+    case "יש חסד":
+      return chesedExistsImage;
+    case "מגה בעיר":
+      return megaInCityImage;
+    case "מחסני השוק בשבילך":
+      return marketWarehouseForYouImage;
+    case "מחסני השוק מהדרין":
+      return marketWarehouseMehadrinImage;
+    case "מיני סופר אלונית":
+      return miniSuperAlonitImage;
+    case "מעיין 2000":
+      return spring2000Image;
+    case "סופר פארם":
+      return superPharmImage;
+    case "קינג סטור":
+      return kingStoreImage;
+    case "רמי לוי":
+      return ramiLeviImage;
+    case "שופרסל אקספרס":
+      return shufersalExpressImage;
+    case "שופרסל דיל":
+      return shufersalDealImage;
+    case "שופרסל שלי":
+      return myShufersalImage;
+    case "שוק העיר":
+      return cityMarketImage;
+    case "שוק מהדרין":
+      return mehadrinMarketImage;
+    case "שירה מרקט":
+      return shiraMarketImage;
+    case "שערי רווחה":
+      return shaareRevahaImage;
+    case "שפע ברכת השם קרוב לבית":
+      return plentyBlessingOfTheNameNearHomeImage;
+    case "good מרקט":
+      return marketGoodImage;
+    default:
+      return marketGoodImage;
+  }
+};
+
+const SupermarketImage = ({ supermarketName, className }) => {
+  return (
+    <img
+      src={getSupermarketImage(supermarketName)}
+      alt={supermarketName}
+      className={className} // מאפשר להעביר ClassName חיצוני
+    />
+  );
+};
+
+export default SupermarketImage;
+
+
+
+Category\CategoryItem.js:
+
+
+
+
+Category\CategoryList.js:
+
+import React from "react";
+import fruitsAndVegetablesImg from "./CatagoryImages/fruitsAndVegetables.jpg";
+import meatChickenAndFishImg from "./CatagoryImages/meatChickenAndFish.jpg";
+import milkAndEggsImg from "./CatagoryImages/milkAndEggs.jpg";
+import breadAndPastriesImg from "./CatagoryImages/breadAndPastries.jpg";
+import drinksWineAndAlcoholImg from "./CatagoryImages/drinksWineAndAlcohol.jpg";
+import frozenProductsImg from "./CatagoryImages/frozenProducts.jpg";
+import cookingAndBakingImg from "./CatagoryImages/cookingAndBaking.jpg";
+import canningImg from "./CatagoryImages/canning.jpg";
+import snacksSweetsAndCerealsImg from "./CatagoryImages/snacksSweetsAndCereals.jpg";
+import cleaningAndDisposableImg from "./CatagoryImages/cleaningAndDisposable.jpg";
+import pharmacyAndBabiesImg from "./CatagoryImages/pharmacyAndBabies.jpg";
+import "./CategoryList.css";
+// import other images similarly
+// import { useCart } from "../../../context/CartContext";
+
+const onclickCategoryHandle = (category) => {
+  console.log(category);
+};
+
+const categoryDictionary = {
+  "פירות וירקות": { imageName: fruitsAndVegetablesImg },
+  "בשר עוף, ודגים": { imageName: meatChickenAndFishImg }, 
+  "מוצרי חלב וביצים": { imageName: milkAndEggsImg }, 
+  "לחמים ומאפים": { imageName: breadAndPastriesImg }, 
+  "משקאות, יין ואלכוהול": { imageName: drinksWineAndAlcoholImg }, 
+  "מוצרים קפואים": { imageName: frozenProductsImg },
+  "בישול ואפייה": { imageName: cookingAndBakingImg },
+  "שימורים": { imageName: canningImg }, 
+  "חטיפים, מתוקים ודגנים": { imageName: snacksSweetsAndCerealsImg },
+  "ניקיון וחד פעמי": { imageName: cleaningAndDisposableImg },
+  "פארם ותינוקות": { imageName: pharmacyAndBabiesImg },
+};
+
+export default function CategoryList() {
+  return (
+    <div className="category-container">
+      {Object.entries(categoryDictionary).map(([category, { imageName }]) => (
+        <div
+          className="category-item"
+          key={category}
+          onClick={() => onclickCategoryHandle(category)}
+        >
+          <img src={imageName} alt={category} />
+          <p>{category}</p>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+
+
+ReplaceSupermarket\ReplaceSupermarket.js:
+
+// import React, { useState } from "react";
+// import Modal from "../Modal";
+// import SupermarketsNames from "./SupermarketsNames";
+// import SupermarketsBranches from "./SupermarketsBranches";
+
+// const ReplaceSupermarket = ({ isOpen, closeModal, onSelectBranch }) => {
+//   const [selectedSupermarket, setSelectedSupermarket] = useState(null);
+
+//   return (
+//     <Modal isOpen={isOpen} onClose={closeModal}>
+//       {!selectedSupermarket ? (
+//         <SupermarketsNames onSelectSupermarket={setSelectedSupermarket} />
+//       ) : (
+//         <SupermarketsBranches
+//           selectedSupermarket={selectedSupermarket}
+//           onSelectBranch={onSelectBranch}
+//         />
+//       )}
+//     </Modal>
+//   );
+// };
+
+// export default ReplaceSupermarket;
+
+import React, { useState } from "react";
+import Modal from "../Modal";
+import SupermarketsNames from "./SupermarketsNames";
+import SupermarketsBranches from "./SupermarketsBranches";
+
+const ReplaceSupermarket = ({ isOpen, closeModal, onSelectBranch }) => {
+  const [selectedSupermarket, setSelectedSupermarket] = useState(null);
+
+  return (
+    <Modal isOpen={isOpen} onClose={closeModal}>
+      {!selectedSupermarket ? (
+        <SupermarketsNames onSelectSupermarket={setSelectedSupermarket} />
+      ) : (
+        <SupermarketsBranches
+          selectedSupermarket={selectedSupermarket}
+          onSelectBranch={onSelectBranch}
+          onBack={() => setSelectedSupermarket(null)}
+        />
+      )}
+    </Modal>
+  );
+};
+
+export default ReplaceSupermarket;
+
+
+
+ReplaceSupermarket\SupermarketsBranches.js:
+
+import React from "react";
+import SupermarketImage from "../supermarketImage";
+import "./SupermarketsBranches.css";
+
+const SupermarketsBranches = ({ selectedSupermarket, onSelectBranch, onBack }) => {
+  if (!selectedSupermarket) return null;
+
+  const { name, branches } = selectedSupermarket;
+
+  return (
+    <div className="sbn_container">
+      {/* אזור כותרת דביקה (Sticky) */}
+      <div className="sbn_header">
+        <SupermarketImage
+          supermarketName={name}
+          className="sbn_logo"
+        />
+        <h3 className="sbn_title">בחר סניף של </h3>
+      </div>
+
+      {/* רשימת הסניפים */}
+      <div className="sbn_list">
+        <ul className="sbn_listUl">
+          {branches.map((branch) => (
+            <li key={branch.supermarketID} className="sbn_listItem">
+              <button
+                className="sbn_branchButton"
+                onClick={() => onSelectBranch(branch.supermarketID)}
+              >
+                {branch.city} - {branch.address}
+              </button>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      {/* אזור תחתון (footer) עבור כפתור "חזרה" */}
+      <div className="sbn_footer">
+        <button className="sbn_backButton" onClick={onBack}>
+          חזרה
+        </button>
+      </div>
+    </div>
+  );
+};
+
+export default SupermarketsBranches;
+
+
+
+ReplaceSupermarket\SupermarketsNames.js:
+
+// // import React, { useState, useEffect } from "react";
+// import React from "react";
+// // import { useCart } from "../../../context/CartContext";
+// import SupermarketImage from "../supermarketImage";
+// import "./SupermarketsNames.css";
+
+// const SupermarketsNames = ({ onSelectSupermarket }) => {
+//   const supermarkets = [
+//     { name: "BE", branches: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10] },
+//     {
+//       name: "Carrefour city (קרפור סיטי)",
+//       branches: [11, 12, 13, 14, 15, 16, 17, 18, 19, 20],
+//     },
+//     { name: "yellow", branches: [21, 22, 23, 24, 25, 26, 27, 28, 29, 30] },
+//     { name: "אושר עד", branches: [31, 32, 33, 34, 35, 36, 37, 38, 39, 40] },
+//     { name: "ויקטורי", branches: [41, 42, 43, 44, 45, 46, 47, 48, 49, 50] },
+//     { name: "יוחננוף", branches: [51, 52, 53, 54, 55, 56, 57, 58, 59, 60] },
+//     { name: "יש בשכונה", branches: [61, 62, 63, 64, 65, 66, 67, 68, 69, 70] },
+//     { name: "יש חסד", branches: [71, 72, 73, 74, 75, 76, 77, 78, 79, 80] },
+//     { name: "מגה בעיר", branches: [81, 82, 83, 84, 85, 86, 87, 88, 89, 90] },
+//     { name: "רמי לוי", branches: [91, 92, 93, 94, 95, 96, 97, 98, 99, 100] },
+//   ];
+
+//   const supermarkets2 = {
+//     BE: [
+//       {
+//         address: "זית שמן 2",
+//         city: "אפרת",
+//         supermarketID: 182,
+//       },
+//       {
+//         address: "הרכס 31",
+//         city: "מעלה אדומים",
+//         supermarketID: 181,
+//       },
+//       {
+//         address: "בית חולים שערי צדק",
+//         city: "ירושלים",
+//         supermarketID: 180,
+//       },
+//     ],
+
+//     "Carrefour city (קרפור סיטי)": [
+//       {
+//         address: "אבי זהר",
+//         city: "ירושלים",
+//         supermarketID: 69,
+//       },
+//     ],
+//     yellow: [
+//       {
+//         address: "99 דרך חברון",
+//         city: "ירושלים",
+//         supermarketID: 139,
+//       },
+//       {
+//         address: "שד משה דיין- גבעת זאב",
+//         city: "ירושלים",
+//         supermarketID: 138,
+//       },
+//       {
+//         address: "עקיבא אזולאי 1את גבעת שאול",
+//         city: "ירושלים",
+//         supermarketID: 137,
+//       },
+//       {
+//         address: "שכונת נוף הריםמבשרת ציון",
+//         city: "ירושלים",
+//         supermarketID: 136,
+//       },
+//       {
+//         address: "איזור תעשיה תלפיות",
+//         city: "ירושלים",
+//         supermarketID: 133,
+//       },
+//       {
+//         address: "שד ויצמן ביציאה מהעיר לתא",
+//         city: "ירושלים",
+//         supermarketID: 123,
+//       },
+//       {
+//         address: "מחלף שער הגיא כביש ים תא",
+//         city: "ירושלים",
+//         supermarketID: 127,
+//       },
+//       {
+//         address: "אונטרמן שכונת גילה",
+//         city: "ירושלים",
+//         supermarketID: 135,
+//       },
+//       {
+//         address: "1 פיקוד מרכז",
+//         city: "ירושלים",
+//         supermarketID: 131,
+//       },
+//       {
+//         address: "חניון מוזיאון ישראל",
+//         city: "ירושלים",
+//         supermarketID: 140,
+//       },
+//       {
+//         address: "כביש בית שמש - ים",
+//         city: "ירושלים",
+//         supermarketID: 134,
+//       },
+//       {
+//         address: "כביש 60 ביציאה הדרומית מירושלים",
+//         city: "ירושלים",
+//         supermarketID: 142,
+//       },
+//       {
+//         address: "44 שבטי ישראל",
+//         city: "ירושלים",
+//         supermarketID: 126,
+//       },
+//       {
+//         address: "5 פארן",
+//         city: "ירושלים",
+//         supermarketID: 130,
+//       },
+//       {
+//         address: "מישור אדומים",
+//         city: "ירושלים",
+//         supermarketID: 141,
+//       },
+//       {
+//         address: "דרך הנרייטה סאלד",
+//         city: "ירושלים",
+//         supermarketID: 132,
+//       },
+//       {
+//         address: "11 דרך בית לחם",
+//         city: "ירושלים",
+//         supermarketID: 124,
+//       },
+//       {
+//         address: "שד בן-צבי",
+//         city: "ירושלים",
+//         supermarketID: 128,
+//       },
+//       {
+//         address: "גולומב",
+//         city: "ירושלים",
+//         supermarketID: 129,
+//       },
+//       {
+//         address: "19 המלך דוד",
+//         city: "ירושלים",
+//         supermarketID: 125,
+//       },
+//     ],
+//     "אושר עד": [
+//       {
+//         address: "פייר קניג 26",
+//         city: "ירושלים",
+//         supermarketID: 16,
+//       },
+//       {
+//         address: "בית הדפוס 29",
+//         city: "ירושלים",
+//         supermarketID: 15,
+//       },
+//       {
+//         address: "שמגר 16",
+//         city: "ירושלים",
+//         supermarketID: 17,
+//       },
+//     ],
+//     ויקטורי: [
+//       {
+//         address: "דרך אגודת הספורט מכבי 1",
+//         city: "ירושלים",
+//         supermarketID: 37,
+//       },
+//       {
+//         address: "הראל 1",
+//         city: "מבשרת ציון",
+//         supermarketID: 192,
+//       },
+//     ],
+//     יוחננוף: [
+//       {
+//         address: "האומן 10",
+//         city: "ירושלים",
+//         supermarketID: 19,
+//       },
+//     ],
+//     "יש בשכונה": [
+//       {
+//         address: "פארן 7 רמת אשכול",
+//         city: "ירושלים",
+//         supermarketID: 25,
+//       },
+//       {
+//         address: "שאולזון 56",
+//         city: "ירושלים",
+//         supermarketID: 27,
+//       },
+//     ],
+//     "מגה בעיר": [
+//       {
+//         address: 'בית"ר פינת ינובסקי',
+//         city: "ירושלים",
+//         supermarketID: 52,
+//       },
+//     ],
+//     "רמי לוי": [
+//       {
+//         address: "בית הדפוס 13",
+//         city: "ירושלים",
+//         supermarketID: 12,
+//       },
+//       {
+//         address: "איזור תעשיה עטרות",
+//         city: "ירושלים",
+//         supermarketID: 14,
+//       },
+//       {
+//         address: "החוצבים 5",
+//         city: "מבשרת ציון",
+//         supermarketID: 189,
+//       },
+//       {
+//         address: "יד חרוצים 18",
+//         city: "ירושלים",
+//         supermarketID: 8,
+//       },
+//       {
+//         address: "הפרסה 3",
+//         city: "ירושלים",
+//         supermarketID: 10,
+//       },
+//       {
+//         address: "דרך החורש 90",
+//         city: "ירושלים",
+//         supermarketID: 9,
+//       },
+//       {
+//         address: "האומן,15",
+//         city: "ירושלים",
+//         supermarketID: 7,
+//       },
+//       {
+//         address: "איזור התעשיה שער בנימין",
+//         city: "ירושלים",
+//         supermarketID: 11,
+//       },
+//       {
+//         address: "כנפי נשרים 26",
+//         city: "ירושלים",
+//         supermarketID: 13,
+//       },
+//     ],
+//   };
+
+//   // const [supermarkets2, setSupermarkets2] = useState([]);
+
+//   // const { getAllSupermarkets } = useCart();
+
+//   // useEffect(() => {
+//   //   async function fetchData() {
+//   //     try {
+//   //       const data = await getAllSupermarkets();
+//   //       console.log("Data received:", data);
+//   //       // בדוק אם data.supermarkets קיים
+//   //       setSupermarkets2(data.supermarkets);
+//   //     } catch (error) {
+//   //       console.error("Error fetching supermarkets", error);
+//   //     }
+//   //   }
+//   //   fetchData();
+//   // }, [getAllSupermarkets]);
+
+//   return (
+//     <div className="smn_container">
+//       {supermarkets.map((supermarket) => (
+//         <div
+//           key={supermarket.name}
+//           className="smn_item"
+//           onClick={() => onSelectSupermarket(supermarket)}
+//         >
+//           <div className="smn_circle">
+//             <SupermarketImage
+//               supermarketName={supermarket.name}
+//               className="smn_image"
+//             />
+//           </div>
+//         </div>
+//       ))}
+//     </div>
+//   );
+// };
+
+// export default SupermarketsNames;
+import React from "react";
+import SupermarketImage from "../supermarketImage";
+import "./SupermarketsNames.css";
+
+const SupermarketsNames = ({ onSelectSupermarket }) => {
+  // dummy data: רשימת הסניפים המדומה עבור כל סופרמרקט
+  const supermarkets2 = {
+    BE: [
+      {
+        address: "זית שמן 2",
+        city: "אפרת",
+        supermarketID: 182,
+      },
+      {
+        address: "הרכס 31",
+        city: "מעלה אדומים",
+        supermarketID: 181,
+      },
+      {
+        address: "בית חולים שערי צדק",
+        city: "ירושלים",
+        supermarketID: 180,
+      },
+    ],
+    "Carrefour city (קרפור סיטי)": [
+      {
+        address: "אבי זהר",
+        city: "ירושלים",
+        supermarketID: 69,
+      },
+    ],
+    yellow: [
+      {
+        address: "99 דרך חברון",
+        city: "ירושלים",
+        supermarketID: 139,
+      },
+      {
+        address: "שד משה דיין- גבעת זאב",
+        city: "ירושלים",
+        supermarketID: 138,
+      },
+      {
+        address: "עקיבא אזולאי 1את גבעת שאול",
+        city: "ירושלים",
+        supermarketID: 137,
+      },
+      // שאר הפריטים...
+    ],
+    "אושר עד": [
+      {
+        address: "פייר קניג 26",
+        city: "ירושלים",
+        supermarketID: 16,
+      },
+      {
+        address: "בית הדפוס 29",
+        city: "ירושלים",
+        supermarketID: 15,
+      },
+      {
+        address: "שמגר 16",
+        city: "ירושלים",
+        supermarketID: 17,
+      },
+    ],
+    ויקטורי: [
+      {
+        address: "דרך אגודת הספורט מכבי 1",
+        city: "ירושלים",
+        supermarketID: 37,
+      },
+      {
+        address: "הראל 1",
+        city: "מבשרת ציון",
+        supermarketID: 192,
+      },
+    ],
+    יוחננוף: [
+      {
+        address: "האומן 10",
+        city: "ירושלים",
+        supermarketID: 19,
+      },
+    ],
+    "יש בשכונה": [
+      {
+        address: "פארן 7 רמת אשכול",
+        city: "ירושלים",
+        supermarketID: 25,
+      },
+      {
+        address: "שאולזון 56",
+        city: "ירושלים",
+        supermarketID: 27,
+      },
+    ],
+    "מגה בעיר": [
+      {
+        address: 'בית"ר פינת ינובסקי',
+        city: "ירושלים",
+        supermarketID: 52,
+      },
+    ],
+    "רמי לוי": [
+      {
+        address: "בית הדפוס 13",
+        city: "ירושלים",
+        supermarketID: 12,
+      },
+      {
+        address: "איזור תעשיה עטרות",
+        city: "ירושלים",
+        supermarketID: 14,
+      },
+      {
+        address: "החוצבים 5",
+        city: "מבשרת ציון",
+        supermarketID: 189,
+      },
+      {
+        address: "יד חרוצים 18",
+        city: "ירושלים",
+        supermarketID: 8,
+      },
+      {
+        address: "הפרסה 3",
+        city: "ירושלים",
+        supermarketID: 10,
+      },
+      {
+        address: "דרך החורש 90",
+        city: "ירושלים",
+        supermarketID: 9,
+      },
+      {
+        address: "האומן,15",
+        city: "ירושלים",
+        supermarketID: 7,
+      },
+      {
+        address: "איזור התעשיה שער בנימין",
+        city: "ירושלים",
+        supermarketID: 11,
+      },
+      {
+        address: "כנפי נשרים 26",
+        city: "ירושלים",
+        supermarketID: 13,
+      },
+    ],
+    // ניתן להוסיף שאר הסופרמרקטים בהתאם
+  };
+
+  // המרת האובייקט למערך: כל פריט יהיה אובייקט עם name ו-branches.
+  const supermarketsArray = Object.keys(supermarkets2).map((name) => ({
+    name,
+    branches: supermarkets2[name],
+  }));
+
+  return (
+    <div className="smn_container">
+      {supermarketsArray.map((supermarket) => (
+        <div
+          key={supermarket.name}
+          className="smn_item"
+          onClick={() => onSelectSupermarket(supermarket)}
+        >
+          <div className="smn_circle">
+            <SupermarketImage
+              supermarketName={supermarket.name}
+              className="smn_image"
+            />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+};
+
+export default SupermarketsNames;

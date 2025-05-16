@@ -1,7 +1,13 @@
-import React, { createContext, useState, useContext, useEffect } from "react";
+import React, {
+  createContext,
+  useState,
+  useContext,
+  useEffect,
+  useRef,
+} from "react";
 import {
   getOptimalSupermarketCarts,
-  getFullActiveCart,
+  // getFullActiveCart,
   getAllBrands,
   getAllSupermarkets,
   getPriceObjectByProductBarcodeAndSupermarketID,
@@ -9,6 +15,8 @@ import {
 } from "../network/cart-optimizationService";
 
 import { getByBarcode } from "../network/productService";
+
+import { useFullCart } from "../hooks/appHooks";
 
 export const CartOptimizationContext = createContext();
 
@@ -76,39 +84,31 @@ export const CartOptimizationContextProvider = ({ children }) => {
     }
   };
 
-  // useEffect to fetch full active cart and then set product settings
-  const [fullCart, setFullCart] = useState([]);
+  const fullCartRef = useRef(null);
+  const { fullCart } = useFullCart();
   useEffect(() => {
-    const fetchFullActiveCart = async () => {
-      try {
-        const response = await getFullActiveCart("1"); // Assuming "1" is a placeholder
-        if (response && response.data && response.data.productsWithPrices) {
-          setFullCart(response.data);
-          const newProductSettings = response.data.productsWithPrices.map(
-            (product) => ({
-              barcode: product.product.barcode,
-              quantity: product.amount,
-              generalName: product.product.generalName,
-              weight: product.product.weight,
-              productDetails: product.product,
-              productSettings: {
-                maxWeightLoss: 0,
-                maxWeightGain: 0,
-                blackListBrands: [],
-                canRoundUp: true,
-                canReplace: true,
-              },
-            })
-          );
-          setProductsSettings(newProductSettings);
-          setIsProductsSettingsUploaded(true);
-        }
-      } catch (error) {
-        console.error("Error fetching full active cart:", error);
-      }
-    };
-    fetchFullActiveCart();
-  }, []); // Empty array ensures this runs once after initial render
+    if (!fullCart || !fullCart.productsWithPrices) return;
+
+    const newProductSettings = fullCart.productsWithPrices.map(
+      ({ product, amount }) => ({
+        barcode: product.barcode,
+        quantity: amount,
+        generalName: product.generalName,
+        weight: product.weight,
+        productDetails: product, // מכיל את כל האובייקט המלא
+        productSettings: {
+          maxWeightLoss: 0,
+          maxWeightGain: 0,
+          blackListBrands: [],
+          canRoundUp: true,
+          canReplace: true,
+        },
+      })
+    );
+
+    setProductsSettings(newProductSettings);
+    setIsProductsSettingsUploaded(true);
+  }, [fullCart]);
 
   // all supermarkets - will be uploaded with useEffect:  without dependency - will be uploaded once
   const [allSupermarkets, setAllSupermarkets] = useState([]);
@@ -119,6 +119,7 @@ export const CartOptimizationContextProvider = ({ children }) => {
     const fetchAllSupermarkets = async () => {
       try {
         const response = await getAllSupermarkets();
+        console.log("AllSupermarkets: ", response);
         if (response && response.data && response.data.supermarkets) {
           // remove duplicates by the supermarketID field:
           const supermarketsNoDuplicated = response.data.supermarkets.reduce(
@@ -483,103 +484,6 @@ export const CartOptimizationContextProvider = ({ children }) => {
     setOptimalCarts(newOptimalCarts);
   };
 
-  // const replaceProductInOptimalCart = (
-  //   supermarketID, // The supermarket ID
-  //   oldOptimalProductBarcode, // the old product barcode that we want to replace
-  //   newProductBarcode, // The new product barcode that we want to replace with
-  //   productQuantity, // The quantity of the product
-  //   totalPriceOldOptimalProduct, // The total price of the old product
-  //   newTotalPrice, // The total price of the new product
-  //   isExistsInOptimalCart // A boolean that indicates if the product exists in the optimal cart
-  // ) =>{
-  //   // step 1: get the optimal cart index by the supermarket ID:
-  //   const optimalCartIndex = optimalCarts.findIndex(
-  //     (cart) => cart.supermarketID === supermarketID
-  //   );
-
-  //   // step 2: get the optimal cart by the index:
-  //   const optimalCart = optimalCarts[optimalCartIndex];
-
-  //   // step 3: create a new optimal cart:
-  //   const newOptimalCart = { ...optimalCart };
-  //   const barcode = newProductBarcode;
-  //   const quantity = productQuantity;
-  //   const totalPrice = newTotalPrice;
-  //   const oldBarcode = oldOptimalProductBarcode;
-  //   const oldQuantity = productQuantity;
-
-  //   // step 4: create a new product:
-  //   const newProduct = {
-  //     barcode,
-  //     quantity,
-  //     totalPrice,
-  //     oldBarcode,
-  //     oldQuantity,
-  //   };
-
-  //   // step 5: update the existsProducts array:
-  //   newOptimalCart.existsProducts = newOptimalCart.existsProducts.map(
-  //     (product) => {
-  //       if (product.oldBarcode === oldOptimalProductBarcode) {
-  //         return newProduct;
-  //       }
-  //       return product;
-  //     }
-  //   );
-
-  //   // step 6: update the total price of the optimal cart:
-  //   newOptimalCart.totalPrice = newOptimalCart.existsProducts.reduce(
-  //     (acc, product) => acc + product.totalPrice,
-  //     0
-  //   );
-
-  //   // step 7: update the optimal carts array:
-  //   const newOptimalCarts = [...optimalCarts];
-  //   newOptimalCarts[optimalCartIndex] = newOptimalCart;
-  //   setOptimalCarts(newOptimalCarts);
-
-  // };
-  //--------------------------------------------------------------------------------
-  // const replaceProductInOptimalCart = (
-  //   oldBarcode,
-  //   newBarcode,
-  //   price,
-  //   quantity,
-  //   oldTotalPrice,
-  //   newTotalPrice,
-  //   supermarketID,
-  //   isExistsInOptimalCart
-  // ) => {
-  //   const optimalCartIndex = optimalCarts.findIndex(
-  //     (cart) => cart.supermarketID === supermarketID
-  //   );
-
-  //   if (optimalCartIndex === -1) return;
-
-  //   const optimalCart = optimalCarts[optimalCartIndex];
-  //   const newOptimalCart = { ...optimalCart };
-
-  //   const updatedExistsProducts = (optimalCart.existsProducts || []).map(
-  //     (product) => {
-  //       if (product.oldBarcode === oldBarcode) {
-  //         return {
-  //           ...product,
-  //           barcode: newBarcode,
-  //           price,
-  //           quantity,
-  //           totalPrice: newTotalPrice,
-  //         };
-  //       }
-  //       return product;
-  //     }
-  //   );
-
-  //   newOptimalCart.existsProducts = updatedExistsProducts;
-
-  //   const newOptimalCarts = [...optimalCarts];
-  //   newOptimalCarts[optimalCartIndex] = newOptimalCart;
-  //   setOptimalCarts(newOptimalCarts);
-  // };
   //================================================================================================
   const replaceProductInOptimalCart = (
     oldBarcode, // the barcode of the product that we want to replace
@@ -636,7 +540,6 @@ export const CartOptimizationContextProvider = ({ children }) => {
       const quantity = product.quantity;
       const oldQuantity = product.quantity;
 
-
       // delete the product fron the nonExistsProducts array and add it to the existsProducts array:
       const newNonExistsProducts = optimalCart.nonExistsProducts.filter(
         (product) => product.oldBarcode !== oldBarcode
@@ -654,7 +557,6 @@ export const CartOptimizationContextProvider = ({ children }) => {
         totalPrice: newTotalPriceOfCart,
         existsProducts: newExistsProducts,
         nonExistsProducts: newNonExistsProducts,
-        
       };
     }
 
@@ -697,7 +599,7 @@ export const CartOptimizationContextProvider = ({ children }) => {
         // Oprtimal Carts:
         getOptimalsCarts,
         isOptimalCartsUploaded,
-        fullCart,
+        fullCart: fullCartRef.current,
         optimalCarts, // A new useState
         setOptimalCarts, // A new useState
         isOptimalCartsCalculated, // A new useState

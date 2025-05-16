@@ -90,7 +90,7 @@ const SearchItem = ({
           </div>
           {product.price ? (
             <div className="search__procuct-price exist">
-              <div>{product.price.price}</div>
+              <div>{product.price}</div>
               <div>₪</div>
             </div>
           ) : (
@@ -98,9 +98,9 @@ const SearchItem = ({
               מוצר לא קיים בסופר
             </div>
           )}
-          {product.price && product.price.discount ? (
+          { product.discount ? (
             <div className="search__procuct-discount">
-              {getDiscountFormat(product.price.discount)}
+              {getDiscountFormat(product.discount)}
             </div>
           ) : (
             <></>

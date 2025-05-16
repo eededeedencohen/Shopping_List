@@ -15,8 +15,8 @@ const root = createRoot(document.getElementById("root"));
 
 root.render(
   <BrowserRouter>
-    <ProductContextProvider>
-      <PriceContextProvider>
+    <PriceContextProvider>
+      <ProductContextProvider>
         <CartContextProvider>
           <CartContextProvider2>
             <PriceContextProvider2>
@@ -28,7 +28,7 @@ root.render(
             </PriceContextProvider2>
           </CartContextProvider2>
         </CartContextProvider>
-      </PriceContextProvider>
-    </ProductContextProvider>
+      </ProductContextProvider>
+    </PriceContextProvider>
   </BrowserRouter>
 );

@@ -505,7 +505,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useProducts } from "../../context/ProductContext";
 import { useCart } from "../../context/CartContext";
-import "./ProductsListManager.css";
+// import "./ProductsListManager.css";
 import { useNavigate } from "react-router";
 import {
   updateProductInCart,

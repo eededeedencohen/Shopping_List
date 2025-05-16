@@ -15,6 +15,7 @@ export const CartContextProvider2 = ({ children }) => {
       setIsLoadingCartData(true);
       try {
         const cartData = await getActiveCart();
+        console.log(cartData);
         setCart(cartData);
         // setSupermarketID(cartData.supermarketID);
       } catch (error) {
@@ -48,7 +49,6 @@ export const CartContextProvider2 = ({ children }) => {
         setCart,
         isLoadingCartData,
         supermarketID, 
-        // setSupermarketID,
         syncCartToServer,
       }}
     >
@@ -90,8 +90,9 @@ export const PriceContextProvider2 = ({ children }) => {
     (async () => {
       setIsLoadingPrices(true);
       try {
-        const arr = await getPricesBySupermarketID(supermarketID);
-        setPricesBySupermarket(arr);
+        const pricesBySupermarket = await getPricesBySupermarketID(supermarketID);
+        console.log("Prices loaded:", pricesBySupermarket);
+        setPricesBySupermarket(pricesBySupermarket);
       } catch (e) {
         console.error("Failed to load prices:", e);
         setPricesBySupermarket([]);
@@ -151,8 +152,6 @@ ProductContext2.js:
 
 import { createContext, useContext, useEffect, useState } from "react";
 import { getAllProducts } from "../services/productService";
-import { getActiveCart } from "../services/cartService";
-import { getPricesBySupermarketID } from "../services/priceService";
 
 const ProductContext2 = createContext(null);
 
@@ -313,11 +312,8 @@ const all_sub_categories = allCategories.map(
 
 export const ProductContextProvider2 = ({ children }) => {
   const [products, setProducts] = useState([]);
-  const [activeCart, setActiveCart] = useState(null);
-  const [pricesBySupermarket, setPricesBySupermarket] = useState({});
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-
   const [activeCategoryIndex, setActiveCategoryIndex] = useState(0);
   const [activeSubCategoryIndex, setActiveSubCategoryIndex] = useState(0);
 
@@ -328,16 +324,8 @@ export const ProductContextProvider2 = ({ children }) => {
       try {
         /* getAllProducts כבר מחזיר מערך של מוצרים */
         const productsData = await getAllProducts();
-        const cartData = await getActiveCart();
-        const pricesData = await getPricesBySupermarketID(
-          cartData.supermarketID
-        );
+        console.log("Products loaded:", productsData);
         setProducts(productsData);
-        setActiveCart(cartData);
-        setPricesBySupermarket(pricesData);
-        console.log("productsData", productsData);
-        console.log("cartData", cartData);
-        console.log("pricesData", pricesData);
       } catch (err) {
         setError(err);
       } finally {

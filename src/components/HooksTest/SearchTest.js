@@ -2,8 +2,8 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import {
-  useEnrichedProducts,   // מוצרים+מחיר+כמות
-  useCartActions         // add / remove
+  useEnrichedProducts, // מוצרים+מחיר+כמות
+  useCartActions, // add / remove
 } from "../../hooks/appHooks";
 
 /*  דיבאונס קצר כדי שלא נבצע סינון בכל הקלדה  */
@@ -22,14 +22,16 @@ const SearchTest = () => {
 
   /* טקסט חיפוש + דיבאונס */
   const [query, setQuery] = useState("");
-  const debouncedQuery   = useDebounced(query, 600);
+  const debouncedQuery = useDebounced(query, 600);
 
   /* סינון על‑גבי הרשימה המואשרת (כולל כמות ומחיר) */
   const filtered = debouncedQuery
-    ? productsWithDetails.filter((p) =>
-        [p.name, p.generalName, p.brand]
+    ? productsWithDetails.filter((product) =>
+        [product.name, product.generalName, product.brand]
           .filter(Boolean)
-          .some((txt) => txt.toLowerCase().includes(debouncedQuery.toLowerCase()))
+          .some((txt) =>
+            txt.toLowerCase().includes(debouncedQuery.toLowerCase())
+          )
       )
     : [];
 
@@ -39,7 +41,7 @@ const SearchTest = () => {
         <button style={{ marginBottom: 12 }}>⮌ לעמוד עגלה</button>
       </Link>
 
-      <h2>Search Test</h2>
+      <h2>Search Test</h2>
 
       {/* תיבת החיפוש */}
       <input

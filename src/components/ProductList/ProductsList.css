@@ -398,7 +398,7 @@
   position: relative;
 }
 .list__product-image::before {
-  content: '';
+  content: "";
   display: block;
   padding-top: 100%; /* יחס 1:1 */
 }
@@ -446,14 +446,13 @@
 /* כפתור אישור (נחשף רק כשיש שינוי) */
 .list__product-operations__confirm {
   background-color: #808080;
-  width: 6rem;
+  width: 7rem;
   margin-right: 2rem;
 
   visibility: hidden;
   opacity: 0;
-  transition: background-color 0.5s ease,
-              opacity 0.5s ease,
-              visibility 0s linear 0.5s; 
+  transition: background-color 0.5s ease, opacity 0.5s ease,
+    visibility 0s linear 0.5s;
 }
 
 .visible {
