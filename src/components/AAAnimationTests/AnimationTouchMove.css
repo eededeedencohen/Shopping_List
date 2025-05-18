@@ -1,0 +1,43 @@
+.am_container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: #f0f0f0;
+  padding: 20px;
+  width: 100%;
+  margin: auto;
+  overflow-x: hidden;
+  min-height: 100vh;
+  touch-action: pan-y;
+}
+
+.am_box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 90%;
+  height: 70px;
+  margin: 10px 0;
+  background-color: white;
+  border: 1px solid #333;
+  font-weight: bold;
+  font-family: sans-serif;
+  cursor: pointer;
+  transition: transform 0.5s ease, opacity 0.5s ease, height 0.5s ease,
+    margin 0.5s ease, padding 0.5s ease;
+  will-change: transform;
+}
+
+.slide-out {
+  transform: translateX(150%);
+  opacity: 0;
+}
+
+.slide-up {
+  transform: translateY(-90px);
+}
+
+.no-transform-transition {
+  transition: opacity 0.5s ease, height 0.5s ease, margin 0.5s ease,
+    padding 0.5s ease;
+}

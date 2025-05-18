@@ -100,6 +100,7 @@ export default function Cart() {
 
   useEffect(() => {
     sendActiveCart();
+    console.log(cart);
   }, [cart, sendActiveCart]); // ← מופעל רק כש-cart משתנה
 
   const handleConfirmCart = async () => {

@@ -1,0 +1,20 @@
+/* ProductSwipeItem.css */
+.product-row {
+  transition: transform 0.4s ease, opacity 0.4s ease;
+  will-change: transform;
+}
+
+/* כשהשורה עפה ימינה */
+.product-row.slide-out {
+  animation: swipeOutRight 0.4s forwards;
+}
+
+@keyframes swipeOutRight {
+  to {
+    transform: translateX(100%);
+    opacity: 0;
+    height: 0;
+    margin: 0;
+    padding: 0;
+  }
+}

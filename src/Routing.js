@@ -21,9 +21,12 @@ import ProductListManager from "./components/ProductList/ProductListManager";
 import ProductListManagerAlternativeProductsGroups from "./components/ProductList/ProductListManagerAlternativeProductsGroups";
 import EditProducts from "./components/ProductList/EditProducts";
 import AI from "./components/AI/AI";
-import ProductsListTest from "./components/HooksTest/ProductsListTest"; 
+import ProductsListTest from "./components/HooksTest/ProductsListTest";
 import CartTest from "./components/HooksTest/CartTest";
 import SearchTest from "./components/HooksTest/SearchTest";
+import AnimationTest from "./components/AAAnimationTests/AnimationTest";
+import AnimationMove from "./components/AAAnimationTests/AnimationMove";
+import AnimationTouchMove from "./components/AAAnimationTests/AnimationTouchMove";
 
 function Routing() {
   return (
@@ -65,6 +68,9 @@ function Routing() {
       <Route path="/products-list-test" element={<ProductsListTest />} />
       <Route path="/cart-test" element={<CartTest />} />
       <Route path="/search-test" element={<SearchTest />} />
+      <Route path="/animation-test" element={<AnimationTest />} />
+      <Route path="/animation-move" element={<AnimationMove />} />
+      <Route path="/animation-touch-move" element={<AnimationTouchMove />} />
     </Routes>
   );
 }

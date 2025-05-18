@@ -65,7 +65,7 @@ const ProductsListTest = () => {
                     </>
                   )}
 
-                  {/* ‎➖ */}
+                  {/*➖ */}
                   <button
                     onClick={() => changeDraft(p.barcode, Math.max(1, draftQty-1))}
                   >

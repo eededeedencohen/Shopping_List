@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo, useEffect } from "react";
 import { Link } from "react-router-dom";
 import {
@@ -47,7 +46,6 @@ const CartTest = () => {
         <p>העגלה ריקה</p>
       </div>
     );
-
 
   const getDraftOrCurrentAmount = (item) =>
     draftAmounts[item.barcode] ?? item.amountInCart;
@@ -108,8 +106,7 @@ const CartTest = () => {
           <strong>{totalPrice}₪</strong>
         ) : (
           <>
-            <strong>{draftTotals.price}₪</strong> &rarr;{" "}
-            {totalPrice}₪
+            <strong>{draftTotals.price}₪</strong> &rarr; {totalPrice}₪
           </>
         )}
       </p>
@@ -191,8 +188,7 @@ const CartTest = () => {
               סה״כ למוצר:&nbsp;
               {hasChanged ? (
                 <>
-                  <strong>{newTotal}₪</strong> &rarr;{" "}
-                  {currentTotal}₪
+                  <strong>{newTotal}₪</strong> &rarr; {currentTotal}₪
                 </>
               ) : (
                 <>{currentTotal}₪</>
@@ -201,7 +197,6 @@ const CartTest = () => {
           </div>
         );
       })}
-
     </div>
   );
 };
