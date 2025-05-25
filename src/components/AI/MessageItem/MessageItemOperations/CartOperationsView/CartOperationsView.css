@@ -1,0 +1,116 @@
+.cart-operations-view {
+  font-family: "Segoe UI", sans-serif;
+  padding: 20px;
+  background: linear-gradient(to bottom, #f8fafd, #e6ecf3);
+  border-radius: 16px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+  max-width: 700px;
+  direction: rtl;
+}
+
+.cart-operations-message {
+  text-align: center;
+  font-size: 1.3rem;
+  font-weight: bold;
+  color: #2c3e50;
+  margin-bottom: 24px;
+}
+
+.cart-operations-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: center;
+}
+
+.operation-box {
+  width: 130px;
+  height: 160px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 10px;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.operation-box.animated {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.image-wrapper {
+  position: relative;
+  width: 80px;
+  height: 80px;
+}
+
+.operation-image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: 10px;
+  border: 1px solid #ddd;
+  background: #f9f9f9;
+}
+
+.cross-mark {
+  position: absolute;
+  top: -8px;
+  left: -8px;
+  background-color: #ff4d4f;
+  color: white;
+  font-size: 14px;
+  font-weight: bold;
+  padding: 5px 8px;
+  border-radius: 50%;
+  box-shadow: 0 0 6px rgba(0, 0, 0, 0.2);
+}
+
+.operation-text {
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.plus {
+  color: #389e0d;
+  background-color: #f6ffed;
+  border: 1px solid #b7eb8f;
+  padding: 6px 12px;
+  border-radius: 10px;
+}
+
+.multiply {
+  color: #096dd9;
+  background-color: #e6f7ff;
+  border: 1px solid #91d5ff;
+  padding: 6px 12px;
+  border-radius: 10px;
+}
+
+/* Optional dark mode tweak */
+@media (prefers-color-scheme: dark) {
+  .cart-operations-view {
+    background: #1f1f1f;
+    color: #f0f0f0;
+  }
+
+  .operation-box {
+    background: #2a2a2a;
+    box-shadow: 0 2px 10px rgba(255, 255, 255, 0.05);
+  }
+
+  .operation-image {
+    border-color: #444;
+    background: #333;
+  }
+
+  .cart-operations-message {
+    color: #f0f0f0;
+  }
+}

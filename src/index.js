@@ -10,6 +10,7 @@ import { CartOptimizationContextProvider } from "./context/cart-optimizationCont
 import { CartContextProvider2 } from "./context/CartContext2";
 import { PriceContextProvider2 } from "./context/PriceContext2";
 import { ProductContextProvider2 } from "./context/ProductContext2";
+import { GroupContextProvider } from "./context/GroupsContext"; // Importing GroupsContext if needed
 
 const root = createRoot(document.getElementById("root"));
 
@@ -20,11 +21,13 @@ root.render(
         <CartContextProvider>
           <CartContextProvider2>
             <PriceContextProvider2>
-              <ProductContextProvider2>
-                <CartOptimizationContextProvider>
-                  <App />
-                </CartOptimizationContextProvider>
-              </ProductContextProvider2>
+              <GroupContextProvider>
+                <ProductContextProvider2>
+                  <CartOptimizationContextProvider>
+                    <App />
+                  </CartOptimizationContextProvider>
+                </ProductContextProvider2>
+              </GroupContextProvider>
             </PriceContextProvider2>
           </CartContextProvider2>
         </CartContextProvider>

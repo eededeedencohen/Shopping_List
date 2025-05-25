@@ -1,0 +1,32 @@
+.bar-chart-wrapper {
+  display: flex;
+  flex-direction: column; /* תאריכים למעלה ומחירים למטה */
+  align-items: center;
+  text-align: center;
+}
+
+.bar-chart {
+  background-color: #00c49f;
+  height: auto; /* גובה משתנה לפי נתונים */
+  width: 30px; /* רוחב אחיד */
+  transition: all 0.3s ease;
+  border-radius: 5px 5px 0 0; /* עיגול למעלה */
+}
+
+.bar-chart-wrapper.selected .bar-chart {
+  background-color: #008080; /* צבע לעמודה שנבחרה */
+}
+
+.bar-value {
+  font-size: 14px;
+  font-weight: bold;
+  margin-top: 5px; /* המחיר אחרי העמודה */
+  color: #333;
+}
+
+.bar-date {
+  font-size: 12px;
+  color: #555;
+  margin-bottom: 5px; /* התאריך לפני העמודה */
+  text-align: center;
+}

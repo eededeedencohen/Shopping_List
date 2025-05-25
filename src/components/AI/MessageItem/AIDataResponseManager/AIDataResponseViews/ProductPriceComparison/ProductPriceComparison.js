@@ -47,16 +47,17 @@ const ProductPriceComparison = () => {
         unitWeight={product.unitWeight}
         barcode={product.barcode}
       />
-
-      {branches.map((branch, index) => (
-        <BranchCard
-          key={index}
-          branchAddress={branch.branchAddress}
-          price={branch.price}
-          supermarketName="רמי לוי"
-          city="ירושלים"
-        />
-      ))}
+      <div className="b1_beanches_cards">
+        {branches.map((branch, index) => (
+          <BranchCard
+            key={index}
+            branchAddress={branch.branchAddress}
+            price={branch.price}
+            supermarketName="רמי לוי"
+            city="ירושלים"
+          />
+        ))}
+      </div>
     </div>
   );
 };

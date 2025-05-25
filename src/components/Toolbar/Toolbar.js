@@ -62,30 +62,30 @@ function Toolbar() {
               <h1>Products</h1>
             </div>
           </Link>
-          <Link to="/product-list" onClick={closeDrawer}>
+          {/* <Link to="/product-list" onClick={closeDrawer}>
             <div className="nav-item">
               <div className="nav-icon">
                 <img src={groceryIcon} alt="Grocery" />
               </div>
               <h1>ProductsList</h1>
             </div>
-          </Link>
-          <Link to="/alternative-products-groups" onClick={closeDrawer}>
+          </Link> */}
+          <Link to="/products-list-groups" onClick={closeDrawer}>
             <div className="nav-item">
               <div className="nav-icon">
                 <img src={groceryIcon} alt="Grocery" />
               </div>
-              <h1>AlternativeProductsGroups</h1>
+              <h1>ProductsListGroups</h1>
             </div>
           </Link>
-          <Link to="/edit-products" onClick={closeDrawer}>
+          {/* <Link to="/edit-products" onClick={closeDrawer}>
             <div className="nav-item">
               <div className="nav-icon">
                 <img src={groceryIcon} alt="Grocery" />
               </div>
               <h1>EditProducts</h1>
             </div>
-          </Link>
+          </Link> */}
           <Link to="/image-parser" onClick={closeDrawer}>
             <div className="nav-item">
               <div className="nav-icon">
@@ -145,6 +145,14 @@ function Toolbar() {
                 <img src={shoppingHistoryIcon} alt="Grocery" />
               </div>
               <h1>Shopping History</h1>
+            </div>
+          </Link>
+          <Link to="/ai" onClick={closeDrawer}>
+            <div className="nav-item">
+              <div className="nav-icon">
+                <img src={aiIcon} alt="Grocery" />
+              </div>
+              <h1>AI</h1>
             </div>
           </Link>
         </div>

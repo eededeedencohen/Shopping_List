@@ -1,0 +1,65 @@
+.ai-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.messages-container {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0.5rem;
+  display: flex;
+  flex-direction: column;
+}
+
+/* אזור הקלט למשתמש – נשאר למטה */
+.user-text-box {
+    padding: 0.75rem 1rem;
+    background-color: #f0f0f0;
+    border-top: 1px solid #ccc;
+    display: flex;
+    align-items: center;
+  }
+  
+  /* סידור התוכן בתוך תיבת הטקסט */
+  .user-text-box form {
+    display: flex;
+    align-items: center;
+    width: 100%;
+  }
+  
+  /* עיצוב התיבה כאשר משתמשים ב-textarea (מומלץ עבור קלט מרובה שורות) */
+  .user-text-box textarea {
+    flex: 1;
+    min-height: 3rem;      /* מאפשר לפחות שתי שורות */
+    max-height: 6rem;      /* אם הטקסט עולה על 6rem, תופיע גלילה */
+    padding: 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 1rem;
+    resize: none;         /* מבטל שינוי גודל ידני */
+    overflow-y: auto;     /* גלילה אנכית במקרה הצורך */
+  }
+
+  .user-text-box textarea::placeholder {
+    direction: rtl;
+    text-align: right;
+  }
+  
+  /* כפתור השליחה */
+  .user-text-box button {
+    padding: 0.5rem 1rem;
+    margin-left: 0.75rem;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+  }
+  
+  /* אפקט ריחוף לכפתור */
+  .user-text-box button:hover {
+    background-color: #0056b3;
+  }

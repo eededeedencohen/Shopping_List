@@ -12,7 +12,7 @@ const MessageItem = ({ message, sender }) => {
   } else if (sender === "loading") {
     return <MesageItemLoadingAI message={message} />;
   } else if (sender === "operation") {
-    return <MessageItemOperationAI message={message}/>;
+    return <MessageItemOperationAI/>;
   }
 };
 

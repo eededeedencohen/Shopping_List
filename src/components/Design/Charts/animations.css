@@ -1,0 +1,36 @@
+/* ========================
+   animations.css  (ייבא פעם אחת ב-App.js)
+   ======================== */
+
+@keyframes fadeSlideUp {
+  0% {
+    opacity: 0;
+    transform: translateY(40px) scale(0.95);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.animate-fadeSlideUp {
+  animation: fadeSlideUp 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes glowPulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0px rgba(0, 255, 255, 0.7);
+  }
+  50% {
+    box-shadow: 0 0 12px rgba(0, 255, 255, 0.9);
+  }
+}
+.animate-glowPulse {
+  animation: glowPulse 2s ease-in-out infinite;
+}
+
+/* רקע גרדיאנט אפל כהה לכל האפליקציה (לא חובה) */
+body {
+  @apply bg-gradient-to-br from-[#111827] via-[#0f172a] to-[#1e293b] text-slate-100;
+}

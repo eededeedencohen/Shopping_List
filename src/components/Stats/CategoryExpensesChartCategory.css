@@ -1,16 +1,18 @@
-.category-list-item {
-    display: flex;
-    align-items: center;            /* ממרכז אנכית את התוכן */
-    border: 2px solid transparent;
-    border-radius: 5px;
-    transition: all 0.3s ease-in-out;
-    cursor: pointer;
-    box-sizing: border-box;
-    height: 70px;                  /* גובה אחיד וקבוע */
-    width: 100%;                   /* ממלא את רוחב המכולה (ניתן לשנות לפי רצונך) */
-  }
+.category-list-item{
+  --accent:#f3c3d7;      
+  display:flex;align-items:center;justify-content:space-between;
+  padding:10px;border-radius:12px;border:2px solid transparent;
+  transition:background .45s,transform .45s;border-color:var(--accent);
+  cursor:pointer;gap:10px;
+}
+.category-list-item:hover{transform:translateY(-4px)}
+.category-list-item.selected{background:var(--accent)}
+.category-list-item-content_name{font-weight:600;color:#fff;font-size:.9rem}
+.category-list-item-content_value{font-size:.75rem;color:#9ca3af}
+.category-list-item-image img{max-height:42px;filter:drop-shadow(0 0 4px rgba(0,0,0,.5))}
+
   
-  .category-list-item:hover {
+  /* .category-list-item:hover {
     border-color: #888;
     background-color: #f0f8ff;
   }
@@ -21,18 +23,14 @@
     font-weight: bold;
   }
   
-  /* אזור הטקסט - 70% מהרוחב */
+ 
   .category-list-item-content {
     width: 70%;
     display: flex;
     flex-direction: column;
-    direction: rtl;                /* טקסט מימין לשמאל */
-    justify-content: center;       /* ממרכז אנכית בתוך הגובה הקבוע */
-    /* במידה ורוצים שהטקסט לא יגלוש:
-       white-space: nowrap;
-       overflow: hidden;
-       text-overflow: ellipsis;
-    */
+    direction: rtl;               
+    justify-content: center;      
+
   }
   
   .category-list-item-content_name {
@@ -47,23 +45,20 @@
     margin: 0;
   }
   
-  /* אזור התמונה - 30% מהרוחב */
   .category-list-item-image {
     width: 30%;
-    height: 100%;                 /* גובה מלא של האייטם */
+    height: 100%;              
     display: flex;
     align-items: center;
-    justify-content: center;      /* ממרכז אופקית את התמונה */
+    justify-content: center;   
     box-sizing: border-box;
-    overflow: hidden;             /* אופציונלי – במקרה שהתמונה גדולה במיוחד */
+    overflow: hidden;             
   }
   
-  /* תמונה ללא שינוי ביחס ממדים (לא נחתכת או נמתחת) */
   .category-list-item-image img {
     max-width: 60px;
     max-height: 60%;
     width: auto;
     height: auto;
-    /* אין כאן object-fit, כדי שלא "יכפה" חיתוך או מתיחה */
   }
-  
+   */

@@ -2,64 +2,115 @@
   display: flex;
   flex-direction: column;
   height: 100%;
+  --grad-start: #1b6eff;
+  --grad-mid: #1ed1ff;
+  --grad-end: #373a3a;
+  --glass-bg: rgba(255, 255, 255, 0.15);
+  --glass-bd: rgba(255, 255, 255, 0.3);
+  --txt-light: #ffffff;
+  --txt-dark: #222222;
+
+  background: radial-gradient(circle at 50% -20%, #ffffff55 0%, transparent 40%),
+    linear-gradient(180deg, var(--grad-start) 0%, var(--grad-end) 100%);
+  color: var(--txt-light);
+  padding: 6px;
+  box-sizing: border-box;
+  font-family: "Heebo", sans-serif;
 }
 
-.messages-container {
+/* =========== MESSAGES =========== */
+.ai-container .messages-container {
   flex: 1;
   overflow-y: auto;
-  padding: 0.5rem;
+  padding: 0.25rem 0.5rem 0.75rem;
   display: flex;
   flex-direction: column;
+  gap: 10px;
 }
 
-/* אזור הקלט למשתמש – נשאר למטה */
-.user-text-box {
-    padding: 0.75rem 1rem;
-    background-color: #f0f0f0;
-    border-top: 1px solid #ccc;
-    display: flex;
-    align-items: center;
-  }
-  
-  /* סידור התוכן בתוך תיבת הטקסט */
-  .user-text-box form {
-    display: flex;
-    align-items: center;
-    width: 100%;
-  }
-  
-  /* עיצוב התיבה כאשר משתמשים ב-textarea (מומלץ עבור קלט מרובה שורות) */
-  .user-text-box textarea {
-    flex: 1;
-    min-height: 3rem;      /* מאפשר לפחות שתי שורות */
-    max-height: 6rem;      /* אם הטקסט עולה על 6rem, תופיע גלילה */
-    padding: 0.5rem;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    font-size: 1rem;
-    resize: none;         /* מבטל שינוי גודל ידני */
-    overflow-y: auto;     /* גלילה אנכית במקרה הצורך */
-  }
+/* =========== USER INPUT BAR =========== */
+.ai-container .user-text-box {
+  position: sticky;
+  bottom: 0;
+  padding: 10px 14px;
+  border-radius: 24px;
+  margin-top: 6px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(14px) saturate(180%);
+  border: 1px solid var(--glass-bd);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25),
+    0 0 8px rgba(255, 255, 255, 0.4) inset;
+}
 
-  .user-text-box textarea::placeholder {
-    direction: rtl;
-    text-align: right;
-  }
-  
-  /* כפתור השליחה */
-  .user-text-box button {
-    padding: 0.5rem 1rem;
-    margin-left: 0.75rem;
-    background-color: #007bff;
-    color: #fff;
-    border: none;
-    border-radius: 5px;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: background-color 0.2s ease;
-  }
-  
-  /* אפקט ריחוף לכפתור */
-  .user-text-box button:hover {
-    background-color: #0056b3;
-  }
+.ai-container .user-text-box form {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.ai-container .user-text-box textarea {
+  flex: 1;
+  min-height: 2.8rem;
+  max-height: 6rem;
+  padding: 0.55rem 0.75rem;
+  font-size: 0.95rem;
+  border: none;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.25);
+  color: var(--txt-light);
+  resize: none;
+  overflow-y: auto;
+  backdrop-filter: blur(6px);
+}
+
+.ai-container .user-text-box textarea::placeholder {
+  color: #e0e0e0;
+  text-align: right;
+  direction: rtl;
+}
+
+.ai-container .user-text-box button {
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  transition: transform 0.16s ease, box-shadow 0.16s ease;
+  color: var(--txt-light);
+}
+
+.ai-container .user-text-box button[type="submit"] {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  font-size: 20px;
+  background: linear-gradient(135deg, var(--grad-start), var(--grad-mid));
+  box-shadow: 0 5px 12px rgba(0, 0, 0, 0.25), 0 0 8px var(--grad-mid),
+    inset 0 0 4px rgba(255, 255, 255, 0.7);
+}
+
+.ai-container .user-text-box button[type="submit"]:active {
+  transform: scale(0.92);
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3), 0 0 6px var(--grad-mid),
+    inset 0 0 6px rgba(255, 255, 255, 0.8);
+}
+
+.ai-container .user-text-box button[type="button"] {
+  padding: 0.55rem 1rem;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.22);
+  box-shadow: inset 0 0 3px rgba(255, 255, 255, 0.4);
+}
+
+.ai-container .user-text-box button[type="button"]:hover {
+  background: rgba(255, 255, 255, 0.32);
+}
+
+/* =========== SCROLLBAR =========== */
+.ai-container .messages-container::-webkit-scrollbar {
+  width: 4px;
+}
+.ai-container .messages-container::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.35);
+  border-radius: 2px;
+}

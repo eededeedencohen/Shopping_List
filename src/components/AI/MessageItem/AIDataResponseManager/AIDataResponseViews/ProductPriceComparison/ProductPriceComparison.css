@@ -1,27 +1,45 @@
+.b1_beanches_cards {
+  display: flex;
+  flex-direction: row;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  scroll-padding-inline: 16px;
+  padding: 12px 8px;
+  gap: 16px;
+}
+
 .b1_card_wrapper {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    max-width: 440px;
-    margin: 32px auto;
-    background-color: #ffffff;
-    border-radius: 24px;
-    overflow: hidden;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
-    padding: 0;
-    border: none;
-    animation: fadeIn 0.3s ease-in-out;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 440px;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 28px;
+  overflow: hidden;
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
+  padding: 0;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  animation: fadeIn 0.4s ease;
+}
+
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
   }
-  
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(12px); }
-    to { opacity: 1; transform: translateY(0); }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
-  
-  .b1_loading {
-    text-align: center;
-    padding: 32px;
-    font-size: 16px;
-    color: #6b7280;
-  }
-  
+}
+
+.b1_loading {
+  text-align: center;
+  padding: 32px;
+  font-size: 16px;
+  color: #6b7280;
+}

@@ -2,6 +2,7 @@ import React from "react";
 import "./MessageItemOperationAI.css";
 // import ExpenseOverview from "../../Stats/ExpenseOverview";
 import ProductPriceComparison from "./AIDataResponseManager/AIDataResponseViews/ProductPriceComparison/ProductPriceComparison";
+// import CartOperationsView from "./MessageItemOperations/CartOperationsView/CartOperationsView";
 
 const MessageItemOperationAI = ({ message }) => {
   return (

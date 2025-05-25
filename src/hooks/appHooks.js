@@ -8,6 +8,7 @@ import { useMemo, useCallback } from "react";
 import { useCart } from "../context/CartContext2";
 import { usePrices } from "../context/PriceContext2";
 import { useProducts as useProductsCtx } from "../context/ProductContext2";
+import { useGroups } from "../context/GroupsContext";
 import { calculateTotalPrice } from "../utils/priceCalculations";
 
 // -----------------------------------------------------------------------------
@@ -275,9 +276,8 @@ export const useCartTotals = () => {
   }, [cart, pricesMap]);
 };
 
-
 //----------------------------------------------------------------------------
-// 
+//
 //----------------------------------------------------------------------------
 export const useCartItems = () => {
   const { productsWithDetails } = useEnrichedProducts();
@@ -402,7 +402,6 @@ export const useRandomSupermarketReplacer = () => {
   return { replaceRandomCheapest };
 };
 
-
 // -----------------------------------------------------------------------------
 // 10) useSync – סנכרון עגלה לשרת בצורה עצמאית
 // -----------------------------------------------------------------------------
@@ -442,6 +441,222 @@ export const useAlternativeProducts = (barcode) => {
       (p) => p.generalName && p.generalName === target.generalName
     );
   }, [productsWithDetails, barcode]);
+};
+
+/**
+ * @summary useGroupState – מחזיר את מצב הקבוצות
+ * @returns { groups, isLoadingGroups }
+ */
+export const useGroupState = () => {
+  const { groups, isLoadingGroups } = useGroups();
+  return { groups, isLoadingGroups };
+};
+
+/**
+ * @summary useGroupActions – פעולות על קבוצות
+ * @returns { createGroup, updateGroup, deleteGroup, renameGroup, copyGroup }
+ */
+export const useGroupActions = () => {
+  const {
+    groups,
+    setGroups,
+    createGroup,
+    updateGroupByName,
+    deleteGroupByName,
+    renameGroup,
+    copyGroupContent,
+  } = useGroups();
+
+  const create = (groupData) => {
+    setGroups([...groups, groupData]);
+    createGroup(groupData).catch((err) =>
+      console.error("createGroup failed:", err)
+    );
+  };
+
+  const update = (groupName, updatedData) => {
+    const updatedGroups = groups.map((g) =>
+      g.groupName === groupName ? { ...g, ...updatedData } : g
+    );
+    setGroups(updatedGroups);
+
+    updateGroupByName(groupName, updatedData).catch((err) =>
+      console.error("updateGroup failed:", err)
+    );
+  };
+
+  const remove = (groupName) => {
+    setGroups(groups.filter((g) => g.groupName !== groupName));
+
+    deleteGroupByName(groupName).catch((err) =>
+      console.error("deleteGroup failed:", err)
+    );
+  };
+
+  const addBarcode = (groupName, barcode) => {
+    const group = groups.find((g) => g.groupName === groupName);
+    if (!group) {
+      console.warn("Group not found:", groupName);
+      return;
+    }
+    if (group.barcodes.includes(barcode)) {
+      console.warn("Barcode already exists in group:", barcode);
+      return;
+    }
+    const updatedGroup = {
+      ...group,
+      barcodes: [...group.barcodes, barcode],
+    };
+    const updatedGroups = groups.map((g) =>
+      g.groupName === groupName ? updatedGroup : g
+    );
+    setGroups(updatedGroups);
+    // updateGroupByName(groupName, updatedGroup).catch((err) =>
+    //   console.error("addBarcodeToGroup failed:", err)
+    // );
+  };
+
+  const removeBarcode = (groupName, barcode) => {
+    const group = groups.find((g) => g.groupName === groupName);
+    if (!group) {
+      console.warn("Group not found:", groupName);
+      return;
+    }
+    if (!group.barcodes.includes(barcode)) {
+      console.warn("Barcode not found in group:", barcode);
+      return;
+    }
+    const updatedGroup = {
+      ...group,
+      barcodes: group.barcodes.filter((b) => b !== barcode),
+    };
+    const updatedGroups = groups.map((g) =>
+      g.groupName === groupName ? updatedGroup : g
+    );
+    setGroups(updatedGroups);
+    // updateGroupByName(groupName, updatedGroup).catch((err) =>
+    //   console.error("removeBarcodeFromGroup failed:", err)
+    // );
+  };
+
+  const rename = (currentName, newName) => {
+    const exists = groups.find((g) => g.groupName === newName);
+    if (exists) {
+      console.warn("Group name already exists:", newName);
+      return;
+    }
+
+    const renamedGroups = groups.map((g) =>
+      g.groupName === currentName ? { ...g, groupName: newName } : g
+    );
+    setGroups(renamedGroups);
+
+    renameGroup({ currentName, newName }).catch((err) =>
+      console.error("renameGroup failed:", err)
+    );
+  };
+
+  const copy = (fromGroupName, toGroupName) => {
+    const from = groups.find((g) => g.groupName === fromGroupName);
+    const to = groups.find((g) => g.groupName === toGroupName);
+    if (!from || !to) return;
+
+    const merged = Array.from(new Set([...to.barcodes, ...from.barcodes]));
+
+    const updated = groups.map((g) =>
+      g.groupName === toGroupName ? { ...g, barcodes: merged } : g
+    );
+    setGroups(updated);
+
+    copyGroupContent({ fromGroupName, toGroupName }).catch((err) =>
+      console.error("copyGroupContent failed:", err)
+    );
+  };
+
+  return {
+    createGroup: create,
+    updateGroup: update,
+    deleteGroup: remove,
+    addBarcodeToGroup: addBarcode,
+    removeBarcodeFromGroup: removeBarcode,
+    renameGroup: rename,
+    copyGroup: copy,
+  };
+};
+
+/**
+ * מחזיר את כל הקבוצות שהברקוד מופיע בהן, כולל פרטי כל מוצר בקבוצה (לפי useProductList)
+ * @param {string} barcode - ברקוד של מוצר
+ * @returns {{
+ *   fullGroups: Array<{
+ *     groupName: string,
+ *     barcodes: string[],
+ *     products: Array<object>
+ *   }>,
+ *   isLoadingGroups: boolean
+ * }}
+ */
+export const useFullGroupsWithProduct = (barcode) => {
+  const { groups, isLoadingGroups } = useGroupState();
+  const { products } = useProductList();
+
+  const fullGroups = useMemo(() => {
+    if (!barcode || !groups?.length || !products?.length) return [];
+
+    const productMap = Object.fromEntries(products.map((p) => [p.barcode, p]));
+
+    return groups
+      .filter((group) => group.barcodes?.includes(barcode))
+      .map((group) => {
+        const detailedProducts = group.barcodes
+          .map((bc) => productMap[bc])
+          .filter(Boolean);
+
+        return {
+          groupName: group.groupName,
+          barcodes: group.barcodes,
+          products: detailedProducts,
+        };
+      });
+  }, [groups, products, barcode]);
+
+  return { fullGroups, isLoadingGroups };
+};
+
+/**
+ * @summary useFullGroupsWithProducts – מחזיר את כל הקבוצות עם פרטי המוצרים שלהן
+ * @returns {{
+ *   fullGroups: Array<{
+ *     groupName: string,
+ *    barcodes: string[],
+ *    products: Array<object>
+ *  }>,
+ *  isLoadingGroups: boolean
+ * }}
+ */
+export const useFullGroupsWithProducts = () => {
+  const { groups, isLoadingGroups } = useGroupState();
+  const { products } = useProductList();
+
+  const fullGroups = useMemo(() => {
+    if (!groups?.length || !products?.length) return [];
+
+    const productMap = Object.fromEntries(products.map((p) => [p.barcode, p]));
+
+    return groups.map((group) => {
+      const detailedProducts = group.barcodes
+        .map((bc) => productMap[bc])
+        .filter(Boolean);
+
+      return {
+        groupName: group.groupName,
+        barcodes: group.barcodes,
+        products: detailedProducts,
+      };
+    });
+  }, [groups, products]);
+
+  return { fullGroups, isLoadingGroups };
 };
 
 export default useCartItems;

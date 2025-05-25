@@ -1,32 +1,37 @@
-.bar-chart-wrapper {
-  display: flex;
-  flex-direction: column; /* תאריכים למעלה ומחירים למטה */
-  align-items: center;
-  text-align: center;
+/* *** scoped only to .bar-chart-wrapper *** */
+.bar-chart-wrapper{
+  /* משתני צבע פרטיים לרכיב */
+  --bar-primary:#FF006A;
+  --bar-secondary:#FF8F00;
+
+  display:flex;flex-direction:column;align-items:center;cursor:pointer;
+  transition:transform .45s cubic-bezier(.19,1,.22,1);
+  animation:bcwFade .7s ease-out both;
+}
+.bar-chart-wrapper:hover{transform:scale(1.12)}
+
+/* bar itself */
+.bar-chart{
+  width:48px;                /* רוחב קבוע */
+  border-radius:6px 6px 0 0;
+  background:linear-gradient(0deg,var(--bar-secondary) 0%,var(--bar-primary) 96%);
+  transition:height .45s cubic-bezier(.19,1,.22,1),filter .45s;
+}
+/* הדגשה למקל הנבחר */
+.bar-chart-wrapper.selected .bar-chart{
+  filter:drop-shadow(0 0 6px var(--bar-primary));
 }
 
-.bar-chart {
-  background-color: #00c49f;
-  height: auto; /* גובה משתנה לפי נתונים */
-  width: 30px; /* רוחב אחיד */
-  transition: all 0.3s ease;
-  border-radius: 5px 5px 0 0; /* עיגול למעלה */
+/* טקסטים */
+.bar-value{
+  font-size:.85rem;font-weight:600;margin-top:6px;color:#fff;
+}
+.bar-date{
+  font-size:.75rem;color:#9ca3af;margin-bottom:6px;
 }
 
-.bar-chart-wrapper.selected .bar-chart {
-  background-color: #008080; /* צבע לעמודה שנבחרה */
-}
-
-.bar-value {
-  font-size: 14px;
-  font-weight: bold;
-  margin-top: 5px; /* המחיר אחרי העמודה */
-  color: #333;
-}
-
-.bar-date {
-  font-size: 12px;
-  color: #555;
-  margin-bottom: 5px; /* התאריך לפני העמודה */
-  text-align: center;
+/* Fade-in animation שמוגדרת מקומית, לא תשפיע על רכיבים אחרים */
+@keyframes bcwFade{
+  from{opacity:0;transform:translateY(22px)}
+  to{opacity:1;transform:translateY(0)}
 }

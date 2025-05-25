@@ -1,0 +1,46 @@
+/* בסיס כללי לכל הכפתורים */
+.show-groups-button,
+.add-to-group-button,
+.remove-from-group-button {
+  font-size: 0.9rem;
+  padding: 6px 12px;
+  margin: 4px 4px 0;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.25s, transform 0.15s;
+  font-weight: 500;
+}
+
+/* כפתור הצג קבוצות */
+.show-groups-button {
+  background-color: #007bff;
+  color: #fff;
+}
+
+.show-groups-button:hover {
+  background-color: #0056b3;
+  transform: scale(1.04);
+}
+
+/* כפתור הוספה לקבוצה */
+.add-to-group-button {
+  background-color: #28a745;
+  color: #fff;
+}
+
+.add-to-group-button:hover {
+  background-color: #218838;
+  transform: scale(1.04);
+}
+
+/* כפתור הסרה מהקבוצה */
+.remove-from-group-button {
+  background-color: #dc3545;
+  color: #fff;
+}
+
+.remove-from-group-button:hover {
+  background-color: #a71d2a;
+  transform: scale(1.04);
+}

@@ -1,0 +1,32 @@
+.category-chart-container {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 5px; 
+  background-color: #ffffff;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 5px;
+  max-width: 100%;
+}
+
+.chart-section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.category-list-container {
+  /* כדי לאפשר גלילה כאשר יש הרבה קטגוריות */
+  max-height: 200px; /* אתה יכול לבחור גובה אחר */
+  overflow-y: auto;
+
+  /* תצוגת Flex בעמודה */
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+
+  max-width: 100%;
+  box-sizing: border-box;
+}

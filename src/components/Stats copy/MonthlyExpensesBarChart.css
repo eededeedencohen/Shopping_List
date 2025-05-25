@@ -1,0 +1,55 @@
+.bar-chart-container {
+  display: flex;
+  flex-direction: row; /* מסדר את המקלות בשורה אחת */
+  align-items: flex-end; /* מוודא שהמקלות מתחילים מלמטה */
+  overflow-x: auto; /* מאפשר גלילה אופקית */
+  gap: 20px; /* רווח אחיד בין המקלות */
+  padding: 10px;
+  white-space: nowrap; /* מבטיח שכל המקלות נשארים בשורה אחת */
+  background-color: #f9f9f9;
+  border-radius: 10px;
+  border: 1px solid #ddd;
+  scroll-behavior: smooth; /* גלילה חלקה */
+  direction: ltr; /* מסדר את התוכן משמאל לימין */
+}
+
+.bar-chart-container::-webkit-scrollbar {
+  display: none; /* הסרת פס הגלילה */
+}
+
+.bar-chart-wrapper {
+  display: flex;
+  flex-direction: column; /* מסדר את המחירים מעל המקלות והתאריכים מתחת */
+  align-items: center;
+  cursor: pointer;
+  transition: transform 0.5s ease-in-out; /* האטת מעבר ההגדלה */
+}
+
+.bar-chart-wrapper:hover {
+  transform: scale(1.1); /* הגדלה קלה בעת מעבר עכבר */
+}
+
+.bar-value {
+  font-weight: bold;
+  margin-top: 5px; /* מרווח בין המקל למחיר */
+  color: #333;
+}
+
+.bar-chart {
+  width: 60px !important; /* הרחבת המקלות ל-60 פיקסלים */
+  background-color: #00c49f;
+  transition: all 0.5s ease-in-out; /* האטת כל המעברים (רוחב, צבע, גובה) */
+  border-radius: 5px 5px 0 0; /* עיגול הקצה העליון של המקל */
+}
+
+.bar-chart-wrapper.selected .bar-chart {
+  background-color: #008080; /* צבע מיוחד למקל שנבחר */
+  transition: background-color 0.5s ease-in-out; /* האטת מעבר הצבע */
+}
+
+.bar-date {
+  margin-bottom: 5px; /* מרווח בין המקל לתאריך */
+  font-size: 0.9rem;
+  color: #555;
+  text-align: center; /* יישור התאריך במרכז */
+}

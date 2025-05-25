@@ -6,15 +6,15 @@ import MessageItem from "./MessageItem/MessageItem";
 const AI = () => {
   const [messages, setMessages] = useState([
     { text: "זאת הודעה מהבינה מלאכותית", sender: "assistant" },
-    {text: "זה הודעה מהמשתמש", sender: "user"},
+    { text: "זה הודעה מהמשתמש", sender: "user" },
     //loading
     { text: "כאן אמור להיות טעינה", sender: "loading" },
     // operation
+    { text: "הנה לך ההוצאות שלך לפי חודש", sender: "assistant" },
     { text: "הנה לך ההוצאות שלך לפי חודש", sender: "operation" },
   ]);
   const [textInput, setTextInput] = useState("");
   const messageEndRef = useRef(null); // Invisible element for auto-scrolling
-
 
   useEffect(() => {
     scrollToBottom();
@@ -28,11 +28,11 @@ const AI = () => {
     setMessages((prevMessages) => [...prevMessages, { text, sender }]);
   };
 
-  const playResponse = (route) => {
-    const url = `${DOMAIN}/${route}`;
-    const audio = new Audio(url);
-    audio.play();
-  };
+  // const playResponse = (route) => {
+  //   const url = `${DOMAIN}/${route}`;
+  //   const audio = new Audio(url);
+  //   audio.play();
+  // };
 
   const handleOnSubmit = async (e) => {
     e.preventDefault();
@@ -63,7 +63,13 @@ const AI = () => {
       // const { text, route } = await response.json();
       const jsonResponse = await response.json();
 
-      const text = jsonResponse.aiUnderstanding?.aiResponse?.messageToUser || "אין תשובה מהבינה המלאכותית";
+      const text =
+        jsonResponse.aiUnderstanding?.aiResponse?.messageToUser ||
+        "אין תשובה מהבינה המלאכותית";
+      const cartOperation =
+        jsonResponse.aiUnderstanding?.aiResponse?.cartOperation || null;
+
+      console.log("cartOperation", cartOperation);
 
       // 3. מוסיפים את הודעת העוזר (הבוט) שהתקבלה
       addMessage(text, "assistant");
@@ -76,6 +82,23 @@ const AI = () => {
       console.error("Error:", error);
       // אפשר להוסיף הודעת שגיאה ל־messages וכו'
     }
+  };
+
+  const handleReset = async () => {
+    // post to `${DOMAIN}/api/v1/ai/reset`,
+    // and clean all the messages aftet the 4th message
+    setMessages((prevMessages) => prevMessages.slice(0, 4));
+    setTextInput("");
+
+    const url = `${DOMAIN}/api/v1/ai/reset`;
+
+    // fetching:
+    await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
   };
 
   return (
@@ -101,6 +124,9 @@ const AI = () => {
             dir="auto" // הדפדפן יקבע את כיוון הטקסט בהתאם לתווים הראשונים
           />
           <button type="submit">שלח</button>
+          <button type="button" onClick={handleReset}>
+            אפס
+          </button>
         </form>
       </div>
     </div>
