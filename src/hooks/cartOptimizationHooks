@@ -1,0 +1,176 @@
+import { useMemo, useCallback } from "react";
+import { useCartOptimization } from "../context/CartOptimizationContext2";
+
+// 🧠 ניהול רשימות שחורות לפי ברקוד מוצר
+export const useBlacklistActions = () => {
+  const {
+    getBlackListBrands,
+    insertBrandToBlackList,
+    removeBrandFromBlackList,
+  } = useCartOptimization();
+
+  return {
+    getBlackListBrands,
+    addBrand: insertBrandToBlackList,
+    removeBrand: removeBrandFromBlackList,
+  };
+};
+
+// 🔄 ניהול הגדרות מוצר (כמו canReplace וכו')
+export const useProductSettingsActions = () => {
+  const { productsSettings, setProductsSettings } = useCartOptimization();
+
+  const toggleSetting = useCallback(
+    (barcode, key) => {
+      const updated = productsSettings.map((product) =>
+        product.barcode === barcode
+          ? {
+              ...product,
+              productSettings: {
+                ...product.productSettings,
+                [key]: !product.productSettings[key],
+              },
+            }
+          : product
+      );
+      setProductsSettings(updated);
+    },
+    [productsSettings, setProductsSettings]
+  );
+
+  const changeWeightSetting = useCallback(
+    (barcode, key, value) => {
+      const updated = productsSettings.map((product) =>
+        product.barcode === barcode
+          ? {
+              ...product,
+              productSettings: {
+                ...product.productSettings,
+                [key]: value,
+              },
+            }
+          : product
+      );
+      setProductsSettings(updated);
+    },
+    [productsSettings, setProductsSettings]
+  );
+
+  return {
+    toggleCanReplace: (barcode) => toggleSetting(barcode, "canReplace"),
+    toggleCanRoundUp: (barcode) => toggleSetting(barcode, "canRoundUp"),
+    setMaxWeightGain: (barcode, value) =>
+      changeWeightSetting(barcode, "maxWeightGain", value),
+    setMaxWeightLoss: (barcode, value) =>
+      changeWeightSetting(barcode, "maxWeightLoss", value),
+  };
+};
+
+// ⚙️ עדכון הגדרות כלליות לכל המוצרים
+export const useBulkSettingsActions = () => {
+  const { productsSettings, setProductsSettings } = useCartOptimization();
+
+  const setBulk = useCallback(
+    (key, value) => {
+      const updated = productsSettings.map((product) => ({
+        ...product,
+        productSettings: {
+          ...product.productSettings,
+          [key]: value,
+        },
+      }));
+      setProductsSettings(updated);
+    },
+    [productsSettings, setProductsSettings]
+  );
+
+  return {
+    setAllCanReplace: (value) => setBulk("canReplace", value),
+    setAllCanRoundUp: (value) => setBulk("canRoundUp", value),
+  };
+};
+
+// 🛒 פעולות על עגלות אופטימליות
+export const useOptimalCartActions = () => {
+  const { optimalCarts, setOptimalCarts } = useCartOptimization();
+
+  const changeQuantity = useCallback(
+    (barcode, supermarketID, newQuantity, newTotalPrice) => {
+      const index = optimalCarts.findIndex(
+        (cart) => cart.supermarketID === supermarketID
+      );
+      if (index === -1) return;
+
+      const newCart = { ...optimalCarts[index] };
+      newCart.existsProducts = newCart.existsProducts.map((p) =>
+        p.oldBarcode === barcode
+          ? { ...p, quantity: newQuantity, totalPrice: newTotalPrice }
+          : p
+      );
+      newCart.totalPrice = newCart.existsProducts.reduce(
+        (sum, p) => sum + p.totalPrice,
+        0
+      );
+
+      const updated = [...optimalCarts];
+      updated[index] = newCart;
+      setOptimalCarts(updated);
+    },
+    [optimalCarts, setOptimalCarts]
+  );
+
+  const deleteProduct = useCallback(
+    (barcode, supermarketID) => {
+      const index = optimalCarts.findIndex(
+        (cart) => cart.supermarketID === supermarketID
+      );
+      if (index === -1) return;
+
+      const updated = [...optimalCarts].map((cart) => ({
+        ...cart,
+        existsProducts: [...cart.existsProducts],
+        nonExistsProducts: [...cart.nonExistsProducts],
+        deletedProducts: [...cart.deletedProducts],
+      }));
+
+      const cartToUpdate = updated[index];
+      cartToUpdate.deletedProducts.push(barcode);
+      cartToUpdate.existsProducts = cartToUpdate.existsProducts.filter(
+        (p) => p.oldBarcode !== barcode
+      );
+      cartToUpdate.nonExistsProducts = cartToUpdate.nonExistsProducts.filter(
+        (p) => p.oldBarcode !== barcode
+      );
+      cartToUpdate.totalPrice = cartToUpdate.existsProducts.reduce(
+        (sum, p) => sum + p.totalPrice,
+        0
+      );
+
+      setOptimalCarts(updated);
+    },
+    [optimalCarts, setOptimalCarts]
+  );
+
+  return { changeQuantity, deleteProduct };
+};
+
+// 📦 מידע כללי כמו הגדרות ראשיות, טענות, וכו'
+export const useOptimizationMetadata = () => {
+  const {
+    canReplaceSettings,
+    setCanReplaceSettings,
+    canRoundUpSettings,
+    setCanRoundUpSettings,
+    calculateOptimalsCarts,
+    isOptimalCartsCalculated,
+  } = useCartOptimization();
+
+  return {
+    canReplaceSettings,
+    setCanReplaceSettings,
+    canRoundUpSettings,
+    setCanRoundUpSettings,
+    calculateOptimalsCarts,
+    isOptimalCartsCalculated,
+  };
+};

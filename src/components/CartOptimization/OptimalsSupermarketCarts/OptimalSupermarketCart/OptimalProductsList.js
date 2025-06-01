@@ -33,6 +33,7 @@ const OptimalProductsList = ({ optimalCart, originalCart }) => {
 
   return (
     <div className="optimal-products-list">
+      {console.log("optimalCartProducts: ", originalCart)}
       {Object.keys(optimalCartProducts).map((key) => {
         if (
           optimalCartProducts[key].isExistsInOptimalCart &&

@@ -1,0 +1,2472 @@
+=== ListProductsSettings.js ===
+import React, { useState } from "react";
+import ProductSettings from "./ProductSettings";
+import "./ListProductsSettings.css";
+import { useCartOptimizationContext } from "../../context/cart-optimizationContext";
+import { useNavigate } from "react-router-dom";
+
+
+export default function ListProductsSettings() {
+  const {
+    productsSettings,
+    isProductsSettingsUploaded,
+    optimalSupermarkets,
+    isDataUploaded,
+    getOptimalsCarts,
+  } = useCartOptimizationContext();
+
+  const navigate = useNavigate();
+
+  const [calculationOptimalCarts, setCalculationOptimalCarts] = useState();
+  const [isCalculationOptimalCarts, setIsCalculationOptimalCarts] =
+    useState(false);
+
+  const handleCalculateOptimalSupermarketCarts = async () => {
+    try {
+      const optimalCarts = await getOptimalsCarts();
+      setCalculationOptimalCarts(optimalCarts);
+      setIsCalculationOptimalCarts(true);
+    } catch (error) {
+      console.error("Error in fetching data: ", error);
+      setIsCalculationOptimalCarts(false);
+    }
+  };
+
+  const handlePringOPtimalSupermarketCarts = () => {
+    if (!isCalculationOptimalCarts) {
+      console.log("No data uploaded yet");
+    } else {
+      console.log(calculationOptimalCarts);
+    }
+  };
+
+  const printOptimalSupermarketCarts = () => {
+    if (!isDataUploaded) {
+      console.log("No data uploaded yet");
+    } else {
+      console.log(optimalSupermarkets);
+    }
+  };
+
+  if (!isProductsSettingsUploaded) {
+    return (
+      <div>
+        <h1>Loading Data...</h1>
+      </div>
+    );
+  }
+
+  return (
+    <div className="list-products-settings">
+      <button onClick={() => navigate("/optimal-carts-settings")}> General Settings</button>
+      <div>
+        {productsSettings.map((product) => (
+          <ProductSettings key={product.barcode} product={product} />
+        ))}
+      </div>
+      <button onClick={printOptimalSupermarketCarts}>
+        Print Optimal Supermarket Carts
+      </button>
+      <button onClick={handleCalculateOptimalSupermarketCarts}>
+        Calculate Optimal Supermarket Carts
+      </button>
+      <button onClick={handlePringOPtimalSupermarketCarts}> Print</button>
+      {console.log("xxx:")}
+    </div>
+  );
+}
+
+
+=== ProductDetails.js ===
+import React from "react";
+import ProductsImages from "../Images/ProductsImages";
+import "./ProductDetails.css";
+import { convertWeightUnit } from "./ProductDetailsHelpers";
+// import { useCartOptimizationContext } from "../../context/cart-optimizationContext";
+
+export default function productDetails({ productDetails, quantity }) {
+  return (
+    <div className="optimal-settings__product-details">
+      <div className="image">
+        <ProductsImages barcode={productDetails.barcode} />
+      </div>
+      <div className="details">
+        <div className="name">{productDetails.name}</div>
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "row-reverse",
+            marginBottom: "0.5rem",
+          }}
+        >
+          <div className="weight">
+            {" "}
+            <p>{productDetails.weight}</p>{" "}
+          </div>
+          <div className="unitsWeight">{convertWeightUnit(productDetails.unitWeight)}</div>
+          <div className="separating-line">|</div>
+          <div className="brand">{productDetails.brand}</div>
+        </div>
+        <div className="quantity">
+          <p>כמות בעגלה</p>
+          <p>:</p>
+          <p style={{ marginRight: "4px" }}>{quantity}</p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+
+=== ProductDetailsHelpers.js ===
+export const convertWeightUnit = (weightUnit) => {
+  weightUnit = weightUnit.toLowerCase();
+  if (weightUnit === "g") {
+    return "גרם";
+  }
+  if (weightUnit === "kg") {
+    return 'ק"ג';
+  }
+  if (weightUnit === "ml") {
+    return 'מ"ל';
+  }
+  if (weightUnit === "l") {
+    return "ליטר";
+  }
+  if (weightUnit === "u") {
+    return "יחידות";
+  }
+  return weightUnit;
+};
+
+
+=== ProductSettings.js ===
+import React from "react";
+import ProductDetails from "./ProductDetails";
+import WeightAccuracy from "./WeightAccuracy";
+import BrandsFilter from "./BrandsFilter/BrandsFilter";
+import "./ProductSettings.css";
+import { useCartOptimizationContext } from "../../context/cart-optimizationContext";
+
+export default function ProductSettings({ product }) {
+  const { changeCanRoundUp, changeCanReplace } = useCartOptimizationContext();
+
+  return (
+    <div className="product-settings">
+      <ProductDetails
+        productDetails={product.productDetails}
+        quantity={product.quantity}
+      />
+      <div className="can-round-up">
+        <div className="explanation">לעגל כמות של המוצר במקרה שקיים מבצע</div>
+        <div className="checkbox">
+          <input
+            type="checkbox"
+            checked={product.productSettings.canRoundUp}
+            onChange={() => changeCanRoundUp(product.barcode)}
+          />
+        </div>
+      </div>
+      <div className="can-replace">
+        <div className="explanation">להחליף במקרה של מוצר חלופי משתלם יותר</div>
+        <div className="checkbox">
+          <input
+            type="checkbox"
+            checked={product.productSettings.canReplace}
+            onChange={() => changeCanReplace(product.barcode)}
+          />
+        </div>
+      </div>
+      {product.productSettings.canReplace && (
+        <WeightAccuracy
+          barcode={product.barcode}
+          productWeight={product.productDetails.weight}
+          productUnitWeight={product.productDetails.unitWeight}
+          currentWeightGain={product.productSettings.maxWeightGain}
+          currentWeightLoss={product.productSettings.maxWeightLoss}
+        />
+      )}
+      {product.productSettings.canReplace && (
+        <BrandsFilter
+          generalName={product.productDetails.generalName}
+          barcode={product.barcode}
+        />
+      )}
+      {console.log(product)}
+    </div>
+  );
+}
+
+
+=== WeightAccuracy.js ===
+import React, { useState } from "react";
+import { useCartOptimizationContext } from "../../context/cart-optimizationContext";
+import {
+  formatProductWeight,
+  reverseFormatProductWeight,
+} from "./WeightAccuracyHelpers";
+import "./WeightAccuracy.css";
+
+export default function WeightAccuracy({
+  barcode,
+  productWeight,
+  productUnitWeight,
+  currentWeightGain,
+  currentWeightLoss,
+}) {
+  const { changeMaxWeightGain, changeMaxWeightLoss } =
+    useCartOptimizationContext();
+  const [tempWeightGain, setTempWeightGain] = useState(
+    formatProductWeight(productWeight + currentWeightGain, productUnitWeight)
+  );
+  const [tempWeightLoss, setTempWeightLoss] = useState(
+    formatProductWeight(productWeight - currentWeightLoss, productUnitWeight)
+  );
+
+  const handleWeightGainChange = (event) => {
+    setTempWeightGain(event.target.value);
+  };
+
+  const handleWeightLossChange = (event) => {
+    setTempWeightLoss(event.target.value);
+  };
+
+  const handleWeightGainMouseUp = () => {
+    let newMaxWeightGain = reverseFormatProductWeight(
+      tempWeightGain,
+      productUnitWeight
+    );
+    changeMaxWeightGain(barcode, newMaxWeightGain - productWeight);
+  };
+
+  const handleWeightLossMouseUp = () => {
+    let newMaxWeightLoss = reverseFormatProductWeight(
+      tempWeightLoss,
+      productUnitWeight
+    );
+    changeMaxWeightLoss(barcode, productWeight - newMaxWeightLoss);
+  };
+
+  return (
+    <div className="product-settings__weight-accuracy">
+      <div className="title">:טווח משקל של מוצר חלופי</div>
+      <div className="weight-accuracy">
+        <div className="max-weight-gain">
+          <input
+            type="range"
+            step={5}
+            min={formatProductWeight(productWeight, productUnitWeight)}
+            max={formatProductWeight(productWeight, productUnitWeight) * 2} // TODO: find the product with the same generalName and get its weight
+            defaultValue={tempWeightGain}
+            onChange={handleWeightGainChange}
+            onMouseUp={handleWeightGainMouseUp}
+            onTouchEnd={handleWeightGainMouseUp}
+            className="weight-gain-value"
+          />
+          <div className="weight-gain-display">{tempWeightGain}</div>
+          <div className="unit-weight-gain">
+            {productUnitWeight === "g" ? "גרם" : 'מ"ל'}
+          </div>
+        </div>
+        <div className="max-weight-loss">
+          <input
+            type="range"
+            step={5}
+            min={0}
+            max={formatProductWeight(productWeight, productUnitWeight)}
+            defaultValue={tempWeightLoss}
+            onChange={handleWeightLossChange}
+            onMouseUp={handleWeightLossMouseUp}
+            onTouchEnd={handleWeightLossMouseUp}
+            className="weight-loss-value"
+          />
+          <div className="weight-loss-display">{tempWeightLoss}</div>
+          <div className="unit-weight-loss">
+            {productUnitWeight === "g" ? "גרם" : 'מ"ל'}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+
+=== WeightAccuracyHelpers.js ===
+export const formatProductWeight = (productWeight, productUnitWeight) => {
+  if (productUnitWeight === "kg" || productUnitWeight === "l") {
+    return productWeight * 1000;
+  }
+  return productWeight;
+};
+
+export const reverseFormatProductWeight = (
+  productWeight,
+  productUnitWeight
+) => {
+  if (productUnitWeight === "kg" || productUnitWeight === "l") {
+    return productWeight / 1000;
+  }
+  return productWeight;
+};
+
+
+=== BrandsFilter\BrandItem.js ===
+import React from "react";
+import "./BrandItem.css";
+import { useCartOptimizationContext } from "../../../context/cart-optimizationContext";
+
+const BrandItem = ({ brand, barcode }) => {
+  const {
+    getBlackListBrands,
+    insertBrandToBlackList,
+    removeBrandFromBlackList,
+  } = useCartOptimizationContext();
+
+  return (
+    <div className="brand-item">
+      <div className="brand-item__brand-name">{brand}</div>
+      <div className="brand-item__checkbox">
+        <input
+          type="checkbox"
+          checked={!getBlackListBrands(barcode).includes(brand)}
+          onChange={() =>
+            getBlackListBrands(barcode).includes(brand)
+              ? removeBrandFromBlackList(barcode, brand)
+              : insertBrandToBlackList(barcode, brand)
+          }
+        ></input>
+      </div>
+    </div>
+  );
+};
+export default BrandItem;
+
+
+=== BrandsFilter\BrandsFilter.js ===
+import React, { useState } from "react";
+import ModalV1 from "../../Modal/ModalV1";
+import "./BrandsFilter.css";
+import { useCartOptimizationContext } from "../../../context/cart-optimizationContext";
+import BrandItem from "./BrandItem";
+import filterIcon from "./filter.svg";
+
+const BrandsFilter = ({ generalName, barcode }) => {
+  const { allBrands, isAllBrandsUploaded } = useCartOptimizationContext();
+  const [isBrandsFilterOpen, setIsBrandsFilterOpen] = useState(false);
+
+  const toggleBrandsFilter = () => setIsBrandsFilterOpen(!isBrandsFilterOpen);
+
+  if (!isAllBrandsUploaded) {
+    return (
+      <div className="brands-filters">
+        <button onClick={toggleBrandsFilter}>Filter Brands</button>
+        <ModalV1 isOpen={isBrandsFilterOpen} onClose={toggleBrandsFilter}>
+          <div>
+            <h1>Loading Data...</h1>
+          </div>
+        </ModalV1>
+        ;
+      </div>
+    );
+  }
+
+  return (
+    <div className="brands-filters">
+      {/*<button onClick={toggleBrandsFilter}>Filter Brands</button>*/}
+      <div className="open-brands-filters-modal" onClick={toggleBrandsFilter}>
+        <div className="brands-filters-icon">
+            <img src={filterIcon} alt="filter" />   
+        </div>
+        <div className="brands-filters-label">סינון מותגים</div>
+      </div>
+      <ModalV1 isOpen={isBrandsFilterOpen} onClose={toggleBrandsFilter}>
+        {isAllBrandsUploaded && (
+          <div className="brand-filter">
+            {allBrands[generalName].map((brand) => (
+              <BrandItem brand={brand} barcode={barcode} key={brand} />
+            ))}
+          </div>
+        )}
+      </ModalV1>
+    </div>
+  );
+};
+
+export default BrandsFilter;
+
+
+=== OptimalCartsSettings\CalculationOptimalCarts.js ===
+import React, { useState, useRef } from "react";
+import { useNavigate } from "react-router-dom";
+import "./CalculationOptimalCarts.css";
+import { useCartOptimizationContext } from "../../../context/cart-optimizationContext";
+
+const CalculationOptimalCarts = () => {
+  const [position, setPosition] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
+  const containerRef = useRef(null);
+  const navigate = useNavigate();
+
+  const { calculateOptimalsCarts } = useCartOptimizationContext();
+
+  const startDragging = () => {
+    setIsDragging(true);
+  };
+
+  const onDrag = (event) => {
+    if (isDragging && containerRef.current) {
+      const containerRect = containerRef.current.getBoundingClientRect();
+      let newLeft = event.clientX - containerRect.left;
+
+      // Constrain the position within the bounds of the container
+      const minLeft = 0;
+      const maxLeft = containerRect.width - 64; // 64 is the width of the swipe button
+      newLeft = Math.max(minLeft, Math.min(newLeft, maxLeft));
+
+      setPosition(newLeft);
+    }
+  };
+
+  const stopDragging = () => {
+    setIsDragging(false);
+
+    // Check if the swipe button is near the right side
+    const threshold = containerRef.current.getBoundingClientRect().width - 64;
+    if (position < threshold) {
+      setPosition(0); // Reset position to left side with animation
+    } else {
+      console.log("Reached the right side");
+      calculateOptimalsCarts();
+      navigate("/optimal-supermarket-carts");
+    }
+  };
+
+  const handleTouchMove = (event) => {
+    if (isDragging && containerRef.current) {
+      const touch = event.touches[0];
+      onDrag({ clientX: touch.clientX });
+    }
+  };
+
+  const handleTouchEnd = () => {
+    stopDragging();
+  };
+
+  const calculateDivColor = () => {
+    const maxPosition =
+      containerRef.current?.getBoundingClientRect().width - 64 || 1;
+    const intensity = Math.min(1, position / maxPosition);
+    // Interpolating between a darker and a lighter color for the div
+    const r = Math.round(46 + (255 - 46) * (intensity / 2));
+    const g = Math.round(46 + (255 - 46) * (intensity / 2));
+    const b = Math.round(46 + (255 - 46) * (intensity / 2));
+    return `rgb(${r}, ${g}, ${b})`;
+  };
+
+  return (
+    <div
+      className="div"
+      style={{ backgroundColor: calculateDivColor() }}
+      ref={containerRef}
+      onMouseMove={onDrag}
+      onMouseUp={stopDragging}
+      onMouseLeave={stopDragging}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
+    >
+      <span className="text">החלק לחישוב העגלות</span>
+      <span
+        className="swipe"
+        style={{ left: `${position}px` }}
+        onMouseDown={startDragging}
+        onTouchStart={startDragging}
+      ></span>
+    </div>
+  );
+};
+
+export default CalculationOptimalCarts;
+
+
+=== OptimalCartsSettings\OptimalCartsSettings.js ===
+import React from "react";
+import ProductsGeneralSettings from "./ProductsGeneralSettings";
+import CalculationOptimalCarts from "./CalculationOptimalCarts";
+import SupermarketsFilter from "./SupermarketsFilter";
+import SettingsIcon from "./settings.svg";
+
+// Correct import for useNavigate
+import { useNavigate } from "react-router-dom";
+
+import "./OptimalCartsSettings.css";
+import { useState } from "react";
+
+const OptimalCartsSettings = () => {
+  const navigate = useNavigate();
+  const [isAnimating, setIsAnimating] = useState(false);
+
+  const handleIconClick = () => {
+    setIsAnimating(true);
+    setTimeout(() => {
+      navigate("/products-settings");
+    }, 800); // Navigate after 3 seconds
+  };
+
+  return (
+    <div className="optimal-carts-settings">
+      <div className="products-settings-button" onClick={handleIconClick}>
+        <div
+          className={`products-settings-icon ${isAnimating ? "rotate" : ""}`}
+        >
+          <img src={SettingsIcon} alt="settings" />
+        </div>
+        <div className="products-settings-label">מעבר להגדרות מוצרים</div>
+      </div>
+      <ProductsGeneralSettings />
+      <SupermarketsFilter />
+      <CalculationOptimalCarts />
+    </div>
+  );
+};
+
+export default OptimalCartsSettings;
+
+
+=== OptimalCartsSettings\ProductsGeneralSettings.js ===
+import React from "react";
+import { useCartOptimizationContext } from "../../../context/cart-optimizationContext";
+import "./ProductsGeneralSettings.css";
+
+const ProductsGeneralSettings = () => {
+  const {
+    canReplaceSettings, // value of "bySelect", "all", "none"
+    canRoundUpSettings, // value of "bySelect", "all", "none"
+    changeCanReplaceSettings,
+    changeCanRoundUpSettings,
+    changeCanReplaceAll,
+    changeCanRoundUpAll,
+  } = useCartOptimizationContext();
+
+  console.log("canReplaceSettings:", canReplaceSettings);
+  console.log("canRoundUpSettings:", canRoundUpSettings);
+
+  const onClickCanReplaceAll = () => {
+    changeCanReplaceAll(true);
+    changeCanReplaceSettings("all");
+  };
+
+  const onClickCanReplaceNone = () => {
+    changeCanReplaceAll(false);
+    changeCanReplaceSettings("none");
+  };
+
+  const onClickCanRoundUpAll = () => {
+    changeCanRoundUpAll(true);
+    changeCanRoundUpSettings("all");
+  };
+
+  const onClickCanRoundUpNone = () => {
+    changeCanRoundUpAll(false);
+    changeCanRoundUpSettings("none");
+  };
+
+  const onClickCanReplaceBySelect = () => {
+    changeCanReplaceSettings("bySelect");
+  };
+
+  const onClickCanRoundUpBySelect = () => {
+    changeCanRoundUpSettings("bySelect");
+  };
+
+  return (
+    <div className="products-general-settings">
+      <div className="can-replace-general-settings">
+        <div
+          className={`all-products ${
+            canReplaceSettings === "all" ? "active" : ""
+          }`}
+          onClick={onClickCanReplaceAll}
+        >
+          עם החלפה אוטומטית של מוצרים
+        </div>
+        <div
+          className={`some-products ${
+            canReplaceSettings === "bySelect" ? "active" : ""
+          }`}
+          onClick={onClickCanReplaceBySelect}
+        >
+          עם החלפה אוטומטית של מוצרים שנבחרו
+        </div>
+        <div
+          className={`no-products ${
+            canReplaceSettings === "none" ? "active" : ""
+          }`}
+          onClick={onClickCanReplaceNone}
+        >
+          ללא החלפה אוטומטית של מוצרים
+        </div>
+      </div>
+      <div className="can-round-up-general-settings">
+        <div
+          className={`all-products ${
+            canRoundUpSettings === "all" ? "active" : ""
+          }`}
+          onClick={onClickCanRoundUpAll}
+        >
+          עם העגלת כמות של כל מוצר שבמבצע
+        </div>
+        <div
+          className={`some-products ${
+            canRoundUpSettings === "bySelect" ? "active" : ""
+          }`}
+          onClick={onClickCanRoundUpBySelect}
+        >
+          עם העגלת כמות של מוצרים שנבחרו
+        </div>
+        <div
+          className={`no-products ${
+            canRoundUpSettings === "none" ? "active" : ""
+          }`}
+          onClick={onClickCanRoundUpNone}
+        >
+          ללא העגלת כמות של מוצרים
+        </div>
+      </div>
+      <button
+      className="temp-button"
+      >Temp Button</button>
+    </div>
+  );
+};
+
+export default ProductsGeneralSettings;
+
+
+=== OptimalCartsSettings\SupermarketItem.js ===
+import React from "react";
+import "./SupermarketItem.css";
+import { useCartOptimizationContext } from "../../../context/cart-optimizationContext";
+
+const SupermarketItem = ({ supermarketObject }) => {
+  const { supermarketIDs, insertSupermarketID, removeSupermarketID } =
+    useCartOptimizationContext();
+
+  const toggleSupermarket = () => {
+    if (supermarketIDs.includes(supermarketObject.supermarketID)) {
+      removeSupermarketID(supermarketObject.supermarketID);
+    } else {
+      insertSupermarketID(supermarketObject.supermarketID);
+    }
+  };
+
+  return (
+    <div className="supermarket-item">
+      <div className="supermarket-item-name">{supermarketObject.name}</div>
+      <div className="supermarket-item-address">
+        ,{supermarketObject.address}
+      </div>
+      <div className="supermarket-item-city">{supermarketObject.city}</div>
+      <div className="supermarket-item-checkbox">
+        <input
+          type="checkbox"
+          checked={supermarketIDs.includes(supermarketObject.supermarketID)}
+          onChange={toggleSupermarket}
+        />
+      </div>
+    </div>
+  );
+};
+
+export default SupermarketItem;
+
+
+=== OptimalCartsSettings\SupermarketsFilter.js ===
+import React, { useState } from "react";
+import ModalV1 from "../../Modal/ModalV1";
+import "./SupermarketsFilter.css";
+import { useCartOptimizationContext } from "../../../context/cart-optimizationContext";
+import SupermarketItem from "./SupermarketItem";
+import filterIcon from "../BrandsFilter/filter.svg";
+
+const SupermarketsFilter = () => {
+  const { allSupermarkets, isAllSupermarketsUploaded, supermarketIDs } =
+    useCartOptimizationContext();
+  const [isSupermarketsFilterOpen, setIsSupermarketsFilterOpen] =
+    useState(false);
+
+  const toggleSupermarketsFilter = () =>
+    setIsSupermarketsFilterOpen(!isSupermarketsFilterOpen);
+
+  if (!isAllSupermarketsUploaded) {
+    return (
+      <div className="supermarkets-filters">
+        {console.log("supermarketIDs: ", supermarketIDs)}
+
+        <div
+          className="open-supermarkets-filters-modal"
+          onClick={toggleSupermarketsFilter}
+        >
+          <div className="supermarkets-filters-icon">
+            <img src={filterIcon} alt="filter" />
+          </div>
+          <div className="supermarkets-filters-label">סינון סופרים</div>
+        </div>
+        <ModalV1
+          isOpen={isSupermarketsFilterOpen}
+          onClose={toggleSupermarketsFilter}
+        >
+          <div>
+            <h1>Loading Data...</h1>
+          </div>
+        </ModalV1>
+      </div>
+    );
+  }
+
+  return (
+    <div className="supermarkets-filters">
+      {console.log("allSupermarkets: ", allSupermarkets)}
+      <div
+        className="open-supermarkets-filters-modal"
+        onClick={toggleSupermarketsFilter}
+      >
+        <div className="supermarkets-filters-icon">
+          <img src={filterIcon} alt="filter" />
+        </div>
+        <div className="supermarkets-filters-label">סינון סופרים</div>
+      </div>
+      <ModalV1
+        isOpen={isSupermarketsFilterOpen}
+        onClose={toggleSupermarketsFilter}
+      >
+        {isAllSupermarketsUploaded && (
+          <div className="supermarket-filter">
+            {allSupermarkets.map((supermarket) => (
+              <SupermarketItem
+                supermarketObject={supermarket}
+                key={supermarket.supermarketID}
+              />
+            ))}
+          </div>
+        )}
+      </ModalV1>
+    </div>
+  );
+};
+
+export default SupermarketsFilter;
+
+
+=== OptimalsSupermarketCarts\CartsFilter.js ===
+import React from "react";
+
+const CartsFilter = () => {
+  return (
+    <div>
+      <h1>Cart Filter</h1>
+    </div>
+  );
+};
+
+export default CartsFilter;
+
+
+=== OptimalsSupermarketCarts\LoadingCart.js ===
+import React from "react";
+
+const LoadingCart = () => {
+  return (
+    <div>
+      <h1>Loading Data...</h1>
+    </div>
+  );
+};
+
+export default LoadingCart;
+
+
+=== OptimalsSupermarketCarts\OptimalsSupermarketCarts.js ===
+import React from "react";
+import { useState } from "react";
+import LoadingCart from "./LoadingCart";
+import CartsFilter from "./CartsFilter";
+import SupermarketOptimalCartItem from "./SupermarketOptimalCartItem";
+import "./OptimalsSupermarketCarts.css";
+import { useCartOptimizationContext } from "../../../context/cart-optimizationContext";
+import {useFullCart} from "../../../hooks/appHooks"
+
+const OptimalsSupermarketCarts = () => {
+  // const { allSupermarkets, fullCart, optimalCarts, isOptimalCartsCalculated } = useCartOptimizationContext();
+    const { allSupermarkets, optimalCarts, isOptimalCartsCalculated } = useCartOptimizationContext();
+
+  const {fullCart} = useFullCart();
+  const [selectedSupermarketID, setSelectedSupermarketID] = useState(0);
+
+  if (!isOptimalCartsCalculated) {
+    return <LoadingCart />;
+  }
+
+  // If no supermarket is selected, display all optimal carts.
+  if (selectedSupermarketID === 0) {
+    return (
+      <div>
+        <CartsFilter />
+        {console.log("fullCart: ", fullCart)}
+        {optimalCarts.map((cart) => (
+          <SupermarketOptimalCartItem
+            key={cart.supermarketID}
+            optimalCart={cart}
+            originalCart={fullCart}
+            supermarketDetails={allSupermarkets.find(
+              (supermarket) => supermarket.supermarketID === cart.supermarketID
+            )}
+            onSelectedSupermarket={setSelectedSupermarketID} // Correctly passing the setter function.
+          />
+        ))}
+      </div>
+    );
+  } else {
+    // Display only the selected supermarket's cart.
+    return (
+      <div>
+        <CartsFilter />
+        {optimalCarts
+          .filter((cart) => cart.supermarketID === selectedSupermarketID)
+          .map((cart) => (
+            <SupermarketOptimalCartItem
+              key={cart.supermarketID}
+              optimalCart={cart}
+              originalCart={fullCart}
+              supermarketDetails={allSupermarkets.find(
+                (supermarket) => supermarket.supermarketID === cart.supermarketID
+              )}
+              onSelectedSupermarket={setSelectedSupermarketID} // Ensure this prop is consistently passed.
+            />
+          ))}
+      </div>
+    );
+  }
+};
+
+export default OptimalsSupermarketCarts;
+
+
+=== OptimalsSupermarketCarts\SupermarketOptimalCartItem.js ===
+import React from "react";
+import { useState } from "react";
+import "./SupermarketOptimalCartItem.css";
+import SupermarketImage from "../../Images/SupermarketImage";
+import { useProducts } from "../../../context/ProductContext";
+import OptimalCartV2 from "./OptimalSupermarketCart/OptimalCartV2";
+
+const SupermarketOptimalCartItem = ({
+  optimalCart,
+  supermarketDetails,
+  originalCart,
+  onSelectedSupermarket, // Ensure this prop is used correctly.
+}) => {
+  const [isShowFullOptimalCart, setIsShowFullOptimalCart] = useState(false);
+  const { getProductDetailsByBarcode } = useProducts();
+  let nonExistsProductsNames = [];
+
+  optimalCart.nonExistsProducts.forEach((product) => {
+    nonExistsProductsNames.push(
+      getProductDetailsByBarcode(product.barcode).name
+    );
+  });
+
+  const handleNavigateToOptimalCart = () => {
+    setIsShowFullOptimalCart(true);
+    onSelectedSupermarket(optimalCart.supermarketID); // Ensure this function is called correctly.
+  };
+
+  if (isShowFullOptimalCart) {
+    return (
+      <OptimalCartV2
+        optimalCart={optimalCart}
+        supermarketDetails={supermarketDetails}
+        originalCart={originalCart}
+        onClickBack={() => {
+          setIsShowFullOptimalCart(false);
+          onSelectedSupermarket(0); // Ensure this function is called correctly.
+          console.log("Back to supermarket selection");
+        }}
+      />
+    );
+  }
+
+  return (
+    <div
+      className="supermarket-optimal-cart-item"
+      onClick={handleNavigateToOptimalCart}
+    >
+      <div className="optimal-cart-details">
+        {console.log("originalCart: ", originalCart)}
+        <div className="supermarket-details">
+          <div className="supermarket-name">
+            <SupermarketImage supermarketName={supermarketDetails.name} />
+          </div>
+          <div className="supermarket-address">
+            ,{supermarketDetails.address}
+          </div>
+          <div className="supermarket-city">{supermarketDetails.city}</div>
+        </div>
+        <div className="total-price-details">
+          <div className="total-price-text">:מחיר כולל</div>
+          <div className="total-price-number">
+            ₪{optimalCart.totalPrice.toFixed(2)}
+          </div>
+        </div>
+      </div>
+      {optimalCart.nonExistsProducts.length > 0 && (
+        <div className="non-exists-products">
+          <div className="non-exists-products-text">:מוצרים חסרים</div>
+          <div className="non-exists-products-names">
+            {nonExistsProductsNames.map((productName, index) => (
+              <div className="non-exists-product" key={index}>
+                ,{productName}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default SupermarketOptimalCartItem;
+
+
+=== OptimalsSupermarketCarts\OptimalSupermarketCart\OptimalCart.js ===
+import React from "react";
+import { useLocation } from "react-router-dom";
+
+import SupermarketDetails from "./SupermarketDetails";
+import OptimalProductsList from "./OptimalProductsList";
+
+const OptimalCart = () => {
+  const { state } = useLocation();
+  const { optimalCart, supermarketDetails, originalCart } = state;
+
+  return (
+    <div className="full-optimal-cart">
+      <SupermarketDetails supermarketDetails={supermarketDetails} />
+      <OptimalProductsList
+        optimalCart={optimalCart}
+        originalCart={originalCart}
+      />
+    </div>
+  );
+};
+
+export default OptimalCart;
+
+
+=== OptimalsSupermarketCarts\OptimalSupermarketCart\OptimalCartV2.js ===
+import React from "react";
+import SupermarketDetails from "./SupermarketDetails";
+import OptimalProductsList from "./OptimalProductsList";
+
+const OptimalCartV2 = ({
+  optimalCart,
+  supermarketDetails,
+  originalCart,
+  onClickBack, // This prop is used to handle the back button click.
+}) => {
+  return (
+    <div className="full-optimal-cart">
+      {/* Supermarket details and products list components remain unchanged */}
+      <SupermarketDetails supermarketDetails={supermarketDetails} />
+      <OptimalProductsList
+        optimalCart={optimalCart}
+        originalCart={originalCart}
+      />
+      {console.log("originalCart: ", originalCart)}
+      {/* Back button added */}
+      <button className="back-button" onClick={onClickBack}>
+        Back
+      </button>
+    </div>
+  );
+};
+
+export default OptimalCartV2;
+
+
+=== OptimalsSupermarketCarts\OptimalSupermarketCart\OptimalProductItem.js ===
+import React from "react";
+import { useState } from "react";
+import ProductsImages from "../../../Images/ProductsImages";
+import EditOptimalProductModal from "./EditOptimalProduct/EditOptimalProductModal";
+import EditOptimalProduct from "./EditOptimalProduct/EditOptimalProduct";
+import EditAlternativeProduct from "./EditOptimalProduct/EditAlternativeProduct";
+import "./OptimalProductItem.css";
+import {
+  getUnitWeightLabelForOne,
+  getConvertedUnitWeight,
+  isExistsInOriginalCart,
+  getSummaryElement,
+} from "./OptimalProductItemHelpers";
+import { useCartOptimizationContext } from "../../../../context/cart-optimizationContext";
+import deleteIcon from "./delete.svg";
+import editIcon from "./edit.svg";
+import upRightIcon from "./up-right.svg";
+import downLeftIcon from "./down-left.svg";
+
+const OptimalProductItem = ({
+  detailsOriginProduct,
+  DetailsOptimalProduct,
+  isExistsInOptimalCart,
+  supermarketID,
+}) => {
+  const { deleteProductFromOptimalCart } = useCartOptimizationContext();
+  const originalProductExists = isExistsInOriginalCart(detailsOriginProduct);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isModalOpen2, setIsModalOpen2] = useState(false);
+
+  const openModal = () => {
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+  };
+
+  const openModal2 = () => {
+    setIsModalOpen2(true);
+  };
+
+  const closeModal2 = () => {
+    setIsModalOpen2(false);
+  };
+
+  const summaryElement = getSummaryElement(
+    DetailsOptimalProduct,
+    detailsOriginProduct,
+    isExistsInOptimalCart
+  );
+
+  return (
+    <div className="optimal-product-item">
+      {console.log("DetailsOptimalProduct", DetailsOptimalProduct)}
+      {console.log("detailsOriginProduct", detailsOriginProduct)}
+      {console.log("supermarketID", supermarketID)}
+      <EditOptimalProductModal isOpen={isModalOpen} onClose={closeModal}>
+        <EditOptimalProduct
+          productDetails={detailsOriginProduct}
+          optimalProductDetails={DetailsOptimalProduct}
+          supermarketID={supermarketID}
+          isReplace={false}
+          replaceProductDetails={null}
+          closeModal={closeModal}
+        />
+      </EditOptimalProductModal>
+
+      <EditOptimalProductModal isOpen={isModalOpen2} onClose={closeModal2}>
+        <EditAlternativeProduct
+          oldBarcode={DetailsOptimalProduct.barcode}
+          generalName={detailsOriginProduct.product.generalName}
+          supermarketID={supermarketID}
+          DetailsOptimalProduct={DetailsOptimalProduct}
+          quantity={DetailsOptimalProduct.quantity}
+          isExistsInOptimalCart={isExistsInOptimalCart}
+        />
+      </EditOptimalProductModal>
+
+      {/* {console.log("=========================================================")}
+      {console.log("detailsOriginProduct", detailsOriginProduct)}
+      {console.log("DetailsOptimalProduct", DetailsOptimalProduct)}
+      {console.log("isExistsInOptimalCart", isExistsInOptimalCart)}
+      {console.log("=========================================================")} */}
+      <div className="optimal-product-item__product-details">
+        <div className="optimal-product-item__image">
+          <ProductsImages barcode={DetailsOptimalProduct.barcode} />
+        </div>
+        <div className="optimal-product-item__general-details">
+          <div className="optimal-product-item__name">
+            {detailsOriginProduct.product.name}
+          </div>
+          <div style={{ display: "flex", flexDirection: "row-reverse" }}>
+            <div className="optimal-product-item__weight">
+              {detailsOriginProduct.product.weight}
+            </div>
+            <div className="optimal-product-item__unit-weight">
+              {getConvertedUnitWeight(detailsOriginProduct.product.unitWeight)}
+            </div>
+            <div className="optimal-product-item__separator-line">|</div>
+            <div className="optimal-product-item__brand">
+              {detailsOriginProduct.product.brand}
+            </div>
+          </div>
+        </div>
+      </div>
+      <div className="green-arrow-right">
+        <img src={upRightIcon} alt="up-right" />
+      </div>
+      <div className="optimal-product-item__price-quantity-details">
+        {isExistsInOptimalCart ? (
+          <div className="optimal-product-item__current-cart">
+            <div className="quantity-current-product">
+              <div className="label"> :כמות</div>
+              <div className="value">{DetailsOptimalProduct.quantity}</div>
+            </div>
+            <div className="total-price-current-product">
+              <div className="label">:סה"כ</div>
+              <div className="value">
+                {"₪" +
+                  (
+                    Math.round(DetailsOptimalProduct.totalPrice * 10) / 10
+                  ).toFixed(2)}
+              </div>
+            </div>
+            <div className="price-for-one-current-product">
+              {/**the price for 100 g or 100 ml */}
+              <div className="label">
+                {`:מחיר ל-100 ${getConvertedUnitWeight(
+                  detailsOriginProduct.product.unitWeight
+                )}`}
+              </div>
+              <div className="value">
+                {"₪" +
+                  getUnitWeightLabelForOne(
+                    DetailsOptimalProduct.totalPrice,
+                    DetailsOptimalProduct.quantity,
+                    detailsOriginProduct.product.unitWeight,
+                    detailsOriginProduct.product.weight
+                  )}
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div className="not-exists">
+            <div className="label">המוצר לא קיים בסל הקניות הנ"ל</div>
+          </div>
+        )}
+        {originalProductExists ? (
+          <div className="optimal-product-item__original-cart">
+            <div className="quantity-original-product">
+              <div className="label"> :כמות</div>
+              <div className="value">{detailsOriginProduct.amount}</div>
+            </div>
+            <div className="total-price-original-product">
+              <div className="label">
+                <div className="label">:סה"כ</div>
+              </div>
+              <div className="value">
+                {(
+                  Math.round(detailsOriginProduct.totalPrice * 10) / 10
+                ).toFixed(2)}
+              </div>
+            </div>
+            <div className="price-for-one-original-product">
+              <div className="label">
+                {`:מחיר ל-100 ${getConvertedUnitWeight(
+                  detailsOriginProduct.product.unitWeight
+                )}`}
+              </div>
+              <div className="value">
+                {"₪" +
+                  getUnitWeightLabelForOne(
+                    detailsOriginProduct.totalPrice,
+                    detailsOriginProduct.amount,
+                    detailsOriginProduct.product.unitWeight,
+                    detailsOriginProduct.product.weight
+                  )}
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div className="not-exists">
+            <div className="label">המוצר לא קיים בסל הקניות המקורי</div>
+          </div>
+        )}
+      </div>
+      <div className="red-arrow-left">
+        <img src={downLeftIcon} alt="down-left" />
+      </div>
+      {/* <div className="optimal-product-item__summary"></div> */}
+      <div className="optimal-product-item__summary">{summaryElement}</div>
+
+      <div className="optimal-product-item__edit-buttons">
+        <div
+          className="delete-optimal-product"
+          onClick={() =>
+            deleteProductFromOptimalCart(
+              DetailsOptimalProduct.barcode,
+              supermarketID
+            )
+          }
+        >
+          <img src={deleteIcon} alt="Delete" />
+        </div>
+        <div className="edit-optimal-product-button">
+          <img onClick={openModal} src={editIcon} alt="Edit" />
+        </div>
+        <button
+          className="edit-optimal-product-button"
+          onClick={openModal2}
+        ></button>
+      </div>
+    </div>
+  );
+};
+
+export default OptimalProductItem;
+
+
+=== OptimalsSupermarketCarts\OptimalSupermarketCart\OptimalProductItemHelpers.js ===
+export const getUnitWeightLabel = (unit) => {
+  switch (unit) {
+    case "g":
+      return "גרם";
+    case "ml":
+      return 'מ"ל';
+    case "kg":
+      return 'ק"ג';
+    case "l":
+      return "ליטר";
+    case "u":
+      return "יחידות";
+    default:
+      return unit;
+  }
+};
+
+export const getConvertedUnitWeight = (unitWeight) => {
+  switch (unitWeight) {
+    // cases g and kg -> return גרם
+    case "g":
+      return "גרם";
+    case "kg":
+      return "גרם";
+    // cases ml and l -> return מ"ל
+    case "ml":
+      return 'מ"ל';
+    case "l":
+      return 'מ"ל';
+    // case u -> return יחידות
+    case "u":
+      return "יחידות";
+    default:
+      return unitWeight;
+  }
+};
+
+export const isExistsInOriginalCart = (DetailsOriginProduct) => {
+  return DetailsOriginProduct.totalPrice > 0;
+};
+
+export const getUnitWeightLabelForOne = (
+  totalPrice,
+  quantity,
+  unitWeight,
+  weight
+) => {
+  const priceForOneUnit = totalPrice / quantity;
+
+  let priceForOneUnitConverted;
+
+  if (unitWeight === "kg") {
+    priceForOneUnitConverted = priceForOneUnit / 1000;
+  } else if (unitWeight === "l") {
+    priceForOneUnitConverted = priceForOneUnit / 1000;
+  } else {
+    priceForOneUnitConverted = priceForOneUnit;
+  }
+
+  const priceForOne = (priceForOneUnitConverted * 100) / weight;
+
+  return priceForOne.toFixed(2);
+};
+
+/**
+ * @summary Get the converted weight to milliliters, grams or units
+ *
+ * @param {string} unitWeight
+ * @param {number} weight
+ *
+ * @returns {number} the converted weight in milliliters, grams or units
+ */
+export const getConvertedWeight = (unitWeight, weight) => {
+  // if the unit weight is kilograms (kg) or liters (l) -> convert the weight to grams or milliliters: else -> return the weight\
+  if (unitWeight === "kg" || unitWeight === "l") {
+    return weight * 1000;
+  }
+  return weight;
+};
+
+/**
+ * @summary Get the price for 100 grams or milliliters or units
+ *
+ * @param {number} totalPrice: the total price of the product
+ * @param {number} quantity: the quantity of the product in the cart
+ * @param {number} weight: the weight of the product
+ * @param {string} unitWeight: the unit weight of the product
+ *
+ * formula: (100 * totalPrice) / (convertedWeight * quantity)
+ * @returns {number} the price for 100 grams or milliliters or units
+ */
+export const getPriceFor100 = (totalPrice, quantity, weight, unitWeight) => {
+  const convertedWeight = getConvertedWeight(unitWeight, weight);
+
+  const priceFor100 = (100 * totalPrice) / (convertedWeight * quantity);
+
+  return priceFor100.toFixed(2);
+};
+
+/**
+ * @summary Get the difference between the total prices of the
+ *          product in the original cart and the optimal cart
+ *
+ * @param {number} price: the price of the product
+ * @param {number} quantity: the quantity of the product in the cart
+ */
+export const getTotalPricesDifference = (
+  originTotalPrice,
+  optimalTotalPrice
+) => {
+  return (originTotalPrice - optimalTotalPrice).toFixed(2);
+};
+
+export const getTotalPricesDifferenceFor100GramOrMl = (
+  originTotalPrice,
+  originQuantity,
+  optimalTotalPrice,
+  optimalQuantity,
+  weight,
+  unitWeight
+) => {
+  // step 1: get the converted weight to grams or milliliters
+  const convertedWeight = getConvertedWeight(unitWeight, weight);
+
+  // step 2: get the price for 100 grams or milliliters for the original cart using getPriceFor100 function:
+  const originPriceFor100 = getPriceFor100(
+    originTotalPrice,
+    originQuantity,
+    convertedWeight,
+    unitWeight
+  );
+
+  // step 3: get the price for 100 grams or milliliters for the optimal cart using getPriceFor100 function:
+  const optimalPriceFor100 = getPriceFor100(
+    optimalTotalPrice,
+    optimalQuantity,
+    convertedWeight,
+    unitWeight
+  );
+
+  // step 4: get the difference between the price for 100 grams or milliliters of the original cart and the optimal cart
+  const priceDifference = (originPriceFor100 - optimalPriceFor100).toFixed(2);
+
+  return priceDifference;
+};
+
+export const getSummaryElement = (
+  DetailsOptimalProduct,
+  DetailsOriginProduct,
+  isExistsInOptimalCart
+) => {
+  // case 1: the product exists in the optimal cart and in the original cart:
+  if (isExistsInOptimalCart && isExistsInOriginalCart(DetailsOriginProduct)) {
+    const priceDifference = getTotalPricesDifference(
+      DetailsOriginProduct.totalPrice,
+      DetailsOptimalProduct.totalPrice
+    );
+    // case the total price of the product in the optimal cart is
+    // less than the total price of the product in the original cart:
+    if (priceDifference > 0) {
+      const productUnitWeight = getConvertedUnitWeight(
+        DetailsOriginProduct.product.unitWeight
+      );
+
+      const convertedUnitWeight = getConvertedWeight(
+        DetailsOriginProduct.product.unitWeight,
+        DetailsOriginProduct.product.weight
+      );
+
+      const priceDifferenceFor100GramOrMl =
+        getTotalPricesDifferenceFor100GramOrMl(
+          DetailsOriginProduct.totalPrice,
+          DetailsOriginProduct.amount,
+          DetailsOptimalProduct.totalPrice,
+          DetailsOptimalProduct.quantity,
+          convertedUnitWeight,
+          DetailsOriginProduct.product.unitWeight
+        );
+      return (
+        <div className="product-exists-in-both-carts">
+          <div className="price-difference">
+            המחיר בסל הקניות האופטימלי נמוך ב-₪{priceDifference} מהמחיר בסל
+            הקניות המקורי
+          </div>
+          <div className="price-difference-for-100-gram-or-ml">
+            המחיר ל-100 {productUnitWeight} בסל הקניות האופטימלי נמוך ב-₪
+            {priceDifferenceFor100GramOrMl} מהמחיר בסל הקניות המקורי
+          </div>
+        </div>
+      );
+    }
+  }
+
+  // case 2:
+
+  // case 3:
+};
+
+
+=== OptimalsSupermarketCarts\OptimalSupermarketCart\OptimalProductsList.js ===
+import React from "react";
+
+import OptimalProductItem from "./OptimalProductItem";
+import OptimalReplaceProductItem from "./OptimalReplaceProductItem";
+import "./OptimalProductsList.css";
+
+const OptimalProductsList = ({ optimalCart, originalCart }) => {
+  const hasReplacedProducts = (product) => {
+    return product.barcode !== product.oldBarcode;
+  };
+
+  let optimalCartProducts = {};
+  let originalCartProducts = {};
+
+  optimalCart.existsProducts.forEach((product) => {
+    optimalCartProducts[product.oldBarcode] = {
+      detailsOptimalProduct: product,
+      isExistsInOptimalCart: true,
+    };
+  });
+  optimalCart.nonExistsProducts.forEach((product) => {
+    optimalCartProducts[product.oldBarcode] = {
+      detailsOptimalProduct: product,
+      isExistsnOpItimalCart: false,
+    };
+  });
+
+  originalCart.productsWithPrices.forEach((product) => {
+    originalCartProducts[product.product.barcode] = {
+      detailsOriginProduct: product,
+    };
+  });
+
+  return (
+    <div className="optimal-products-list">
+      {console.log("optimalCartProducts: ", originalCart)}
+      {Object.keys(optimalCartProducts).map((key) => {
+        if (
+          optimalCartProducts[key].isExistsInOptimalCart &&
+          hasReplacedProducts(optimalCartProducts[key].detailsOptimalProduct)
+        ) {
+          const barcodeOldProduct =
+            optimalCartProducts[key].detailsOptimalProduct.oldBarcode;
+          return (
+            <OptimalReplaceProductItem
+              key={key}
+              detailsOriginProduct={
+                originalCartProducts[barcodeOldProduct].detailsOriginProduct
+              }
+              DetailsOptimalProduct={
+                optimalCartProducts[key].detailsOptimalProduct
+              }
+              isExistsInOptimalCart={
+                optimalCartProducts[key].isExistsInOptimalCart
+              }
+              supermarketID={optimalCart.supermarketID}
+            />
+          );
+        } else {
+          return (
+            <OptimalProductItem
+              key={key}
+              detailsOriginProduct={
+                originalCartProducts[key].detailsOriginProduct
+              }
+              DetailsOptimalProduct={
+                optimalCartProducts[key].detailsOptimalProduct
+              }
+              isExistsInOptimalCart={
+                optimalCartProducts[key].isExistsInOptimalCart
+              }
+              supermarketID={optimalCart.supermarketID}
+            />
+          );
+        }
+      })}
+    </div>
+  );
+};
+
+export default OptimalProductsList;
+
+
+=== OptimalsSupermarketCarts\OptimalSupermarketCart\OptimalReplaceProductItem.js ===
+import React from "react";
+import { useState, useEffect } from "react";
+import ProductsImages from "../../../Images/ProductsImages";
+import EditOptimalProductModal from "./EditOptimalProduct/EditOptimalProductModal";
+import EditOptimalProduct from "./EditOptimalProduct/EditOptimalProduct";
+import EditAlternativeProduct from "./EditOptimalProduct/EditAlternativeProduct";
+import "./OptimalProductItem.css"; // import "./OptimalReplaceProductItem.css";
+import {
+  getUnitWeightLabelForOne,
+  getConvertedUnitWeight,
+  isExistsInOriginalCart,
+  getSummaryElement,
+} from "./OptimalProductItemHelpers";
+import { useCartOptimizationContext } from "../../../../context/cart-optimizationContext";
+import deleteIcon from "./delete.svg";
+import editIcon from "./edit.svg";
+import upRightIcon from "./up-right.svg";
+import downLeftIcon from "./down-left.svg";
+
+const OptimalReplaceProductItem = ({
+  detailsOriginProduct,
+  DetailsOptimalProduct,
+  isExistsInOptimalCart,
+  supermarketID,
+}) => {
+  const [productDetails, setProductDetails] = useState({});
+  const [isProductDetailsUpdated, setIsProductDetailsUpdated] = useState(false);
+  const originalProductExists = isExistsInOriginalCart(detailsOriginProduct);
+  const { getProductByBarcode, deleteProductFromOptimalCart } =
+    useCartOptimizationContext();
+
+  // Get the product details
+  useEffect(() => {
+    if (isExistsInOptimalCart) {
+      getProductByBarcode(DetailsOptimalProduct.barcode).then((response) => {
+        setProductDetails(response);
+        setIsProductDetailsUpdated(true);
+      });
+    }
+  }, [
+    isExistsInOptimalCart,
+    DetailsOptimalProduct.barcode,
+    getProductByBarcode,
+  ]);
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isModalOpen2, setIsModalOpen2] = useState(false);
+
+  const openModal = () => {
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+  };
+
+  const openModal2 = () => {
+    setIsModalOpen2(true);
+  };
+
+  const closeModal2 = () => {
+    setIsModalOpen2(false);
+  };
+
+  const summaryElement = getSummaryElement(
+    DetailsOptimalProduct,
+    detailsOriginProduct,
+    isExistsInOptimalCart
+  );
+
+  if (!isProductDetailsUpdated) {
+    return <div>Loading...</div>;
+  }
+  //   return (
+  //     <div>
+  //       ReplaceProductItem
+  //       {console.log("=========================================================")}
+  //       {console.log("detailsOriginProduct", detailsOriginProduct)}
+  //       {console.log("DetailsOptimalProduct", DetailsOptimalProduct)}
+  //       {console.log("isExistsInOptimalCart", isExistsInOptimalCart)}
+  //       {console.log("productDetails", productDetails)}
+  //       {console.log("=========================================================")}
+  //     </div>
+  //   );
+  // };
+
+  // export default OptimalReplaceProductItem;
+
+  return (
+    <div className="optimal-product-item">
+      {console.log(
+        "& & & & & & & & & & & & & & & & & & & & & & & & & & & & & &"
+      )}
+      {console.log("DetailsOptimalProduct", DetailsOptimalProduct)}
+      {console.log("productDetailsA", productDetails)}
+      {console.log(
+        "& & & & & & & & & & & & & & & & & & & & & & & & & & & & & &"
+      )}
+      <EditOptimalProductModal isOpen={isModalOpen} onClose={closeModal}>
+        <EditOptimalProduct
+          productDetails={detailsOriginProduct}
+          optimalProductDetails={DetailsOptimalProduct}
+          supermarketID={supermarketID}
+          isReplace={true}
+          replaceProductDetails={productDetails}
+          closeModal={closeModal}
+        />
+      </EditOptimalProductModal>
+
+      <EditOptimalProductModal isOpen={isModalOpen2} onClose={closeModal2}>
+        <EditAlternativeProduct
+          oldBarcode={DetailsOptimalProduct.barcode}
+          generalName={detailsOriginProduct.product.generalName}
+          supermarketID={supermarketID}
+          DetailsOptimalProduct={DetailsOptimalProduct}
+          quantity={DetailsOptimalProduct.quantity}
+          isExistsInOptimalCart={isExistsInOptimalCart}
+        />
+      </EditOptimalProductModal>
+
+      <div className="optimal-product-item__product-details">
+        {console.log("DetailsOptimalProduct", DetailsOptimalProduct)}
+        {console.log("productDetails", productDetails)}
+        <div className="optimal-product-item__image">
+          <ProductsImages barcode={productDetails.barcode} />
+        </div>
+        <div className="optimal-product-item__general-details">
+          <div className="optimal-product-item__name">
+            {productDetails.name}
+          </div>
+          <div style={{ display: "flex", flexDirection: "row-reverse" }}>
+            <div className="optimal-product-item__weight">
+              {productDetails.weight}
+            </div>
+            <div className="optimal-product-item__unit-weight">
+              {/* {getConvertedUnitWeight(detailsOriginProduct.product.unitWeight)} */}
+              {getConvertedUnitWeight(productDetails.unitWeight)}
+            </div>
+            <div className="optimal-product-item__separator-line">|</div>
+            <div className="optimal-product-item__brand">
+              {/* {detailsOriginProduct.product.brand} */}
+              {productDetails.brand}
+            </div>
+          </div>
+        </div>
+      </div>
+      <div className="green-arrow-right">
+        <img src={upRightIcon} alt="up-right" />
+      </div>
+      <div className="optimal-product-item__price-quantity-details">
+        {isExistsInOptimalCart ? (
+          <div className="optimal-product-item__current-cart">
+            <div className="quantity-current-product">
+              <div className="label"> :כמות</div>
+              <div className="value">{DetailsOptimalProduct.quantity}</div>
+            </div>
+            <div className="total-price-current-product">
+              <div className="label">:סה"כ</div>
+              <div className="value">
+                {"₪" +
+                  (
+                    Math.round(DetailsOptimalProduct.totalPrice * 10) / 10
+                  ).toFixed(2)}
+              </div>
+            </div>
+            <div className="price-for-one-current-product">
+              {/**the price for 100 g or 100 ml */}
+              <div className="label">
+                {`:מחיר ל-100 ${getConvertedUnitWeight(
+                  detailsOriginProduct.product.unitWeight
+                )}`}
+              </div>
+              <div className="value">
+                {"₪" +
+                  getUnitWeightLabelForOne(
+                    DetailsOptimalProduct.totalPrice,
+                    DetailsOptimalProduct.quantity,
+                    detailsOriginProduct.product.unitWeight,
+                    detailsOriginProduct.product.weight
+                  )}
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div className="not-exists">
+            <div className="label">המוצר לא קיים בסל הקניות הנ"ל</div>
+          </div>
+        )}
+        {originalProductExists ? (
+          <div className="optimal-product-item__original-cart">
+            <div className="quantity-original-product">
+              <div className="label"> :כמות</div>
+              <div className="value">{detailsOriginProduct.amount}</div>
+            </div>
+            <div className="total-price-original-product">
+              <div className="label">
+                <div className="label">:סה"כ</div>
+              </div>
+              <div className="value">
+                {(
+                  Math.round(detailsOriginProduct.totalPrice * 10) / 10
+                ).toFixed(2)}
+              </div>
+            </div>
+            <div className="price-for-one-original-product">
+              <div className="label">
+                {`:מחיר ל-100 ${getConvertedUnitWeight(
+                  detailsOriginProduct.product.unitWeight
+                )}`}
+              </div>
+              <div className="value">
+                {"₪" +
+                  getUnitWeightLabelForOne(
+                    detailsOriginProduct.totalPrice,
+                    detailsOriginProduct.amount,
+                    detailsOriginProduct.product.unitWeight,
+                    detailsOriginProduct.product.weight
+                  )}
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div className="not-exists">
+            <div className="label">המוצר לא קיים בסל הקניות המקורי</div>
+          </div>
+        )}
+      </div>
+      <div className="red-arrow-left">
+        <img src={downLeftIcon} alt="down-left" />
+      </div>
+      {/* <div className="optimal-product-item__summary"></div> */}
+      <div className="optimal-product-item__summary">{summaryElement}</div>
+
+      <div className="optimal-product-item__edit-buttons">
+        <div
+          className="delete-optimal-product"
+          onClick={() =>
+            deleteProductFromOptimalCart(
+              DetailsOptimalProduct.barcode,
+              supermarketID
+            )
+          }
+        >
+          <img src={deleteIcon} alt="Delete" />
+        </div>
+        <div className="edit-optimal-product-button">
+          <img onClick={openModal} src={editIcon} alt="Edit" />
+        </div>
+        <button
+          className="edit-optimal-product-button"
+          onClick={openModal2}
+        ></button>
+      </div>
+    </div>
+  );
+};
+
+export default OptimalReplaceProductItem;
+
+// import React, { useState, useEffect } from "react";
+// import ProductsImages from "../../../Images/ProductsImages";
+// import EditOptimalProductModal from "./EditOptimalProduct/EditOptimalProductModal";
+// import EditOptimalProduct from "./EditOptimalProduct/EditOptimalProduct";
+// import EditAlternativeProduct from "./EditOptimalProduct/EditAlternativeProduct";
+// import "./OptimalProductItem.css";
+// import {
+//   getUnitWeightLabelForOne,
+//   getConvertedUnitWeight,
+//   getSummaryElement,
+// } from "./OptimalProductItemHelpers";
+// import { useCartOptimizationContext } from "../../../../context/cart-optimizationContext";
+// import deleteIcon from "./delete.svg";
+// import editIcon from "./edit.svg";
+// import upRightIcon from "./up-right.svg";
+// import downLeftIcon from "./down-left.svg";
+
+// const OptimalReplaceProductItem = ({
+//   detailsOriginProduct,
+//   DetailsOptimalProduct,
+//   isExistsInOptimalCart,
+//   supermarketID,
+// }) => {
+//   const [productDetails, setProductDetails] = useState({});
+//   const [isProductDetailsUpdated, setIsProductDetailsUpdated] = useState(false);
+//   const { getProductByBarcode, deleteProductFromOptimalCart } =
+//     useCartOptimizationContext();
+
+//   useEffect(() => {
+//     if (isExistsInOptimalCart) {
+//       getProductByBarcode(DetailsOptimalProduct.barcode).then((response) => {
+//         setProductDetails(response);
+//         setIsProductDetailsUpdated(true);
+//       });
+//     }
+//   }, [
+//     isExistsInOptimalCart,
+//     DetailsOptimalProduct.barcode,
+//     getProductByBarcode,
+//   ]);
+
+//   const [isModalOpen, setIsModalOpen] = useState(false);
+//   const [isModalOpen2, setIsModalOpen2] = useState(false);
+
+//   const openModal = () => {
+//     setIsModalOpen(true);
+//   };
+
+//   const closeModal = () => {
+//     setIsModalOpen(false);
+//   };
+
+//   const openModal2 = () => {
+//     setIsModalOpen2(true);
+//   };
+
+//   const closeModal2 = () => {
+//     setIsModalOpen2(false);
+//   };
+
+//   const summaryElement = getSummaryElement(
+//     DetailsOptimalProduct,
+//     detailsOriginProduct,
+//     isExistsInOptimalCart
+//   );
+
+//   const originalProductExists = detailsOriginProduct.amount > 0;
+
+//   if (!isProductDetailsUpdated) {
+//     return <div>Loading...</div>;
+//   }
+
+//   return (
+//     <div className="optimal-product-item">
+//       <EditOptimalProductModal isOpen={isModalOpen} onClose={closeModal}>
+//         <EditOptimalProduct
+//           productDetails={detailsOriginProduct}
+//           optimalProductDetails={DetailsOptimalProduct}
+//           supermarketID={supermarketID}
+//           isReplace={true}
+//           replaceProductDetails={productDetails}
+//           closeModal={closeModal}
+//         />
+//       </EditOptimalProductModal>
+
+//       <EditOptimalProductModal isOpen={isModalOpen2} onClose={closeModal2}>
+//         <EditAlternativeProduct
+//           oldBarcode={DetailsOptimalProduct.barcode}
+//           generalName={detailsOriginProduct.product.generalName}
+//           supermarketID={supermarketID}
+//           DetailsOptimalProduct={DetailsOptimalProduct}
+//           quantity={DetailsOptimalProduct.quantity}
+//           isExistsInOptimalCart={isExistsInOptimalCart}
+//         />
+//       </EditOptimalProductModal>
+
+//       <div className="optimal-product-item__product-details">
+//         {console.log("DetailsOptimalProduct", DetailsOptimalProduct)}
+//         {console.log("productDetails", productDetails)}
+//         <div className="optimal-product-item__image">
+//           <ProductsImages barcode={productDetails.barcode} />
+//         </div>
+//         <div className="optimal-product-item__general-details">
+//           <div className="optimal-product-item__name">
+//             {productDetails.name}
+//           </div>
+//           <div style={{ display: "flex", flexDirection: "row-reverse" }}>
+//             <div className="optimal-product-item__weight">
+//               {productDetails.weight}
+//             </div>
+//             <div className="optimal-product-item__unit-weight">
+//               {getConvertedUnitWeight(productDetails.unitWeight)}
+//             </div>
+//             <div className="optimal-product-item__separator-line">|</div>
+//             <div className="optimal-product-item__brand">
+//               {productDetails.brand}
+//             </div>
+//           </div>
+//           <div className="optimal-product-item__quantity">
+//             כמות: {DetailsOptimalProduct.quantity} יחידות
+//           </div>
+//           <div className="optimal-product-item__total-price">
+//             סה"כ: ₪{DetailsOptimalProduct.totalPrice}
+//           </div>
+//           <div className="optimal-product-item__price-for-one">
+//             {`מחיר ל-100 ${getConvertedUnitWeight(
+//               productDetails.unitWeight
+//             )}: ₪${getUnitWeightLabelForOne(
+//               DetailsOptimalProduct.totalPrice,
+//               DetailsOptimalProduct.quantity,
+//               productDetails.unitWeight,
+//               productDetails.weight
+//             )}`}
+//           </div>
+//         </div>
+//       </div>
+//       <div className="green-arrow-right">
+//         <img src={upRightIcon} alt="up-right" />
+//       </div>
+//       <div className="optimal-product-item__price-quantity-details">
+//         {isExistsInOptimalCart ? (
+//           <div className="optimal-product-item__current-cart">
+//             <div className="quantity-current-product">
+//               <div className="label"> :כמות</div>
+//               <div className="value">{DetailsOptimalProduct.quantity}</div>
+//             </div>
+//             <div className="total-price-current-product">
+//               <div className="label">:סה"כ</div>
+//               <div className="value">
+//                 {"₪" +
+//                   (
+//                     Math.round(DetailsOptimalProduct.totalPrice * 10) / 10
+//                   ).toFixed(2)}
+//               </div>
+//             </div>
+//             <div className="price-for-one-current-product">
+//               <div className="label">
+//                 {`:מחיר ל-100 ${getConvertedUnitWeight(
+//                   detailsOriginProduct.product.unitWeight
+//                 )}`}
+//               </div>
+//               <div className="value">
+//                 {"₪" +
+//                   getUnitWeightLabelForOne(
+//                     DetailsOptimalProduct.totalPrice,
+//                     DetailsOptimalProduct.quantity,
+//                     detailsOriginProduct.product.unitWeight,
+//                     detailsOriginProduct.product.weight
+//                   )}
+//               </div>
+//             </div>
+//           </div>
+//         ) : (
+//           <div className="not-exists">
+//             <div className="label">המוצר לא קיים בסל הקניות הנ"ל</div>
+//           </div>
+//         )}
+//         {originalProductExists ? (
+//           <div className="optimal-product-item__original-cart">
+//             <div className="quantity-original-product">
+//               <div className="label"> :כמות</div>
+//               <div className="value">{detailsOriginProduct.amount}</div>
+//             </div>
+//             <div className="total-price-original-product">
+//               <div className="label">:סה"כ</div>
+//               <div className="value">
+//                 {(
+//                   Math.round(detailsOriginProduct.totalPrice * 10) / 10
+//                 ).toFixed(2)}
+//               </div>
+//             </div>
+//             <div className="price-for-one-original-product">
+//               <div className="label">
+//                 {`:מחיר ל-100 ${getConvertedUnitWeight(
+//                   detailsOriginProduct.product.unitWeight
+//                 )}`}
+//               </div>
+//               <div className="value">
+//                 {"₪" +
+//                   getUnitWeightLabelForOne(
+//                     detailsOriginProduct.totalPrice,
+//                     detailsOriginProduct.amount,
+//                     detailsOriginProduct.product.unitWeight,
+//                     detailsOriginProduct.product.weight
+//                   )}
+//               </div>
+//             </div>
+//           </div>
+//         ) : (
+//           <div className="not-exists">
+//             <div className="label">המוצר לא קיים בסל הקניות המקורי</div>
+//           </div>
+//         )}
+//       </div>
+//       <div className="red-arrow-left">
+//         <img src={downLeftIcon} alt="down-left" />
+//       </div>
+//       <div className="optimal-product-item__summary">{summaryElement}</div>
+
+//       <div className="optimal-product-item__edit-buttons">
+//         <div
+//           className="delete-optimal-product"
+//           onClick={() =>
+//             deleteProductFromOptimalCart(
+//               DetailsOptimalProduct.barcode,
+//               supermarketID
+//             )
+//           }
+//         >
+//           <img src={deleteIcon} alt="Delete" />
+//         </div>
+//         <div className="edit-optimal-product-button">
+//           <img onClick={openModal} src={editIcon} alt="Edit" />
+//         </div>
+//         <button
+//           className="edit-optimal-product-button"
+//           onClick={openModal2}
+//         ></button>
+//       </div>
+//     </div>
+//   );
+// };
+
+// export default OptimalReplaceProductItem;
+
+
+=== OptimalsSupermarketCarts\OptimalSupermarketCart\SupermarketDetails.js ===
+import React from "react";
+import "./SupermarketDetails.css";
+// Import the logo component:
+import SupermarketLogo from "../../../../components/Images/SupermarketImage";
+
+const SupermarketDetails = ({ supermarketDetails }) => {
+  const { name: supermarketName, address: supermarketAddress, city: supermarketCity } = supermarketDetails;
+
+  return (
+    <div className="optimal-cart">
+      {console.log("supermarketName: ", supermarketName)}
+      <div className="optimal-cart__supermarket-logo">
+        <SupermarketLogo supermarketName={supermarketName} />
+        {console.log("supermarketDetails: ", supermarketDetails)}
+      </div>
+      <div className="optimal-cart__supermarket-info">
+        <div className="optimal-cart__supermarket-address">
+          {supermarketAddress}
+        </div>
+        <div className="optimal-cart__supermarket-city">
+          {supermarketCity}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default SupermarketDetails;
+
+
+=== OptimalsSupermarketCarts\OptimalSupermarketCart\EditOptimalProduct\EditAlternativeProduct.js ===
+import React, { useState, useEffect } from "react";
+import Image from "../../../../Images/Images";
+import { useCartOptimizationContext } from "../../../../../context/cart-optimizationContext";
+import "./EditAlternativeProduct.css";
+
+function EditAlternativeProduct({
+  oldBarcode,
+  generalName,
+  supermarketID,
+  DetailsOptimalProduct,
+  quantity,
+  isExistsInOptimalCart,
+}) {
+  const { getReplacementProductsByGeneralNameAndSupermarketID, replaceProductInOptimalCart } =
+    useCartOptimizationContext();
+  const [realProducts, setRealProducts] = useState([]);
+  const [isLoadingRealProducts, setIsLoadingRealProducts] = useState(true);
+
+  // loading the real products:
+  useEffect(() => {
+    const fetchRealProducts = async () => {
+      try {
+        const response =
+          await getReplacementProductsByGeneralNameAndSupermarketID(
+            generalName,
+            supermarketID
+          );
+
+        setRealProducts(response);
+        setIsLoadingRealProducts(false);
+      } catch (error) {
+        console.error("Error in fetching replacement products: ", error);
+      }
+    };
+    fetchRealProducts();
+  }, [
+    generalName,
+    supermarketID,
+    getReplacementProductsByGeneralNameAndSupermarketID,
+  ]);
+
+  const convertWeightUnit = (weightUnit) => {
+    weightUnit = weightUnit.toLowerCase();
+    if (weightUnit === "g") {
+      return "גרם";
+    }
+    if (weightUnit === "kg") {
+      return 'ק"ג';
+    }
+    if (weightUnit === "ml") {
+      return 'מ"ל';
+    }
+    if (weightUnit === "l") {
+      return "ליטר";
+    }
+    return weightUnit;
+  };
+
+  const max18Characters = (str) => {
+    if (str.length > 26) {
+      return "..." + str.substring(0, 21);
+    }
+    return str;
+  };
+
+  const priceFormat = (price) => {
+    return price.toFixed(2);
+  };
+
+  const discountPriceFormat = (price) => {
+    const units = price.discount.units;
+    const totalPrice = price.discount.totalPrice;
+    return (
+      <div
+        className="list__discount-price"
+        style={{
+          display: "flex",
+          flexDirection: "row-reverse",
+          alignItems: "center",
+          color: "#ff0000",
+          fontWeight: "bold",
+        }}
+      >
+        <p style={{ marginLeft: "0.3rem" }}>{units}</p>
+        <p>{"יחידות ב"}</p>
+        <p>{" - "}</p>
+        <p>{priceFormat(totalPrice)}</p>
+        <p style={{ fontWeight: "bold" }}>{"₪"}</p>
+      </div>
+    );
+  };
+
+  const getProductTotalPrice = (priceObj, quantity) => {
+    const hasDiscount = priceObj && priceObj.discount;
+    if (hasDiscount) {
+      const units = priceObj.discount.units;
+      const totalPrice = priceObj.discount.totalPrice;
+      return (
+        (quantity % units) * priceObj.price +
+        Math.floor(quantity / units) * totalPrice
+      );
+    } else {
+      return priceObj ? priceObj.price * quantity : 0;
+    }
+  };
+
+  const tempFunctionPrintData = (product) => {
+    console.log("====================================================");
+    console.log("oldBarcode: ", oldBarcode); // the barcode of the product that we want to replace (not the original product)
+    console.log("newBarcode: ", product.product.barcode); // the product that we want to replace with
+    console.log("priceobj: ", product.price);
+    console.log("quantity", quantity);
+    console.log("oldTotalPrice: ", DetailsOptimalProduct.totalPrice);
+    console.log("newTotalPrice: ", getProductTotalPrice(product.price, quantity));
+    console.log("supermarketID: ", supermarketID);
+    console.log("- - - - - - - - - - - - - - - - - - - - - -");
+    console.log("isExistsInOptimalCart: ", isExistsInOptimalCart);
+    console.log("====================================================");
+    replaceProductInOptimalCart(
+      oldBarcode, // the old barcode
+      product.product.barcode, // the new barcode
+      DetailsOptimalProduct.totalPrice, // the old total price
+      getProductTotalPrice(product.price, quantity), // the new total price of the product only
+      supermarketID, // the supermarket id
+    );
+  };
+
+  if (isLoadingRealProducts) {
+    return <div>Loading...</div>;
+  }
+
+  return (
+    <div className="replace-products">
+      {realProducts.map((product) => (
+        <React.Fragment key={product.product._id}>
+          <div
+            className="replace-product"
+            onClick={() => tempFunctionPrintData(product)}
+          >
+            <div className="replace-product-image">
+              <Image barcode={product.product.barcode} />
+            </div>
+            <div className="replace-product-details">
+              <p className="replace-product-details__name">{`${
+                product.product.name && max18Characters(product.product.name)
+              }`}</p>
+              <div className="replace-product-details__information">
+                <p style={{ marginLeft: "0.3rem" }}>{product.product.weight}</p>
+                <p>{convertWeightUnit(product.product.unitWeight)}</p>
+                <p style={{ color: "black" }}>{"|"}</p>
+                <p className="replace-product-details__brand">
+                  {product.product.brand}
+                </p>
+              </div>
+              <div className="replace-product-details__price">
+                {product.price && <p> {product.price.price}</p>}
+                {product.price && <p style={{ fontWeight: "bold" }}>{"₪"}</p>}
+              </div>
+              {product.price &&
+                product.price.discount &&
+                discountPriceFormat(product.price)}
+            </div>
+          </div>
+          <div className="replace-product-separator"></div>
+        </React.Fragment>
+      ))}
+    </div>
+  );
+}
+
+export default EditAlternativeProduct;
+
+
+=== OptimalsSupermarketCarts\OptimalSupermarketCart\EditOptimalProduct\EditOptimalProduct.js ===
+import React from "react";
+import { useState } from "react";
+import { useEffect } from "react";
+import ProductsImages from "../../../../Images/ProductsImages";
+import { useCartOptimizationContext } from "../../../../../context/cart-optimizationContext";
+import "./EditOptimalProduct.css";
+import PointerIcon from "./pointer.svg";
+
+const convertLaterToUnitWeight = (unitWeight) => {
+  switch (true) {
+    case unitWeight === "g":
+      return "גרם";
+    case unitWeight === "kg":
+      return "קילוגרם";
+    case unitWeight === "ml":
+      return "מיליליטר";
+    case unitWeight === "l":
+      return "ליטר";
+    case unitWeight === "u":
+      return "יחידות";
+    default:
+      return unitWeight;
+  }
+};
+
+const EditOptimalProduct = ({
+  productDetails,
+  optimalProductDetails,
+  supermarketID,
+  isReplace,
+  replaceProductDetails,
+  closeModal,
+}) => {
+  const {
+    getPriceByProductBarcodeAndSupermarketID,
+    changeOptimalProductQuantity,
+  } = useCartOptimizationContext();
+
+  // useState for the price of the product:
+  const [productPrice, setProductPrice] = useState(0);
+  const [isProductPriceLoading, setIsProductPriceLoading] = useState(true);
+
+  // useState for the editing quantity:
+  const [editingQuantity, setEditingQuantity] = useState(
+    optimalProductDetails.quantity
+  );
+
+  const [editedTotalPrice, setEditedTotalPrice] = useState(0);
+
+  // useEffect for getting the price of the product:
+  useEffect(() => {
+    const fetchProductPrice = async () => {
+      const productPrice = await getPriceByProductBarcodeAndSupermarketID(
+        optimalProductDetails.barcode,
+        supermarketID
+      );
+      console.log(
+        "optimalProductDetails.barcode",
+        optimalProductDetails.barcode
+      );
+      setProductPrice(productPrice);
+      setIsProductPriceLoading(false);
+    };
+    fetchProductPrice();
+  }, [
+    optimalProductDetails.barcode,
+    supermarketID,
+    getPriceByProductBarcodeAndSupermarketID,
+  ]);
+
+  useEffect(() => {
+    // case there is a discount:
+    if (productPrice.hasDiscount) {
+      setEditedTotalPrice(
+        (editingQuantity % productPrice.discount.units) * productPrice.price +
+          Math.floor(editingQuantity / productPrice.discount.units) *
+            productPrice.discount.totalPrice
+      );
+    }
+    // case there is no discount:
+    else {
+      setEditedTotalPrice(editingQuantity * productPrice.price);
+    }
+  }, [editingQuantity, productPrice]);
+
+  const addOneToEditingQuantity = () => {
+    setEditingQuantity(editingQuantity + 1);
+  };
+
+  const reduceOneFromEditingQuantity = () => {
+    if (editingQuantity > 1) {
+      setEditingQuantity(editingQuantity - 1);
+    }
+  };
+
+  const updateOptimalProductQuantity = () => {
+    changeOptimalProductQuantity(
+      productDetails.product.barcode,
+      supermarketID,
+      editingQuantity,
+      editedTotalPrice
+    );
+    closeModal();
+  };
+
+  // console.log("productDetails", productDetails);
+  // console.log("optimalProductDetails", optimalProductDetails);
+  // console.log("supermarketID", supermarketID);
+  console.log("productPrice", productPrice);
+
+  if (isProductPriceLoading || !productPrice) {
+    return <div>Loading...</div>;
+  }
+  return (
+    <div className="edit-optimal-product">
+      <div className="edit-optimal-product__edit-amount">
+        <div className="edit-amount__product-details">
+          <div className="product-image">
+            {!isReplace ? (
+              <ProductsImages barcode={productDetails.product.barcode} />
+            ) : (
+              <ProductsImages barcode={replaceProductDetails.barcode} />
+            )}
+          </div>
+          <div className="product-details">
+            <div className="product-name">
+              {!isReplace
+                ? productDetails.product.name
+                : replaceProductDetails.name}
+            </div>
+
+            <div className="product-unique-details">
+              {/* <div className="weight">{productDetails.product.weight}</div> */}
+              <div className="weight">
+                {!isReplace
+                  ? productDetails.product.weight
+                  : replaceProductDetails.weight}
+              </div>
+              {/* <div className="unit-weight">
+                {convertLaterToUnitWeight(productDetails.product.unitWeight)}
+              </div> */}
+              <div className="unit-weight">
+                {convertLaterToUnitWeight(
+                  !isReplace
+                    ? productDetails.product.unitWeight
+                    : replaceProductDetails.unitWeight
+                )}
+              </div>
+              <div className="separating-line">|</div>
+
+              <div
+                className="brand"
+                style={{
+                  textAlign: "right",
+                  whiteSpace: "nowrap",
+                  width: "100%",
+                }}
+              >
+                {!isReplace
+                  ? productDetails.product.brand
+                  : replaceProductDetails.brand}
+              </div>
+            </div>
+            <div className="priduct-unit-price">
+              <div className="label">:מחיר</div>
+              <div className="price">₪{productPrice.price}</div>
+            </div>
+            <div className="product-discount-price">
+              {productPrice.hasDiscount ? (
+                <div>
+                  מבצע: {productPrice.discount.units} יחידות ב- ₪
+                  {productPrice.discount.totalPrice}
+                </div>
+              ) : null}
+            </div>
+          </div>
+        </div>
+        <div className="edit-amount__alternative-products-guide">
+          <div className="pointer-icon">
+            <img src={PointerIcon} alt="pointer" />
+          </div>
+          <div className="guide">
+            <b>לחץ כאן</b> להצגת מוצרים חלופיים
+          </div>
+        </div>
+        <div className="edit-amount__product-details-optimal-cart">
+          <div className="edit-amount__current-amount">
+            כמות נוכחית: <b>{optimalProductDetails.quantity} יחידות</b>
+          </div>
+          <div className="edit-amount__current-total-price">
+            מחיר נוכחי: <b>₪{optimalProductDetails.totalPrice.toFixed(2)}</b>
+          </div>
+          <div>{editedTotalPrice.toFixed(2)}</div>
+        </div>
+        <div className="edit-amount__operations">
+          <div
+            className="quantity-reduction-button"
+            onClick={reduceOneFromEditingQuantity}
+          >
+            -
+          </div>
+          <div className="display-editing-quantity">{editingQuantity}</div>
+          <div className="quantity-unit-label">'יח</div>
+          <div
+            className="quantity-increase-button"
+            onClick={addOneToEditingQuantity}
+          >
+            +
+          </div>
+          <div
+            className="confirm-button"
+            onClick={updateOptimalProductQuantity}
+          >
+            עדכן
+          </div>
+        </div>
+        <div className="edit-amount__edited-total-price">
+          {/* {editedTotalPrice.toFixed(2)} */}
+          מחיר חדש: <b>₪{editedTotalPrice.toFixed(2)}</b>
+        </div>
+      </div>
+      <div className="edit-optimal-product__replace-product"></div>
+      <div></div>
+    </div>
+  );
+};
+
+export default EditOptimalProduct;
+
+
+=== OptimalsSupermarketCarts\OptimalSupermarketCart\EditOptimalProduct\EditOptimalProductModal.js ===
+// import React, { useEffect } from "react";
+import ReactDOM from "react-dom";
+import "./EditOptimalProductModal.css";
+
+const EditOptimalProductModal = ({ isOpen, children, onClose }) => {
+  if (!isOpen) {
+    return null;
+  }
+
+  const handleOverlayClick = (event) => {
+    // Check if the clicked target is the overlay itself and not the modal window
+    if (event.target.className === "modal-overlay-edit-optimal-product") {
+      onClose();
+    }
+  };
+
+  return ReactDOM.createPortal(
+    <div className="modal-overlay-edit-optimal-product" onClick={handleOverlayClick}>
+      <div className="modal-window">
+        {children}
+      </div>
+    </div>,
+    document.getElementById("modal-root")
+  );
+};
+
+export default EditOptimalProductModal;
+
+

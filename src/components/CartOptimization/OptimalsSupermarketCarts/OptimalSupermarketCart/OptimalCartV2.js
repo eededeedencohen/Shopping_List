@@ -12,8 +12,11 @@ const OptimalCartV2 = ({
     <div className="full-optimal-cart">
       {/* Supermarket details and products list components remain unchanged */}
       <SupermarketDetails supermarketDetails={supermarketDetails} />
-      <OptimalProductsList optimalCart={optimalCart} originalCart={originalCart} />
-      
+      <OptimalProductsList
+        optimalCart={optimalCart}
+        originalCart={originalCart}
+      />
+      {console.log("originalCart: ", originalCart)}
       {/* Back button added */}
       <button className="back-button" onClick={onClickBack}>
         Back

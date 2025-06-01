@@ -7,7 +7,6 @@ import React, {
 } from "react";
 import {
   getOptimalSupermarketCarts,
-  // getFullActiveCart,
   getAllBrands,
   getAllSupermarkets,
   getPriceObjectByProductBarcodeAndSupermarketID,
@@ -24,13 +23,28 @@ export const CartOptimizationContextProvider = ({ children }) => {
   const [canReplaceSettings, setCanReplaceSettings] = useState("bySelect"); // bySelect, all, none
   const [canRoundUpSettings, setCanRoundUpSettings] = useState("bySelect"); // bySelect, all, none
 
+  /**
+   * ===============================================================================
+   * @param {String} newCanReplaceSettings - The new settings for canReplace.
+   * @summary - Update the useState of the canReplaceSettings
+   * @description - This function is used to update the canReplaceSettings useState.
+   * ==============================================================================
+   */
   const changeCanReplaceSettings = (newCanReplaceSettings) => {
     setCanReplaceSettings(newCanReplaceSettings);
   };
 
+  /**
+   * ===============================================================================
+   * @param {String} newCanRoundUpSettings - The new settings for canRoundUp.
+   * @summary - Update the useState of the canRoundUpSettings
+   * @description - This function is used to update the canRoundUpSettings useState.
+   * ===============================================================================
+   */
   const changeCanRoundUpSettings = (newCanRoundUpSettings) => {
     setCanRoundUpSettings(newCanRoundUpSettings);
   };
+
 
   const [supermarketIDs, setSupermarketIDs] = useState([]);
 
@@ -39,6 +53,7 @@ export const CartOptimizationContextProvider = ({ children }) => {
     useState(false);
 
   const [isOptimalCartsUploaded, setIsOptimalCartsUploaded] = useState(false);
+  
   const getOptimalsCarts = async () => {
     try {
       const response = await getOptimalSupermarketCarts(
@@ -408,47 +423,6 @@ export const CartOptimizationContextProvider = ({ children }) => {
     setOptimalCarts(newOptimalCarts);
   };
 
-  /**=========================
-   *  OPPERATIONS ON THE CART:
-   ===========================*/
-
-  // Update amount of the product in the optimal cart:
-
-  // // Delete the product form the optimal cart:
-  // const deleteProductFromOptimalCart = (barcode, supermarketID) => {
-
-  //   console.log("optimalCartsTest: ", optimalCarts);
-
-  //   // step 1:
-  //   const optimalCartIndex = optimalCarts.findIndex(
-  //     (cart) => cart.supermarketID === supermarketID
-  //   );
-  //   const optimalCart = optimalCarts[optimalCartIndex];
-
-  //   // step 2:
-  //   const newOptimalCart = { ...optimalCart };
-  //   newOptimalCart.deletedProducts = [
-  //     ...newOptimalCart.deletedProducts,
-  //     barcode,
-  //   ];
-
-  //   // step 3:
-  //   newOptimalCart.existsProducts = newOptimalCart.existsProducts.filter(
-  //     (product) => product.oldBarcode !== barcode
-  //   );
-  //   newOptimalCart.nonExistsProducts = newOptimalCart.nonExistsProducts.filter(
-  //     (product) => product.oldBarcode !== barcode
-  //   );
-
-  //   // step 4:
-  //   const newOptimalCarts = [...optimalCarts];
-
-  //   newOptimalCarts[optimalCartIndex] = newOptimalCart;
-
-  //   setOptimalCarts(newOptimalCarts);
-
-  //   console.log("optimalCartsTest: ", optimalCarts);
-  // };
   const deleteProductFromOptimalCart = (barcode, supermarketID) => {
     // Step 1: Find the optimal cart
     const cartIndex = optimalCarts.findIndex(
@@ -629,3 +603,7 @@ export const CartOptimizationContextProvider = ({ children }) => {
 
 export const useCartOptimizationContext = () =>
   useContext(CartOptimizationContext);
+
+
+
+

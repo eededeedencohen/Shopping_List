@@ -14,7 +14,7 @@ const SupermarketOptimalCartItem = ({
   const [isShowFullOptimalCart, setIsShowFullOptimalCart] = useState(false);
   const { getProductDetailsByBarcode } = useProducts();
   let nonExistsProductsNames = [];
-  
+
   optimalCart.nonExistsProducts.forEach((product) => {
     nonExistsProductsNames.push(
       getProductDetailsByBarcode(product.barcode).name
@@ -47,6 +47,7 @@ const SupermarketOptimalCartItem = ({
       onClick={handleNavigateToOptimalCart}
     >
       <div className="optimal-cart-details">
+        {console.log("originalCart: ", originalCart)}
         <div className="supermarket-details">
           <div className="supermarket-name">
             <SupermarketImage supermarketName={supermarketDetails.name} />

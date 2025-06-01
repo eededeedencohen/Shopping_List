@@ -5,9 +5,13 @@ import CartsFilter from "./CartsFilter";
 import SupermarketOptimalCartItem from "./SupermarketOptimalCartItem";
 import "./OptimalsSupermarketCarts.css";
 import { useCartOptimizationContext } from "../../../context/cart-optimizationContext";
+import {useFullCart} from "../../../hooks/appHooks"
 
 const OptimalsSupermarketCarts = () => {
-  const { allSupermarkets, fullCart, optimalCarts, isOptimalCartsCalculated } = useCartOptimizationContext();
+  // const { allSupermarkets, fullCart, optimalCarts, isOptimalCartsCalculated } = useCartOptimizationContext();
+    const { allSupermarkets, optimalCarts, isOptimalCartsCalculated } = useCartOptimizationContext();
+
+  const {fullCart} = useFullCart();
   const [selectedSupermarketID, setSelectedSupermarketID] = useState(0);
 
   if (!isOptimalCartsCalculated) {
@@ -19,6 +23,7 @@ const OptimalsSupermarketCarts = () => {
     return (
       <div>
         <CartsFilter />
+        {console.log("fullCart: ", fullCart)}
         {optimalCarts.map((cart) => (
           <SupermarketOptimalCartItem
             key={cart.supermarketID}

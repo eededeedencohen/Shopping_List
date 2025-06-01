@@ -1,0 +1,204 @@
+/* ProductCardList.css */
+/* --------------------------------------------------------------------------------- */
+/* כל הסגנונות של כרטיס מוצר בודד + האופרציות שלו                                   */
+/* --------------------------------------------------------------------------------- */
+
+/* כרטיס מוצר */
+.list__product-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  margin: 10px;
+  padding: 5px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-shadow: 0 0 10px #ccc;
+  background-color: #fff;
+  overflow: hidden;
+}
+
+/* תגית "מבצע" אלכסונית */
+.list__product-badge {
+  position: absolute;
+  top: 3px;
+  left: -27px;
+  background-color: #af4c4c90;
+  color: #fff;
+  padding: 5px;
+  border-radius: 5px;
+  font-size: 0.9rem;
+  text-align: center;
+  transform: rotate(-45deg);
+  width: 90px;
+  font-weight: bold;
+}
+
+/* מבנה פנימי */
+.list__product-details {
+  display: flex;
+  flex-direction: row;
+}
+.list__product-data {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-end;
+  width: 70%;
+  padding-right: 5px;
+}
+
+/* שם מוצר */
+.list__product-name {
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: #2f416e;
+  margin: 0 0 2px 0;
+}
+
+/* מידע נוסף */
+.list__product-info {
+  display: flex;
+  flex-direction: row-reverse;
+  align-items: center;
+}
+.list__separator {
+  margin: 0 0.4rem;
+  color: #888;
+}
+
+/* משקל ומותג */
+.list__product-weight,
+.list__product-brand {
+  display: flex;
+  flex-direction: row-reverse;
+  align-items: center;
+  font-size: 1rem;
+  color: #2f416e;
+  margin: 0;
+}
+.list__product-weight p {
+  margin-left: 3px;
+}
+.list__product-brand p {
+  margin-right: 3px;
+  font-weight: bold;
+}
+
+/* מחיר יחידה */
+.list__product-price {
+  display: flex;
+  flex-direction: row-reverse;
+  align-items: center;
+  font-size: 1.2rem;
+  color: #a0a0a0;
+  margin-top: 5px;
+}
+
+/* מחיר מבצע */
+.list__discount-price {
+  display: flex;
+  flex-direction: row-reverse;
+  align-items: center;
+  color: #ff0000;
+  font-weight: bold;
+  margin-top: 3px;
+}
+
+/* תמונת מוצר (30%) */
+.list__product-image {
+  width: 30%;
+  position: relative;
+}
+.list__product-image::before {
+  content: "";
+  display: block;
+  padding-top: 100%; /* יחס 1:1 */
+}
+.list__product-image img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: 5px;
+}
+
+/* ---------------------------------------------------------- */
+/*           כפתורי + / - / אישור כמות                        */
+/* ---------------------------------------------------------- */
+.list__product-operations {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin-top: 5px;
+}
+
+/* כפתור אישור (מופיע רק כשה-JS מוסיף class visible) */
+.list__product-operations__confirm,
+.list__product-operations__add,
+.list__product-operations__reduce {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 5px;
+  padding: 10px 15px;
+  border: 2px solid #ccc;
+  border-radius: 30px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  color: #fff;
+}
+
+.list__product-operations__add,
+.list__product-operations__reduce {
+  width: 3rem;
+  height: 3rem;
+  font-size: 1.5rem;
+  padding-bottom: 1rem;
+}
+
+/* אישור */
+.list__product-operations__confirm {
+  background-color: #808080;
+  width: 7rem;
+  margin-right: 2rem;
+  visibility: hidden;
+  opacity: 0;
+  transition: background-color 0.5s ease, opacity 0.5s ease,
+    visibility 0s linear 0.5s;
+}
+.visible {
+  opacity: 1;
+  visibility: visible;
+  transition-delay: 0s;
+}
+
+/* הוספה */
+.list__product-operations__add {
+  background-color: #4caf50;
+  margin-right: 0.5rem;
+}
+.list__product-operations__add:hover {
+  background-color: #3e8e41;
+}
+
+/* הפחתה */
+.list__product-operations__reduce {
+  background-color: #f44336;
+  margin-left: 0.5rem;
+}
+.list__product-operations__reduce:hover {
+  background-color: #d32f2f;
+}
+
+/* כמות נוכחית */
+.list__product-operations__quantity {
+  font-size: 1rem;
+  padding: 5px 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  background-color: #f2f2f2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
