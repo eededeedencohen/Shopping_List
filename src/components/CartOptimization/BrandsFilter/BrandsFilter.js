@@ -1,12 +1,14 @@
 import React, { useState } from "react";
 import ModalV1 from "../../Modal/ModalV1";
 import "./BrandsFilter.css";
-import { useCartOptimizationContext } from "../../../context/cart-optimizationContext";
+// import { useCartOptimizationContext } from "../../../context/cart-optimizationContext";
+import { useBrands } from "../../../hooks/optimizationHooks";
 import BrandItem from "./BrandItem";
 import filterIcon from "./filter.svg";
 
 const BrandsFilter = ({ generalName, barcode }) => {
-  const { allBrands, isAllBrandsUploaded } = useCartOptimizationContext();
+  // const { allBrands, isAllBrandsUploaded } = useCartOptimizationContext();
+  const { allBrands, isAllBrandsUploaded } = useBrands();
   const [isBrandsFilterOpen, setIsBrandsFilterOpen] = useState(false);
 
   const toggleBrandsFilter = () => setIsBrandsFilterOpen(!isBrandsFilterOpen);
@@ -30,7 +32,7 @@ const BrandsFilter = ({ generalName, barcode }) => {
       {/*<button onClick={toggleBrandsFilter}>Filter Brands</button>*/}
       <div className="open-brands-filters-modal" onClick={toggleBrandsFilter}>
         <div className="brands-filters-icon">
-            <img src={filterIcon} alt="filter" />   
+          <img src={filterIcon} alt="filter" />
         </div>
         <div className="brands-filters-label">סינון מותגים</div>
       </div>

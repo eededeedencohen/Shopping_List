@@ -1,0 +1,105 @@
+.ppa_product-animation-add {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 9999;
+  pointer-events: none;
+}
+
+.ppa_product-animation-sequence {
+  position: relative;
+  width: 200px;
+  height: 200px;
+}
+
+.ppa_cart-image {
+  position: absolute;
+  bottom: 0;
+  left: -200px;
+  width: 150px;
+  animation: ppa_cartIn 1s ease-out forwards, ppa_cartOut 1s ease-in forwards;
+  animation-delay: 0s, 1.7s;
+}
+
+.ppa_product-image-container {
+  position: absolute;
+  top: -150px;
+  left: 50%;
+  transform: translateX(-70%);
+  animation: ppa_productDropPosition 0.7s ease-in forwards;
+  animation-delay: 1s;
+}
+
+.ppa_product-image-wrapper {
+  position: relative;
+  display: inline-block;
+  animation: ppa_productDropAndClip 0.7s ease-in forwards;
+  animation-delay: 1s;
+}
+
+.ppa_product-image {
+  width: 80px;
+  height: auto;
+}
+
+.ppa_product-amount-badge {
+  position: absolute;
+  bottom: 0px;
+  right: -1px;
+  background-color: #0cff3c;
+  color: white;
+  font-weight: bold;
+  font-size: 18px;
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 3px solid white;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+}
+
+/* אנימציות */
+@keyframes ppa_cartIn {
+  to {
+    left: 0px;
+  }
+}
+
+@keyframes ppa_cartOut {
+  to {
+    left: 300px;
+  }
+}
+
+@keyframes ppa_productDropPosition {
+  0% {
+    top: -150px;
+  }
+  70% {
+    top: 40px;
+  }
+  85% {
+    top: 60px;
+  }
+  100% {
+    top: 80px;
+  }
+}
+
+@keyframes ppa_productDropAndClip {
+  0% {
+    clip-path: inset(0% 0% 0% 0%);
+  }
+  70% {
+    clip-path: inset(0% 0% 0% 0%);
+  }
+  85% {
+    clip-path: inset(0% 0% 30% 0%);
+  }
+  100% {
+    clip-path: inset(0% 0% 100% 0%);
+  }
+}

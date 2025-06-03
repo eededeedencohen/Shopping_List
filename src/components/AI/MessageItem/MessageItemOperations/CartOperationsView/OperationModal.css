@@ -1,0 +1,21 @@
+/* .modal1-window {
+
+} */
+
+/* @keyframes slide-left {
+  0% {
+    transform: translateX(150%) translateY(5%);
+  }
+  100% {
+    transform: translateX(50%) translateY(5%);
+  }
+}
+
+@keyframes slide-right {
+  0% {
+    transform: translateX(50%) translateY(5%);
+  }
+  100% {
+    transform: translateX(150%) translateY(5%);
+  }
+} */

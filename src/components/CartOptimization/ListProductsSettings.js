@@ -1,18 +1,25 @@
 import React, { useState } from "react";
 import ProductSettings from "./ProductSettings";
 import "./ListProductsSettings.css";
-import { useCartOptimizationContext } from "../../context/cart-optimizationContext";
+// import { useCartOptimizationContext } from "../../context/cart-optimizationContext";
+import {
+  useSettings,
+  useCalculateOptimalCarts,
+} from "../../hooks/optimizationHooks";
 import { useNavigate } from "react-router-dom";
 
-
 export default function ListProductsSettings() {
+  // const {
+  //   productsSettings,
+  //   isProductsSettingsUploaded,
+  //   getOptimalsCarts,
+  // } = useCartOptimizationContext();
+
+  const { productsSettings, isProductsSettingsUploaded } = useSettings();
+
   const {
-    productsSettings,
-    isProductsSettingsUploaded,
-    optimalSupermarkets,
-    isDataUploaded,
-    getOptimalsCarts,
-  } = useCartOptimizationContext();
+    getOptimalsCarts, // fetch-once
+  } = useCalculateOptimalCarts();
 
   const navigate = useNavigate();
 
@@ -39,13 +46,13 @@ export default function ListProductsSettings() {
     }
   };
 
-  const printOptimalSupermarketCarts = () => {
-    if (!isDataUploaded) {
-      console.log("No data uploaded yet");
-    } else {
-      console.log(optimalSupermarkets);
-    }
-  };
+  // const printOptimalSupermarketCarts = () => {
+  //   if (!isDataUploaded) {
+  //     console.log("No data uploaded yet");
+  //   } else {
+  //     console.log(optimalSupermarkets);
+  //   }
+  // };
 
   if (!isProductsSettingsUploaded) {
     return (
@@ -57,15 +64,15 @@ export default function ListProductsSettings() {
 
   return (
     <div className="list-products-settings">
-      <button onClick={() => navigate("/optimal-carts-settings")}> General Settings</button>
+      <button onClick={() => navigate("/optimal-carts-settings")}>
+        {" "}
+        General Settings
+      </button>
       <div>
         {productsSettings.map((product) => (
           <ProductSettings key={product.barcode} product={product} />
         ))}
       </div>
-      <button onClick={printOptimalSupermarketCarts}>
-        Print Optimal Supermarket Carts
-      </button>
       <button onClick={handleCalculateOptimalSupermarketCarts}>
         Calculate Optimal Supermarket Carts
       </button>

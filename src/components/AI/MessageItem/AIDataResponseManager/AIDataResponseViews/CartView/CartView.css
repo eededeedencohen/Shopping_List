@@ -1,0 +1,215 @@
+/* ╔══════════════════════╗
+   ║ Luxury Glass Cart    ║
+   ╚══════════════════════╝ */
+
+:root {
+  --glass: rgba(255 255 255 / 0.18);
+  --br: 24px;
+  --brd: 1px solid rgba(255 255 255 / 0.32);
+  --sh: 0 10px 30px rgba(0 0 0 / 0.15);
+  --grad-h: linear-gradient(135deg, #6366f1, #a855f7);
+}
+
+/* מעטפת */
+.cv_root {
+  font-family: "Assistant", sans-serif;
+  max-width: 580px;
+  margin: auto;
+  background: var(--glass);
+  border: var(--brd);
+  border-radius: var(--br);
+  backdrop-filter: blur(22px) saturate(180%);
+  -webkit-backdrop-filter: blur(22px) saturate(180%);
+  box-shadow: var(--sh);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  height: 80vh;
+  width: 100%;
+}
+
+/* טעינה */
+.cv_loading {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+.cv_loading p {
+  margin-top: 10px;
+  font-size: 18px;
+  color: #475569;
+}
+
+/* Header */
+.cv_header {
+  padding: 20px;
+  text-align: center;
+  background: var(--grad-h);
+  color: #fff;
+}
+.cv_supName {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 900;
+  letter-spacing: 0.5px;
+}
+.cv_supAddr {
+  margin: 4px 0 0;
+  font-size: 14px;
+  opacity: 0.9;
+}
+
+/* Scroll area */
+.cv_scroll {
+  flex: 1;
+  overflow-y: auto;
+}
+.cv_list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 18px 16px 120px;
+}
+
+/* Item */
+.cv_item {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  background: var(--glass);
+  border: var(--brd);
+  border-radius: 20px;
+  box-shadow: 0 6px 18px rgba(0 0 0 / 0.1);
+  padding: 12px 14px;
+}
+
+/* picture + badge */
+.cv_pic {
+  position: relative;
+  width: 70px;
+  height: 70px;
+  flex-shrink: 0;
+}
+.cv_pic img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: 14px;
+}
+.cv_badge {
+  position: absolute;
+  bottom: -6px;
+  right: -6px;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: #22c55e;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 6px rgba(0 0 0 / 0.25);
+}
+
+/* info */
+.cv_info {
+  flex: 1;
+  text-align: right;
+}
+.cv_name {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 800;
+  color: #1e293b;
+}
+.cv_line {
+  margin: 2px 0 0;
+  font-size: 13px;
+  color: #475569;
+}
+
+/* price + remove */
+.cv_priceBox {
+  display: flex;
+  flex-direction: column;
+  align-items: end;
+  gap: 6px;
+}
+.cv_price {
+  font-size: 16px;
+  font-weight: 800;
+  color: #0ea5e9;
+}
+.cv_remove {
+  width: 34px;
+  height: 34px;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  background: #ef4444;
+  color: #fff;
+  font-size: 18px;
+  box-shadow: 0 3px 10px rgba(0 0 0 / 0.25);
+  transition: transform 0.15s;
+}
+.cv_remove:active {
+  transform: scale(0.88);
+}
+
+/* Total – sticky */
+.cv_total {
+  position: sticky;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #0f172a;
+  color: #fff;
+  padding: 18px 22px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 18px;
+  box-shadow: 0 -4px 14px rgba(0 0 0 / 0.2);
+}
+.cv_total strong {
+  font-size: 22px;
+  font-weight: 900;
+}
+
+.cv_item {
+  transition: transform 0.2s ease-out;
+}
+
+/* ─── Bounce (החלקה ימינה) ─── */
+.cv_item.bounce {
+  animation: cv_bounce 0.45s cubic-bezier(0.18, 0.89, 0.29, 1.15);
+}
+@keyframes cv_bounce {
+  0% {
+    transform: translateX(100%);
+  }
+  60% {
+    transform: translateX(-18px);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+/* ─── Delete (שמאלה) ─── */
+.cv_item.delete {
+  animation: cv_swipeOut 0.4s ease forwards;
+}
+@keyframes cv_swipeOut {
+  to {
+    transform: translateX(-120%);
+    opacity: 0;
+    height: 0;
+    margin: 0;
+    padding: 0;
+  }
+}

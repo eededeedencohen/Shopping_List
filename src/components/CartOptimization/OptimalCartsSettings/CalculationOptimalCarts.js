@@ -1,7 +1,8 @@
 import React, { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import "./CalculationOptimalCarts.css";
-import { useCartOptimizationContext } from "../../../context/cart-optimizationContext";
+// import { useCartOptimizationContext } from "../../../context/cart-optimizationContext";
+import { useCalculateOptimalCarts } from "../../../hooks/optimizationHooks";
 
 const CalculationOptimalCarts = () => {
   const [position, setPosition] = useState(0);
@@ -9,7 +10,10 @@ const CalculationOptimalCarts = () => {
   const containerRef = useRef(null);
   const navigate = useNavigate();
 
-  const { calculateOptimalsCarts } = useCartOptimizationContext();
+  // const { calculateOptimalsCarts } = useCartOptimizationContext();
+  const {
+    calculateOptimalsCarts, // alias ישן
+  } = useCalculateOptimalCarts(); // useCalculateOptimalCarts
 
   const startDragging = () => {
     setIsDragging(true);

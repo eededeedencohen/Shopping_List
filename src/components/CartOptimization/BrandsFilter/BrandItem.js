@@ -1,13 +1,21 @@
-import React from "react";
+// import { useCartOptimizationContext } from "../../../context/cart-optimizationContext";
+import {
+  useSettings,
+  useSettingsOperations,
+} from "../../../hooks/optimizationHooks";
 import "./BrandItem.css";
-import { useCartOptimizationContext } from "../../../context/cart-optimizationContext";
 
 const BrandItem = ({ brand, barcode }) => {
-  const {
-    getBlackListBrands,
-    insertBrandToBlackList,
-    removeBrandFromBlackList,
-  } = useCartOptimizationContext();
+  // const {
+  //   getBlackListBrands,
+  //   insertBrandToBlackList,
+  //   removeBrandFromBlackList,
+  // } = useCartOptimizationContext();
+
+  const { getBlackListBrands } = useSettings(); // useSettings
+
+  const { insertBrandToBlackList, removeBrandFromBlackList } =
+    useSettingsOperations();
 
   return (
     <div className="brand-item">

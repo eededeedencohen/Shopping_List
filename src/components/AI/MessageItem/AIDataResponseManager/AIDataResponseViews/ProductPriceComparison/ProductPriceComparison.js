@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from "react";
 import data from "./xyz.json";
-import "./ProductPriceComparison.css";
+import "./ProductPriceComparison.css"; // ⬅️ קובץ חדש
+import "./ProductHeader.css";
+import "./BranchCard.css";
+
 import ProductHeader from "./ProductHeader";
 import BranchCard from "./BranchCard";
 
@@ -10,55 +13,43 @@ const ProductPriceComparison = () => {
 
   useEffect(() => {
     const allBranches = data.data["רמי לוי"];
-    const barcodeToMatch = "7290010117864";
+    const barcode = "7290010117864";
 
-    const matchedBranches = [];
-    let productDetails = null;
+    const hits = [];
+    let prod = null;
 
-    allBranches.forEach((branch) => {
-      const match = branch.products.find(
-        (item) => item.product.barcode === barcodeToMatch
-      );
-
+    allBranches.forEach((b) => {
+      const match = b.products.find((p) => p.product.barcode === barcode);
       if (match) {
-        if (!productDetails) productDetails = match.product;
-
-        matchedBranches.push({
-          branchAddress: branch.branchAddress,
-          price: match.price,
-        });
+        if (!prod) prod = match.product;
+        hits.push({ branchAddress: b.branchAddress, price: match.price });
       }
     });
 
-    if (productDetails) {
-      setProduct(productDetails);
-      setBranches(matchedBranches);
-    }
+    setProduct(prod);
+    setBranches(hits);
   }, []);
 
-  if (!product) return <div className="b1_loading">טוען נתונים...</div>;
+  if (!product) return <div className="fun_loading">טוען...</div>;
 
   return (
-    <div className="b1_card_wrapper">
-      <ProductHeader
-        name={product.name}
-        brand={product.brand}
-        weight={product.weight}
-        unitWeight={product.unitWeight}
-        barcode={product.barcode}
-      />
-      <div className="b1_beanches_cards">
-        {branches.map((branch, index) => (
-          <BranchCard
-            key={index}
-            branchAddress={branch.branchAddress}
-            price={branch.price}
-            supermarketName="רמי לוי"
-            city="ירושלים"
-          />
-        ))}
+    <section className="fun_sheet">
+      <div className="fun_card">
+        <ProductHeader {...product} />
+        <div className="fun_branches">
+          {branches.map((br, i) => (
+            <BranchCard
+              key={i}
+              index={i}
+              branchAddress={br.branchAddress}
+              city="ירושלים"
+              price={br.price}
+              supermarketName="רמי לוי"
+            />
+          ))}
+        </div>
       </div>
-    </div>
+    </section>
   );
 };
 

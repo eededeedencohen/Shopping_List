@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import Image from "../../../../Images/Images";
-import { useCartOptimizationContext } from "../../../../../context/cart-optimizationContext";
+// import { useCartOptimizationContext } from "../../../../../context/cart-optimizationContext";
+import { useOptimalProductsOperation } from "../../../../../hooks/optimizationHooks";
 import "./EditAlternativeProduct.css";
 
 function EditAlternativeProduct({
@@ -11,8 +12,14 @@ function EditAlternativeProduct({
   quantity,
   isExistsInOptimalCart,
 }) {
-  const { getReplacementProductsByGeneralNameAndSupermarketID, replaceProductInOptimalCart } =
-    useCartOptimizationContext();
+  // const {
+  //   getReplacementProductsByGeneralNameAndSupermarketID,
+  //   replaceProductInOptimalCart,
+  // } = useCartOptimizationContext();
+  const {
+    getReplacementProductsByGeneralNameAndSupermarketID,
+    replaceProductInOptimalCart,
+  } = useOptimalProductsOperation(); // useOptimalProductsOperation
   const [realProducts, setRealProducts] = useState([]);
   const [isLoadingRealProducts, setIsLoadingRealProducts] = useState(true);
 
@@ -111,7 +118,10 @@ function EditAlternativeProduct({
     console.log("priceobj: ", product.price);
     console.log("quantity", quantity);
     console.log("oldTotalPrice: ", DetailsOptimalProduct.totalPrice);
-    console.log("newTotalPrice: ", getProductTotalPrice(product.price, quantity));
+    console.log(
+      "newTotalPrice: ",
+      getProductTotalPrice(product.price, quantity)
+    );
     console.log("supermarketID: ", supermarketID);
     console.log("- - - - - - - - - - - - - - - - - - - - - -");
     console.log("isExistsInOptimalCart: ", isExistsInOptimalCart);
@@ -121,7 +131,7 @@ function EditAlternativeProduct({
       product.product.barcode, // the new barcode
       DetailsOptimalProduct.totalPrice, // the old total price
       getProductTotalPrice(product.price, quantity), // the new total price of the product only
-      supermarketID, // the supermarket id
+      supermarketID // the supermarket id
     );
   };
 

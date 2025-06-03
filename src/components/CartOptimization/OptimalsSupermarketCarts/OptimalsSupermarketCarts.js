@@ -4,14 +4,20 @@ import LoadingCart from "./LoadingCart";
 import CartsFilter from "./CartsFilter";
 import SupermarketOptimalCartItem from "./SupermarketOptimalCartItem";
 import "./OptimalsSupermarketCarts.css";
-import { useCartOptimizationContext } from "../../../context/cart-optimizationContext";
-import {useFullCart} from "../../../hooks/appHooks"
+// import { useCartOptimizationContext } from "../../../context/cart-optimizationContext";
+import {
+  useSupermarkets,
+  useOptimalCarts,
+} from "../../../hooks/optimizationHooks";
+import { useFullCart } from "../../../hooks/appHooks";
 
 const OptimalsSupermarketCarts = () => {
   // const { allSupermarkets, fullCart, optimalCarts, isOptimalCartsCalculated } = useCartOptimizationContext();
-    const { allSupermarkets, optimalCarts, isOptimalCartsCalculated } = useCartOptimizationContext();
+  // const { allSupermarkets, optimalCarts, isOptimalCartsCalculated } = useCartOptimizationContext();
+  const { allSupermarkets } = useSupermarkets();
+  const { optimalCarts, isOptimalCartsCalculated } = useOptimalCarts();
 
-  const {fullCart} = useFullCart();
+  const { fullCart } = useFullCart();
   const [selectedSupermarketID, setSelectedSupermarketID] = useState(0);
 
   if (!isOptimalCartsCalculated) {
@@ -50,7 +56,8 @@ const OptimalsSupermarketCarts = () => {
               optimalCart={cart}
               originalCart={fullCart}
               supermarketDetails={allSupermarkets.find(
-                (supermarket) => supermarket.supermarketID === cart.supermarketID
+                (supermarket) =>
+                  supermarket.supermarketID === cart.supermarketID
               )}
               onSelectedSupermarket={setSelectedSupermarketID} // Ensure this prop is consistently passed.
             />

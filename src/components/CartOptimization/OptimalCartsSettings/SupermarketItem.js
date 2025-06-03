@@ -1,10 +1,17 @@
 import React from "react";
 import "./SupermarketItem.css";
-import { useCartOptimizationContext } from "../../../context/cart-optimizationContext";
+// import { useCartOptimizationContext } from "../../../context/cart-optimizationContext";
+import {
+  useSettings,
+  useSettingsOperations,
+} from "../../../hooks/optimizationHooks";
 
 const SupermarketItem = ({ supermarketObject }) => {
-  const { supermarketIDs, insertSupermarketID, removeSupermarketID } =
-    useCartOptimizationContext();
+  // const { supermarketIDs, insertSupermarketID, removeSupermarketID } =
+  //   useCartOptimizationContext();
+  const { supermarketIDs } = useSettings();
+
+  const { insertSupermarketID, removeSupermarketID } = useSettingsOperations();
 
   const toggleSupermarket = () => {
     if (supermarketIDs.includes(supermarketObject.supermarketID)) {

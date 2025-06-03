@@ -2,7 +2,9 @@ import React from "react";
 import { useState } from "react";
 import { useEffect } from "react";
 import ProductsImages from "../../../../Images/ProductsImages";
-import { useCartOptimizationContext } from "../../../../../context/cart-optimizationContext";
+// import { useCartOptimizationContext } from "../../../../../context/cart-optimizationContext";
+import { useOptimalCartsOperation } from "../../../../../hooks/optimizationHooks";
+
 import "./EditOptimalProduct.css";
 import PointerIcon from "./pointer.svg";
 
@@ -31,10 +33,15 @@ const EditOptimalProduct = ({
   replaceProductDetails,
   closeModal,
 }) => {
+  // const {
+  //   getPriceByProductBarcodeAndSupermarketID,
+  //   changeOptimalProductQuantity,
+  // } = useCartOptimizationContext()
+
   const {
     getPriceByProductBarcodeAndSupermarketID,
     changeOptimalProductQuantity,
-  } = useCartOptimizationContext();
+  } = useOptimalCartsOperation(); // useOptimalCartsOperation
 
   // useState for the price of the product:
   const [productPrice, setProductPrice] = useState(0);

@@ -177,6 +177,15 @@ export const useProductSearch = () => {
   );
 };
 
+export const useGetProductByBarcode = (barcode) => {
+  const { products } = useProductsCtx();
+
+  return useMemo(() => {
+    if (!barcode) return null;
+    return products.find((p) => p.barcode === barcode) ?? null;
+  }, [products, barcode]);
+}
+
 // -----------------------------------------------------------------------------
 // 5) Enriched products (מוצרים + מחיר + כמות + totals) – יעיל עם Maps
 // -----------------------------------------------------------------------------

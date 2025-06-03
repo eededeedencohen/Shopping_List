@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { useCartOptimizationContext } from "../../context/cart-optimizationContext";
+// import { useCartOptimizationContext } from "../../context/cart-optimizationContext";
+import { useSettingsOperations } from "../../hooks/optimizationHooks";
 import {
   formatProductWeight,
   reverseFormatProductWeight,
@@ -13,8 +14,9 @@ export default function WeightAccuracy({
   currentWeightGain,
   currentWeightLoss,
 }) {
-  const { changeMaxWeightGain, changeMaxWeightLoss } =
-    useCartOptimizationContext();
+  // const { changeMaxWeightGain, changeMaxWeightLoss } =
+  //   useCartOptimizationContext();
+  const { changeMaxWeightGain, changeMaxWeightLoss } = useSettingsOperations();
   const [tempWeightGain, setTempWeightGain] = useState(
     formatProductWeight(productWeight + currentWeightGain, productUnitWeight)
   );

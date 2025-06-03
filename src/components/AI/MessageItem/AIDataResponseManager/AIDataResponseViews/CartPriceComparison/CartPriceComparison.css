@@ -1,0 +1,149 @@
+/*  ╔═════════════════════════════════════════╗
+    ║   CartPriceComparison – Scoped Styles  ║
+    ╚═════════════════════════════════════════╝ */
+
+/* ── מעטפת-על של הקומפוננטה ───────────────── */
+.cartComp {
+  width: 100%;
+  /* אפשר להוסיף margin/padding חיצוני לפי הצורך */
+  font-family: "Assistant", sans-serif;
+}
+
+/* ── לוח חצי-שקוף (רקע פנימי) ─────────────── */
+.cartComp .cpc_panel {
+  width: 100%;
+  padding: 1.2rem 0.8rem 2rem;
+  background: linear-gradient(145deg, #00afff 0%, #55adff 50%, #4562b5 100%);
+  border-radius: 18px;
+  overflow-y: auto; /* גלילה רק בתוך הקומפוננטה */
+}
+
+/* ── רשימת עגלות ───────────────────────────── */
+.cartComp .cpc_wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 1.3rem;
+  max-width: 540px;
+  margin-inline: auto;
+}
+
+/* ── כרטיס עגלה (Glassmorphism) ───────────── */
+.cartComp .cpc_cartCard {
+  background: rgba(255 255 255 / 0.18);
+  border: 1px solid rgba(255 255 255 / 0.34);
+  border-radius: 16px;
+  backdrop-filter: blur(14px) saturate(160%);
+  -webkit-backdrop-filter: blur(14px) saturate(160%);
+  box-shadow: 0 6px 18px rgba(0 0 0 / 0.2);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* ── כותרת (נלחצת לפתיחה/סגירה) ───────────── */
+.cartComp .cpc_header {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 1rem 1.25rem;
+  background: rgba(255 255 255 / 0.35);
+  backdrop-filter: blur(6px);
+  cursor: pointer;
+  position: relative;
+}
+
+.cartComp .cpc_marketName {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.cartComp .cpc_marketAddr {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #e2e2e2;
+}
+
+.cartComp .cpc_total {
+  position: absolute;
+  inset-inline-end: 1.25rem;
+  top: 1rem;
+  font-weight: 700;
+  color: #ffeb3b;
+}
+
+/* ── כפתור Toggle (Mobile - no :hover) ─────── */
+.cartComp .cpc_toggleBtn {
+  margin: 0.75rem auto 1.25rem;
+  padding: 8px 24px;
+  border: 1px solid rgba(255 255 255 / 0.45);
+  border-radius: 10px;
+  background: rgba(255 255 255 / 0.2);
+  color: #ffffff;
+  font-size: 0.9rem;
+  backdrop-filter: blur(10px);
+  transition: transform 0.15s;
+}
+
+.cartComp .cpc_toggleBtn:active {
+  transform: scale(0.96);
+}
+
+/* ── רשימת מוצרים – גובה מונפש ─────────────── */
+.cartComp .cpc_products {
+  overflow: hidden;
+  transition: max-height 0.45s ease;
+  padding: 0 1rem;
+}
+
+/* ── שורת מוצר ─────────────────────────────── */
+.cartComp .cpc_productRow {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.85rem 0;
+  border-bottom: 1px dashed rgba(255 255 255 / 0.25);
+}
+
+.cartComp .cpc_productRow:last-child {
+  border-bottom: none;
+}
+
+/* ── תמונת מוצר ───────────────────────────── */
+.cartComp .cpc_prodImg {
+  width: 58px;
+  height: 58px;
+  border-radius: 10px;
+  border: 1px solid rgba(255 255 255 / 0.4);
+  background: rgba(255 255 255 / 0.2);
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+/* ── מידע ליד התמונה ──────────────────────── */
+.cartComp .cpc_prodInfo {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex: 1;
+}
+
+.cartComp .cpc_prodDetails {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 0.85rem;
+  color: #ffffff;
+}
+
+.cartComp .cpc_prodBarcode {
+  font-weight: 500;
+  opacity: 0.9;
+}
+
+.cartComp .cpc_prodSubtotal {
+  font-weight: 600;
+  color: #ffeb3b;
+  font-size: 0.9rem;
+}

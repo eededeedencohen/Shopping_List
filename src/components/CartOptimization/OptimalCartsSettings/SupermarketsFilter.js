@@ -1,13 +1,16 @@
 import React, { useState } from "react";
 import ModalV1 from "../../Modal/ModalV1";
 import "./SupermarketsFilter.css";
-import { useCartOptimizationContext } from "../../../context/cart-optimizationContext";
+// import { useCartOptimizationContext } from "../../../context/cart-optimizationContext";
+import { useSettings, useSupermarkets } from "../../../hooks/optimizationHooks";
 import SupermarketItem from "./SupermarketItem";
 import filterIcon from "../BrandsFilter/filter.svg";
 
 const SupermarketsFilter = () => {
-  const { allSupermarkets, isAllSupermarketsUploaded, supermarketIDs } =
-    useCartOptimizationContext();
+  // const { allSupermarkets, isAllSupermarketsUploaded, supermarketIDs } =
+  //   useCartOptimizationContext();
+  const { allSupermarkets, isAllSupermarketsUploaded } = useSupermarkets();
+  const { supermarketIDs } = useSettings();
   const [isSupermarketsFilterOpen, setIsSupermarketsFilterOpen] =
     useState(false);
 

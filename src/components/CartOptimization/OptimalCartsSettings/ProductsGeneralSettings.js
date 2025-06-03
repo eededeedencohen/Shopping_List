@@ -1,16 +1,28 @@
 import React from "react";
-import { useCartOptimizationContext } from "../../../context/cart-optimizationContext";
+// import { useCartOptimizationContext } from "../../../context/cart-optimizationContext";
+import {
+  useSettings,
+  useSettingsOperations,
+} from "../../../hooks/optimizationHooks";
 import "./ProductsGeneralSettings.css";
 
 const ProductsGeneralSettings = () => {
+  // const {
+  //   canReplaceSettings, // value of "bySelect", "all", "none"
+  //   canRoundUpSettings, // value of "bySelect", "all", "none"
+  //   changeCanReplaceSettings,
+  //   changeCanRoundUpSettings,
+  //   changeCanReplaceAll,
+  //   changeCanRoundUpAll,
+  // } = useCartOptimizationContext();
+
+  const { canReplaceSettings, canRoundUpSettings } = useSettings(); // useSettings
   const {
-    canReplaceSettings, // value of "bySelect", "all", "none"
-    canRoundUpSettings, // value of "bySelect", "all", "none"
     changeCanReplaceSettings,
     changeCanRoundUpSettings,
     changeCanReplaceAll,
     changeCanRoundUpAll,
-  } = useCartOptimizationContext();
+  } = useSettingsOperations();
 
   console.log("canReplaceSettings:", canReplaceSettings);
   console.log("canRoundUpSettings:", canRoundUpSettings);
@@ -97,9 +109,7 @@ const ProductsGeneralSettings = () => {
           ללא העגלת כמות של מוצרים
         </div>
       </div>
-      <button
-      className="temp-button"
-      >Temp Button</button>
+      <button className="temp-button">Temp Button</button>
     </div>
   );
 };

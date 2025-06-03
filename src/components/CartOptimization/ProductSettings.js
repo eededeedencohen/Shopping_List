@@ -3,10 +3,12 @@ import ProductDetails from "./ProductDetails";
 import WeightAccuracy from "./WeightAccuracy";
 import BrandsFilter from "./BrandsFilter/BrandsFilter";
 import "./ProductSettings.css";
-import { useCartOptimizationContext } from "../../context/cart-optimizationContext";
+// import { useCartOptimizationContext } from "../../context/cart-optimizationContext";
+import { useSettingsOperations } from "../../hooks/optimizationHooks";
 
 export default function ProductSettings({ product }) {
-  const { changeCanRoundUp, changeCanReplace } = useCartOptimizationContext();
+  // const { changeCanRoundUp, changeCanReplace } = useCartOptimizationContext();
+  const { changeCanRoundUp, changeCanReplace } = useSettingsOperations();
 
   return (
     <div className="product-settings">

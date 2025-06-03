@@ -11,7 +11,8 @@ import {
   isExistsInOriginalCart,
   getSummaryElement,
 } from "./OptimalProductItemHelpers";
-import { useCartOptimizationContext } from "../../../../context/cart-optimizationContext";
+// import { useCartOptimizationContext } from "../../../../context/cart-optimizationContext";
+import { useOptimalCartsOperation } from "../../../../hooks/optimizationHooks";
 import deleteIcon from "./delete.svg";
 import editIcon from "./edit.svg";
 import upRightIcon from "./up-right.svg";
@@ -26,8 +27,10 @@ const OptimalReplaceProductItem = ({
   const [productDetails, setProductDetails] = useState({});
   const [isProductDetailsUpdated, setIsProductDetailsUpdated] = useState(false);
   const originalProductExists = isExistsInOriginalCart(detailsOriginProduct);
+  // const { getProductByBarcode, deleteProductFromOptimalCart } =
+  //   useCartOptimizationContext();
   const { getProductByBarcode, deleteProductFromOptimalCart } =
-    useCartOptimizationContext();
+    useOptimalCartsOperation(); // useOptimalCartsOperation
 
   // Get the product details
   useEffect(() => {

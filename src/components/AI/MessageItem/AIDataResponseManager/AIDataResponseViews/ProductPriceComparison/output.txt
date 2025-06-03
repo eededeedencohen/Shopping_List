@@ -1,0 +1,394 @@
+BranchCard.css:
+
+.b1_branch_card {
+  min-width: 320px;
+  flex-shrink: 0;
+  scroll-snap-align: center;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 20px 22px;
+  border-radius: 24px;
+  background: rgba(202, 203, 214, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.b1_branch_card:hover {
+  transform: scale(1.01);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
+}
+
+.b1_branch_left {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  min-width: 130px;
+  max-width: 130px;
+}
+
+.b1_branch_base_price {
+  font-size: 22px;
+  font-weight: 800;
+  color: #0f172a;
+  margin-bottom: 12px;
+}
+
+.b1_branch_discount_container {
+  min-height: 70px;
+}
+
+.b1_branch_discount_box {
+  background: linear-gradient(to bottom right, #fff0f1, #ffeaea);
+  border: 1px solid #fca5a5;
+  border-radius: 14px;
+  padding: 10px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 14px;
+  color: #b91c1c;
+  font-weight: 600;
+  box-shadow: inset 0 0 3px rgba(249, 134, 134, 0.3);
+}
+
+.b1_branch_discount_units,
+.b1_branch_discount_total,
+.b1_branch_discount_per {
+  line-height: 1.3;
+}
+
+.b1_branch_discount_per {
+  font-size: 12px;
+  color: #dc2626;
+}
+
+.b1_branch_discount_placeholder {
+  height: 70px;
+}
+
+.b1_branch_right {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 6px;
+}
+
+.b1_branch_logo_wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 72px;
+  height: 42px;
+}
+
+.b1_branch_logo_img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.b1_branch_address {
+  font-size: 13px;
+  color: #4b5563;
+  font-weight: 500;
+  word-break: break-word;
+  line-height: 1.4;
+  max-width: 220px;
+}
+
+
+
+BranchCard.js:
+
+import React from "react";
+import SupermarketImage from "../../../../../Images/SupermarketImage";
+import "./BranchCard.css";
+
+const BranchCard = ({ branchAddress, city, price, supermarketName }) => {
+  const hasDiscount = price?.hasDiscount && price.discount;
+
+  return (
+    <div className="b1_branch_card">
+      <div className="b1_branch_left">
+        <span className="b1_branch_base_price">₪{price.price.toFixed(2)}</span>
+
+        <div className="b1_branch_discount_container">
+          {hasDiscount ? (
+            <div className="b1_branch_discount_box">
+              <span className="b1_branch_discount_units">
+                {price.discount.units} יחידות
+              </span>
+              <span className="b1_branch_discount_total">
+                ב־₪{price.discount.totalPrice.toFixed(2)}
+              </span>
+              <span className="b1_branch_discount_per">
+                ₪{price.discount.priceForUnit.toFixed(2)} ליחידה
+              </span>
+            </div>
+          ) : (
+            <div className="b1_branch_discount_placeholder" />
+          )}
+        </div>
+      </div>
+
+      <div className="b1_branch_right">
+        <div className="b1_branch_logo_wrapper">
+          <SupermarketImage
+            supermarketName={supermarketName}
+            className="b1_branch_logo_img"
+          />
+        </div>
+        <span className="b1_branch_address">
+          {branchAddress}, {city}
+        </span>
+      </div>
+    </div>
+  );
+};
+
+export default BranchCard;
+
+
+ProductHeader.css:
+
+.b1_header_wrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: linear-gradient(to right, #7586b2, #fef9ff);
+  padding: 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.b1_header_image {
+  width: 100px;
+  height: 100px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(12px);
+  padding: 8px;
+  box-shadow: inset 0 0 10px rgba(255, 255, 255, 0.25);
+}
+
+.b1_header_name {
+  font-size: 20px;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 6px;
+  line-height: 1.3;
+  text-shadow: 0 1px 1px rgba(255, 255, 255, 0.6);
+}
+
+.b1_header_name {
+  font-size: 20px;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 6px;
+  line-height: 1.3;
+  text-shadow: 0 1px 1px rgba(255, 255, 255, 0.6);
+}
+
+.b1_header_image {
+  width: 110px;
+  height: 110px;
+  flex-shrink: 0;
+  border-radius: 16px;
+  background-color: #ffffff;
+  padding: 8px;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.05);
+}
+
+.b1_header_img_tag {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.b1_header_text {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: right;
+  flex-grow: 1;
+  margin-right: 12px;
+}
+
+.b1_header_name {
+  font-size: 22px;
+  font-weight: 800;
+  color: #1e293b;
+  margin-bottom: 6px;
+  line-height: 1.3;
+}
+
+.b1_header_details {
+  font-size: 14px;
+  font-weight: 500;
+  color: #64748b;
+}
+
+
+
+ProductHeader.js:
+
+import React from 'react';
+import ProductsImages from '../../../../../Images/ProductsImages';
+import './ProductHeader.css';
+
+const translateUnit = (unit) => {
+  switch (unit.toLowerCase()) {
+    case 'g': return 'גרם';
+    case 'kg': return 'קילוגרם';
+    case 'l': return 'ליטר';
+    case 'ml': return 'מיליליטר';
+    case 'u': return 'יחידות';
+    default: return unit;
+  }
+};
+
+const ProductHeader = ({ name, brand, weight, unitWeight, barcode }) => {
+  return (
+    <div className="b1_header_wrapper">
+      <div className="b1_header_image">
+        <ProductsImages barcode={barcode} className="b1_header_img_tag" />
+      </div>
+      <div className="b1_header_text">
+        <span className="b1_header_name">{name}</span>
+        <span className="b1_header_details">
+          {brand} • {weight} {translateUnit(unitWeight)}
+        </span>
+      </div>
+    </div>
+  );
+};
+
+export default ProductHeader;
+
+
+
+ProductPriceComparison.css:
+
+.b1_beanches_cards {
+  display: flex;
+  flex-direction: row;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  scroll-padding-inline: 16px;
+  padding: 12px 8px;
+  gap: 16px;
+}
+
+.b1_card_wrapper {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 440px;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 28px;
+  overflow: hidden;
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
+  padding: 0;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  animation: fadeIn 0.4s ease;
+}
+
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.b1_loading {
+  text-align: center;
+  padding: 32px;
+  font-size: 16px;
+  color: #6b7280;
+}
+
+
+
+ProductPriceComparison.js:
+
+import React, { useEffect, useState } from "react";
+import data from "./xyz.json";
+import "./ProductPriceComparison.css";
+import ProductHeader from "./ProductHeader";
+import BranchCard from "./BranchCard";
+
+const ProductPriceComparison = () => {
+  const [product, setProduct] = useState(null);
+  const [branches, setBranches] = useState([]);
+
+  useEffect(() => {
+    const allBranches = data.data["רמי לוי"];
+    const barcodeToMatch = "7290010117864";
+
+    const matchedBranches = [];
+    let productDetails = null;
+
+    allBranches.forEach((branch) => {
+      const match = branch.products.find(
+        (item) => item.product.barcode === barcodeToMatch
+      );
+
+      if (match) {
+        if (!productDetails) productDetails = match.product;
+
+        matchedBranches.push({
+          branchAddress: branch.branchAddress,
+          price: match.price,
+        });
+      }
+    });
+
+    if (productDetails) {
+      setProduct(productDetails);
+      setBranches(matchedBranches);
+    }
+  }, []);
+
+  if (!product) return <div className="b1_loading">טוען נתונים...</div>;
+
+  return (
+    <div className="b1_card_wrapper">
+      <ProductHeader
+        name={product.name}
+        brand={product.brand}
+        weight={product.weight}
+        unitWeight={product.unitWeight}
+        barcode={product.barcode}
+      />
+      <div className="b1_beanches_cards">
+        {branches.map((branch, index) => (
+          <BranchCard
+            key={index}
+            branchAddress={branch.branchAddress}
+            price={branch.price}
+            supermarketName="רמי לוי"
+            city="ירושלים"
+          />
+        ))}
+      </div>
+    </div>
+  );
+};
+
+export default ProductPriceComparison;
+
+
+

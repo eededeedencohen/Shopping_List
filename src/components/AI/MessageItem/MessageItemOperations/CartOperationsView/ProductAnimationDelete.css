@@ -1,0 +1,151 @@
+.ppd_wrapper {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  width: 300px;
+  height: 300px;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  z-index: 9999;
+}
+
+/* שלב 1: עגלה נכנסת */
+.ppd_cart {
+  position: absolute;
+  bottom: 20px;
+  left: -200px;
+  width: 80px;
+  animation: ppd_cartEnter 1s ease-out forwards,
+    ppd_cartCrashRotateReturn 1.5s ease-in forwards;
+  animation-delay: 0s, 2s;
+  z-index: 10;
+}
+
+/* שלב 2: המוצר יוצא בקשת ואז נופל */
+.ppd_product {
+  position: absolute;
+  bottom: 70px;
+  left: 80px;
+  animation: ppd_productArcOut 1s ease-out forwards,
+    ppd_productFall 0.5s ease-in forwards;
+  animation-delay: 0s, 1s;
+  opacity: 1;
+  animation-fill-mode: forwards;
+}
+
+/* עטיפה של המוצר והתג ביחד */
+.ppd_product-wrapper {
+  position: relative;
+  animation: ppd_productReveal 0.5s ease-in-out forwards;
+  animation-delay: 1s;
+}
+
+.ppd_product-image {
+  width: 60px;
+  height: auto;
+}
+
+.ppd_badge {
+  position: absolute;
+  bottom: -10px;
+  right: -10px;
+  background-color: #f50057;
+  color: white;
+  font-weight: bold;
+  font-size: 14px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid white;
+}
+
+/* שלב 3–4: הפח נשאר קבוע ואז עף כשהעגלה מתנגשת */
+.ppd_garbage {
+  position: absolute;
+  bottom: 20px;
+  right: 13px;
+  width: 80px;
+  animation: ppd_garbageFlyAway 0.6s ease-out forwards;
+  animation-delay: 2.5s;
+  z-index: 11;
+}
+
+/* === אנימציות === */
+
+@keyframes ppd_cartEnter {
+  to {
+    left: 80px;
+  }
+}
+
+@keyframes ppd_productArcOut {
+  0% {
+    opacity: 1;
+    transform: translate(0, 20px);
+  }
+  30% {
+    opacity: 1;
+    transform: translate(60px, -90px);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(140px, -40px);
+  }
+}
+
+@keyframes ppd_productFall {
+  0% {
+    transform: translate(140px, -40px);
+    opacity: 1;
+    scale: 1;
+  }
+  100% {
+    transform: translate(140px, 60px);
+    opacity: 0;
+  }
+}
+
+@keyframes ppd_productReveal {
+  0% {
+    scale: 1;
+  }
+  100% {
+    scale: 1;
+  }
+}
+
+@keyframes ppd_garbageFlyAway {
+  0% {
+    transform: rotate(0deg) translateX(0);
+    opacity: 1;
+  }
+  100% {
+    transform: rotate(70deg) translateX(250px) translateY(-100px);
+    opacity: 0;
+  }
+}
+
+@keyframes ppd_cartCrashRotateReturn {
+  0% {
+    left: 80px;
+    transform: rotate(0deg);
+  }
+  30% {
+    left: 180px;
+    transform: rotate(0deg);
+  }
+  60% {
+    transform: scaleX(-1);
+  }
+  61% {
+    /* שומר על ההיפוך */
+    transform: scaleX(-1);
+  }
+  100% {
+    left: -200px;
+    transform: scaleX(-1); /* נשאר בהיפוך */
+  }
+}
