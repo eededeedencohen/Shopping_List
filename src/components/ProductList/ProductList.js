@@ -427,9 +427,6 @@ function ProductsList() {
 
   return (
     <div className="list__product-list">
-      <button onClick={moveToNewCart}>Go to Cart</button>
-      <button onClick={moveToNewProductList}>Go to Product List</button>
-      <button onClick={moveToNewSearch}>Go to Search</button>
       {/* ניווט הקטגוריות */}
       <CategoryNavigation />
       {/* ניווט תתי־קטגוריות */}
@@ -515,43 +512,7 @@ function ProductsList() {
                 >
                   -
                 </div>
-                <div>
-                  <div>
-                    {selectedBarcode === product.barcode ? (
-                      <button
-                        onClick={() => handleCloseBarcode(product.barcode)}
-                        style={{ backgroundColor: "blue", color: "white" }}
-                      >
-                        Save
-                      </button>
-                    ) : (
-                      <button
-                        onClick={() => handleOpenBarcode(product.barcode)}
-                        style={{ backgroundColor: "green", color: "white" }}
-                      >
-                        Open
-                      </button>
-                    )}
-
-                    {selectedBarcode && selectedBarcode !== product.barcode && (
-                      <button
-                        onClick={() => handleToggleAlternative(product.barcode)}
-                        style={{
-                          backgroundColor: groupData[selectedBarcode]?.includes(
-                            product.barcode
-                          )
-                            ? "red"
-                            : "green",
-                          color: "white",
-                        }}
-                      >
-                        {groupData[selectedBarcode]?.includes(product.barcode)
-                          ? "Remove"
-                          : "Add"}
-                      </button>
-                    )}
-                  </div>
-                </div>
+                <div></div>
               </div>
             </div>
           ))}
