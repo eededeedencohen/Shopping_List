@@ -71,11 +71,12 @@
 }
 
 .list__product-name {
-  font-size: 1.1rem;
+  font-size: 1rem;
   font-weight: bold;
   color: #2f416e;
   margin: 0;
   margin-bottom: 2px;
+  text-align: end;
 }
 
 .list__product-info {
@@ -85,7 +86,7 @@
 }
 
 .list__separator {
-  margin: 0 0.4rem;
+  margin: 0 0.2rem;
   color: #888;
 }
 
@@ -93,7 +94,7 @@
   display: flex;
   flex-direction: row-reverse;
   align-items: center;
-  font-size: 1rem;
+  font-size: 0.9rem;
   color: #2f416e;
   margin: 0;
 }
@@ -105,7 +106,7 @@
   display: flex;
   flex-direction: row-reverse;
   align-items: center;
-  font-size: 1rem;
+  font-size: 0.9rem;
   color: #2f416e;
   margin: 0;
 }
@@ -118,7 +119,7 @@
   display: flex;
   flex-direction: row-reverse;
   align-items: center;
-  font-size: 1.2rem;
+  font-size: 1rem;
   color: #a0a0a0;
   margin-top: 5px;
 }

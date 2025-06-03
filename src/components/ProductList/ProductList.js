@@ -11,12 +11,6 @@ import {
 import "./ProductsList.css";
 import { useNavigate } from "react-router";
 
-import {
-  getAlternativeProductByBarcode,
-  createAlternativeProduct,
-  updateAlternativeProductByBarcode,
-} from "../../network/alternative-productsService";
-
 import Image from "./Images";
 import CategoryNavigation from "./CategoryNavigation";
 import SubCategoryNavigation from "./SubCategoryNavigation";
@@ -120,83 +114,9 @@ function ProductsList() {
   const [productAmounts, setProductAmounts] = useState({});
   const [oldProductAmounts, setOldProductAmounts] = useState({});
 
-  // =================================================================================
-  const [selectedBarcode, setSelectedBarcode] = useState(null); // הברקוד הנבחר
-  const [groupData, setGroupData] = useState({}); // אובייקט הברקודים לקבוצה
-  // =================================================================================
-
   useEffect(() => {
     sendActiveCart();
   }, [cart, sendActiveCart]); // ← מופעל רק כש-cart משתנה
-
-  const handleOpenBarcode = async (barcode) => {
-    if (selectedBarcode === null) {
-      // אם אין ברקוד נבחר -> מעבר למצב עריכה
-      setSelectedBarcode(barcode);
-
-      try {
-        const response = await getAlternativeProductByBarcode(barcode);
-        if (response?.data?.alternativeProduct) {
-          setGroupData({
-            [barcode]: response.data.alternativeProduct.alternatives,
-          });
-        } else {
-          setGroupData({ [barcode]: [] });
-        }
-      } catch (error) {
-        console.error("Error fetching alternative product:", error);
-        setGroupData({ [barcode]: [] });
-      }
-    }
-  };
-
-  const handleToggleAlternative = (barcode) => {
-    if (!selectedBarcode) return;
-
-    setGroupData((prevData) => {
-      const currentAlternatives = prevData[selectedBarcode] || [];
-
-      if (currentAlternatives.includes(barcode)) {
-        // אם הברקוד כבר קיים -> הסרה מהרשימה
-        return {
-          ...prevData,
-          [selectedBarcode]: currentAlternatives.filter(
-            (item) => item !== barcode
-          ),
-        };
-      } else {
-        // אם הברקוד לא קיים -> הוספה לרשימה
-        return {
-          ...prevData,
-          [selectedBarcode]: [...currentAlternatives, barcode],
-        };
-      }
-    });
-  };
-
-  const handleCloseBarcode = async (barcode) => {
-    if (selectedBarcode === barcode) {
-      console.log("Saving group:", groupData);
-
-      try {
-        const existingAlternative = await getAlternativeProductByBarcode(
-          barcode
-        );
-
-        if (existingAlternative?.data?.alternativeProduct) {
-          await updateAlternativeProductByBarcode(barcode, groupData[barcode]);
-        } else {
-          await createAlternativeProduct(barcode, groupData[barcode]);
-        }
-      } catch (error) {
-        console.error("Error updating alternative product:", error);
-      }
-
-      // יציאה ממצב עריכה
-      setSelectedBarcode(null);
-      setGroupData({});
-    }
-  };
 
   /* כאן נשמור את ה-inline style שנחיל על ה-container (כדי ליצור אנימציות) */
   const [containerStyle, setContainerStyle] = useState({});
@@ -315,19 +235,7 @@ function ProductsList() {
     nav(`/priceList/${barcode}`);
   };
 
-  const moveToNewCart = () => {
-    nav("cart-test");
-  };
-
-  const moveToNewProductList = () => {
-    nav("products-list-test");
-  };
-
-  const moveToNewSearch = () => {
-    nav("search-test");
-  };
   const glassSquaresRef = useRef([]);
-
 
   /* הוספה לסל */
   const incrementAmount = (barcode) => {
@@ -443,35 +351,35 @@ function ProductsList() {
           onTouchEnd={handleTouchEnd}
         >
           {/* Glass background squares */}
-          
-<div className="glass-bg">
-  {(() => {
-    // מאחסן נתונים קבועים ברינדרים הבאים
-    if (!glassSquaresRef.current.length) {
-      glassSquaresRef.current = Array.from({ length: 25 }, () => ({
-        size: 40 + Math.random() * 60,       // 40-100px
-        left: Math.random() * 100,           // %
-        top: Math.random() * 100,            // %
-        duration: 20 + Math.random() * 20,   // 20-40s
-        delay: -Math.random() * 20,          // התחלה אקראית
-      }));
-    }
-    return glassSquaresRef.current.map((sq, idx) => (
-      <div
-        key={idx}
-        className="glass-square"
-        style={{
-          width: `${sq.size}px`,
-          height: `${sq.size}px`,
-          left: `${sq.left}%`,
-          top: `${sq.top}%`,
-          animationDuration: `${sq.duration}s`,
-          animationDelay: `${sq.delay}s`,
-        }}
-      />
-    ));
-  })()}
-</div>
+
+          <div className="glass-bg">
+            {(() => {
+              // מאחסן נתונים קבועים ברינדרים הבאים
+              if (!glassSquaresRef.current.length) {
+                glassSquaresRef.current = Array.from({ length: 25 }, () => ({
+                  size: 40 + Math.random() * 60, // 40-100px
+                  left: Math.random() * 100, // %
+                  top: Math.random() * 100, // %
+                  duration: 20 + Math.random() * 20, // 20-40s
+                  delay: -Math.random() * 20, // התחלה אקראית
+                }));
+              }
+              return glassSquaresRef.current.map((sq, idx) => (
+                <div
+                  key={idx}
+                  className="glass-square"
+                  style={{
+                    width: `${sq.size}px`,
+                    height: `${sq.size}px`,
+                    left: `${sq.left}%`,
+                    top: `${sq.top}%`,
+                    animationDuration: `${sq.duration}s`,
+                    animationDelay: `${sq.delay}s`,
+                  }}
+                />
+              ));
+            })()}
+          </div>
           {filteredProducts.map((product) => (
             <div className="list__product-card" key={product.barcode}>
               {product.discount && (
@@ -481,7 +389,7 @@ function ProductsList() {
               <div className="list__product-details">
                 <div className="list__product-data">
                   <div className="list__product-name">
-                    <p>{maxCharacters(product.name, 23)}</p>
+                    <p>{product.name}</p>
                   </div>
                   <div className="list__product-info">
                     <div className="list__product-weight">
