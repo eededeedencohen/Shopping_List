@@ -1,94 +1,75 @@
-import React, { useState, useRef } from "react";
+import React, { useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import {
+  motion,
+  useMotionValue,
+  useTransform,
+  useSpring, // ♦
+} from "framer-motion";
 import "./CalculationOptimalCarts.css";
-// import { useCartOptimizationContext } from "../../../context/cart-optimizationContext";
 import { useCalculateOptimalCarts } from "../../../hooks/optimizationHooks";
 
-const CalculationOptimalCarts = () => {
-  const [position, setPosition] = useState(0);
-  const [isDragging, setIsDragging] = useState(false);
-  const containerRef = useRef(null);
+export default function CalculationOptimalCarts() {
   const navigate = useNavigate();
+  const { calculateOptimalsCarts } = useCalculateOptimalCarts();
+  const containerRef = useRef(null);
 
-  // const { calculateOptimalsCarts } = useCartOptimizationContext();
-  const {
-    calculateOptimalsCarts, // alias ישן
-  } = useCalculateOptimalCarts(); // useCalculateOptimalCarts
+  /* targetX = אצבע,  heavyX = הכדור  */
+  const targetX = useMotionValue(0);
+  const heavyX = useSpring(targetX, {
+    stiffness: 90, // ↓ נמוך = רך
+    damping: 25, // ↑ גבוה = יותר בלימה
+    mass: 3, // ↑ גדול = מרגיש כבד
+  });
 
-  const startDragging = () => {
-    setIsDragging(true);
-  };
+  /* אחוז מילוי לפי heavyX (לא לפי האצבע!) */
+  const progress = useTransform(heavyX, (latest) => {
+    if (!containerRef.current) return "0%";
+    const w = containerRef.current.offsetWidth - 72;
+    return `${(Math.min(latest, w) / w) * 100}%`;
+  });
 
-  const onDrag = (event) => {
-    if (isDragging && containerRef.current) {
-      const containerRect = containerRef.current.getBoundingClientRect();
-      let newLeft = event.clientX - containerRect.left;
-
-      // Constrain the position within the bounds of the container
-      const minLeft = 0;
-      const maxLeft = containerRect.width - 64; // 64 is the width of the swipe button
-      newLeft = Math.max(minLeft, Math.min(newLeft, maxLeft));
-
-      setPosition(newLeft);
-    }
-  };
-
-  const stopDragging = () => {
-    setIsDragging(false);
-
-    // Check if the swipe button is near the right side
-    const threshold = containerRef.current.getBoundingClientRect().width - 64;
-    if (position < threshold) {
-      setPosition(0); // Reset position to left side with animation
-    } else {
-      console.log("Reached the right side");
+  const handleDragEnd = (_, info) => {
+    const w = containerRef.current.offsetWidth - 72;
+    if (info.point.x >= w) {
+      // overshoot קטן + ניתוב
+      targetX.set(w + 14);
+      targetX.set(w);
       calculateOptimalsCarts();
       navigate("/optimal-supermarket-carts");
+    } else {
+      targetX.set(0);
     }
-  };
-
-  const handleTouchMove = (event) => {
-    if (isDragging && containerRef.current) {
-      const touch = event.touches[0];
-      onDrag({ clientX: touch.clientX });
-    }
-  };
-
-  const handleTouchEnd = () => {
-    stopDragging();
-  };
-
-  const calculateDivColor = () => {
-    const maxPosition =
-      containerRef.current?.getBoundingClientRect().width - 64 || 1;
-    const intensity = Math.min(1, position / maxPosition);
-    // Interpolating between a darker and a lighter color for the div
-    const r = Math.round(46 + (255 - 46) * (intensity / 2));
-    const g = Math.round(46 + (255 - 46) * (intensity / 2));
-    const b = Math.round(46 + (255 - 46) * (intensity / 2));
-    return `rgb(${r}, ${g}, ${b})`;
   };
 
   return (
-    <div
-      className="div"
-      style={{ backgroundColor: calculateDivColor() }}
+    <motion.div
+      className="holo-slider"
       ref={containerRef}
-      onMouseMove={onDrag}
-      onMouseUp={stopDragging}
-      onMouseLeave={stopDragging}
-      onTouchMove={handleTouchMove}
-      onTouchEnd={handleTouchEnd}
+      style={{ "--progress": progress }}
     >
-      <span className="text">החלק לחישוב העגלות</span>
-      <span
-        className="swipe"
-        style={{ left: `${position}px` }}
-        onMouseDown={startDragging}
-        onTouchStart={startDragging}
-      ></span>
-    </div>
-  );
-};
+      <span className="holo-track-lines" />
+      <span className="holo-glow" />
+      <span className="holo-label">החלק לחישוב העגלות</span>
 
-export default CalculationOptimalCarts;
+      <motion.span
+        className="holo-thumb"
+        drag="x"
+        dragConstraints={containerRef}
+        dragElastic={0.3}
+        /*  ❯❯❯ האצבע מזיזה targetX  */
+        style={{ x: heavyX }}
+        onDrag={(_, info) => {
+          const { left } = containerRef.current.getBoundingClientRect();
+          const w = containerRef.current.offsetWidth - 72;
+          const clamped = Math.min(Math.max(0, info.point.x - left), w);
+          targetX.set(clamped); // מעדכן יעד, הכדור ירדוף
+        }}
+        whileTap={{ scale: 1.08 }}
+        onDragEnd={handleDragEnd}
+      >
+        {/* ...child layers בדיוק כמו קודם... */}
+      </motion.span>
+    </motion.div>
+  );
+}

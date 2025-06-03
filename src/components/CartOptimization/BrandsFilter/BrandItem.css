@@ -1,32 +1,138 @@
+/* ---------- פריסת הפריט (כמו שהיה) ---------- */
+
 .brand-item {
   display: flex;
   flex-direction: row-reverse;
   margin-top: 1rem;
 }
 
-.brand-item .brand-item__brand-name {
-    width: 80%;
-    font-size: 1.2rem;
-    font-weight: 500;
-    color: #000;
-    text-align: right;
-    padding-right: 1rem;
-    transition: all 0.3s ease-in-out;
+.brand-item__brand-name {
+  width: 80%;
+  font-size: 1.2rem;
+  font-weight: 500;
+  color: #000;
+  text-align: right;
+  padding-right: 1rem;
+  transition: all 0.3s ease-in-out;
 }
 
-.brand-item .brand-item__checkbox {
-    width: 20%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    transition: all 0.3s ease-in-out;
+.brand-item__checkbox {
+  width: 20%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
-.brand-item .brand-item__checkbox input[type="checkbox"] {
-    width: 1.5rem;
-    height: 1.5rem;
-    border: 1px solid #000;
-    border-radius: 50%;
-    cursor: pointer;
-    transition: all 0.3s ease-in-out;
+/* ---------- עיצוב הצ'ק-בוקס המעוגל ---------- */
+/* מבוסס על הקוד ששיתפת, בתחביר מעט מצומצם + התאמת גודל */
+
+.checkbox-wrapper * {
+  -webkit-tap-highlight-color: transparent;
+  outline: none;
+}
+
+.checkbox-wrapper input[type="checkbox"] {
+  display: none; /* מסתירים את ה-input המקורי */
+}
+
+/* כפתור עגול עם גרדיאנט */
+.checkbox-wrapper label {
+  --size: 34px; /* אפשר לשנות אם רוצים גדול/קטן יותר */
+  --shadow: calc(var(--size) * 0.07) calc(var(--size) * 0.1);
+
+  position: relative;
+  display: block;
+  width: var(--size);
+  height: var(--size);
+  border-radius: 50%;
+  cursor: pointer;
+
+  background: linear-gradient(43deg, #00bdff 0%, #1645c7 46%, #ffcc70 100%);
+  box-shadow: 0 var(--shadow) #ffbeb8;
+
+  transition: 0.2s ease transform, 0.2s ease box-shadow;
+  overflow: hidden;
+}
+
+.checkbox-wrapper label:before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: calc(var(--size) * 0.7);
+  height: calc(var(--size) * 0.7);
+  background: #fff;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  box-shadow: inset 0 var(--shadow) #ffbeb8;
+  transition: 0.2s ease width, 0.2s ease height;
+}
+
+/* אפקט האוור */
+.checkbox-wrapper label:hover:before {
+  width: calc(var(--size) * 0.55);
+  height: calc(var(--size) * 0.55);
+  box-shadow: inset 0 var(--shadow) #ff9d96;
+}
+
+/* אפקט לחיצה */
+.checkbox-wrapper label:active {
+  transform: scale(0.9);
+}
+
+/* סימן ה-✔ */
+.checkbox-wrapper .tick_mark {
+  position: absolute;
+  top: 0;
+  left: calc(var(--size) * -0.05);
+  width: calc(var(--size) * 0.6);
+  height: calc(var(--size) * 0.6);
+  margin-left: calc(var(--size) * 0.14);
+  transform: rotate(-40deg);
+}
+
+.checkbox-wrapper .tick_mark:before,
+.checkbox-wrapper .tick_mark:after {
+  content: "";
+  position: absolute;
+  background: #fff;
+  border-radius: 2px;
+  opacity: 0;
+  transition: 0.2s ease transform, 0.2s ease opacity;
+}
+
+/* רגל קצרה */
+.checkbox-wrapper .tick_mark:before {
+  left: 0;
+  bottom: 0;
+  width: calc(var(--size) * 0.1);
+  height: calc(var(--size) * 0.3);
+  box-shadow: -2px 0 5px rgba(0 0 0 / 0.23);
+  transform: translateY(calc(var(--size) * -0.68));
+}
+
+/* רגל ארוכה */
+.checkbox-wrapper .tick_mark:after {
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: calc(var(--size) * 0.1);
+  box-shadow: 0 3px 5px rgba(0 0 0 / 0.23);
+  transform: translateX(calc(var(--size) * 0.78));
+}
+
+/* מצב מסומן */
+.checkbox-wrapper input[type="checkbox"]:checked + label {
+  box-shadow: rgba(0, 0, 0, 0.35) 0 8px 18px;
+}
+
+.checkbox-wrapper input[type="checkbox"]:checked + label:before {
+  width: 0;
+  height: 0;
+}
+
+.checkbox-wrapper input[type="checkbox"]:checked + label .tick_mark:before,
+.checkbox-wrapper input[type="checkbox"]:checked + label .tick_mark:after {
+  transform: translate(0);
+  opacity: 1;
 }

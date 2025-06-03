@@ -30,6 +30,8 @@ import AnimationTouchMove from "./components/AAAnimationTests/AnimationTouchMove
 import Chatbot from "./components/Design/Chatbot/Chatbot";
 import StatsDashboard from "./components/Design/Charts/StatsDashboard";
 import ProductsListGroups from "./components/ProductList/ProductListGroups";
+// BarcodeScanner
+import RobotMascot from "./components/AAAnimationTests/RobotMascot";
 
 function Routing() {
   return (
@@ -77,6 +79,8 @@ function Routing() {
       <Route path="/chatbot" element={<Chatbot />} />
       <Route path="/stats-dashboard" element={<StatsDashboard />} />
       <Route path="/products-list-groups" element={<ProductsListGroups />} />
+      <Route path="/robot" element={<RobotMascot />} />
+      {/* Add more routes as needed */}
     </Routes>
   );
 }

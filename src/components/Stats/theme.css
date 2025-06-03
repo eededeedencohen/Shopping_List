@@ -1,53 +1,32 @@
-:root {
-  --primary: #ff006a;
-  --secondary: #ff8f00;
-  --bg-start: #15152a;
-  --bg-end: #1b1a33;
-  --pane: #242449;
-  --text-light: #fff;
-  --text-muted: #9ca3af;
-  --radius: 18px;
-  --trans: 0.45s cubic-bezier(0.19, 1, 0.22, 1);
-  --font: "Poppins", sans-serif;
+/* 🟣 בסיס גלס-מורפי כללי */
+:root{
+  --primary:#ff006a;
+  --secondary:#ff8f00;
+  --accent:#16e0bd;
+  --paneBG:rgba(255,255,255,.12);
+  --paneBorder:rgba(255,255,255,.25);
+  --blur:14px;
+  --radius:20px;
+  --font:"Inter", "Assistant", sans-serif;
+  --trans:.45s cubic-bezier(.19,1,.22,1);
 }
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: var(--font);
+
+*{margin:0;padding:0;box-sizing:border-box;font-family:var(--font);}
+
+body{
+  min-height:100vh;
+  background:linear-gradient(155deg,#111 0%,#222 100%);
+  color:#fff;
 }
-body {
-  background: linear-gradient(160deg, var(--bg-start) 0%, var(--bg-end) 100%);
-  color: var(--text-light);
+
+.glassy{
+  background:var(--paneBG);
+  backdrop-filter:blur(var(--blur));
+  -webkit-backdrop-filter:blur(var(--blur));
+  border:1px solid var(--paneBorder);
+  border-radius:var(--radius);
+  box-shadow:0 8px 24px rgba(0,0,0,.35);
 }
-.fade-in {
-  opacity: 0;
-  animation: fadeIn 0.7s ease-out forwards;
-}
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(22px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-.card {
-  background: var(--pane);
-  border-radius: var(--radius);
-  padding: 18px;
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
-}
-.btn-primary {
-  background: var(--primary);
-  color: #fff;
-  border: none;
-  border-radius: 12px;
-  padding: 12px 26px;
-  transition: filter var(--trans);
-}
-.btn-primary:active {
-  filter: brightness(0.9);
-}
+
+.fade-in{opacity:0;animation:fade .7s ease-out forwards;}
+@keyframes fade{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
