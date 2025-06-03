@@ -326,6 +326,8 @@ function ProductsList() {
   const moveToNewSearch = () => {
     nav("search-test");
   };
+  const glassSquaresRef = useRef([]);
+
 
   /* הוספה לסל */
   const incrementAmount = (barcode) => {
@@ -440,6 +442,36 @@ function ProductsList() {
           onTouchMove={handleTouchMove}
           onTouchEnd={handleTouchEnd}
         >
+          {/* Glass background squares */}
+          
+<div className="glass-bg">
+  {(() => {
+    // מאחסן נתונים קבועים ברינדרים הבאים
+    if (!glassSquaresRef.current.length) {
+      glassSquaresRef.current = Array.from({ length: 25 }, () => ({
+        size: 40 + Math.random() * 60,       // 40-100px
+        left: Math.random() * 100,           // %
+        top: Math.random() * 100,            // %
+        duration: 20 + Math.random() * 20,   // 20-40s
+        delay: -Math.random() * 20,          // התחלה אקראית
+      }));
+    }
+    return glassSquaresRef.current.map((sq, idx) => (
+      <div
+        key={idx}
+        className="glass-square"
+        style={{
+          width: `${sq.size}px`,
+          height: `${sq.size}px`,
+          left: `${sq.left}%`,
+          top: `${sq.top}%`,
+          animationDuration: `${sq.duration}s`,
+          animationDelay: `${sq.delay}s`,
+        }}
+      />
+    ));
+  })()}
+</div>
           {filteredProducts.map((product) => (
             <div className="list__product-card" key={product.barcode}>
               {product.discount && (

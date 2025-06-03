@@ -1,7 +1,7 @@
 .toolbar {
   display: flex;
   justify-content: flex-start;
-  background-color: #106c53;
+  background-color: #0074cf;
   padding: 10px;
   position: fixed;
   width: 100%;
@@ -10,7 +10,6 @@
   /* border-radius: 0px 0px 5px 5px; */
   box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 1);
 }
-
 
 .toolbar .search-icon {
   position: absolute;
@@ -25,7 +24,6 @@
   width: 20px;
   height: 20px;
 }
-
 
 .toolbar .cart-icon {
   position: absolute; /* use absolute positioning */
@@ -63,7 +61,7 @@
   left: 0;
   width: 0;
   height: 100%;
-  background-color: #92ccecdd;
+  background-color: #8f999fdd;
   overflow-x: hidden;
   transition: 0.5s;
   z-index: 3;
@@ -72,7 +70,7 @@
 }
 
 .drawer.open {
-  width: 250px;
+  width: 150px;
 }
 
 .drawer a {
@@ -123,27 +121,17 @@
   justify-content: center;
   align-items: center;
   border-radius: 50%;
-  background: rgb(196, 247, 255); /* Set initial background to white */
+  /* background: rgb(196, 247, 255); Set initial background to white */
   transition: background-position 2s ease-in-out infinite;
   position: relative;
   /*making this div like 3d button*/
-  border: 1px solid #000000;
-  border-style: groove;
-  border-width: 2px;
+
   /*adding shadow */
-  box-shadow: 0px 0px 20px 0px rgba(0, 0, 0, 1);
 }
 
 .drawer .nav-icon img {
   width: 70%;
   height: 70%;
-}
-
-.drawer .nav-icon:hover {
-  background: linear-gradient(90deg, lime, aqua, blue, aqua);
-  background-size: 300% 300%;
-  animation: colorWave 2s linear infinite;
-  box-shadow: 0px 0px 0px 0px rgba(0, 0, 0, 1);
 }
 
 /* Animation Keyframes */
