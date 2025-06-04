@@ -36,11 +36,6 @@ export const convertWeightUnit = (weightUnit) => {
   }
 };
 
-const maxCharacters = (str, maxLen) => {
-  if (!str) return "";
-  return str.length > maxLen ? "..." + str.substring(0, maxLen - 3) : str;
-};
-
 // const priceFormat = (price) => price.toFixed(2);
 const priceFormat = (price) => {
   if (typeof price !== "number") return "—";

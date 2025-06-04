@@ -31,10 +31,11 @@ export const convertWeightUnit = (weightUnit) => {
     return "גרם";
   }
   if (weightUnit === "kg") {
-    return "קילוגרם";
+    // ק"ג
+    return 'ק"ג';
   }
   if (weightUnit === "ml") {
-    return "מיליליטר";
+    return 'מ"ל';
   }
   if (weightUnit === "l") {
     return "ליטר";
@@ -309,7 +310,7 @@ export default function Cart() {
                       style={{
                         display: "flex",
                         flexDirection: "row-reverse",
-                        alignItems: "center",
+                        alignItems: "flex-start",
                         paddingRight: "5px",
                         width: "100%",
                       }}
