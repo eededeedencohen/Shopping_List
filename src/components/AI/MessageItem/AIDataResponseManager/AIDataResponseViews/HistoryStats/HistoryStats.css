@@ -74,6 +74,7 @@
   align-items: flex-end;
   gap: 14px;
   padding: 24px 12px;
+  overflow-x: hidden;
 }
 
 .bar-wrapper {

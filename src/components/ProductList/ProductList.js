@@ -377,6 +377,9 @@ function ProductsList() {
           </div>
           {filteredProducts.map((product) => (
             <div className="list__product-card" key={product.barcode}>
+
+
+
               {product.discount && (
                 <div className="list__product-badge">מבצע</div>
               )}
@@ -450,6 +453,7 @@ function ProductsList() {
                 <div></div>
               </div>
             </div>
+            
           ))}
         </div>
       </div>

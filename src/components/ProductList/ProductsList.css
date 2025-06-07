@@ -233,7 +233,7 @@
 
 .glass-square {
   position: absolute;
-  background: rgba(117, 198, 255, 0.286);
+  background: rgba(102, 170, 219, 0.286);
   border: 1px solid rgba(0, 191, 255, 0.445);
   backdrop-filter: blur(10px) saturate(160%);
   border-radius: 8px;
