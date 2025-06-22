@@ -1,0 +1,61 @@
+/* טקסטי סטטוס */
+.bq_status {
+  text-align: center;
+  font: 1.3rem/2rem Heebo, Arial;
+  margin-top: 2rem;
+}
+.bq_status.bq_error {
+  color: crimson;
+}
+.bq_status.bq_success {
+  color: seagreen;
+}
+
+/* מעטפת וידאו */
+.bq_scanner {
+  position: relative;
+  width: 100%;
+  max-width: 500px;
+  aspect-ratio: 3/4; /* קובע גובה – לא נשאר 0px */
+  margin: 0 auto;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #000;
+}
+
+/* הווידאו החי */
+.bq_feed {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* מסגרת לבנה */
+.bq_frame {
+  position: absolute;
+  inset: 15%;
+  border: 3px solid rgba(255, 255, 255, 0.8);
+  border-radius: 8px;
+}
+
+/* קו אדום נוסע */
+.bq_line {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, #ff0033, transparent);
+  animation: bq_sweep 2s linear infinite;
+}
+
+@keyframes bq_sweep {
+  0%,
+  100% {
+    top: 0;
+  }
+  50% {
+    top: calc(100% - 3px);
+  }
+}

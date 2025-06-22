@@ -4,7 +4,7 @@ import MessageItemAI from "./MessageItemAI";
 import MessageItemOperationAI from "./MessageItemOperationAI";
 import MessageItemUser from "./MessageItemUser";
 
-const MessageItem = ({ message, sender }) => {
+const MessageItem = ({ message, sender, type, data, action }) => {
   if (sender === "assistant") {
     return <MessageItemAI message={message} />;
   } else if (sender === "user") {
@@ -12,7 +12,14 @@ const MessageItem = ({ message, sender }) => {
   } else if (sender === "loading") {
     return <MesageItemLoadingAI message={message} />;
   } else if (sender === "operation") {
-    return <MessageItemOperationAI/>;
+    return (
+      <MessageItemOperationAI
+        type={type}
+        message={message}
+        data={data}
+        action={action}
+      />
+    );
   }
 };
 

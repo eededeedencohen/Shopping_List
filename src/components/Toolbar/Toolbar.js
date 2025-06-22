@@ -3,16 +3,27 @@ import { Link } from "react-router-dom";
 import SearchBar from "../SearchBar/SearchBar";
 import SearchModal from "../SearchBar/SearchModal";
 import "./Toolbar.css";
-import groceryIcon from "./grocery.svg";
-import receiptIcon from "./receipt.svg";
-import shoppingListIcon from "./note.svg";
-import shoppingHistoryIcon from "./history2.svg";
-import statisticIcon from "./statistics.svg";
-import voiceAssistantIcon from "./voice-assistant.svg";
-import aiIcon from "./ai.svg";
+
 import cartIcon from "./cart.svg";
 import SearchIcon from "./search.svg";
+//=========================================================
+import { ReactComponent as GroceryIcon2 } from "./grocery2.svg";
+import { ReactComponent as AiIcon2 } from "./robot.svg";
+//pie-chart:
+import { ReactComponent as PieChartIcon } from "./pie-chart.svg";
+//transaction-history
+import { ReactComponent as TransactionHistoryIcon } from "./transaction-history.svg";
+// voice2
+import { ReactComponent as Voice2Icon } from "./voice-bot.svg";
+// wishlist
+import { ReactComponent as WishlistIcon } from "./wishlist.svg";
 
+// editing:
+import { ReactComponent as EditIcon } from "./editing.svg";
+
+// data-classification
+import { ReactComponent as DataClassificationIcon } from "./data-classification.svg";
+//=========================================================
 function Toolbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -57,88 +68,58 @@ function Toolbar() {
           <Link to="/" onClick={closeDrawer}>
             <div className="nav-item">
               <div className="nav-icon">
-                <img src={groceryIcon} alt="Grocery" />
+                <GroceryIcon2 className="svg-icon" /> {/* הוסף class */}
               </div>
               <h1>Products</h1>
             </div>
           </Link>
-          {/* <Link to="/product-list" onClick={closeDrawer}>
-            <div className="nav-item">
-              <div className="nav-icon">
-                <img src={groceryIcon} alt="Grocery" />
-              </div>
-              <h1>ProductsList</h1>
-            </div>
-          </Link> */}
+
           <Link to="/products-list-groups" onClick={closeDrawer}>
             <div className="nav-item">
               <div className="nav-icon">
-                <img src={groceryIcon} alt="Grocery" />
+                <DataClassificationIcon className="svg-icon" />{" "}
               </div>
-              <h1>ProductsListGroups</h1>
-            </div>
-          </Link>
-          {/* <Link to="/edit-products" onClick={closeDrawer}>
-            <div className="nav-item">
-              <div className="nav-icon">
-                <img src={groceryIcon} alt="Grocery" />
-              </div>
-              <h1>EditProducts</h1>
-            </div>
-          </Link> */}
-          <Link to="/image-parser" onClick={closeDrawer}>
-            <div className="nav-item">
-              <div className="nav-icon">
-                <img src={groceryIcon} alt="Grocery" />
-              </div>
-              <h1>Image parser</h1>
-            </div>
-          </Link>
-          <Link to="/grocery" onClick={closeDrawer}>
-            <div className="nav-item">
-              <div className="nav-icon">
-                <img src={shoppingListIcon} alt="Grocery" />
-              </div>
-              <h1>List from Image</h1>
+              <h1>Edit Groups</h1>
             </div>
           </Link>
 
-          <Link to="/grocery" onClick={closeDrawer}>
+          <Link to="/edit-products" onClick={closeDrawer}>
             <div className="nav-item">
               <div className="nav-icon">
-                <img src={receiptIcon} alt="Grocery" />
+                <EditIcon className="svg-icon" /> {/* הוסף class */}
+              </div>
+              <h1>Edit</h1>
+            </div>
+          </Link>
+
+          <Link to="/image-parser" onClick={closeDrawer}>
+            <div className="nav-item">
+              <div className="nav-icon">
+                <WishlistIcon className="svg-icon" /> {/* הוסף class */}
               </div>
               <h1>Receipt To History</h1>
             </div>
           </Link>
-          <Link
-            to="/expense-overview"
-            onClick={closeDrawer}
-            className="link-nav"
-          >
-            <div className="nav-item">
+
+          <Link to="/expense-overview" onClick={closeDrawer}>
+            <div className="nav-item selected-page">
               <div className="nav-icon">
-                <img src={statisticIcon} alt="Grocery" />
+                <PieChartIcon className="svg-icon" />
               </div>
               <h1>Statistics</h1>
             </div>
           </Link>
+
           <Link to="/audio-recorder" onClick={closeDrawer}>
             <div className="nav-item">
               <div className="nav-icon">
-                <img src={voiceAssistantIcon} alt="Grocery" />
+                <Voice2Icon className="svg-icon" />
               </div>
               <h1>Voice Assistant</h1>
             </div>
           </Link>
-          <Link to="/audio-recorder" onClick={closeDrawer}>
-            <div className="nav-item">
-              <div className="nav-icon">
-                <img src={aiIcon} alt="Grocery" />
-              </div>
-              <h1>Predict Shopping List</h1>
-            </div>
-          </Link>
+
+          {/* 
           <Link to="/history" onClick={closeDrawer}>
             <div className="nav-item">
               <div className="nav-icon">
@@ -146,11 +127,21 @@ function Toolbar() {
               </div>
               <h1>Shopping History</h1>
             </div>
+          </Link> */}
+
+          <Link to="/history" onClick={closeDrawer}>
+            <div className="nav-item">
+              <div className="nav-icon">
+                <TransactionHistoryIcon className="svg-icon" />
+              </div>
+              <h1>Shopping History</h1>
+            </div>
           </Link>
+
           <Link to="/ai" onClick={closeDrawer}>
             <div className="nav-item">
               <div className="nav-icon">
-                <img src={aiIcon} alt="Grocery" />
+                <AiIcon2 className="svg-icon" />
               </div>
               <h1>AI</h1>
             </div>

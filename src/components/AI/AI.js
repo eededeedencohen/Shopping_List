@@ -5,13 +5,38 @@ import MessageItem from "./MessageItem/MessageItem";
 
 const AI = () => {
   const [messages, setMessages] = useState([
-    { text: "זאת הודעה מהבינה מלאכותית", sender: "assistant" },
-    { text: "זה הודעה מהמשתמש", sender: "user" },
+    {
+      text: "זאת הודעה מהבינה מלאכותית",
+      sender: "assistant",
+      type: "regular",
+      data: null,
+    },
+    { text: "זה הודעה מהמשתמש", sender: "user", type: "regular", data: null },
     //loading
-    { text: "כאן אמור להיות טעינה", sender: "loading" },
+    {
+      text: "כאן אמור להיות טעינה",
+      sender: "loading",
+      type: "loading",
+      data: null,
+    },
     // operation
-    { text: "הנה לך ההוצאות שלך לפי חודש", sender: "assistant" },
-    { text: "הנה לך ההוצאות שלך לפי חודש", sender: "operation" },
+    {
+      text: "הנה לך ההוצאות שלך לפי חודש",
+      sender: "assistant",
+      type: "operation",
+      data: null,
+    },
+    {
+      text: "הנה לך ההוצאות שלך לפי חודש",
+      sender: "operation",
+      type: "cartOperations",
+      data: null,
+      action: {
+        barcode: "7290108350616",
+        operationType: "delete",
+        newQuantity: 0,
+      },
+    },
   ]);
   const [textInput, setTextInput] = useState("");
   const messageEndRef = useRef(null); // Invisible element for auto-scrolling
@@ -24,8 +49,17 @@ const AI = () => {
     messageEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
-  const addMessage = (text, sender) => {
-    setMessages((prevMessages) => [...prevMessages, { text, sender }]);
+  const addMessage = (
+    text,
+    sender,
+    type = "regular",
+    data = null,
+    action = []
+  ) => {
+    setMessages((prevMessages) => [
+      ...prevMessages,
+      { text, sender, type, data, action },
+    ]);
   };
 
   // const playResponse = (route) => {
@@ -49,7 +83,7 @@ const AI = () => {
     try {
       const response = await fetch(
         // `${DOMAIN}/api/v1/voice-assistant/user-text`,
-        `${DOMAIN}/api/v1/ai/ai-response-v3`,
+        `${DOMAIN}/api/v1/ai/ai-response-v4`,
 
         {
           method: "POST",
@@ -63,16 +97,28 @@ const AI = () => {
       // const { text, route } = await response.json();
       const jsonResponse = await response.json();
 
-      const text =
-        jsonResponse.aiUnderstanding?.aiResponse?.messageToUser ||
-        "אין תשובה מהבינה המלאכותית";
-      const cartOperation =
-        jsonResponse.aiUnderstanding?.aiResponse?.cartOperation || null;
+      const aiResponse = jsonResponse.aiResponse || {};
+      const messageToUser = aiResponse.messageToUser || "";
+      const messageType = aiResponse.messageType || "regular";
+      const action = aiResponse.actions || {};
+      const data = aiResponse.data || {};
 
-      console.log("cartOperation", cartOperation);
+      // const text =
+      //   jsonResponse.aiResponse?.messageToUser || "אין תשובה מהבינה המלאכותית";
+      // const cartOperation =
+      //   jsonResponse.aiUnderstanding?.aiResponse?.cartOperation || null;
+
+      console.log("cartOperation", action);
+      console.log("data", data);
+      console.log("messageToUser", messageToUser);
+      console.log("messageType", messageType);
+
+      // sender - assistant if the type is regular
+      // else - operation
+      const sender = messageType === "regular" ? "assistant" : "operation";
 
       // 3. מוסיפים את הודעת העוזר (הבוט) שהתקבלה
-      addMessage(text, "assistant");
+      addMessage(messageToUser, sender, messageType, data, action);
 
       // 4. מפעילים אודיו אם קיים
       // if (route) {
@@ -108,8 +154,11 @@ const AI = () => {
           <MessageItem
             key={index}
             message={message.text}
+            messageType={message.type || "regular"} // Default to "regular" if type is not provided
             sender={message.sender}
-            // type={message.type}
+            type={message.type}
+            data={message.data} // Uncomment if you want to pass data to MessageItem
+            action={message.action} // Uncomment if you want to pass action to MessageItem
           />
         ))}
         <div ref={messageEndRef} />

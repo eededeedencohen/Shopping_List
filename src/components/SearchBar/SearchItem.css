@@ -112,10 +112,18 @@
 
 .search__product-decrease-amount,
 .search__product-increase-amount {
-  width: 2rem;
-  height: 2rem;
+  width: 2.5rem;
+  height: 2.5rem;
   font-size: 1.5rem;
   padding-bottom: 1rem;
+  transition: width 0.1s ease, height 0.1s ease, font-size 0.3s ease,
+    padding-bottom 0.3s ease;
+}
+
+.search__product-decrease-amount:active,
+.search__product-increase-amount:active {
+  width: 2rem;
+  height: 2rem;
 }
 
 .search__product-increase-amount {
@@ -144,11 +152,12 @@
   width: 6rem;
   padding: 5px 3px;
   margin-right: 2rem;
-  
+
   visibility: hidden;
   transition: background-color 0.5s ease;
   opacity: 0; /* start with invisible */
-  transition: background-color 0.5s ease, opacity 0.5s ease, visibility 0s linear 0.5s; /* Animate both background color and opacity */
+  transition: background-color 0.5s ease, opacity 0.5s ease,
+    visibility 0s linear 0.5s; /* Animate both background color and opacity */
 }
 
 .visible {

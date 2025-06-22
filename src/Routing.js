@@ -19,7 +19,7 @@ import OptimalCart from "./components/CartOptimization/OptimalsSupermarketCarts/
 import ExpenseOverview from "./components/Stats/ExpenseOverview";
 // import ProductListManager from "./components/ProductList/ProductListManager";
 // import ProductListManagerAlternativeProductsGroups from "./components/ProductList/ProductListManagerAlternativeProductsGroups";
-// import EditProducts from "./components/ProductList/EditProducts";
+import EditProducts from "./components/ProductList/EditProducts";
 import AI from "./components/AI/AI";
 import ProductsListTest from "./components/HooksTest/ProductsListTest";
 import CartTest from "./components/HooksTest/CartTest";
@@ -31,7 +31,7 @@ import Chatbot from "./components/Design/Chatbot/Chatbot";
 import StatsDashboard from "./components/Design/Charts/StatsDashboard";
 import ProductsListGroups from "./components/ProductList/ProductListGroups";
 // BarcodeScanner
-import RobotMascot from "./components/AAAnimationTests/RobotMascot";
+import BarcodeScanner from "./components/AAAnimationTests/BarcodeScanner";
 
 function Routing() {
   return (
@@ -68,7 +68,7 @@ function Routing() {
         path="/alternative-products-groups"
         element={<ProductListManagerAlternativeProductsGroups />}
       /> */}
-      {/* <Route path="/edit-products" element={<EditProducts />} /> */}
+      <Route path="/edit-products" element={<EditProducts />} />
       <Route path="/ai" element={<AI />} />
       <Route path="/products-list-test" element={<ProductsListTest />} />
       <Route path="/cart-test" element={<CartTest />} />
@@ -79,7 +79,7 @@ function Routing() {
       <Route path="/chatbot" element={<Chatbot />} />
       <Route path="/stats-dashboard" element={<StatsDashboard />} />
       <Route path="/products-list-groups" element={<ProductsListGroups />} />
-      <Route path="/robot" element={<RobotMascot />} />
+      <Route path="/robot" element={<BarcodeScanner />} />
       {/* Add more routes as needed */}
     </Routes>
   );
