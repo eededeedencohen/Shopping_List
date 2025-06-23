@@ -19,3 +19,8 @@
     transform: translateX(150%) translateY(5%);
   }
 } */
+/* השכבה שמכסה את כל המסך */
+.modal-overlay {
+  -webkit-backdrop-filter: blur(6px); /* תמיכה בספארי */
+  backdrop-filter: blur(6px); /* תמיכה בדפדפנים מודרניים */
+}

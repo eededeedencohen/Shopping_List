@@ -6,10 +6,7 @@ import ProductPriceComparison from "./AIDataResponseManager/AIDataResponseViews/
 import CartOperationsAnimation from "./MessageItemOperations/CartOperationsView/CartOperationsAddAnimation";
 import CartPriceComparison from "./AIDataResponseManager/AIDataResponseViews/CartPriceComparison/CartPriceComparison";
 import CartView from "./AIDataResponseManager/AIDataResponseViews/CartView/CartView.js";
-import {
-  HistoryStats,
-  MonthlyExpensesChart,
-} from "./AIDataResponseManager/AIDataResponseViews/HistoryStats/HistoryStats.js";
+import MonthlyExpensesChart from "./History/MonthlyExpensesChart.js";
 
 const getComponentByType = (type, data, action) => {
   switch (type) {
@@ -20,7 +17,6 @@ const getComponentByType = (type, data, action) => {
     case "B1 Result":
       return <ProductPriceComparison data={data} />;
     case "cartOperation":
-      
       return (
         <CartOperationsAnimation
           barcode={action.barcode}
@@ -28,7 +24,8 @@ const getComponentByType = (type, data, action) => {
           action={action.operationType}
         />
       );
-
+    case "monthlyExpenses":
+      return <MonthlyExpensesChart data={data} />;
     default:
       return null;
   }

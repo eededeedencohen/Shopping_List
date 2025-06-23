@@ -24,3 +24,11 @@ code {
 * {
   box-sizing: border-box;
 }
+
+/* ───── Global focus reset ───────────────────────────── */
+/* Pointer (mouse / touch) → no ugly outline            */
+/* Keyboard (Tab)      → browser outline is preserved   */
+
+*:focus:not(:focus-visible) {
+  outline: none;
+}

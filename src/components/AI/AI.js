@@ -29,12 +29,23 @@ const AI = () => {
     {
       text: "הנה לך ההוצאות שלך לפי חודש",
       sender: "operation",
-      type: "cartOperations",
+      type: "cartOperation",
       data: null,
       action: {
         barcode: "7290108350616",
         operationType: "delete",
         newQuantity: 0,
+      },
+    },
+    {
+      text: "הנה לך ההוצאות שלך לפי חודש",
+      sender: "operation",
+      type: "monthlyExpenses",
+      data: {
+        "2025-01": 89.3,
+        "2025-02": 200.2,
+        "2025-05": 1968.4,
+        "2025-06": 1579.5,
       },
     },
   ]);
@@ -154,7 +165,6 @@ const AI = () => {
           <MessageItem
             key={index}
             message={message.text}
-            messageType={message.type || "regular"} // Default to "regular" if type is not provided
             sender={message.sender}
             type={message.type}
             data={message.data} // Uncomment if you want to pass data to MessageItem
