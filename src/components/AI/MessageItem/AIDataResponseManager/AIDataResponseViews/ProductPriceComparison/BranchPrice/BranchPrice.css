@@ -1,0 +1,75 @@
+/* ╔════════════════════════════════════╗
+   ║  בלוק מחיר / מבצע / סניפים        ║
+   ╚════════════════════════════════════╝ */
+.test_bp__wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 16px 18px 20px;
+  text-align: center;
+}
+
+/* ───── מחיר ───── */
+.test_bp__price {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #ffffff;
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+}
+
+.test_bp__currency {
+  font-size: 1.2rem;
+}
+
+/* ───── קלף-מבצע ───── */
+.test_bp__dealCard {
+  --grad-start: #ff6584;
+  --grad-end: #ff416c;
+
+  margin-top: 12px;
+  padding: 8px 20px;
+  border-radius: 26px;
+  background: linear-gradient(135deg, var(--grad-start), var(--grad-end));
+  color: #fff;
+  font-size: 0.85rem;
+  font-weight: 600;
+  white-space: nowrap;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25),
+    0 0 8px 2px rgba(255, 99, 132, 0.55);
+}
+
+.test_bp__dealLabel {
+  font-weight: 700;
+}
+
+/* ───── מפריד קו דק ───── */
+.test_bp__separator {
+  width: 92%;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.25);
+  margin: 16px 0 10px;
+}
+
+/* ───── ‘צ’יפים’ של סניפים ───── */
+.test_bp__branches {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+}
+
+.test_bp__chip {
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 12px;
+  padding: 6px 12px;
+  font-size: 0.75rem;
+  color: #eaeaea;
+  transition: background 0.15s;
+}
+
+.test_bp__chip:hover {
+  background: rgba(255, 255, 255, 0.25);
+}

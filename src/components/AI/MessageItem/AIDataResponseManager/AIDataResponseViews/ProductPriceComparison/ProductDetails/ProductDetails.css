@@ -1,0 +1,80 @@
+/* ───────── עטיפה כללית ───────── */
+.test_pd__wrapper {
+  display: flex;
+  flex-direction: row-reverse; /* תמונה מימין, טקסט משמאל */
+  align-items: center;
+  gap: 18px; /* רווח בין תמונה לטקסט */
+  width: 100%;
+  justify-content: center; /* מרכז את כל הציר */
+  text-align: right; /* יישור טקסט לימין */
+  direction: rtl;
+}
+
+/* ───────── תמונה ───────── */
+.test_pd__image {
+  width: 95px;
+  min-width: 95px;
+  height: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.35));
+}
+
+/* ───────── בלוק טקסט ───────── */
+.test_pd__info {
+  flex: 1; /* יתפוס את השטח שנותר */
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start; /* שמור יישור לימין במסגרת RTL */
+}
+
+/* שם מוצר */
+.test_pd__name {
+  margin: 0 0 4px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #fff;
+}
+
+/* ברקוד */
+.test_pd__barcode {
+  margin: 0 0 8px;
+  font-size: 0.9rem;
+  opacity: 0.9;
+  color: #e0e0e0;
+  direction: ltr; /* ברקוד תמיד משמאל-לימין */
+}
+
+/* מטא-דאטה (משקל, קטגוריה…) */
+.test_pd__meta {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  font-size: 0.8rem;
+  line-height: 1.35;
+  color: #d6d6d6;
+}
+
+.test_pd__meta li + li {
+  margin-top: 2px;
+}
+
+/* ───────── מצב “לא נמצא” ───────── */
+.test_pd__missing {
+  margin: 0 auto;
+  font-size: 0.9rem;
+  opacity: 0.7;
+}
+
+/* ───────── רספונסיביות ───────── */
+@media (max-width: 380px) {
+  .test_pd__wrapper {
+    gap: 12px;
+  }
+  .test_pd__image {
+    width: 80px;
+    min-width: 80px;
+  }
+  .test_pd__name {
+    font-size: 1rem;
+  }
+}

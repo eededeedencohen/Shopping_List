@@ -161,17 +161,42 @@ export const useProductList = () => {
   };
 };
 
+// export const useProductSearch = () => {
+//   const { products } = useProductsCtx();
+//   return useCallback(
+//     (query) => {
+//       const q = query.toLowerCase();
+//       return products.filter(
+//         (p) =>
+//           p.name.toLowerCase().includes(q) ||
+//           p.generalName?.toLowerCase().includes(q) ||
+//           p.brand?.toLowerCase().includes(q) ||
+//           p.barcode.includes(q)
+//       );
+//     },
+//     [products]
+//   );
+// };
 export const useProductSearch = () => {
   const { products } = useProductsCtx();
+
   return useCallback(
     (query) => {
-      const q = query.toLowerCase();
-      return products.filter(
-        (p) =>
-          p.name.toLowerCase().includes(q) ||
-          p.generalName?.toLowerCase().includes(q) ||
-          p.brand?.toLowerCase().includes(q)
-      );
+      const q = query.trim().toLowerCase();
+
+      return products.filter((p) => {
+        const name = p.name?.toLowerCase() ?? "";
+        const generalName = p.generalName?.toLowerCase() ?? "";
+        const brand = p.brand?.toLowerCase() ?? "";
+        const barcode = p.barcode ? String(p.barcode) : "";
+
+        return (
+          name.includes(q) ||
+          generalName.includes(q) ||
+          brand.includes(q) ||
+          barcode.includes(q) // ← עובד גם כש-q הוא טקסט או ספרות
+        );
+      });
     },
     [products]
   );
@@ -184,7 +209,7 @@ export const useGetProductByBarcode = (barcode) => {
     if (!barcode) return null;
     return products.find((p) => p.barcode === barcode) ?? null;
   }, [products, barcode]);
-}
+};
 
 // -----------------------------------------------------------------------------
 // 5) Enriched products (מוצרים + מחיר + כמות + totals) – יעיל עם Maps

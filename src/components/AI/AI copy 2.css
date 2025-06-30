@@ -1,5 +1,7 @@
-/* ---------- ROOT VARIABLES ---------- */
-:root {
+.ai-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
   --grad-start: #1b6eff;
   --grad-mid: #1ed1ff;
   --grad-end: #373a3a;
@@ -7,34 +9,16 @@
   --glass-bd: rgba(255, 255, 255, 0.3);
   --txt-light: #ffffff;
   --txt-dark: #222222;
-}
 
-/* ---------- AI CONTAINER ---------- */
-.ai-container {
-  position: relative; /* מאפשר שכבתיות */
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  background: transparent; /* fallback – הקנבס מכסה */
+  background: radial-gradient(circle at 50% -20%, #ffffff55 0%, transparent 40%),
+    linear-gradient(180deg, var(--grad-start) 0%, var(--grad-end) 100%);
   color: var(--txt-light);
   padding: 6px;
   box-sizing: border-box;
   font-family: "Heebo", sans-serif;
 }
 
-/* קנבס הנוירונים – מאחור */
-.neuron-bg {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: -1; /* מאחורי הממשק */
-
-  background: linear-gradient(35deg, rgb(0, 17, 23) 0%, rgb(176, 214, 255) 95%);
-}
-
-/* ---------- MESSAGES ---------- */
+/* =========== MESSAGES =========== */
 .ai-container .messages-container {
   flex: 1;
   overflow-y: auto;
@@ -45,7 +29,7 @@
   overflow-x: hidden;
 }
 
-/* ---------- USER INPUT BAR ---------- */
+/* =========== USER INPUT BAR =========== */
 .ai-container .user-text-box {
   position: sticky;
   bottom: 0;
@@ -123,7 +107,7 @@
   background: rgba(255, 255, 255, 0.32);
 }
 
-/* ---------- SCROLLBAR ---------- */
+/* =========== SCROLLBAR =========== */
 .ai-container .messages-container::-webkit-scrollbar {
   width: 4px;
 }

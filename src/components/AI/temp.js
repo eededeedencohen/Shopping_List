@@ -1,10 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
-import { DOMAIN } from "../../constants";
-import "./AI.css";
-import MessageItem from "./MessageItem/MessageItem";
-import NeuronBackground from "./NeuronBackground";
-
-const b1Data = {
+const originalData = {
   "רמי לוי": [
     {
       branchName: "רמי לוי",
@@ -1130,6 +1124,338 @@ const b1Data = {
       ],
     },
   ],
+  "שערי רווחה": [
+    {
+      branchName: "שערי רווחה",
+      branchAddress: "לואיס ברנדס 3",
+      products: [
+        {
+          product: {
+            _id: "646db90aadbba146043f714a",
+            name: "דוריטוס חריף אש",
+            hasUiqueBarcode: true,
+            barcode: "7290010117864",
+            brand: "דוריטוס",
+            weight: 70,
+            unitWeight: "g",
+            generalName: "דוריטוס",
+            __v: 0,
+            category: "חטיפים ודגנים",
+            subcategory: "חטיפים מלוחים",
+            id: "646db90aadbba146043f714a",
+          },
+          price: {
+            price: 3.5,
+            hasDiscount: true,
+            discount: {
+              units: 3,
+              priceForUnit: 3.33,
+              totalPrice: 10,
+              _id: "67b341eac07fd56234a18bdb",
+            },
+          },
+        },
+        {
+          product: {
+            _id: "646db90aadbba146043f7149",
+            name: "דוריטוס נאצ'ו",
+            hasUiqueBarcode: true,
+            barcode: "7290100850909",
+            brand: "דוריטוס",
+            weight: 70,
+            unitWeight: "g",
+            generalName: "דוריטוס",
+            __v: 0,
+            category: "חטיפים ודגנים",
+            subcategory: "חטיפים מלוחים",
+            id: "646db90aadbba146043f7149",
+          },
+          price: {
+            price: 3.5,
+            hasDiscount: true,
+            discount: {
+              units: 3,
+              priceForUnit: 3.33,
+              totalPrice: 10,
+              _id: "67b341ebc07fd56234a21a1f",
+            },
+          },
+        },
+        {
+          product: {
+            _id: "646db90aadbba146043f714d",
+            name: "דוריטוס חמוץ חריף",
+            hasUiqueBarcode: true,
+            barcode: "7290100850916",
+            brand: "דוריטוס",
+            weight: 70,
+            unitWeight: "g",
+            generalName: "דוריטוס",
+            __v: 0,
+            category: "חטיפים ודגנים",
+            subcategory: "חטיפים מלוחים",
+            id: "646db90aadbba146043f714d",
+          },
+          price: {
+            price: 3.5,
+            hasDiscount: true,
+            discount: {
+              units: 3,
+              priceForUnit: 3.33,
+              totalPrice: 10,
+              _id: "67b341ebc07fd56234a21a3d",
+            },
+          },
+        },
+        {
+          product: {
+            _id: "646db90aadbba146043f7148",
+            name: "דוריטוס גריל",
+            hasUiqueBarcode: true,
+            barcode: "7290100850923",
+            brand: "דוריטוס",
+            weight: 70,
+            unitWeight: "g",
+            generalName: "דוריטוס",
+            __v: 0,
+            category: "חטיפים ודגנים",
+            subcategory: "חטיפים מלוחים",
+            id: "646db90aadbba146043f7148",
+          },
+          price: {
+            price: 3.5,
+            hasDiscount: true,
+            discount: {
+              units: 3,
+              priceForUnit: 3.33,
+              totalPrice: 10,
+              _id: "67b341ebc07fd56234a21b1b",
+            },
+          },
+        },
+        {
+          product: {
+            _id: "646db90aadbba146043f714b",
+            name: "דוריטוס טבעי",
+            hasUiqueBarcode: true,
+            barcode: "7290100850930",
+            brand: "דוריטוס",
+            weight: 70,
+            unitWeight: "g",
+            generalName: "דוריטוס",
+            __v: 0,
+            category: "חטיפים ודגנים",
+            subcategory: "חטיפים מלוחים",
+            id: "646db90aadbba146043f714b",
+          },
+          price: {
+            price: 3.5,
+            hasDiscount: true,
+            discount: {
+              units: 3,
+              priceForUnit: 3.33,
+              totalPrice: 10,
+              _id: "67b341ebc07fd56234a21bf7",
+            },
+          },
+        },
+        {
+          product: {
+            _id: "646db90aadbba146043f714f",
+            name: "דוריטוס טבעי",
+            hasUiqueBarcode: true,
+            barcode: "7290106528628",
+            brand: "דוריטוס",
+            weight: 185,
+            unitWeight: "g",
+            generalName: "דוריטוס",
+            __v: 0,
+            category: "חטיפים ודגנים",
+            subcategory: "חטיפים מלוחים",
+            id: "646db90aadbba146043f714f",
+          },
+          price: {
+            price: 8.5,
+            hasDiscount: false,
+            discount: null,
+          },
+        },
+        {
+          product: {
+            _id: "646db90aadbba146043f714e",
+            name: "דוריטוס חמוץ חריף",
+            hasUiqueBarcode: true,
+            barcode: "7290106667266",
+            brand: "דוריטוס",
+            weight: 185,
+            unitWeight: "g",
+            generalName: "דוריטוס",
+            __v: 0,
+            category: "חטיפים ודגנים",
+            subcategory: "חטיפים מלוחים",
+            id: "646db90aadbba146043f714e",
+          },
+          price: {
+            price: 8.5,
+            hasDiscount: false,
+            discount: null,
+          },
+        },
+      ],
+    },
+    {
+      branchName: "שערי רווחה",
+      branchAddress: "25 ירמיהו",
+      products: [
+        {
+          product: {
+            _id: "646db90aadbba146043f714a",
+            name: "דוריטוס חריף אש",
+            hasUiqueBarcode: true,
+            barcode: "7290010117864",
+            brand: "דוריטוס",
+            weight: 70,
+            unitWeight: "g",
+            generalName: "דוריטוס",
+            __v: 0,
+            category: "חטיפים ודגנים",
+            subcategory: "חטיפים מלוחים",
+            id: "646db90aadbba146043f714a",
+          },
+          price: {
+            price: 3.5,
+            hasDiscount: true,
+            discount: {
+              units: 3,
+              priceForUnit: 3.33,
+              totalPrice: 10,
+              _id: "67b341eac07fd56234a18bde",
+            },
+          },
+        },
+        {
+          product: {
+            _id: "646db90aadbba146043f714d",
+            name: "דוריטוס חמוץ חריף",
+            hasUiqueBarcode: true,
+            barcode: "7290100850916",
+            brand: "דוריטוס",
+            weight: 70,
+            unitWeight: "g",
+            generalName: "דוריטוס",
+            __v: 0,
+            category: "חטיפים ודגנים",
+            subcategory: "חטיפים מלוחים",
+            id: "646db90aadbba146043f714d",
+          },
+          price: {
+            price: 3.5,
+            hasDiscount: true,
+            discount: {
+              units: 3,
+              priceForUnit: 3.33,
+              totalPrice: 10,
+              _id: "67b341ebc07fd56234a21a40",
+            },
+          },
+        },
+        {
+          product: {
+            _id: "646db90aadbba146043f7148",
+            name: "דוריטוס גריל",
+            hasUiqueBarcode: true,
+            barcode: "7290100850923",
+            brand: "דוריטוס",
+            weight: 70,
+            unitWeight: "g",
+            generalName: "דוריטוס",
+            __v: 0,
+            category: "חטיפים ודגנים",
+            subcategory: "חטיפים מלוחים",
+            id: "646db90aadbba146043f7148",
+          },
+          price: {
+            price: 3.5,
+            hasDiscount: true,
+            discount: {
+              units: 3,
+              priceForUnit: 3.33,
+              totalPrice: 10,
+              _id: "67b341ebc07fd56234a21b1e",
+            },
+          },
+        },
+        {
+          product: {
+            _id: "646db90aadbba146043f714b",
+            name: "דוריטוס טבעי",
+            hasUiqueBarcode: true,
+            barcode: "7290100850930",
+            brand: "דוריטוס",
+            weight: 70,
+            unitWeight: "g",
+            generalName: "דוריטוס",
+            __v: 0,
+            category: "חטיפים ודגנים",
+            subcategory: "חטיפים מלוחים",
+            id: "646db90aadbba146043f714b",
+          },
+          price: {
+            price: 3.5,
+            hasDiscount: true,
+            discount: {
+              units: 3,
+              priceForUnit: 3.33,
+              totalPrice: 10,
+              _id: "67b341ebc07fd56234a21bfa",
+            },
+          },
+        },
+        {
+          product: {
+            _id: "646db90aadbba146043f714f",
+            name: "דוריטוס טבעי",
+            hasUiqueBarcode: true,
+            barcode: "7290106528628",
+            brand: "דוריטוס",
+            weight: 185,
+            unitWeight: "g",
+            generalName: "דוריטוס",
+            __v: 0,
+            category: "חטיפים ודגנים",
+            subcategory: "חטיפים מלוחים",
+            id: "646db90aadbba146043f714f",
+          },
+          price: {
+            price: 8.5,
+            hasDiscount: false,
+            discount: null,
+          },
+        },
+        {
+          product: {
+            _id: "646db90aadbba146043f714e",
+            name: "דוריטוס חמוץ חריף",
+            hasUiqueBarcode: true,
+            barcode: "7290106667266",
+            brand: "דוריטוס",
+            weight: 185,
+            unitWeight: "g",
+            generalName: "דוריטוס",
+            __v: 0,
+            category: "חטיפים ודגנים",
+            subcategory: "חטיפים מלוחים",
+            id: "646db90aadbba146043f714e",
+          },
+          price: {
+            price: 8.5,
+            hasDiscount: false,
+            discount: null,
+          },
+        },
+      ],
+    },
+  ],
   "שפע ברכת השם": [
     {
       branchName: "שפע ברכת השם",
@@ -1182,150 +1508,35 @@ const b1Data = {
   ],
 };
 
-const AI = () => {
-  const [messages, setMessages] = useState([
-    {
-      text: "זאת הודעה מהבינה מלאכותית",
-      sender: "assistant",
-      type: "regular",
-      data: null,
-    },
-    { text: "זה הודעה מהמשתמש", sender: "user", type: "regular", data: null },
-    {
-      text: "כאן אמור להיות טעינה",
-      sender: "loading",
-      type: "loading",
-      data: null,
-    },
-    {
-      text: "הנה לך ההוצאות שלך לפי חודש",
-      sender: "assistant",
-      type: "operation",
-      data: null,
-    },
-    {
-      text: "הנה לך ההוצאות שלך לפי חודש",
-      sender: "operation",
-      type: "cartOperation",
-      data: null,
-      action: {
-        barcode: "7290108350616",
-        operationType: "delete",
-        newQuantity: 0,
-      },
-    },
-    {
-      text: "הנה לך ההוצאות שלך לפי חודש",
-      sender: "operation",
-      type: "monthlyExpenses",
-      data: {
-        "2025-01": 89.3,
-        "2025-02": 200.2,
-        "2025-05": 1968.4,
-        "2025-06": 1579.5,
-      },
-    },
-    {
-      text: "הנה לך ההוצאות שלך לפי חודש",
-      sender: "operation",
-      type: "B1 Result",
-      data: b1Data,
-    },
-  ]);
-
-  const [textInput, setTextInput] = useState("");
-  const messageEndRef = useRef(null);
-
-  /* --------- auto-scroll --------- */
-  useEffect(() => {
-    messageEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
-
-  const addMessage = (
-    text,
-    sender,
-    type = "regular",
-    data = null,
-    action = []
-  ) => {
-    setMessages((prev) => [...prev, { text, sender, type, data, action }]);
-  };
-
-  const handleOnSubmit = async (e) => {
-    e.preventDefault();
-    if (!textInput.trim()) return;
-
-    /* 1. push user msg */
-    const userText = textInput;
-    addMessage(userText, "user");
-    setTextInput("");
-
-    /* 2. ask server */
-    try {
-      const res = await fetch(`${DOMAIN}/api/v1/ai/ai-response-v4`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text: userText }),
-      });
-
-      const json = await res.json();
-      const aiResp = json.aiResponse ?? {};
-      const messageToUser = aiResp.messageToUser ?? "";
-      const messageType = aiResp.messageType ?? "regular";
-      const action = aiResp.actions ?? {};
-      const data = aiResp.data ?? {};
-
-      const sender = messageType === "regular" ? "assistant" : "operation";
-      addMessage(messageToUser, sender, messageType, data, action);
-    } catch (err) {
-      console.error(err);
-      addMessage("⚠️ ארעה שגיאה, נסה שוב.", "assistant");
+function compressBranch({ branchName, branchAddress, products }) {
+  const groups = {};
+  for (const { product, price } of products) {
+    // מפתח ייחודי: generalName + hash של price-object
+    const key = product.generalName + "|" + JSON.stringify(price);
+    if (!groups[key]) {
+      groups[key] = {
+        generalName: product.generalName,
+        price: price, // עותק ראשון הוא ה"master"
+        barcodes: [],
+      };
     }
+    groups[key].barcodes.push(product.barcode);
+  }
+  return {
+    branchName,
+    branchAddress,
+    products: Object.values(groups), // המוצרים הדחוסים
   };
+}
 
-  const handleReset = async () => {
-    setMessages((prev) => prev.slice(0, 4));
-    setTextInput("");
-    await fetch(`${DOMAIN}/api/v1/ai/reset`, { method: "POST" });
-  };
+function compressData(data) {
+  const result = {};
+  for (const [supName, branches] of Object.entries(data)) {
+    result[supName] = branches.map(compressBranch);
+  }
+  return result;
+}
 
-  return (
-    <div className="ai-container">
-      {/* רקע הנוירונים החי */}
-      <NeuronBackground />
-
-      {/* ---------- הודעות ---------- */}
-      <div className="messages-container">
-        {messages.map((m, i) => (
-          <MessageItem
-            key={i}
-            message={m.text}
-            sender={m.sender}
-            type={m.type}
-            data={m.data}
-            action={m.action}
-          />
-        ))}
-        <div ref={messageEndRef} />
-      </div>
-
-      {/* ---------- שורת קלט ---------- */}
-      <div className="user-text-box">
-        <form onSubmit={handleOnSubmit}>
-          <textarea
-            value={textInput}
-            onChange={(e) => setTextInput(e.target.value)}
-            placeholder="...הקלד הודעה"
-            dir="auto"
-          />
-          <button type="submit">שלח</button>
-          <button type="button" onClick={handleReset}>
-            אפס
-          </button>
-        </form>
-      </div>
-    </div>
-  );
-};
-
-export default AI;
+// שימוש:
+const compressed = compressData(originalData);
+console.log(JSON.stringify(compressed, null, 2));

@@ -1,62 +1,59 @@
-/* ╔════════════════════════════╗
-   ║   Fun Price Comparison     ║
-   ╚════════════════════════════╝ */
+/* ממד הכרטיס וקונפיגורציה כללית */
+:root {
+  --card-w: 340px;
 
-.fun_sheet {
-  padding: 22px 14px 34px;
-  display: flex;
-  justify-content: center;
-  /* רקע “קונפטי” – משלב גרדיאנט ותבנית */
-  background: repeating-radial-gradient(
-      circle at 0 0,
-      rgba(255 255 255 / 0.08) 0 3px,
-      transparent 3px 9px
-    ),
-    linear-gradient(120deg, #4c6ef5, #a996ff 50%, #f094fb 100%);
-  min-height: 100vh;
+  --clr-card-bg: rgba(255, 255, 255, 0.08);
+  --clr-card-border: rgba(255, 255, 255, 0.35);
+  --clr-sep: rgba(255, 255, 255, 0.25);
+  --clr-text: #fff;
 }
 
-.fun_card {
-  width: 100%;
-  max-width: 500px;
-  background: rgba(255 255 255 / 0.12);
-  border: 1px solid rgba(255 255 255 / 0.25);
-  border-radius: 30px;
-  backdrop-filter: blur(22px) saturate(180%);
-  -webkit-backdrop-filter: blur(22px) saturate(180%);
-  box-shadow: 0 18px 36px rgba(0 0 0 / 0.18);
+#test_card {
+  width: var(--card-w);
+  min-width: var(--card-w);
+  max-width: var(--card-w);
+  margin: 32px auto;
+  color: var(--clr-text);
+  background: var(--clr-card-bg);
+  backdrop-filter: blur(18px);
+  border: 1.5px solid var(--clr-card-border);
+  border-radius: 14px;
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.45);
   overflow: hidden;
-  animation: funPop 0.5s cubic-bezier(0.17, 0.89, 0.32, 1.28);
 }
 
-@keyframes funPop {
-  0% {
-    transform: scale(0.8) rotateX(-10deg);
-    opacity: 0;
-  }
-  70% {
-    transform: scale(1.04);
-  }
-  100% {
-    transform: scale(1) rotateX(0);
-    opacity: 1;
-  }
-}
-
-/* קרוסלת הענפים */
-.fun_branches {
+/* כל קופסאות-הבן יורשות reset בסיסי */
+.test_box {
   display: flex;
-  gap: 18px;
-  padding: 16px 12px 22px;
-  overflow-x: auto;
-  scroll-snap-type: x mandatory;
-  scroll-padding-inline: 24px;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 18px 22px;
+  border-bottom: 1px solid var(--clr-sep);
+  user-select: none;
+  touch-action: pan-y;
+}
+.test_box:last-child {
+  border-bottom: none;
+}
+.test_anim {
+  transition: transform 0.3s ease;
 }
 
-.fun_loading {
-  font-family: "Assistant", sans-serif;
-  color: #fff;
-  text-align: center;
-  margin-top: 40px;
-  font-size: 18px;
+@media (max-width: 360px) {
+  #test_card {
+    scale: 0.92;
+    margin: 16px auto;
+  }
+}
+
+/* מעניקים גובהים בסיסיים */
+.test_headerBox {
+  min-height: 90px;
+}
+.test_productBox {
+  min-height: 110px;
+}
+.test_branchBox {
+  min-height: 150px;
 }

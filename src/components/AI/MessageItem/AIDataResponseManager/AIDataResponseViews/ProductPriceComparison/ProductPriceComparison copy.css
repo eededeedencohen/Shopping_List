@@ -1,0 +1,62 @@
+/* ╔════════════════════════════╗
+   ║   Fun Price Comparison     ║
+   ╚════════════════════════════╝ */
+
+.fun_sheet {
+  padding: 22px 14px 34px;
+  display: flex;
+  justify-content: center;
+  /* רקע “קונפטי” – משלב גרדיאנט ותבנית */
+  background: repeating-radial-gradient(
+      circle at 0 0,
+      rgba(255 255 255 / 0.08) 0 3px,
+      transparent 3px 9px
+    ),
+    linear-gradient(120deg, #4c6ef5, #a996ff 50%, #f094fb 100%);
+  min-height: 100vh;
+}
+
+.fun_card {
+  width: 100%;
+  max-width: 500px;
+  background: rgba(255 255 255 / 0.12);
+  border: 1px solid rgba(255 255 255 / 0.25);
+  border-radius: 30px;
+  backdrop-filter: blur(22px) saturate(180%);
+  -webkit-backdrop-filter: blur(22px) saturate(180%);
+  box-shadow: 0 18px 36px rgba(0 0 0 / 0.18);
+  overflow: hidden;
+  animation: funPop 0.5s cubic-bezier(0.17, 0.89, 0.32, 1.28);
+}
+
+@keyframes funPop {
+  0% {
+    transform: scale(0.8) rotateX(-10deg);
+    opacity: 0;
+  }
+  70% {
+    transform: scale(1.04);
+  }
+  100% {
+    transform: scale(1) rotateX(0);
+    opacity: 1;
+  }
+}
+
+/* קרוסלת הענפים */
+.fun_branches {
+  display: flex;
+  gap: 18px;
+  padding: 16px 12px 22px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scroll-padding-inline: 24px;
+}
+
+.fun_loading {
+  font-family: "Assistant", sans-serif;
+  color: #fff;
+  text-align: center;
+  margin-top: 40px;
+  font-size: 18px;
+}

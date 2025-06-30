@@ -1,150 +1,89 @@
-// import React, { useEffect, useState } from "react";
-// import data from "./xyz.json";
-// import "./ProductPriceComparison.css"; // ⬅️ קובץ חדש
-// import "./ProductHeader.css";
-// import "./BranchCard.css";
-
-// import ProductHeader from "./ProductHeader";
-// import BranchCard from "./BranchCard";
-
-// const ProductPriceComparison = ({data}) => {
-//   const [product, setProduct] = useState(null);
-//   const [branches, setBranches] = useState([]);
-
-//   useEffect(() => {
-//     const allBranches = data.data["רמי לוי"];
-//     const barcode = "7290010117864";
-
-//     const hits = [];
-//     let prod = null;
-
-//     allBranches.forEach((b) => {
-//       const match = b.products.find((p) => p.product.barcode === barcode);
-//       if (match) {
-//         if (!prod) prod = match.product;
-//         hits.push({ branchAddress: b.branchAddress, price: match.price });
-//       }
-//     });
-
-//     setProduct(prod);
-//     setBranches(hits);
-//   }, []);
-
-//   if (!product) return <div className="fun_loading">טוען...</div>;
-
-//   return (
-//     <section className="fun_sheet">
-//       <div className="fun_card">
-//         <ProductHeader {...product} />
-//         <div className="fun_branches">
-//           {branches.map((br, i) => (
-//             <BranchCard
-//               key={i}
-//               index={i}
-//               branchAddress={br.branchAddress}
-//               city="ירושלים"
-//               price={br.price}
-//               supermarketName="רמי לוי"
-//             />
-//           ))}
-//         </div>
-//       </div>
-//     </section>
-//   );
-// };
-
-// export default ProductPriceComparison;
-import React, { useEffect, useMemo, useState } from "react";
+// ./ProductPriceComparison.jsx
+import React, { useState, useMemo } from "react";
 import "./ProductPriceComparison.css";
-import "./ProductHeader.css";
-import "./BranchCard.css";
 
-import ProductHeader from "./ProductHeader";
-import BranchCard from "./BranchCard";
+import SwipeBox from "./SwipeBox";
+import CardHeader from "./CardHeader/CardHeader";
+import ProductDetails from "./ProductDetails/ProductDetails";
+import BranchPrice from "./BranchPrice/BranchPrice";
 
-const ProductPriceComparison = ({ data }) => {
-  /* 1️⃣ חילוץ כל-המוצרים הייחודיים ע"פ ברקוד */
-  const products = useMemo(() => {
-    const map = new Map(); // barcode → product
-    Object.values(data ?? {}) // כל הרשתות
-      .flat() // כל הסניפים
-      .forEach((branch) =>
-        branch.products.forEach(({ product }) => {
-          if (!map.has(product.barcode)) map.set(product.barcode, product);
+import { compressData } from "./utils";
+
+export default function ProductPriceComparison({ data }) {
+  /*— דחיסת נתונים (מחירים + סניפים) —*/
+  const comp = compressData(data);
+  const chains = Object.keys(comp);
+
+  /*— ***מפה : barcode → product*** —*/
+  const productMap = useMemo(() => {
+    const map = {};
+    Object.values(data)
+      .flat() // כל הסניפים של כל הרשתות
+      .forEach(({ products }) =>
+        products.forEach(({ product }) => {
+          map[product.barcode] = product; // אם אותו ברקוד חוזר – דריסה לא משנה
         })
       );
-      console.log("products", data);
-    return Array.from(map.values());
+    return map;
   }, [data]);
 
-  /* 2️⃣ ברקוד נבחר – מתחיל בברקוד הראשון שמצאנו */
-  const [barcode, setBarcode] = useState(products[0]?.barcode || "");
+  /*— state —*/
+  const [chainIdx, setChain] = useState(0);
+  const [prodIdx, setProd] = useState(0);
+  const [priceIdx, setPrice] = useState(0);
 
-  /* 3️⃣ חיפוש התאמות מחיר בכל הרשתות עבור הברקוד */
-  const { product, hits } = useMemo(() => {
-    if (!barcode) return { product: null, hits: [] };
+  /*— חישובי תצוגה —*/
+  const chainName = chains[chainIdx];
+  const chainObj = comp[chainName];
+  const barcodes = Object.keys(chainObj);
+  const barcode = barcodes[prodIdx];
 
-    let foundProduct = null;
-    const matches = [];
+  const groupsRaw = chainObj[barcode];
+  const groups = Array.isArray(groupsRaw) ? groupsRaw : [groupsRaw];
+  const grp = groups[priceIdx];
 
-    Object.entries(data ?? {}).forEach(([marketName, branches]) => {
-      branches.forEach((branch) => {
-        const match = branch.products.find(
-          (p) => p.product.barcode === barcode
-        );
-        if (match) {
-          if (!foundProduct) foundProduct = match.product;
-          matches.push({
-            supermarketName: marketName,
-            branchAddress: branch.branchAddress,
-            price: match.price,
-          });
-        }
-      });
-    });
+  const product = productMap[barcode] ?? null; // ← מעבירים לרכיב-בת
 
-    return { product: foundProduct, hits: matches };
-  }, [data, barcode]);
+  /*— פעולות מעבר —*/
+  const nextChain = (d) => {
+    setChain((i) => (i + d + chains.length) % chains.length);
+    setProd(0);
+    setPrice(0);
+  };
+  const nextProd = (d) => {
+    setProd((i) => (i + d + barcodes.length) % barcodes.length);
+    setPrice(0);
+  };
+  const nextPrice = (d) =>
+    setPrice((i) => (i + d + groups.length) % groups.length);
 
-  /* ───────  UI  ─────── */
-
-  if (!product) return <div className="fun_loading">טוען...</div>;
-
+  /*— JSX —*/
   return (
-    <section className="fun_sheet">
-      <div className="fun_card">
-        {/* בחירת מוצר */}
-        <select
-          className="fun_select"
-          value={barcode}
-          onChange={(e) => setBarcode(e.target.value)}
-        >
-          {products.map((p) => (
-            <option key={p.barcode} value={p.barcode}>
-              {p.name} • {p.weight}
-              {p.unitWeight}
-            </option>
-          ))}
-        </select>
+    <div id="test_card">
+      <SwipeBox
+        className="test_headerBox"
+        onSwipeLeft={() => nextChain(1)}
+        onSwipeRight={() => nextChain(-1)}
+      >
+        <CardHeader chainName={chainName} />
+      </SwipeBox>
 
-        {/* כותרת מוצר */}
-        <ProductHeader {...product} />
+      <SwipeBox
+        className="test_productBox"
+        onSwipeLeft={() => nextProd(1)}
+        onSwipeRight={() => nextProd(-1)}
+      >
+        {/* מעבירים את האובייקט המלא */}
+        <ProductDetails product={product} />
+      </SwipeBox>
 
-        {/* רשימת סניפים מכל הרשתות */}
-        <div className="fun_branches">
-          {hits.map((h, i) => (
-            <BranchCard
-              key={i}
-              index={i}
-              branchAddress={h.branchAddress}
-              price={h.price}
-              supermarketName={h.supermarketName}
-            />
-          ))}
-        </div>
-      </div>
-    </section>
+      <SwipeBox
+        className="test_branchBox"
+        onSwipeLeft={() => nextPrice(1)}
+        onSwipeRight={() => nextPrice(-1)}
+      >
+        <BranchPrice priceObj={grp.price} branches={grp.branches} />
+      </SwipeBox>
+    </div>
   );
-};
-
-export default ProductPriceComparison;
+}
