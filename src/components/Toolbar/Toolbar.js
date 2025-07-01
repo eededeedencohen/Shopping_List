@@ -1,108 +1,155 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import SearchBar from "../SearchBar/SearchBar";
 import SearchModal from "../SearchBar/SearchModal";
+import { useCartTotals } from "../../hooks/appHooks";
 import "./Toolbar.css";
 
 import cartIcon from "./cart.svg";
 import SearchIcon from "./search.svg";
-//=========================================================
 import { ReactComponent as GroceryIcon2 } from "./grocery2.svg";
 import { ReactComponent as AiIcon2 } from "./robot.svg";
-//pie-chart:
 import { ReactComponent as PieChartIcon } from "./pie-chart.svg";
-//transaction-history
 import { ReactComponent as TransactionHistoryIcon } from "./transaction-history.svg";
-// voice2
 import { ReactComponent as Voice2Icon } from "./voice-bot.svg";
-// wishlist
 import { ReactComponent as WishlistIcon } from "./wishlist.svg";
-
-// editing:
 import { ReactComponent as EditIcon } from "./editing.svg";
-
-// data-classification
 import { ReactComponent as DataClassificationIcon } from "./data-classification.svg";
-//=========================================================
+
 function Toolbar() {
+  const { totalAmount } = useCartTotals(); // ← כמות בעגלה
+  const [selectedPage, setSelectedPage] = useState(window.location.pathname);
   const [isOpen, setIsOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const toggleDrawer = () => {
-    setIsOpen(!isOpen);
-  };
-
-  const closeDrawer = () => {
-    if (isOpen) {
-      setIsOpen(false);
+  /* אפקט פופ */
+  const [pop, setPop] = useState(false);
+  useEffect(() => {
+    if (totalAmount > 0) {
+      // תפעיל רק אם ״יש מה להראות״
+      setPop(true);
+      const t = setTimeout(() => setPop(false), 300); // משך האנימציה
+      return () => clearTimeout(t);
     }
-  };
+  }, [totalAmount]);
 
-  const openModal = () => {
-    setIsModalOpen(true);
+  /* ניווט */
+  const toggleDrawer = () => setIsOpen(!isOpen);
+  const closeDrawer = () => isOpen && setIsOpen(false);
+  const handleNavClick = (path) => {
+    setSelectedPage(path);
+    closeDrawer();
   };
-
-  const closeModal = () => {
-    setIsModalOpen(false);
+  const handleCartClick = () => {
+    setSelectedPage("");
+    closeDrawer();
   };
 
   return (
     <nav className="toolbar">
+      {/* חיפוש */}
       <div className="search-icon">
-        <img src={SearchIcon} alt="SearchIcon" onClick={openModal} />
+        <img
+          src={SearchIcon}
+          alt="Search"
+          onClick={() => setIsModalOpen(true)}
+        />
       </div>
-      <SearchModal isOpen={isModalOpen} onClose={closeModal}>
-        <SearchBar closeModal={closeModal} />
+      <SearchModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
+        <SearchBar closeModal={() => setIsModalOpen(false)} />
       </SearchModal>
+
+      {/* המבורגר */}
       <div className="hamburger-menu" onClick={toggleDrawer}>
         &#9776;
       </div>
-      <Link to="/cart" onClick={closeDrawer}>
+
+      {/* עגלה */}
+      <Link to="/cart" onClick={handleCartClick}>
         <div className="cart-icon">
-          <img src={cartIcon} alt="CartIcon" />
+          <img src={cartIcon} alt="Cart" />
+          {totalAmount > 0 && (
+            <span className={`cart-badge ${pop ? "pop" : ""}`}>
+              {totalAmount}
+            </span>
+          )}
         </div>
       </Link>
 
+      {/* Drawer */}
       <div className={`drawer ${isOpen ? "open" : ""}`}>
         <div className="routes-icons">
-          <Link to="/" onClick={closeDrawer}>
-            <div className="nav-item">
+          {/* 4. כל האייטמים נשארו כפי שהיו – נוספה בדיקה ל-selected-page */}
+          <Link to="/" onClick={() => handleNavClick("/")}>
+            <div
+              className={`nav-item ${
+                selectedPage === "/" ? "selected-page" : ""
+              }`}
+            >
               <div className="nav-icon">
-                <GroceryIcon2 className="svg-icon" /> {/* הוסף class */}
+                <GroceryIcon2 className="svg-icon" />
               </div>
               <h1>Products</h1>
             </div>
           </Link>
 
-          <Link to="/products-list-groups" onClick={closeDrawer}>
-            <div className="nav-item">
+          <Link
+            to="/products-list-groups"
+            onClick={() => handleNavClick("/products-list-groups")}
+          >
+            <div
+              className={`nav-item ${
+                selectedPage === "/products-list-groups" ? "selected-page" : ""
+              }`}
+            >
               <div className="nav-icon">
-                <DataClassificationIcon className="svg-icon" />{" "}
+                <DataClassificationIcon className="svg-icon" />
               </div>
               <h1>Edit Groups</h1>
             </div>
           </Link>
 
-          <Link to="/edit-products" onClick={closeDrawer}>
-            <div className="nav-item">
+          <Link
+            to="/edit-products"
+            onClick={() => handleNavClick("/edit-products")}
+          >
+            <div
+              className={`nav-item ${
+                selectedPage === "/edit-products" ? "selected-page" : ""
+              }`}
+            >
               <div className="nav-icon">
-                <EditIcon className="svg-icon" /> {/* הוסף class */}
+                <EditIcon className="svg-icon" />
               </div>
               <h1>Edit</h1>
             </div>
           </Link>
 
-          <Link to="/image-parser" onClick={closeDrawer}>
-            <div className="nav-item">
+          <Link
+            to="/image-parser"
+            onClick={() => handleNavClick("/image-parser")}
+          >
+            <div
+              className={`nav-item ${
+                selectedPage === "/image-parser" ? "selected-page" : ""
+              }`}
+            >
               <div className="nav-icon">
-                <WishlistIcon className="svg-icon" /> {/* הוסף class */}
+                <WishlistIcon className="svg-icon" />
               </div>
               <h1>Receipt To History</h1>
             </div>
           </Link>
 
-          <Link to="/expense-overview" onClick={closeDrawer}>
-            <div className="nav-item selected-page">
+          <Link
+            to="/expense-overview"
+            onClick={() => handleNavClick("/expense-overview")}
+          >
+            <div
+              className={`nav-item ${
+                selectedPage === "/expense-overview" ? "selected-page" : ""
+              }`}
+            >
               <div className="nav-icon">
                 <PieChartIcon className="svg-icon" />
               </div>
@@ -110,8 +157,15 @@ function Toolbar() {
             </div>
           </Link>
 
-          <Link to="/audio-recorder" onClick={closeDrawer}>
-            <div className="nav-item">
+          <Link
+            to="/audio-recorder"
+            onClick={() => handleNavClick("/audio-recorder")}
+          >
+            <div
+              className={`nav-item ${
+                selectedPage === "/audio-recorder" ? "selected-page" : ""
+              }`}
+            >
               <div className="nav-icon">
                 <Voice2Icon className="svg-icon" />
               </div>
@@ -119,18 +173,12 @@ function Toolbar() {
             </div>
           </Link>
 
-          {/* 
-          <Link to="/history" onClick={closeDrawer}>
-            <div className="nav-item">
-              <div className="nav-icon">
-                <img src={shoppingHistoryIcon} alt="Grocery" />
-              </div>
-              <h1>Shopping History</h1>
-            </div>
-          </Link> */}
-
-          <Link to="/history" onClick={closeDrawer}>
-            <div className="nav-item">
+          <Link to="/history" onClick={() => handleNavClick("/history")}>
+            <div
+              className={`nav-item ${
+                selectedPage === "/history" ? "selected-page" : ""
+              }`}
+            >
               <div className="nav-icon">
                 <TransactionHistoryIcon className="svg-icon" />
               </div>
@@ -138,8 +186,12 @@ function Toolbar() {
             </div>
           </Link>
 
-          <Link to="/ai" onClick={closeDrawer}>
-            <div className="nav-item">
+          <Link to="/ai" onClick={() => handleNavClick("/ai")}>
+            <div
+              className={`nav-item ${
+                selectedPage === "/ai" ? "selected-page" : ""
+              }`}
+            >
               <div className="nav-icon">
                 <AiIcon2 className="svg-icon" />
               </div>
@@ -148,6 +200,8 @@ function Toolbar() {
           </Link>
         </div>
       </div>
+
+      {/* Overlay */}
       <div
         className={`overlay ${isOpen ? "visible" : ""}`}
         onClick={closeDrawer}

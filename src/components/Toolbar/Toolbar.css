@@ -8,7 +8,7 @@
   padding: 10px;
   background-color: #0074cf;
   box-shadow: 0 0 10px rgba(0, 0, 0, 1);
-  z-index: 3;
+  z-index: 10;
 }
 
 /* Search icon */
@@ -35,6 +35,26 @@
   cursor: pointer;
 }
 
+/* מונה פריטים */
+.cart-badge {
+  position: absolute;
+  bottom: 0px; /* במקום top */
+  right: -6px; /* השאר כמו שהיה או עדכן לפי הטעם */
+  min-width: 20px;
+  height: 20px;
+  padding: 0 4px;
+  border-radius: 50%;
+  background: linear-gradient(90deg, rgb(255 0 0) 0%, rgb(255 139 139) 100%);
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  pointer-events: none;
+}
+
 .toolbar .cart-icon img {
   width: 35px;
   height: 35px;
@@ -46,7 +66,7 @@
   inset: 0;
   display: none;
   background-color: rgba(0, 0, 0, 0.5);
-  z-index: 2;
+  z-index: 9;
 }
 
 .overlay.visible {
@@ -66,7 +86,7 @@
   box-shadow: inset -5px 2px 18px rgb(255 255 255);
   transition: width 0.5s ease;
   transition-delay: 0.1s; /* שמירה על הדיליי המקורי לפתיחת המגירה */
-  z-index: 3;
+  z-index: 100000;
 }
 
 .drawer.open {
@@ -140,10 +160,10 @@
 
 .selected-page {
   color: rgb(255, 255, 255);
-  background-color: #0084ff4c;
+  background-color: #00000084;
   border-radius: 5px;
   width: 220px;
-  color: rgb(0, 72, 127);
+  color: rgb(255 120 0);
 }
 
 /* שמור על מפתח keyframes אם תרצה אנימציה עתידית */
@@ -151,4 +171,20 @@
   0% {
     background-position: 100% 0;
   }
+}
+
+/* אפקט POP */
+@keyframes popAnim {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.4);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+.pop {
+  animation: popAnim 0.3s ease;
 }

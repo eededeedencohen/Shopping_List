@@ -1,0 +1,308 @@
+/* ─────────  CONTAINER  ───────── */
+.brobot-container {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  z-index: 9;
+  cursor: grab;
+  user-select: none;
+  touch-action: none;
+  transition: transform 0.08s linear;
+}
+.brobot-container:active {
+  cursor: grabbing;
+}
+
+/* ─────────  ROBOT IMAGE  ───────── */
+.brobot-img {
+  width: 160px;
+  height: auto;
+  display: block;
+  position: relative;
+  z-index: 2;
+}
+
+/* ─────────  SCREEN BACKGROUND  ───────── */
+.brobot-bg {
+  position: absolute;
+  top: 38%;
+  left: 20%;
+  width: 59%;
+  height: 38%;
+  background: #0047ff;
+  border-radius: 14%/10%;
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* ─────────  SCREEN WRAPPER  ───────── */
+.brobot-screen {
+  position: absolute;
+  top: 38%;
+  left: 22%;
+  width: 56%;
+  height: 34%;
+  border-radius: 14%/10%;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 3;
+  pointer-events: none;
+}
+
+/* ─────────  EYES & PUPILS  ───────── */
+.eye {
+  position: absolute;
+  width: 14%;
+  height: 34%;
+  background: #fff;
+  border-radius: 50%;
+  box-shadow: inset 0 0 4px rgba(0, 0, 0, 0.6);
+  animation: blink 4s infinite;
+}
+
+/* eye positions per orientation */
+.brobot-container.front .eye.left {
+  left: 25%;
+  top: 25%;
+}
+.brobot-container.front .eye.right {
+  right: 25%;
+  top: 25%;
+}
+
+/* ראש פונה שמאלה */
+.brobot-container.left .eye.left {
+  left: 15%;
+  top: 25%;
+} /* קרובה למרכז */
+.brobot-container.left .eye.right {
+  right: 35%;
+  top: 25%;
+} /* רחוקה יותר */
+
+/* ראש פונה ימינה */
+.brobot-container.right .eye.left {
+  left: 35%;
+  top: 25%;
+} /* רחוקה יותר */
+.brobot-container.right .eye.right {
+  right: 15%;
+  top: 25%;
+} /* קרובה למרכז */
+
+/* pupil (moves) */
+.pupil {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 80%;
+  height: 50%;
+  background: #acacac;
+  border-radius: 50%;
+  transform: translate(calc(-50% + var(--dx, 0)), calc(-50% + var(--dy, 0)));
+  transition: transform 0.25s ease;
+  box-shadow: inset 0 0 2px rgba(0, 0, 0, 0.388);
+}
+
+/* blink scales Y only */
+@keyframes blink {
+  0%,
+  88%,
+  100% {
+    transform: scaleY(1);
+  }
+  90%,
+  95% {
+    transform: scaleY(0.1);
+  }
+}
+
+/* ─────────  MOUTH  ───────── */
+/* ─────────  MOUTH  ───────── */
+.mouth {
+  position: absolute;
+  bottom: 6%;
+  height: 26%;
+  transform: translateX(-50%);
+  border: 3px solid #fff;
+  border-top: none;
+  border-radius: 0 0 40% 40% / 0 0 100% 100%;
+}
+
+/* אנימציית דיבור (כבר קיימת) */
+@keyframes talk {
+  0% {
+    transform: translateX(-50%) scaleY(1);
+  }
+  50% {
+    transform: translateX(-50%) scaleY(0.3);
+  }
+  100% {
+    transform: translateX(-50%) scaleY(1);
+  }
+}
+.mouth.speaking {
+  animation: talk var(--talk-speed, 0.25s) steps(2) infinite;
+  border-top: none;
+  background: #eee;
+}
+
+/* ─── התאמות לפי כיוון הראש ─── */
+.brobot-container.front .mouth {
+  left: 50%;
+  width: 46%;
+} /* ברירת-מחדל */
+.brobot-container.left .mouth {
+  left: 40%;
+  width: 42%;
+} /* מבט שמאלה */
+.brobot-container.right .mouth {
+  left: 60%;
+  width: 42%;
+} /* מבט ימינה */
+
+/* ─────────  RECORDING EQ  ───────── */
+.rec-indicator {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 3px;
+}
+.rec-indicator .bar {
+  --delay: calc(var(--i) * 0.1s);
+  width: 8%;
+  height: 40%;
+  background: #fff;
+  border-radius: 2px;
+  animation: eq 0.8s ease-in-out var(--delay) infinite;
+}
+@keyframes eq {
+  0%,
+  100% {
+    transform: scaleY(0.3);
+  }
+  50% {
+    transform: scaleY(1);
+  }
+}
+
+/* ─────────  CONTROL PANEL  ───────── */
+.brobot-panel {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 210px;
+  padding: 10px;
+  background: rgba(0, 0, 0, 0.82);
+  backdrop-filter: blur(4px);
+  border: 1px solid #4d9;
+  border-radius: 10px;
+  font-family: sans-serif;
+  color: #fff;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+  transition: width 0.2s ease;
+  z-index: 8; /* גבוה מכל דבר */
+}
+.brobot-panel.closed {
+  width: 42px;
+  padding: 0;
+}
+.toggle-btn {
+  position: absolute;
+  left: -22px;
+  top: 8px;
+  width: 22px;
+  height: 22px;
+  border: none;
+  border-radius: 50%;
+  background: #4d9;
+  color: #002;
+  cursor: pointer;
+}
+
+/* ─────────  TABS  ───────── */
+.tabs {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.tab-btn {
+  width: 100%;
+  font-size: 0.7rem;
+  padding: 4px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  background: #eee;
+  color: #002;
+}
+.tab-btn.active {
+  background: #9cf;
+  font-weight: 700;
+}
+.tab-content {
+  margin-top: 6px;
+}
+label {
+  display: block;
+  font-size: 0.7rem;
+  margin: 4px 0;
+}
+
+/* ─────────  EYES GRID  ───────── */
+.eyes-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  margin-top: 4px;
+}
+.eyes-btn {
+  width: 70px;
+  height: 40px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+/* צבעים רק לכפתורים! */
+.eyes-btn.up,
+.eyes-btn.left {
+  background: #9f9;
+}
+.eyes-btn.right,
+.eyes-btn.down {
+  background: #f99;
+}
+.eyes-btn.chosen {
+  outline: 3px solid #ff0;
+}
+
+/* ─────────  PANEL BUTTONS  ───────── */
+.panel-buttons {
+  display: flex;
+  gap: 4px;
+  margin-top: 4px;
+}
+.panel-buttons button {
+  flex: 1;
+  font-size: 0.7rem;
+  padding: 4px;
+  border: none;
+  border-radius: 4px;
+  background: #00c0ff;
+  color: #002;
+  cursor: pointer;
+}
+.panel-buttons button:hover {
+  background: #20d4ff;
+}
+.panel-buttons button:active {
+  background: #0aa;
+}
+.panel-buttons button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
