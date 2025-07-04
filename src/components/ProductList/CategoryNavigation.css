@@ -1,12 +1,36 @@
+.category-navigation-container {
+  --default-icon-color: #d6fcff;
+  --color-משקאות-קלים: #ff0000;
+  --color-המקפיא: #00fbff;
+  --color-יינות: #dd1eff;
+  --color-תבלינים-אבקות-ומרקי-אינסטנט: #ff9800;
+  --color-פארם-ותינוקות: #795548;
+  --color-שימורים: #607d8b;
+  --color-חטיפים-ודגנים: #ffc107;
+  --color-חלב-ביצים-ומעדנים: #3f51b5;
+  --color-אפייה-ביתית: #f06292;
+  --color-בירות: #ffd000;
+  --color-מתוקים-ושוקולד: #8d6e63;
+  --color-מוצרי-בסיס-לבישול: #009688;
+  --color-אלכוהול-וקוקטיילים: #c2185b;
+  --color-חד-פעמי: #9e9e9e;
+  --color-ניקיון-וטואלטיקה: #607d8b;
+  --color-שמנים: #ffe100;
+  --color-רטבים: #ff2a2a;
+  --color-גבינות: #fbc02d;
+  --color-משקאות-חמים: #6d4c41;
+  --color-מוצרי-תינוקות: #ba68c8;
+}
+
 .mobile-navigation {
   display: flex;
   flex-direction: row;
   overflow-x: auto;
-  padding: 10px; /* Adjust as needed for spacing between topics */
+  padding: 10px;
 }
 
 .navigation-topic {
-  flex: 0 0 33.33%; /* כל נושא תופס ~שליש מסך, או שתשנה כרצונך */
+  flex: 0 0 33.33%;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -16,13 +40,13 @@
   background-color: #f2f2f2;
   border-radius: 5px;
   margin-right: 10px;
-  height: 4rem;
+  height: 5rem;
   position: relative;
   transition: background-color 1s ease;
 }
 
 .active-topic {
-  background-color: #007bff; /* צבע רקע אחר לקטגוריה פעילה */
+  background-color: #007bff;
   color: #fff;
   transition: background-color 1s ease;
 }
@@ -35,4 +59,15 @@
   bottom: 5px;
   left: 10%;
   transition: left 1s ease;
+}
+
+.category-icon {
+  transition: fill 0.5s ease;
+}
+
+.icon-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
 }

@@ -5,6 +5,17 @@
   padding-top: 40px;
 }
 
+.App::before {
+  content: "";
+  position: fixed; /* קבוע למסך, לא לתוכן */
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: -1; /* מאחורי התוכן */
+  background: linear-gradient(35deg, rgb(201 240 255) 0%, rgb(255 255 255) 95%);
+}
+
 .row {
   display: flex;
 }
@@ -17,5 +28,3 @@
   float: left;
   width: 50%;
 }
-
-
