@@ -3,11 +3,10 @@ import ProductDetails from "./ProductDetails";
 import WeightAccuracy from "./WeightAccuracy";
 import BrandsFilter from "./BrandsFilter/BrandsFilter";
 import "./ProductSettings.css";
-// import { useCartOptimizationContext } from "../../context/cart-optimizationContext";
 import { useSettingsOperations } from "../../hooks/optimizationHooks";
 
 export default function ProductSettings({ product }) {
-  // const { changeCanRoundUp, changeCanReplace } = useCartOptimizationContext();
+  /* ❱❱ מחלץ את הפונקציות החדשות ❰❰ */
   const { changeCanRoundUp, changeCanReplace } = useSettingsOperations();
 
   return (
@@ -16,6 +15,8 @@ export default function ProductSettings({ product }) {
         productDetails={product.productDetails}
         quantity={product.quantity}
       />
+
+      {/* כפתור עיגול כמות */}
       <div className="can-round-up">
         <div className="explanation">לעגל כמות של המוצר במקרה שקיים מבצע</div>
         <div className="checkbox">
@@ -26,6 +27,8 @@ export default function ProductSettings({ product }) {
           />
         </div>
       </div>
+
+      {/* כפתור החלפה */}
       <div className="can-replace">
         <div className="explanation">להחליף במקרה של מוצר חלופי משתלם יותר</div>
         <div className="checkbox">
@@ -36,22 +39,23 @@ export default function ProductSettings({ product }) {
           />
         </div>
       </div>
+
+      {/* רכיבי המשך מופיעים רק אם מותר להחליף */}
       {product.productSettings.canReplace && (
-        <WeightAccuracy
-          barcode={product.barcode}
-          productWeight={product.productDetails.weight}
-          productUnitWeight={product.productDetails.unitWeight}
-          currentWeightGain={product.productSettings.maxWeightGain}
-          currentWeightLoss={product.productSettings.maxWeightLoss}
-        />
+        <>
+          <WeightAccuracy
+            barcode={product.barcode}
+            productWeight={product.productDetails.weight}
+            productUnitWeight={product.productDetails.unitWeight}
+            currentWeightGain={product.productSettings.maxWeightGain}
+            currentWeightLoss={product.productSettings.maxWeightLoss}
+          />
+          <BrandsFilter
+            generalName={product.productDetails.generalName}
+            barcode={product.barcode}
+          />
+        </>
       )}
-      {product.productSettings.canReplace && (
-        <BrandsFilter
-          generalName={product.productDetails.generalName}
-          barcode={product.barcode}
-        />
-      )}
-      {console.log(product)}
     </div>
   );
 }

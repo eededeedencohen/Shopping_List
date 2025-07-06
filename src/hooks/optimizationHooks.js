@@ -38,17 +38,19 @@ export const useSettings = () => {
 };
 
 /* ─────────────────────── 2) useSettingsOperations ─────────────────────── */
+/* ─────────────────────── 2) useSettingsOperations ─────────────────────── */
 export const useSettingsOperations = () => {
   const {
+    /* setters גלובליים */
     setCanReplaceSettings,
     setCanRoundUpSettings,
     setProductsSettings,
     setSupermarketIDs,
   } = useCartOptimizationCtx();
 
-  /* flags (bulk) */
-  const changeCanReplaceSettings = setCanReplaceSettings;
-  const changeCanRoundUpSettings = setCanRoundUpSettings;
+  /* ─────────────  ⬤  FLAGS – “bySelect” / “all / none”  ⬤  ───────────── */
+  const changeCanReplaceSettings = setCanReplaceSettings; // bulk flag
+  const changeCanRoundUpSettings = setCanRoundUpSettings; // bulk flag
 
   const changeCanReplaceAll = (val) =>
     setProductsSettings((arr) =>
@@ -66,14 +68,44 @@ export const useSettingsOperations = () => {
       }))
     );
 
-  /* supermarkets list */
+  /* ─────────────  ⬤  NEW: TOGGLE PER-PRODUCT  ⬤  ───────────── */
+  const changeCanRoundUp = (barcode) =>
+    setProductsSettings((arr) =>
+      arr.map((p) =>
+        p.barcode === barcode
+          ? {
+              ...p,
+              productSettings: {
+                ...p.productSettings,
+                canRoundUp: !p.productSettings.canRoundUp,
+              },
+            }
+          : p
+      )
+    );
+
+  const changeCanReplace = (barcode) =>
+    setProductsSettings((arr) =>
+      arr.map((p) =>
+        p.barcode === barcode
+          ? {
+              ...p,
+              productSettings: {
+                ...p.productSettings,
+                canReplace: !p.productSettings.canReplace,
+              },
+            }
+          : p
+      )
+    );
+
+  /* ─────────────  ⬤  SUPERMARKETS, BRANDS, LIMITS  ⬤  ───────────── */
   const insertSupermarketID = (id) =>
     setSupermarketIDs((ids) => (ids.includes(id) ? ids : [...ids, id]));
 
   const removeSupermarketID = (id) =>
     setSupermarketIDs((ids) => ids.filter((x) => x !== id));
 
-  /* black‑list brand ops */
   const insertBrandToBlackList = (code, brand) =>
     setProductsSettings((arr) =>
       arr.map((p) =>
@@ -105,39 +137,38 @@ export const useSettingsOperations = () => {
           : p
       )
     );
-  /* ───────────── per‑product numeric limits ───────────── */
-  const changeMaxWeightGain = (barcode, newMaxWeightGain) =>
+
+  const changeMaxWeightGain = (barcode, val) =>
     setProductsSettings((arr) =>
       arr.map((p) =>
         p.barcode === barcode
           ? {
               ...p,
-              productSettings: {
-                ...p.productSettings,
-                maxWeightGain: newMaxWeightGain,
-              },
+              productSettings: { ...p.productSettings, maxWeightGain: val },
             }
           : p
       )
     );
 
-  const changeMaxWeightLoss = (barcode, newMaxWeightLoss) =>
+  const changeMaxWeightLoss = (barcode, val) =>
     setProductsSettings((arr) =>
       arr.map((p) =>
         p.barcode === barcode
           ? {
               ...p,
-              productSettings: {
-                ...p.productSettings,
-                maxWeightLoss: newMaxWeightLoss,
-              },
+              productSettings: { ...p.productSettings, maxWeightLoss: val },
             }
           : p
       )
     );
 
-  /* ───────────── RETURN API ───────────── */
+  /* ─────────────  ⬤  RETURN API  ⬤  ───────────── */
   return {
+    /* per-product toggles – מה שהרכיב צריך */
+    changeCanRoundUp,
+    changeCanReplace,
+
+    /* bulk flags & helpers */
     changeCanReplaceSettings,
     changeCanRoundUpSettings,
     changeCanReplaceAll,
@@ -145,10 +176,8 @@ export const useSettingsOperations = () => {
 
     insertSupermarketID,
     removeSupermarketID,
-
     insertBrandToBlackList,
     removeBrandFromBlackList,
-
     changeMaxWeightGain,
     changeMaxWeightLoss,
   };

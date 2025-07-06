@@ -60,21 +60,6 @@ const getFontSize = (text) => {
   return "16px";
 };
 
-const getCategoryColors = (cssVars, isActive) => {
-  const container = document.querySelector(".category-navigation-container");
-  if (!container) return [];
-
-  const style = getComputedStyle(container);
-  const defaultColor = style.getPropertyValue("--default-icon-color").trim();
-
-  if (!isActive) return Array(cssVars.length).fill(defaultColor);
-
-  return cssVars.map((varName) => {
-    const color = style.getPropertyValue(varName).trim();
-    return color || defaultColor;
-  });
-};
-
 const CategoryNavigation = () => {
   const {
     allCategories,
@@ -117,7 +102,6 @@ const CategoryNavigation = () => {
           const cssVars = config.cssVars || [
             `--color-${topic.replace(/ /g, "-").replace(/,/g, "")}`,
           ];
-          const iconColors = getCategoryColors(cssVars, isActive);
 
           return (
             <div
@@ -126,21 +110,28 @@ const CategoryNavigation = () => {
               onClick={() => handleTopicClick(index)}
             >
               <div className="icon-wrapper">
-                {icons.map((IconComponent, i) => (
-                  <IconComponent
-                    key={i}
-                    className="category-icon"
-                    style={{
-                      fill: iconColors[i],
-                      width: "24px",
-                      height: "24px",
-                      margin: "0 2px 4px 2px",
-                      transform:
-                        (config.transforms && config.transforms[i]) || "none",
-                    }}
-                  />
-                ))}
+                {icons.map((IconComponent, i) => {
+                  const fill = isActive
+                    ? `var(${cssVars[i] || cssVars[0]})` // ← הצבע של הקטגוריה
+                    : "var(--default-icon-color)"; // ← צבע ברירת-מחדל
+
+                  return (
+                    <IconComponent
+                      key={i}
+                      className="category-icon"
+                      style={{
+                        fill,
+                        width: 24,
+                        height: 24,
+                        margin: "0 2px 4px 2px",
+                        transform:
+                          (config.transforms && config.transforms[i]) || "none",
+                      }}
+                    />
+                  );
+                })}
               </div>
+
               <span style={{ fontSize: getFontSize(topic) }}>{topic}</span>
               {isActive && <div className="navigation-topic-underline"></div>}
             </div>

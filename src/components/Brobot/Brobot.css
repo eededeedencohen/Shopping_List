@@ -306,3 +306,8 @@ label {
   opacity: 0.4;
   cursor: default;
 }
+
+/* Brobot.css */
+.brobot-container.left .brobot-img {
+  transform: scaleX(-1); /* הופך את התמונה לימין-לשמאל */
+}

@@ -8,7 +8,7 @@ import React, {
 import "./Brobot.css";
 
 import BrobotFront from "./BrobotImages/BrobotFront.png";
-import BrobotLeft from "./BrobotImages/BrobotLeft.png";
+// import BrobotLeft from "./BrobotImages/BrobotLeft.png";
 import BrobotRight from "./BrobotImages/BrobotRight.png";
 
 function Brobot(_, ref) {
@@ -30,6 +30,13 @@ function Brobot(_, ref) {
   const [recording, setRecording] = useState(false);
 
   const [eyeDir, setEyeDir] = useState("center"); // up|down|left|right|center
+
+  useEffect(() => {
+    [BrobotFront, BrobotRight].forEach((src) => {
+      const img = new Image();
+      img.src = src;
+    });
+  }, []);
   const eyePos = {
     center: [0, 0],
     up: [0, -35],
@@ -90,7 +97,7 @@ function Brobot(_, ref) {
     const timer = setInterval(() => {
       switch (step % 4) {
         case 0:
-          setHeadImg(BrobotLeft);
+          setHeadImg(BrobotRight);
           setOrient("left");
           break;
         case 1:
