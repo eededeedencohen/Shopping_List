@@ -1,5 +1,4 @@
 import React from "react";
-// import { useCartOptimizationContext } from "../../../context/cart-optimizationContext";
 import {
   useSettings,
   useSettingsOperations,
@@ -7,15 +6,6 @@ import {
 import "./ProductsGeneralSettings.css";
 
 const ProductsGeneralSettings = () => {
-  // const {
-  //   canReplaceSettings, // value of "bySelect", "all", "none"
-  //   canRoundUpSettings, // value of "bySelect", "all", "none"
-  //   changeCanReplaceSettings,
-  //   changeCanRoundUpSettings,
-  //   changeCanReplaceAll,
-  //   changeCanRoundUpAll,
-  // } = useCartOptimizationContext();
-
   const { canReplaceSettings, canRoundUpSettings } = useSettings(); // useSettings
   const {
     changeCanReplaceSettings,
@@ -109,7 +99,6 @@ const ProductsGeneralSettings = () => {
           ללא העגלת כמות של מוצרים
         </div>
       </div>
-      <button className="temp-button">Temp Button</button>
     </div>
   );
 };
