@@ -1,0 +1,31 @@
+.smf_modal-window {
+  background: #fff;
+  border-radius: 5px;
+  max-width: 500px;
+  position: relative;
+  width: 50%;
+  height: 95%;
+  overflow: auto;
+  transform: translateX(50%) translateY(5%);
+  animation: slide-left 0.5s ease;
+}
+
+/* Existing open animation */
+@keyframes slide-left {
+  0% {
+    transform: translateX(150%) translateY(5%);
+  }
+  100% {
+    transform: translateX(50%) translateY(5%);
+  }
+}
+
+/* New close animation */
+@keyframes slide-right {
+  0% {
+    transform: translateX(50%) translateY(5%);
+  }
+  100% {
+    transform: translateX(150%) translateY(5%);
+  }
+}

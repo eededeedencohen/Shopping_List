@@ -1,8 +1,20 @@
+/* ╔═══  Optimal-Carts-Settings  ═══╗ */
 .optimal-carts-settings {
+  position: fixed; /* “יושבת” על חלון התצוגה */
+  top: var(--toolbar-h, 40px); /* מתחת לטול-בר */
+  left: 0;
+  right: 0;
+  bottom: 0; /* עד לתחתית המכשיר */
+  z-index: 0; /* מתחת לטול-בר (z-index:10) */
+
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: 100%;
+  overflow-y: auto; /* גלילה אם התוכן ארוך */
+  padding-bottom: 2rem; /* ריפוד קטן, שלא “ידביק” את הכפתור התחתון */
+
+  /* 🎨  רקע משלך – מחליף את הקודם */
+  background: linear-gradient(35deg, rgb(255 255 255) 0%, rgb(0 70 145) 95%);
 }
 
 .products-settings-button {
@@ -53,9 +65,9 @@
 }
 
 .products-settings-button:active {
-    box-shadow: 0 5px #666;
-    transform: translateY(4px);
-  }
+  box-shadow: 0 5px #666;
+  transform: translateY(4px);
+}
 
 .products-settings-button:active:after {
   padding: 0;
@@ -89,4 +101,72 @@
 
 .rotate {
   animation: rotate 1s cubic-bezier(0.005, 0, 0.95, 1) forwards;
+}
+
+/* ╔═══  Glass Button – FIX  ═══╗ */
+.supermarkets-filter-button {
+  align-self: flex-end;
+  /* פריסה */
+  display: flex;
+  flex-direction: row-reverse; /* טקסט ימין, אייקון שמאל */
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  /* ממדים – ↑ גובה, ↑ padding */
+  width: 10.5rem;
+  height: 5rem; /* ← היה 2.7rem */
+  padding-inline: 1.25rem;
+
+  /* מראה זכוכית */
+  background: rgba(255, 255, 255, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+
+  border-radius: 0.65rem;
+  backdrop-filter: blur(12px) saturate(150%);
+  -webkit-backdrop-filter: blur(12px) saturate(150%);
+
+  /* צבע בסיס – לבן (הטקסט + האייקון יורשים) */
+  color: #ffffff;
+
+  font: 600 0.9rem/1rem "Open Sans", sans-serif;
+  letter-spacing: 0.02em;
+  text-shadow: 0 0 2px rgba(0, 0, 0, 0.35); /* זוהר עדין */
+  backdrop-filter: blur(12px) saturate(150%);
+
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25),
+    0 0 8px rgba(255, 255, 255, 0.4) inset;
+
+  cursor: pointer;
+  transition: transform 0.1s ease, background 0.1s ease, box-shadow 0.1s ease;
+}
+
+.supermarkets-filter-button:active {
+  transform: translateY(2px);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.2) inset,
+    0 1px 4px rgba(0, 0, 0, 0.35) inset;
+}
+
+/* ║  אייקון  ║ */
+.supermarkets-filter-icon {
+  width: 1.25rem; /* טיפה גדול יותר */
+  height: 1.25rem;
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* fill + stroke == currentColor (= לבן) */
+.supermarkets-filter-icon svg,
+.supermarkets-filter-icon img {
+  width: 100%;
+  height: 100%;
+  fill: currentColor;
+  stroke: currentColor;
+}
+
+/* ║  תווית  ║ */
+.supermarkets-filter-label {
+  white-space: nowrap;
+  pointer-events: none; /* שלא ילחץ רק על הטקסט */
 }
