@@ -1,40 +1,48 @@
 import React, { useState, useEffect } from "react";
 import ReactDOM from "react-dom";
 import SupermarketsNamesFillter from "./SupermarketsNamesFillter";
+import SupermarketsBranches from "./SupermarketsBranches";
 import "./SupermarketsFilterModal.css";
 
-const SupermarketsFilterModal = ({ isOpen, children, onClose }) => {
+const SupermarketsFilterModal = ({ isOpen, onClose }) => {
   const [isRendered, setIsRendered] = useState(false);
-  const [modalStyle, setModalStyle] = useState("slide-left 0.5s ease");
+  const [modalStyle, setModalStyle] = useState("smf_slide-left 0.5s ease");
+  const [activeChain, setActiveChain] = useState(null); // ← null = show chains
 
+  /* ─── open / close animation ─── */
   useEffect(() => {
     if (isOpen) {
-      setIsRendered(true); // Ensure modal is rendered when it should be open
-      setModalStyle("smf_slide-left 0.5s ease"); // Set the opening animation
+      setIsRendered(true);
+      setModalStyle("smf_slide-left 0.5s ease");
     } else if (!isOpen && isRendered) {
-      setModalStyle("smf_slide-right 0.5s ease"); // Set the closing animation
-      setTimeout(() => {
-        setIsRendered(false); // Remove the modal from the DOM after the animation
-      }, 500); // This timeout should match the duration of your animation
+      setModalStyle("smf_slide-right 0.5s ease");
+      setTimeout(() => setIsRendered(false), 500);
     }
   }, [isOpen, isRendered]);
 
-  const handleOverlayClick = (event) => {
-    if (event.target.className === "modal-overlay") {
-      onClose();
-    }
+  const handleOverlayClick = (e) => {
+    if (e.target.className === "modal-overlay") onClose();
   };
 
-  // Only render the modal if it's supposed to be open or in the process of closing
-  if (!isRendered) {
-    return null;
-  }
+  /* ─── reset when modal closes ─── */
+  useEffect(() => {
+    if (!isOpen) setActiveChain(null);
+  }, [isOpen]);
+
+  if (!isRendered) return null;
 
   return ReactDOM.createPortal(
     <div className="modal-overlay" onClick={handleOverlayClick}>
       <div className="smf_modal-window" style={{ animation: modalStyle }}>
-        <SupermarketsNamesFillter />
-        {children}
+        {/* ----- תצוגה מתחלפת ----- */}
+        {activeChain ? (
+          <SupermarketsBranches
+            supermarketName={activeChain}
+            onBack={() => setActiveChain(null)}
+          />
+        ) : (
+          <SupermarketsNamesFillter onSelect={setActiveChain} />
+        )}
       </div>
     </div>,
     document.getElementById("modal-root")

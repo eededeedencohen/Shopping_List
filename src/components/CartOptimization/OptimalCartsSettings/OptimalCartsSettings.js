@@ -1,7 +1,6 @@
 import React from "react";
 import ProductsGeneralSettings from "./ProductsGeneralSettings";
 import CalculationOptimalCarts from "./CalculationOptimalCarts";
-import SupermarketsFilter from "./SupermarketsFilter";
 import SupermarketsFilterModal from "./SupermarketsFilterModal";
 import SettingsIcon from "./settings.svg";
 import { ReactComponent as FilterIcon } from "../BrandsFilter/filter.svg";
@@ -52,7 +51,6 @@ const OptimalCartsSettings = () => {
         isOpen={isModalOpen}
         onClose={handleModalClose}
       ></SupermarketsFilterModal>
-      <SupermarketsFilter />
       <CalculationOptimalCarts />
     </div>
   );

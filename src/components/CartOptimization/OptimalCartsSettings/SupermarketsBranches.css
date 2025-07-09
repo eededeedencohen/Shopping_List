@@ -1,0 +1,97 @@
+/* רשימת סניפים (RTL כברירת-מחדל) */
+.sb-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  direction: rtl;
+}
+
+/* כרטיס/שורה בודדת */
+.sb-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 10px;
+  background: #ffffff;
+  border: 1px solid #e5e8ec;
+  border-radius: 10px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+  cursor: pointer;
+  transition: box-shadow 0.25s, transform 0.25s;
+}
+
+.sb-item:hover {
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
+  transform: translateY(-2px);
+}
+
+/* צ׳קבוקס — בגלל השפה RTL הוא נמצא מימין */
+.sb-checkbox {
+  /* מסירים עיצוב ברירת-מחדל ומגדירים גודל נוח */
+  width: 20px;
+  height: 20px;
+  accent-color: #2196f3; /* צבע כחול נעים */
+  margin-top: 3px; /* יישור אנכי לטקסט */
+}
+
+/* מידע טקסטואלי */
+.sb-info {
+  display: flex;
+  flex-direction: column;
+  font-family: inherit;
+}
+
+.sb-address {
+  font-weight: 700;
+  color: #00695c; /* ירוק-כחול לקריאות */
+}
+
+.sb-city {
+  font-size: 0.85rem;
+  color: #424242;
+}
+
+/* הודעות עזר */
+.sb-loading,
+.sb-empty {
+  text-align: center;
+  padding: 1rem;
+  font-weight: 500;
+}
+
+.sb-wrapper {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.sb-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.sb-back {
+  border: 0;
+  background: transparent;
+  font-size: 1.2rem;
+  cursor: pointer;
+  color: #2196f3;
+}
+
+.sb-title {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.sb-list {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  direction: rtl;
+}
+
+/* השאר (sb-item, sb-checkbox, sb-info…) נשארו כפי שהיו */
