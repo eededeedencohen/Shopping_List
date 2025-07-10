@@ -10,6 +10,7 @@ import {
   useGroupActions,
   useProductGroups,
 } from "../../hooks/appHooks";
+import ProductsListGroup from "./ProductsListGroup"; // ← הוסף
 
 import "./ProductsList.css";
 import "./ProductListGroups.css";
@@ -40,11 +41,6 @@ export const convertWeightUnit = (weightUnit) => {
     default:
       return weightUnit;
   }
-};
-
-const maxCharacters = (str, maxLen) => {
-  if (!str) return "";
-  return str.length > maxLen ? "..." + str.substring(0, maxLen - 3) : str;
 };
 
 // const priceFormat = (price) => price.toFixed(2);
@@ -127,6 +123,8 @@ function ProductsListGroups() {
   const [isModalAllGroupsOpen, setIsModalAllGroupsOpen] = useState(false);
   const [selectedBarcode, setSelectedBarcode] = useState(null);
   const [EditedGroup, setEditedGroup] = useState(null);
+  const [viewGroupName, setViewGroupName] = useState(null); // ← הוסף
+  const [isModalGroupOpen, setIsModalGroupOpen] = useState(false); // ← הוסף
 
   useEffect(() => {
     sendActiveCart();
@@ -390,6 +388,12 @@ function ProductsListGroups() {
         onClose={() => setIsModalAllGroupsOpen(false)}
         onSelectGroup={handleSelectGroup}
       />
+      <ProductsListGroup /* ← הוסף בלוק חדש */
+        isOpen={isModalGroupOpen}
+        groupName={viewGroupName}
+        onClose={() => setIsModalGroupOpen(false)}
+      />
+
       {/* ניווט הקטגוריות */}
       <CategoryNavigation />
       {/* ניווט תתי־קטגוריות */}
@@ -412,7 +416,7 @@ function ProductsListGroups() {
               <div className="list__product-details">
                 <div className="list__product-data">
                   <div className="list__product-name">
-                    <p>{maxCharacters(product.name, 23)}</p>
+                    <p>{product.name}</p>
                   </div>
                   <div className="list__product-info">
                     <div className="list__product-weight">
@@ -439,7 +443,15 @@ function ProductsListGroups() {
                     {groups
                       .filter((g) => g.barcodes.includes(product.barcode))
                       .map((g) => (
-                        <span key={g.groupName} className="tag">
+                        <span
+                          key={g.groupName}
+                          className="tag"
+                          onClick={() => {
+                            // ← הוסף
+                            setViewGroupName(g.groupName);
+                            setIsModalGroupOpen(true);
+                          }} // ← עד כאן
+                        >
                           {g.groupName}
                         </span>
                       ))}
