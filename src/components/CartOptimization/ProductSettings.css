@@ -51,3 +51,25 @@
   margin-right: 3px;
   font-weight: bold;
 }
+
+/* תגיות קבוצות */
+.group-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 8px 0 14px;
+}
+
+.tag {
+  background: #e0f2f1;
+  color: #00695c;
+  font-size: 0.75rem;
+  padding: 4px 8px;
+  border-radius: 12px;
+}
+
+.no-tags,
+.loading {
+  font-size: 0.75rem;
+  color: #777;
+}

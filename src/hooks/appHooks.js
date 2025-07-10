@@ -694,3 +694,61 @@ export const useFullGroupsWithProducts = () => {
 };
 
 export default useCartItems;
+
+// -----------------------------------------------------------------------------
+// useProductGroups – כל הקבוצות שבהן המוצר מופיע (ללא JSX)
+// -----------------------------------------------------------------------------
+export const useProductGroups = (barcode) => {
+  const { groups, isLoadingGroups } = useGroupState();
+
+  const groupsWithProduct = useMemo(() => {
+    if (!barcode || !groups?.length) return [];
+    return groups.filter((g) => g.barcodes?.includes(barcode));
+  }, [groups, barcode]);
+
+  return { groups: groupsWithProduct, isLoading: isLoadingGroups };
+};
+
+// -----------------------------------------------------------------------------
+// useGroupProductsWithPrice – מוצרים בקבוצה + מחיר יחידה ו-Total (אין JSX)
+// -----------------------------------------------------------------------------
+export const useGroupProductsWithPrice = (groupName) => {
+  const { groups, isLoadingGroups } = useGroupState();
+  const { products } = useProductList();
+  const { pricesMap, isLoadingPrices } = usePriceMap();
+
+  const result = useMemo(() => {
+    if (!groupName || !groups?.length || !products?.length) {
+      return { products: [], totalPrice: 0 };
+    }
+
+    /* מציאת הקבוצה */
+    const g = groups.find((grp) => grp.groupName === groupName);
+    if (!g) return { products: [], totalPrice: 0 };
+
+    /* מפות מהירות */
+    const productMap = Object.fromEntries(products.map((p) => [p.barcode, p]));
+
+    let sum = 0;
+
+    const detailed = g.barcodes
+      .map((bc) => {
+        const prod = productMap[bc];
+        if (!prod) return null;
+
+        const unit = pricesMap[bc]?.price ?? null;
+        if (unit) sum += unit;
+
+        return { ...prod, unitPrice: unit };
+      })
+      .filter(Boolean);
+
+    return { products: detailed, totalPrice: Number(sum.toFixed(2)) };
+  }, [groupName, groups, products, pricesMap]);
+
+  return {
+    products: result.products, // [{ barcode, name, …, unitPrice }, …]
+    totalPrice: result.totalPrice, // סכום המחירים
+    isLoading: isLoadingGroups || isLoadingPrices,
+  };
+};

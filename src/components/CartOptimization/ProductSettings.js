@@ -4,10 +4,14 @@ import WeightAccuracy from "./WeightAccuracy";
 import BrandsFilter from "./BrandsFilter/BrandsFilter";
 import "./ProductSettings.css";
 import { useSettingsOperations } from "../../hooks/optimizationHooks";
+import {
+  useProductGroups, 
+} from "../../hooks/appHooks";
 
 export default function ProductSettings({ product }) {
   /* ❱❱ מחלץ את הפונקציות החדשות ❰❰ */
   const { changeCanRoundUp, changeCanReplace } = useSettingsOperations();
+  const { groups, isLoading } = useProductGroups(product.barcode);
 
   return (
     <div className="product-settings">
@@ -54,6 +58,19 @@ export default function ProductSettings({ product }) {
             generalName={product.productDetails.generalName}
             barcode={product.barcode}
           />
+          <div className="group-tags">
+            {isLoading ? (
+              <span className="loading">טוען תגיות…</span>
+            ) : groups.length ? (
+              groups.map((g) => (
+                <span key={g.groupName} className="tag">
+                  {g.groupName}
+                </span>
+              ))
+            ) : (
+              <span className="no-tags">אין תגיות</span>
+            )}
+          </div>
         </>
       )}
     </div>
