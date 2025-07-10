@@ -8,6 +8,7 @@ import {
   useUpdateActiveCart,
   useGroupState,
   useGroupActions,
+  useProductGroups,
 } from "../../hooks/appHooks";
 
 import "./ProductsList.css";
@@ -434,6 +435,15 @@ function ProductsListGroups() {
                     )}
                   </div>
                   {product.discount && discountPriceFormat(product.discount)}
+                  <div className="list__product-tags">
+                    {groups
+                      .filter((g) => g.barcodes.includes(product.barcode))
+                      .map((g) => (
+                        <span key={g.groupName} className="tag">
+                          {g.groupName}
+                        </span>
+                      ))}
+                  </div>
                 </div>
                 <div
                   className="list__product-image"
