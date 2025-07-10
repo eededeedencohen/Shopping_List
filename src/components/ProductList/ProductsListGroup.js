@@ -2,6 +2,8 @@ import React from "react";
 import Modal from "../Cart/Modal";
 import Image from "../Images/ProductsImages";
 import { useGroupState, useGroupActions } from "../../hooks/appHooks";
+import { useProductList, usePriceMap } from "../../hooks/appHooks"; // ← הוסף
+
 import "./ProductsListGroup.css";
 
 /**
@@ -13,6 +15,13 @@ import "./ProductsListGroup.css";
 const ProductsListGroup = ({ isOpen, groupName, onClose, canEdit = false }) => {
   const { groups } = useGroupState();
   const { removeBarcodeFromGroup } = useGroupActions();
+  const { products } = useProductList();
+  const { pricesMap } = usePriceMap();
+
+  const productMap = React.useMemo(
+    () => Object.fromEntries(products.map((p) => [p.barcode, p])),
+    [products]
+  );
 
   const group = groups.find((g) => g.groupName === groupName);
 
@@ -30,7 +39,19 @@ const ProductsListGroup = ({ isOpen, groupName, onClose, canEdit = false }) => {
             {group.barcodes.map((bc) => (
               <div key={bc} className="group-modal__card">
                 <Image barcode={bc} className="group-modal__img" />
-                <span className="group-modal__barcode">{bc}</span>
+
+                {/* פרטי מוצר */}
+                <div className="group-modal__info">
+                  <span className="name">
+                    {productMap[bc]?.name || "שם לא ידוע"}
+                  </span>
+                  <span className="brand">{productMap[bc]?.brand || ""}</span>
+                  <span className="price">
+                    {pricesMap[bc]?.price != null
+                      ? `${pricesMap[bc].price.toFixed(2)} ₪`
+                      : "—"}
+                  </span>
+                </div>
 
                 {canEdit && (
                   <button

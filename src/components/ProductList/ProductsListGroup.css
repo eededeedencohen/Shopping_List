@@ -58,3 +58,18 @@
   font-size: 0.7rem;
   line-height: 20px;
 }
+
+.group-modal__info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 0.75rem;
+  margin-top: 4px;
+}
+
+.group-modal__info .name {
+  font-weight: 600;
+}
+.group-modal__info .price {
+  color: #00695c;
+}

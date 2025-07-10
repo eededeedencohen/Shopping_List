@@ -8,7 +8,6 @@ import {
   useUpdateActiveCart,
   useGroupState,
   useGroupActions,
-  useProductGroups,
 } from "../../hooks/appHooks";
 import ProductsListGroup from "./ProductsListGroup"; // ← הוסף
 
