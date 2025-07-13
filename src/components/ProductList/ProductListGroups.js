@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useMemo, useCallback } from "react";
 import { Spin } from "antd";
 import {
   useCartState,
@@ -8,11 +8,13 @@ import {
   useUpdateActiveCart,
   useGroupState,
   useGroupActions,
+  useProductSearch,
 } from "../../hooks/appHooks";
 import ProductsListGroup from "./ProductsListGroup"; // ← הוסף
 
 import "./ProductsList.css";
 import "./ProductListGroups.css";
+import "./ProductSearch.css";
 import { useNavigate } from "react-router";
 
 import Image from "./Images";
@@ -124,6 +126,11 @@ function ProductsListGroups() {
   const [EditedGroup, setEditedGroup] = useState(null);
   const [viewGroupName, setViewGroupName] = useState(null); // ← הוסף
   const [isModalGroupOpen, setIsModalGroupOpen] = useState(false); // ← הוסף
+  const [searchQuery, setSearchQuery] = useState(""); // ← הוסף
+  const [sortByGroupCount, setSortByGroupCount] = useState(false); // מיון לפי קבוצות
+  const [showAllProducts, setShowAllProducts] = useState(false); // הצג הכל
+
+  const productSearch = useProductSearch(); // ← הוסף
 
   useEffect(() => {
     sendActiveCart();
@@ -315,30 +322,82 @@ function ProductsListGroups() {
     setOldProductAmounts({ ...oldProductAmounts, [barcode]: amount });
   };
 
-  /* סינון מוצרים לפי קטגוריה ותת־קטגוריה פעילים */
+  /* ────────────────────────────────────────────── */
+  /*   סינון + חיפוש + “הצג הכול” + מיון יעיל      */
+  /* ────────────────────────────────────────────── */
+
+  /* 1) קטגוריה / תת־קטגוריה נוכחית */
   const currentCategory = allCategories[activeCategoryIndex];
   const subCats = all_sub_categories[activeCategoryIndex] || [];
   const currentSubCategory = subCats[activeSubCategoryIndex];
 
-  // const filteredProducts = products.filter((product) => {
-  const filteredProducts = productsWithDetails.filter((product) => {
-    if (product.category !== currentCategory) return false;
-    if (currentSubCategory) {
-      return product.subcategory === currentSubCategory;
-    }
+  /* 2) סינון לפי קטגוריה */
+  const filteredProducts = productsWithDetails.filter((p) => {
+    if (p.category !== currentCategory) return false;
+    if (currentSubCategory) return p.subcategory === currentSubCategory;
     return true;
   });
+
+  /* 3) מפה: ברקוד → כמות קבוצות (מחושב פעם אחת) */
+  const groupCountMap = useMemo(() => {
+    const map = {};
+    groups.forEach(({ barcodes }) =>
+      barcodes.forEach((bc) => (map[bc] = (map[bc] || 0) + 1))
+    );
+    return map;
+  }, [groups]);
+
+  /* 4) פונקציה נוחה לשימוש */
+  const getGroupCount = useCallback(
+    (barcode) => groupCountMap[barcode] || 0,
+    [groupCountMap] // ← מתעדכן רק כש-groups משתנה
+  );
+
+  /* 5) בניית productsToRender – ממואיז */
+  const productsToRender = useMemo(() => {
+    /* בסיס הרשימה */
+    let base;
+    if (searchQuery.trim()) {
+      base = productSearch(searchQuery)
+        .map((p) => productsWithDetails.find((e) => e.barcode === p.barcode))
+        .filter(Boolean);
+    } else if (showAllProducts) {
+      base = productsWithDetails;
+    } else {
+      base = filteredProducts;
+    }
+
+    /* מיון לפי כמות הקבוצות (קטן→גדול) */
+    if (sortByGroupCount) {
+      base = [...base].sort(
+        (a, b) => getGroupCount(a.barcode) - getGroupCount(b.barcode)
+      );
+    }
+
+    return base;
+  }, [
+    productsWithDetails,
+    filteredProducts,
+    searchQuery,
+    showAllProducts,
+    sortByGroupCount,
+    productSearch,
+    getGroupCount,
+  ]);
 
   const handleSelectGroup = (groupName) => {
     setEditedGroup(groupName);
   };
 
-  const isProductInGroup = (barcode, groupName) => {
-    // asume that the groupName are exists in the groups state
-    const group = groups.find((g) => g.groupName === groupName);
-    if (!group) return false;
-    return group.barcodes.includes(barcode);
-  };
+  /* ===== פונקציות-עזר לקבוצות ===== */
+  /* 4-bis) בדיקה אם מוצר שייך לקבוצה (ממואיז) */
+  const isProductInGroup = useCallback(
+    (barcode, groupName) => {
+      const group = groups.find((g) => g.groupName === groupName);
+      return group ? group.barcodes.includes(barcode) : false;
+    },
+    [groups]
+  );
 
   const handleUpdateGroup = async (groupName) => {
     const currentBarcodes = groups.find(
@@ -376,6 +435,33 @@ function ProductsListGroups() {
           {EditedGroup} :סיום עריכת:
         </button>
       )}
+      <input
+        type="text"
+        className="product-search-input" /* עיצוב ב-CSS המצורף */
+        placeholder="חיפוש מוצר..."
+        value={searchQuery}
+        onChange={(e) => setSearchQuery(e.target.value)}
+      />
+      <div className="list__controls">
+        <label className="list__checkbox">
+          <input
+            type="checkbox"
+            checked={sortByGroupCount}
+            onChange={(e) => setSortByGroupCount(e.target.checked)}
+          />
+          מיין לפי כמות קבוצות
+        </label>
+
+        <label className="list__checkbox">
+          <input
+            type="checkbox"
+            checked={showAllProducts}
+            onChange={(e) => setShowAllProducts(e.target.checked)}
+          />
+          הצג הכל
+        </label>
+      </div>
+
       <ModalShowProductGroups
         isOpen={isModalGroupsOpen}
         onClose={() => setIsModalGroupsOpen(false)}
@@ -406,7 +492,7 @@ function ProductsListGroups() {
           onTouchMove={handleTouchMove}
           onTouchEnd={handleTouchEnd}
         >
-          {filteredProducts.map((product) => (
+          {productsToRender.map((product) => (
             <div className="list__product-card" key={product.barcode}>
               {product.discount && (
                 <div className="list__product-badge">מבצע</div>

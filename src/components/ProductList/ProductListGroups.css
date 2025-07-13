@@ -44,3 +44,21 @@
   background-color: #a71d2a;
   transform: scale(1.04);
 }
+
+.list__controls {
+  display: flex;
+  gap: 1rem; /* רווח בין הצ'קבוקסים */
+  margin: 0.5rem 0;
+  direction: rtl; /* כדי שהכיתוב יופיע מימין לשמאל בעברית */
+}
+
+.list__checkbox {
+  font-size: 0.9rem;
+  cursor: pointer;
+  user-select: none;
+}
+
+.list__checkbox input {
+  margin-left: 0.4rem;
+  cursor: pointer;
+}
