@@ -1,4 +1,11 @@
-import { useEffect, useRef, useState, useMemo, useCallback } from "react";
+import {
+  useEffect,
+  useRef,
+  useState,
+  useMemo,
+  useCallback,
+  useTransition,
+} from "react";
 import { Spin } from "antd";
 import {
   useCartState,
@@ -126,7 +133,9 @@ function ProductsListGroups() {
   const [EditedGroup, setEditedGroup] = useState(null);
   const [viewGroupName, setViewGroupName] = useState(null); // ← הוסף
   const [isModalGroupOpen, setIsModalGroupOpen] = useState(false); // ← הוסף
+  const [query, setQuery] = useState(""); // הטקסט שמקלידים מיידית
   const [searchQuery, setSearchQuery] = useState(""); // ← הוסף
+  const [isPending, startTransition] = useTransition(); // בודק אם “ברקע”
   const [sortByGroupCount, setSortByGroupCount] = useState(false); // מיון לפי קבוצות
   const [showAllProducts, setShowAllProducts] = useState(false); // הצג הכל
 
@@ -437,11 +446,18 @@ function ProductsListGroups() {
       )}
       <input
         type="text"
-        className="product-search-input" /* עיצוב ב-CSS המצורף */
+        className="product-search-input"
         placeholder="חיפוש מוצר..."
-        value={searchQuery}
-        onChange={(e) => setSearchQuery(e.target.value)}
+        value={query}
+        onChange={(e) => {
+          const value = e.target.value;
+          setQuery(value); // רינדור מיידי – אין קפיצה
+          startTransition(() => {
+            setSearchQuery(value); // חיפוש “ברקע”
+          });
+        }}
       />
+      {isPending && <span className="mini-spinner" />} {/* אינדיקציה עדינה */}
       <div className="list__controls">
         <label className="list__checkbox">
           <input
@@ -461,7 +477,6 @@ function ProductsListGroups() {
           הצג הכל
         </label>
       </div>
-
       <ModalShowProductGroups
         isOpen={isModalGroupsOpen}
         onClose={() => setIsModalGroupsOpen(false)}
@@ -478,12 +493,10 @@ function ProductsListGroups() {
         groupName={viewGroupName}
         onClose={() => setIsModalGroupOpen(false)}
       />
-
       {/* ניווט הקטגוריות */}
       <CategoryNavigation />
       {/* ניווט תתי־קטגוריות */}
       <SubCategoryNavigation />
-
       <div className="list__products-wrapper">
         <div
           className="list__products-container"
