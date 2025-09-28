@@ -25,11 +25,6 @@ function ReplaceProducts({ barcode, closeModal, userId }) {
       await new Promise((resolve) => setTimeout(resolve, 500)); // ← דיליי של שנייה
 
       replaceProductNew(barcode, newBarcode);
-      // כאן אם אתה עדיין צריך לשלוח לשרת – תשאיר
-      // await axios.post(`${DOMAIN}/api/v1/carts/replace/${userId}`, {
-      //   oldBarcode: barcode,
-      //   newBarcode,
-      // });
     } catch (error) {
       console.error("Error posting data: ", error);
     } finally {

@@ -8,7 +8,6 @@ import React, {
 import "./Brobot.css";
 
 import BrobotFront from "./BrobotImages/BrobotFront.png";
-// import BrobotLeft from "./BrobotImages/BrobotLeft.png";
 import BrobotRight from "./BrobotImages/BrobotRight.png";
 
 function Brobot(_, ref) {

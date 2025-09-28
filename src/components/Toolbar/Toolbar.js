@@ -198,6 +198,19 @@ function Toolbar() {
               <h1>AI</h1>
             </div>
           </Link>
+
+          <Link to="/barcode-scanner" onClick={() => handleNavClick("/barcode-scanner")}>
+            <div
+              className={`nav-item ${
+                selectedPage === "/barcode-scanner" ? "selected-page" : ""
+              }`}
+            >
+              <div className="nav-icon">
+                <AiIcon2 className="svg-icon" />
+              </div>
+              <h1>AI</h1>
+            </div>
+          </Link>
         </div>
       </div>
 

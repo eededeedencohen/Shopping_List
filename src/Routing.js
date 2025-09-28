@@ -79,7 +79,7 @@ function Routing() {
       <Route path="/chatbot" element={<Chatbot />} />
       <Route path="/stats-dashboard" element={<StatsDashboard />} />
       <Route path="/products-list-groups" element={<ProductsListGroups />} />
-      <Route path="/robot" element={<BarcodeScanner />} />
+      <Route path="/barcode-scanner" element={<BarcodeScanner />} />
       {/* Add more routes as needed */}
     </Routes>
   );

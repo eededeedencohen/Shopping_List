@@ -60,7 +60,7 @@ export const PriceContextProvider2 = ({ children }) => {
   };
 
   /**
-   * Finds the cheapest supermarkets for a given list of cart products.
+   * Finds the cheapest supermarkets id for a given list of cart products.
    * @param {Array<{ barcode: string, amount: number }>} cartProducts
    * @returns {Promise<number[]>}
    */

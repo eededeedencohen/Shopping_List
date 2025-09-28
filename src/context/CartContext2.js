@@ -16,7 +16,6 @@ const CartContext2 = createContext(null);
 
 export const CartContextProvider2 = ({ children }) => {
   const [cart, setCart] = useState(null);
-  // const [supermarketID, setSupermarketID] = useState(null);
   const [isLoadingCartData, setIsLoadingCartData] = useState(false);
 
   useEffect(() => {
@@ -26,7 +25,6 @@ export const CartContextProvider2 = ({ children }) => {
         const cartData = await getActiveCart();
         console.log(cartData);
         setCart(cartData);
-        // setSupermarketID(cartData.supermarketID);
       } catch (error) {
         console.error("Failed to load cart", error);
       } finally {
@@ -37,10 +35,12 @@ export const CartContextProvider2 = ({ children }) => {
     loadCart();
   }, []);
 
-  const supermarketID = cart?.supermarketID ?? null; // ← כאן אין שגיאת scope
+  const supermarketID = cart?.supermarketID ?? null;
 
   /**
+   * ===============================
    * Syncs the current cart state with the server.
+   * ===============================
    */
   const syncCartToServer = async (updatedCart) => {
     try {

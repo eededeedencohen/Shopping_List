@@ -69,7 +69,7 @@ export const useCartActions = () => {
     [cart, setCart]
   );
 
-  // החלפת סופרמרקט → cart + טעינת מחירים חדשה (PriceContext כבר מאזין ל-id)
+  //  סופרמרקט → cart + טעינת מחירים חדשה (PriceContext כבר מאזין ל-id)
   const replaceSupermarket = useCallback(
     (newSupermarketID) => {
       if (!cart || supermarketID === newSupermarketID) return;

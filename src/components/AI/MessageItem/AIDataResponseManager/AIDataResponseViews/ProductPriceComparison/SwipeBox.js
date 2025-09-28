@@ -44,6 +44,9 @@ function SwipeBox({
   };
 
   /* ── מאזינים ל-Mouse ו-Touch ── */
+  // SwipeBox.js
+
+  /* ── מאזינים ל-Mouse ו-Touch ── */
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
@@ -51,40 +54,54 @@ function SwipeBox({
     let startX = 0,
       dragging = false;
 
-    // Touch
-    el.ontouchstart = (e) => {
+    const handleDragStart = (clientX) => {
       dragging = true;
-      startX = e.touches[0].clientX;
+      startX = clientX;
       setAnim(false);
-    };
-    el.ontouchmove = (e) =>
-      dragging && setOffset(e.touches[0].clientX - startX);
-    el.ontouchend = (e) => {
-      if (!dragging) return;
-      dragging = false;
-      finish(e.changedTouches[0].clientX - startX);
     };
 
-    // Mouse
-    el.onmousedown = (e) => {
-      dragging = true;
-      startX = e.clientX;
-      setAnim(false);
+    const handleDragMove = (clientX) => {
+      if (!dragging) return;
+      setOffset(clientX - startX);
     };
-    window.onmousemove = (e) => dragging && setOffset(e.clientX - startX);
-    window.onmouseup = (e) => {
+
+    const handleDragEnd = (clientX) => {
       if (!dragging) return;
       dragging = false;
-      finish(e.clientX - startX);
+      finish(clientX - startX);
     };
+
+    // --- Touch Events ---
+    const handleTouchStart = (e) => handleDragStart(e.touches[0].clientX);
+    const handleTouchMove = (e) => handleDragMove(e.touches[0].clientX);
+    const handleTouchEnd = (e) => handleDragEnd(e.changedTouches[0].clientX);
+
+    el.addEventListener("touchstart", handleTouchStart, { passive: true });
+    // מאזינים על החלון כולו כדי לתפוס תנועה גם מחוץ לקופסה
+    window.addEventListener("touchmove", handleTouchMove, { passive: true });
+    window.addEventListener("touchend", handleTouchEnd, { passive: true });
+
+    // --- Mouse Events ---
+    const handleMouseDown = (e) => handleDragStart(e.clientX);
+    const handleMouseMove = (e) => handleDragMove(e.clientX);
+    const handleMouseUp = (e) => handleDragEnd(e.clientX);
+
+    el.addEventListener("mousedown", handleMouseDown);
+    // מאזינים על החלון כולו
+    window.addEventListener("mousemove", handleMouseMove);
+    window.addEventListener("mouseup", handleMouseUp);
 
     /* ניקוי listeners בעת unmount */
     return () => {
-      el.ontouchstart = el.ontouchmove = el.ontouchend = null;
-      el.onmousedown = null;
-      window.onmousemove = window.onmouseup = null;
+      el.removeEventListener("touchstart", handleTouchStart);
+      window.removeEventListener("touchmove", handleTouchMove);
+      window.removeEventListener("touchend", handleTouchEnd);
+
+      el.removeEventListener("mousedown", handleMouseDown);
+      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("mouseup", handleMouseUp);
     };
-  }, [onSwipeLeft, onSwipeRight]);
+  }, [onSwipeLeft, onSwipeRight]); // finish function depends on these props implicitly
 
   return (
     <section
