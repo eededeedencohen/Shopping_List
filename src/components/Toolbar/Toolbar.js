@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import SearchBar from "../SearchBar/SearchBar";
 import SearchModal from "../SearchBar/SearchModal";
 import { useCartTotals } from "../../hooks/appHooks";
+import useVibrate from "../../hooks/useVibrate";
 import "./Toolbar.css";
 
 import cartIcon from "./cart.svg";
@@ -15,12 +16,14 @@ import { ReactComponent as Voice2Icon } from "./voice-bot.svg";
 import { ReactComponent as WishlistIcon } from "./wishlist.svg";
 import { ReactComponent as EditIcon } from "./editing.svg";
 import { ReactComponent as DataClassificationIcon } from "./data-classification.svg";
-
+import { ReactComponent as BarcodeIcon} from "./barcode.svg"
 function Toolbar() {
   const { totalAmount } = useCartTotals(); // ← כמות בעגלה
   const [selectedPage, setSelectedPage] = useState(window.location.pathname);
   const [isOpen, setIsOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const vibrate = useVibrate();
 
   /* אפקט פופ */
   const [pop, setPop] = useState(false);
@@ -34,7 +37,11 @@ function Toolbar() {
   }, [totalAmount]);
 
   /* ניווט */
-  const toggleDrawer = () => setIsOpen(!isOpen);
+  const toggleDrawer = () => {
+    // 👈 שימוש פשוט ונוח בפונקציית הרטט
+    vibrate(50); 
+    setIsOpen(!isOpen);
+  };
   const closeDrawer = () => isOpen && setIsOpen(false);
   const handleNavClick = (path) => {
     setSelectedPage(path);
@@ -206,9 +213,9 @@ function Toolbar() {
               }`}
             >
               <div className="nav-icon">
-                <AiIcon2 className="svg-icon" />
+                <BarcodeIcon className="svg-icon" />
               </div>
-              <h1>AI</h1>
+              <h1>Barcode Scanner</h1>
             </div>
           </Link>
         </div>

@@ -2,7 +2,6 @@ import React, {
   useState,
   useEffect,
   useRef,
-  // useCallback,
   Fragment,
 } from "react";
 import { ReactMediaRecorder } from "react-media-recorder-2";
@@ -26,9 +25,15 @@ const getVoices = () =>
 /* ---------------------------------------------------------- */
 /*  ניגון MP3 + סנכרון פה + מד רמקול                          */
 /* ---------------------------------------------------------- */
-function playAudioWithMouthSync(url, brobotRef, setSpkLevel, currentAudioRef) {
+function playAudioWithMouthSync(
+  url,
+  brobotRef,
+  setSpkLevel,
+  currentAudioRef,
+  isAiSpeakingRef
+) {
   const audio = new Audio(url);
-  currentAudioRef.current = audio; // נשמור כדי שנוכל לעצור
+  currentAudioRef.current = audio;
   audio.crossOrigin = "anonymous";
 
   const AudioCtx = window.AudioContext || window.webkitAudioContext;
@@ -41,7 +46,7 @@ function playAudioWithMouthSync(url, brobotRef, setSpkLevel, currentAudioRef) {
 
   const dataArray = new Uint8Array(analyser.frequencyBinCount);
   let talking = false;
-  const threshold = 2; // ← מדבר כש‑RMS ≥ 2
+  const threshold = 2;
 
   const step = () => {
     analyser.getByteTimeDomainData(dataArray);
@@ -62,51 +67,47 @@ function playAudioWithMouthSync(url, brobotRef, setSpkLevel, currentAudioRef) {
     if (!audio.paused) requestAnimationFrame(step);
   };
 
-  audio.addEventListener("play", () => requestAnimationFrame(step));
+  audio.addEventListener("play", () => {
+    isAiSpeakingRef.current = true; // 🔒 נועל הקלטה
+    console.log("%c🔊 AI is speaking...", "color: cyan");
+    requestAnimationFrame(step);
+  });
+
   audio.addEventListener("ended", () => {
     brobotRef.current?.talkStop();
     setSpkLevel(0);
+    isAiSpeakingRef.current = false; // 🔓 משחרר הקלטה
+    console.log("%c✅ AI finished speaking", "color: yellow");
   });
 
-  ctx
-    .resume()
-    .then(() => audio.play())
-    .catch(console.error);
+  ctx.resume().then(() => audio.play()).catch(console.error);
 }
 
+/* ---------------------------------------------------------- */
+/*  קומפוננטת AI הראשית                                      */
+/* ---------------------------------------------------------- */
 export default function AI() {
-  /* ------------------------------------------------------ */
-  /*      מצבי־תצוגה                                        */
-  /* ------------------------------------------------------ */
   const [messages, setMessages] = useState([]);
   const [textInput, setTextInput] = useState("");
   const [isRecording, setIsRecording] = useState(false);
+  const [micLevel, setMicLevel] = useState(0);
+  const [spkLevel, setSpkLevel] = useState(0);
+  const [micThreshold, setMicThreshold] = useState(30);
 
-  const [micLevel, setMicLevel] = useState(0); // מד מיקרופון
-  const [spkLevel, setSpkLevel] = useState(0); // מד רמקול
-
-  const [micThreshold, setMicThreshold] = useState(30); // 1‑20 מומלץ
-
-  /* ------------------------------------------------------ */
-  /*      רפרנסים                                          */
-  /* ------------------------------------------------------ */
   const brobotRef = useRef(null);
   const messageEndRef = useRef(null);
   const recorderFns = useRef({ start: () => {}, stop: () => {} });
-  const currentAudioRef = useRef(null); // נשמור אודיו פעיל כדי לעצור
+  const currentAudioRef = useRef(null);
+  const quietSinceRef = useRef(null);
+  const recordingLock = useRef(false);
+  const isAiSpeakingRef = useRef(false); // 🧠 האם ה-AI מדבר כרגע
 
-  const quietSinceRef = useRef(null); // למדידות שקט
-
-  /* ------------------------------------------------------ */
-  /*      גלילה אוטומטית                                    */
-  /* ------------------------------------------------------ */
+  /* גלילה אוטומטית */
   useEffect(() => {
     messageEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  /* ------------------------------------------------------ */
-  /*      ניהול הודעות                                      */
-  /* ------------------------------------------------------ */
+  /* ניהול הודעות */
   const addMessage = (
     text,
     sender,
@@ -114,15 +115,15 @@ export default function AI() {
     data = null,
     action = {}
   ) => setMessages((p) => [...p, { text, sender, type, data, action }]);
-
   const removeLoadingMessage = () =>
     setMessages((p) => p.filter((m) => m.type !== "loading"));
 
   /* ------------------------------------------------------ */
-  /*      טריגר‑קול (מיקרופון)                              */
+  /*      טריגר-קול (מיקרופון)                              */
   /* ------------------------------------------------------ */
   useEffect(() => {
     let ctx, analyser, dataArray, rafId;
+
     navigator.mediaDevices
       .getUserMedia({ audio: true })
       .then((stream) => {
@@ -132,7 +133,6 @@ export default function AI() {
         analyser = ctx.createAnalyser();
         analyser.fftSize = 2048;
         src.connect(analyser);
-
         dataArray = new Uint8Array(analyser.frequencyBinCount);
 
         const loop = () => {
@@ -145,29 +145,38 @@ export default function AI() {
 
           setMicLevel(Math.round(rms));
 
-          /* --- START recording --- */
-          // if (false && !isRecording && rms >= micThreshold) {
-          if (!isRecording && rms >= micThreshold) {
-            // אם יש אודיו מנגן – לעצור
+          // ✅ תנאי חדש - לא להתחיל הקלטה כשה-AI מדבר
+          if (
+            !isRecording &&
+            rms >= micThreshold &&
+            !recordingLock.current &&
+            !isAiSpeakingRef.current
+          ) {
+            console.log("%c🎙️ START recording", "color: lime");
+            recordingLock.current = true;
             currentAudioRef.current?.pause?.();
             speechSynthesis.cancel();
-
             recorderFns.current.start();
             setIsRecording(true);
             quietSinceRef.current = null;
           }
 
-          /* --- STOP recording (1 שנ׳ שקט ≤ 1) --- */
           if (isRecording) {
             if (rms <= 1) {
               if (!quietSinceRef.current) quietSinceRef.current = Date.now();
               else if (Date.now() - quietSinceRef.current >= 1000) {
+                console.log("%c⏹ STOP recording", "color: red");
                 recorderFns.current.stop();
                 setIsRecording(false);
                 quietSinceRef.current = null;
+                // משחרר את הנעילה אחרי שנייה
+                setTimeout(() => {
+                  recordingLock.current = false;
+                  console.log("%c🔓 UNLOCKED", "color: orange");
+                }, 1000);
               }
             } else {
-              quietSinceRef.current = null; // חזר רעש
+              quietSinceRef.current = null;
             }
           }
 
@@ -275,7 +284,8 @@ export default function AI() {
           `${DOMAIN}/${audioRoute}`,
           brobotRef,
           setSpkLevel,
-          currentAudioRef
+          currentAudioRef,
+          isAiSpeakingRef // ← חדש
         );
     } catch (err) {
       console.error(err);
@@ -300,7 +310,6 @@ export default function AI() {
   /* ------------------------------------------------------ */
   return (
     <Fragment>
-      {/* --- הקלטה --- */}
       <ReactMediaRecorder
         audio
         onStop={handleRecordingStop}
@@ -314,19 +323,15 @@ export default function AI() {
       <div className="ai-container">
         <NeuronBackground />
 
-        {/* ברובוט */}
-        {/* <div onClick={handleBrobotClick}> */}
         <div>
           <Brobot ref={brobotRef} />
         </div>
 
-        {/* מדים */}
         <div className="meters">
           <div className="mic-meter">🎙️ {micLevel}</div>
           <div className="spk-meter">🔈 {spkLevel}</div>
         </div>
 
-        {/* סף מיקרופון */}
         <div className="threshold-control">
           <label>
             סף מיקרופון&nbsp;
@@ -341,7 +346,6 @@ export default function AI() {
           </label>
         </div>
 
-        {/* הודעות */}
         <div className="messages-container">
           {messages.map((m, i) => (
             <MessageItem
@@ -356,7 +360,6 @@ export default function AI() {
           <div ref={messageEndRef} />
         </div>
 
-        {/* קלט טקסט */}
         <div className="user-text-box">
           <form onSubmit={handleOnSubmit}>
             <textarea

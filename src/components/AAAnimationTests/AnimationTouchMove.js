@@ -12,7 +12,7 @@ const AnimationTouchMove = () => {
   const [touchCurrent, setTouchCurrent] = useState({ x: 0, y: 0 });
   const [currentIndex, setCurrentIndex] = useState(null);
 
-  const containerRef = useRef(null);
+  const containerRef = useRef(null); 
 
   const handleRemove = (index) => {
     if (exitingItems.includes(index)) return;
