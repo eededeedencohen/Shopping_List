@@ -1,8 +1,8 @@
 // import React, { useEffect } from "react";
 import ReactDOM from "react-dom";
-import "./SearchModal.css";
+import "./productComparisonModal.css";
 
-const SearchModal = ({ isOpen, children, onClose }) => {
+const ProductComparisonModal = ({ isOpen, children, onClose }) => {
   if (!isOpen) {
     return null;
   }
@@ -25,4 +25,4 @@ const SearchModal = ({ isOpen, children, onClose }) => {
   );
 };
 
-export default SearchModal;
+export default ProductComparisonModal;
