@@ -9,11 +9,12 @@ import {
 } from "../../hooks/appHooks";
 
 import "./ProductsList.css";
-import { useNavigate } from "react-router";
 
 import Image from "./Images";
 import CategoryNavigation from "./CategoryNavigation";
 import SubCategoryNavigation from "./SubCategoryNavigation";
+import ProductComparisonModal from "../PriceList/productComparisonModal";
+import ProductComparison from "../PriceList/productComparison";
 
 /* -------------------------------- */
 /* פונקציות עזר (אינן משתנות)      */
@@ -104,8 +105,6 @@ function ProductsList() {
     setActiveSubCategoryIndex,
   } = useProductList();
 
-  const nav = useNavigate();
-
   const [productAmounts, setProductAmounts] = useState({});
   const [oldProductAmounts, setOldProductAmounts] = useState({});
 
@@ -117,8 +116,20 @@ function ProductsList() {
   const [containerStyle, setContainerStyle] = useState({});
 
   /* refs לזיהוי כיוון Swipe */
-  const startTouch = useRef({ x: 0 });
+  const startTouch = useRef({ x: 0, y: 0 });
   const swipeDirection = useRef(null);
+
+  const [selectedBarcode, setSelectedBarcode] = useState(null);
+  const [isComparisonModalOpen, setIsComparisonModalOpen] = useState(false);
+
+  const openComparisonModal = (barcode) => {
+    setSelectedBarcode(barcode);
+    setIsComparisonModalOpen(true);
+  };
+  const closeComparisonModal = () => {
+    setIsComparisonModalOpen(false);
+    setSelectedBarcode(null);
+  };
 
   /* -------------------------------- */
   /* זיהוי תחילת נגיעה והחלקה         */
@@ -126,13 +137,21 @@ function ProductsList() {
   const handleTouchStart = (event) => {
     swipeDirection.current = null;
     setContainerStyle({});
-    startTouch.current.x = event.touches[0].clientX;
+    const touch = event.touches[0];
+    startTouch.current = { x: touch.clientX, y: touch.clientY };
   };
 
   const handleTouchMove = (event) => {
-    const moveX = event.touches[0].clientX;
+    const touch = event.touches[0];
+    const moveX = touch.clientX;
+    const moveY = touch.clientY;
     const deltaX = moveX - startTouch.current.x;
-    if (Math.abs(deltaX) > 150) {
+    const deltaY = moveY - startTouch.current.y;
+
+
+    const SWIPE_THRESHOLD = 200; // כמה רחוק נחשב כהחלקה
+
+    if (Math.abs(deltaX) > SWIPE_THRESHOLD) {
       swipeDirection.current = deltaX > 0 ? "right" : "left";
     }
   };
@@ -226,9 +245,9 @@ function ProductsList() {
   };
 
   /* מעבר לעמוד מחיר */
-  const moveToPriceList = (barcode) => {
-    nav(`/priceList/${barcode}`);
-  };
+  // const moveToPriceList = (barcode) => {
+  //   nav(`/priceList/${barcode}`);
+  // };
 
   const glassSquaresRef = useRef([]);
 
@@ -331,133 +350,138 @@ function ProductsList() {
   }
 
   return (
-    <div className="list__product-list">
-      {/* ניווט הקטגוריות */}
-      <CategoryNavigation />
-      {/* ניווט תתי־קטגוריות */}
-      <SubCategoryNavigation />
+    <>
+      <div className="list__product-list">
+        {/* ניווט הקטגוריות */}
+        <CategoryNavigation />
+        {/* ניווט תתי־קטגוריות */}
+        <SubCategoryNavigation />
 
-      <div className="list__products-wrapper">
-        <div
-          className="list__products-container"
-          style={containerStyle}
-          onTouchStart={handleTouchStart}
-          onTouchMove={handleTouchMove}
-          onTouchEnd={handleTouchEnd}
-        >
-          {/* Glass background squares */}
+        <div className="list__products-wrapper">
+          <ProductComparisonModal
+            isOpen={isComparisonModalOpen}
+            onClose={closeComparisonModal}
+          >
+            <ProductComparison barcode={selectedBarcode} />
+          </ProductComparisonModal>
+          <div
+            className="list__products-container"
+            style={containerStyle}
+            onTouchStart={handleTouchStart}
+            onTouchMove={handleTouchMove}
+            onTouchEnd={handleTouchEnd}
+          >
+            {/* Glass background squares */}
 
-          <div className="glass-bg">
-            {(() => {
-              // מאחסן נתונים קבועים ברינדרים הבאים
-              if (!glassSquaresRef.current.length) {
-                glassSquaresRef.current = Array.from({ length: 25 }, () => ({
-                  size: 40 + Math.random() * 60, // 40-100px
-                  left: Math.random() * 100, // %
-                  top: Math.random() * 100, // %
-                  duration: 20 + Math.random() * 20, // 20-40s
-                  delay: -Math.random() * 20, // התחלה אקראית
-                }));
-              }
-              return glassSquaresRef.current.map((sq, idx) => (
-                <div
-                  key={idx}
-                  className="glass-square"
-                  style={{
-                    width: `${sq.size}px`,
-                    height: `${sq.size}px`,
-                    left: `${sq.left}%`,
-                    top: `${sq.top}%`,
-                    animationDuration: `${sq.duration}s`,
-                    animationDelay: `${sq.delay}s`,
-                  }}
-                />
-              ));
-            })()}
-          </div>
-          {filteredProducts.map((product) => (
-            <div className="list__product-card" key={product.barcode}>
-
-
-
-              {product.discount && (
-                <div className="list__product-badge">מבצע</div>
-              )}
-
-              <div className="list__product-details">
-                <div className="list__product-data">
-                  <div className="list__product-name">
-                    <p>{product.name}</p>
-                  </div>
-                  <div className="list__product-info">
-                    <div className="list__product-weight">
-                      <p>{product.weight}</p>
-                      <p>{convertWeightUnit(product.unitWeight)}</p>
-                    </div>
-                    <div className="list__separator">|</div>
-                    <div className="list__product-brand">
-                      <p>{product.brand}</p>
-                    </div>
-                  </div>
-                  <div className="list__product-price">
-                    {typeof product.unitPrice === "number" ? (
-                      <>
-                        <p>{priceFormat(product.unitPrice)}</p>
-                        <p style={{ fontSize: "1.4rem" }}>₪</p>
-                      </>
-                    ) : (
-                      <p>מחיר לא זמין בסופר</p>
-                    )}
-                  </div>
-                  {product.discount && discountPriceFormat(product.discount)}
-                </div>
-                <div
-                  className="list__product-image"
-                  onClick={() => moveToPriceList(product.barcode)}
-                >
-                  <Image barcode={product.barcode} />
-                </div>
-              </div>
-              <div className="list__product-operations">
-                <div
-                  id={`add-to-cart-${product.barcode}`}
-                  className="list__product-operations__confirm"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    updateAmount(product.barcode);
-                  }}
-                >
-                  אין שינוי
-                </div>
-                <div
-                  className="list__product-operations__add"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    incrementAmount(product.barcode);
-                  }}
-                >
-                  +
-                </div>
-                <div className="list__product-operations__quantity">
-                  <span>{productAmounts[product.barcode] || 0}</span>
-                </div>
-                <div
-                  className="list__product-operations__reduce"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    decrementAmount(product.barcode);
-                  }}
-                >
-                  -
-                </div>
-                <div></div>
-              </div>
+            <div className="glass-bg">
+              {(() => {
+                // מאחסן נתונים קבועים ברינדרים הבאים
+                if (!glassSquaresRef.current.length) {
+                  glassSquaresRef.current = Array.from({ length: 25 }, () => ({
+                    size: 40 + Math.random() * 60, // 40-100px
+                    left: Math.random() * 100, // %
+                    top: Math.random() * 100, // %
+                    duration: 20 + Math.random() * 20, // 20-40s
+                    delay: -Math.random() * 20, // התחלה אקראית
+                  }));
+                }
+                return glassSquaresRef.current.map((sq, idx) => (
+                  <div
+                    key={idx}
+                    className="glass-square"
+                    style={{
+                      width: `${sq.size}px`,
+                      height: `${sq.size}px`,
+                      left: `${sq.left}%`,
+                      top: `${sq.top}%`,
+                      animationDuration: `${sq.duration}s`,
+                      animationDelay: `${sq.delay}s`,
+                    }}
+                  />
+                ));
+              })()}
             </div>
-            
-          ))}
+            {filteredProducts.map((product) => (
+              <div className="list__product-card" key={product.barcode}>
+                {product.discount && (
+                  <div className="list__product-badge">מבצע</div>
+                )}
+
+                <div className="list__product-details">
+                  <div className="list__product-data">
+                    <div className="list__product-name">
+                      <p>{product.name}</p>
+                    </div>
+                    <div className="list__product-info">
+                      <div className="list__product-weight">
+                        <p>{product.weight}</p>
+                        <p>{convertWeightUnit(product.unitWeight)}</p>
+                      </div>
+                      <div className="list__separator">|</div>
+                      <div className="list__product-brand">
+                        <p>{product.brand}</p>
+                      </div>
+                    </div>
+                    <div className="list__product-price">
+                      {typeof product.unitPrice === "number" ? (
+                        <>
+                          <p>{priceFormat(product.unitPrice)}</p>
+                          <p style={{ fontSize: "1.4rem" }}>₪</p>
+                        </>
+                      ) : (
+                        <p>מחיר לא זמין בסופר</p>
+                      )}
+                    </div>
+                    {product.discount && discountPriceFormat(product.discount)}
+                  </div>
+                  <div
+                    className="list__product-image"
+                    onClick={() => openComparisonModal(product.barcode)}
+                    onContextMenu={(e) => e.preventDefault()}
+                  >
+                    <Image barcode={product.barcode} />
+                  </div>
+                </div>
+                <div className="list__product-operations">
+                  <div
+                    id={`add-to-cart-${product.barcode}`}
+                    className="list__product-operations__confirm"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      updateAmount(product.barcode);
+                    }}
+                  >
+                    אין שינוי
+                  </div>
+                  <div
+                    className="list__product-operations__add"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      incrementAmount(product.barcode);
+                    }}
+                  >
+                    +
+                  </div>
+                  <div className="list__product-operations__quantity">
+                    <span>{productAmounts[product.barcode] || 0}</span>
+                  </div>
+                  <div
+                    className="list__product-operations__reduce"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      decrementAmount(product.barcode);
+                    }}
+                  >
+                    -
+                  </div>
+                  <div></div>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }
 

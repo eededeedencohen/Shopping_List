@@ -2,9 +2,11 @@
   0% {
     transform: scale(1);
   }
+
   50% {
     transform: scale(1.1);
   }
+
   100% {
     transform: scale(1);
   }
@@ -14,6 +16,7 @@
   0% {
     transform: translateY(-100%);
   }
+
   100% {
     transform: translateY(0);
   }
@@ -42,7 +45,8 @@
   width: 100%;
   margin-top: 1rem;
   margin-bottom: 1rem;
-  gap: 1rem; /* מרווח בין הכפתורים */
+  gap: 1rem;
+  /* מרווח בין הכפתורים */
 }
 
 .cart-operations div {
@@ -50,9 +54,11 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  width: 110px; /* גודל קבוע */
+  width: 110px;
+  /* גודל קבוע */
   height: 110px;
-  border-radius: 50%; /* הופך לעגול */
+  border-radius: 50%;
+  /* הופך לעגול */
   color: white;
   font-size: 14px;
   font-weight: bold;
@@ -179,8 +185,10 @@
   /* אין צורך בשני פקודות סותרות  */
   /* flex-direction: row;          */
   /* flex-direction: row-reverse;  */
-  align-items: center; /* יישור אנכי אחיד */
-  gap: 0.75rem; /* רווח בינ-עמודתי */
+  align-items: center;
+  /* יישור אנכי אחיד */
+  gap: 0.75rem;
+  /* רווח בינ-עמודתי */
   width: 100%;
   padding: 0.4rem 0;
   box-sizing: border-box;
@@ -196,8 +204,10 @@
   margin-left: 0;
   flex-direction: row-reverse;
 
-  max-width: 100%; /* Add this to prevent overflowing */
-  overflow: hidden; /* Add this to hide content that overflows */
+  max-width: 100%;
+  /* Add this to prevent overflowing */
+  overflow: hidden;
+  /* Add this to hide content that overflows */
 }
 
 .cart .product-details {
@@ -271,10 +281,13 @@
 
 .cart .product-image {
   /* קיבוע מידות */
-  width: 90px; /* אפשר לשנות ל-80 / 100px וכו' */
+  width: 90px;
+  /* אפשר לשנות ל-80 / 100px וכו' */
   height: 90px;
-  flex: 0 0 90px; /* מונע מה-flex לשנות את הגודל */
-  display: flex; /* ממרכז את התמונה בתוך הריבוע */
+  flex: 0 0 90px;
+  /* מונע מה-flex לשנות את הגודל */
+  display: flex;
+  /* ממרכז את התמונה בתוך הריבוע */
   align-items: center;
   justify-content: center;
 }
@@ -282,7 +295,8 @@
 .cart .product-image img {
   width: 100%;
   height: 100%;
-  object-fit: contain; /* אם מעדיפים חיתוך מלא → cover */
+  object-fit: contain;
+  /* אם מעדיפים חיתוך מלא → cover */
 }
 
 .cart .product-price__total-price {
@@ -380,22 +394,31 @@
   background-color: rgb(193, 0, 0);
   border: none;
   cursor: pointer;
-  padding: 10px; /* Increased padding for a larger button */
+  padding: 10px;
+  /* Increased padding for a larger button */
   border-radius: 5px;
-  width: 40px; /* Specify a width for the button */
-  height: 40px; /* Specify a height for the button */
-  display: flex; /* To center the icon inside the button */
-  justify-content: center; /* Center icon horizontally */
-  align-items: center; /* Center icon vertically */
+  width: 40px;
+  /* Specify a width for the button */
+  height: 40px;
+  /* Specify a height for the button */
+  display: flex;
+  /* To center the icon inside the button */
+  justify-content: center;
+  /* Center icon horizontally */
+  align-items: center;
+  /* Center icon vertically */
 }
 
 .cart__delete-product button img {
-  width: 24px; /* Increase the width of the trash icon */
-  height: 24px; /* Increase the height of the trash icon */
+  width: 24px;
+  /* Increase the width of the trash icon */
+  height: 24px;
+  /* Increase the height of the trash icon */
 }
 
 .spinner-container {
-  position: fixed; /* Overlay the spinner on top of the content */
+  position: fixed;
+  /* Overlay the spinner on top of the content */
   top: 0;
   left: 0;
   right: 0;
@@ -403,36 +426,43 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: rgba(255, 255, 255, 0); /* Semi-transparent black overlay */
-  z-index: 9999; /* Ensure the spinner is on top */
-  transition: opacity 0.3s ease; /* Smooth fade-in transition */
+  background-color: rgba(255, 255, 255, 0);
+  /* Semi-transparent black overlay */
+  z-index: 9999;
+  /* Ensure the spinner is on top */
+  transition: opacity 0.3s ease;
+  /* Smooth fade-in transition */
 }
 
 @keyframes glow {
   0% {
     color: rgb(5, 115, 56);
   }
+
   50% {
     color: rgba(50, 214, 126, 0.809);
   }
+
   100% {
     color: rgb(5, 115, 56);
   }
 }
 
 .spinner-container p {
-  color: rgb(
-    26,
-    24,
-    24
-  ); /* Make the loading text white to contrast with the overlay */
-  font-size: 1.5rem; /* Make the text larger */
-  position: absolute; /* Position the text in the center of the screen */
+  color: rgb(26,
+      24,
+      24);
+  /* Make the loading text white to contrast with the overlay */
+  font-size: 1.5rem;
+  /* Make the text larger */
+  position: absolute;
+  /* Position the text in the center of the screen */
   top: 30%;
   text-align: center;
   width: 80%;
   font-weight: bold;
-  animation: glow 2s ease-in-out infinite; /* Apply the glow animation */
+  animation: glow 2s ease-in-out infinite;
+  /* Apply the glow animation */
 }
 
 .spinner-container .ant-spin-dot {
@@ -492,4 +522,83 @@
 
 .product--swipe-out {
   animation: swipeOutRight 0.4s ease forwards;
+}
+
+/* ===== Long-press + swipe behavior wrapper ===== */
+
+.swipe-container {
+  position: relative;
+}
+
+.swipe-content {
+  position: relative;
+  transition: transform 0.16s ease;
+  will-change: transform;
+}
+
+.swipe-content.dragging {
+  transition: none;
+}
+
+.swipe-content.spring {
+  animation: springBack 320ms ease-out forwards;
+}
+
+@keyframes springBack {
+  0% {
+    transform: translateX(var(--startX));
+  }
+
+  60% {
+    transform: translateX(-8px);
+  }
+
+  80% {
+    transform: translateX(4px);
+  }
+
+  100% {
+    transform: translateX(0);
+  }
+}
+
+.shadow {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  border-radius: 14px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  padding-inline-start: 14px;
+  gap: 10px;
+  pointer-events: none;
+}
+
+.shadow.idle {
+  width: 0;
+}
+
+.shadow.show {
+  background: linear-gradient(90deg,
+      rgba(255, 149, 0, 0.22),
+      rgba(255, 149, 0, 0.08));
+}
+
+.shadow.armed {
+  background: linear-gradient(90deg,
+      rgba(255, 59, 48, 0.38),
+      rgba(255, 59, 48, 0.12));
+}
+
+.shadow-text {
+  font-size: 13px;
+  color: #222;
+  opacity: 0.8;
+  user-select: none;
+}
+
+.shadow-text.strong {
+  font-weight: 800;
 }

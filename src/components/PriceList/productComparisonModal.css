@@ -1,55 +1,64 @@
-.modal-overlay {
-    position: fixed;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background: rgba(0, 0, 0, 0.7);
+.pcm__modal-overlay {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(5.6px);
+}
+
+.pcm__modal-window {
+  background: rgba(255, 255, 255, 0.49);
+  border-radius: 16px;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(5.6px);
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  max-width: 500px;
+  position: relative;
+  animation: pcm__slide-down 0.5s ease;
+}
+
+.pcm__close-button-container {
+  position: fixed;
+  top: 60px;
+  left: 10%;
+  transform: translateX(-50%);
+  z-index: 1;
+}
+
+.pcm__close-button {
+  background: rgb(234, 68, 68);
+  color: white;
+  border: 2px solid rgb(244, 185, 179);
+  border-radius: 50%;
+  padding: 10px;
+  box-shadow: 0 0 5px #dd4141;
+  cursor: pointer;
+  /*Increase the wight a little*/
+  width: 40px;
+}
+
+
+@keyframes pcm__slide-down {
+  0% {
+    transform: translateY(-100%);
   }
-  
-  .modal-window {
-    background: #fff;
-    border-radius: 5px;
-    max-width: 500px;
-    position: relative;
-    animation: slide-down 0.5s ease;
+
+  100% {
+    transform: translateY(0);
   }
-  
-  .close-button-container {
-    position: fixed;
-    top: 60px;
-    left: 10%;
-    transform: translateX(-50%);
-    z-index: 1;
+}
+
+@media (max-width: 600px) {
+  .pcm__modal-window {
+    width: 80%;
+    height: 80%;
+
+    overflow: auto;
+    /* Add this line */
   }
-  
-  .close-button {
-    background: rgb(234, 68, 68);
-    color: white;
-    border: 2px solid rgb(244, 185, 179);
-    border-radius: 50%;
-    padding: 10px;
-    box-shadow: 0 0 5px #dd4141;
-    cursor: pointer;
-    /*Increase the wight a little*/
-    width: 40px;
-  }
-  
-  
-  @keyframes slide-down {
-    0% { transform: translateY(-100%); }
-    100% { transform: translateY(0); }
-  }
-  
-  @media (max-width: 600px) {
-    .modal-window {
-      width: 80%;
-      height: 80%;
-  
-      overflow: auto; /* Add this line */
-    }
-  }
-  
+}

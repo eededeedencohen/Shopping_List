@@ -1,5 +1,5 @@
 // import { useState, useEffect, useMemo } from "react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import Modal from "./Modal";
 import ReplaceProducts from "./ReplaceProducts";
@@ -61,6 +61,56 @@ export default function Cart() {
   const { replaceRandomCheapest } = useRandomSupermarketReplacer(); // Get the random supermarket replacer from the context
 
   const navigate = useNavigate();
+
+  // --- FLIP refs for cart rows (רק התנהגות/אנימציה, בלי שינוי עיצוב) ---
+  const rowRefs = useRef(new Map());
+
+  const setRowRef = (barcode) => (node) => {
+    if (node) rowRefs.current.set(barcode, node);
+    else rowRefs.current.delete(barcode);
+  };
+
+  const measureTops = () => {
+    const tops = new Map();
+    cartItems.forEach((item) => {
+      const el = rowRefs.current.get(item.barcode);
+      if (el) tops.set(item.barcode, el.getBoundingClientRect().top);
+    });
+    return tops;
+  };
+
+  const removeWithFLIP = (barcode) => {
+    const first = measureTops();
+
+    // מסיר מהקונקסט (אותה התנהגות של remove)
+    remove(barcode);
+
+    // מפעיל FLIP על השורות שנשארו
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        rowRefs.current.forEach((el, key) => {
+          const oldTop = first.get(key);
+          if (oldTop == null) return;
+          const newTop = el.getBoundingClientRect().top;
+          const dy = oldTop - newTop;
+          if (dy !== 0) {
+            el.style.transition = "none";
+            el.style.transform = `translateY(${dy}px)`;
+            requestAnimationFrame(() => {
+              el.style.transition = "transform 260ms cubic-bezier(.2,.8,.25,1)";
+              el.style.transform = "translateY(0)";
+              setTimeout(() => {
+                if (!el) return;
+                el.style.transition = "";
+                el.style.transform = "";
+              }, 300);
+            });
+          }
+        });
+      });
+    });
+  };
+
   const userId = "1"; // Replace this with the actual userId.
 
   //////////////////////////////////////////////////////////////
@@ -255,9 +305,9 @@ export default function Cart() {
       {/* ///////////////////////////////////////////////////////////////////////////////////////////*/}
 
       <div className="supermarket">
-        <div className="supermarket-title">
+        {/* <div className="supermarket-title">
           <h3>הסופרמרקט הכי משתלם לעגלה שלך</h3>
-        </div>
+        </div> */}
         <div className="supermarket-logo">
           <SupermarketImage supermarketName={currentSupermarket.name} />
         </div>
@@ -280,156 +330,180 @@ export default function Cart() {
         </div>
       </div>
       <hr className="line" />
-
       <div className="products">
         {cartItems.length === 0 ? (
           <div className="cart-test_empty">
             <p>אין מוצרים בעגלה</p>
           </div>
         ) : (
-          cartItems.map((item, index) => {
+          cartItems.map((item) => {
             const currentDraftAmount = getDraftOrCurrentAmount(item);
             const hasChanged = currentDraftAmount !== item.amountInCart;
             const currentTotal = calculateTotalPrice(item.amountInCart, item);
             const newTotal = calculateTotalPrice(currentDraftAmount, item);
 
             return (
-              <div key={index}>
-                <div
-                  className="product"
-                  onClick={() => {
-                    setCurrentBarcode(item.barcode);
-                    setModalOpen(true);
-                  }}
-                >
-                  <div className="product-details">
-                    <div className="product-details__name">
-                      <span>{item.name.split(" ").slice(0, 3).join(" ")}</span>
-                    </div>
-                    <div
-                      style={{
-                        display: "flex",
-                        flexDirection: "row-reverse",
-                        alignItems: "flex-start",
-                        paddingRight: "5px",
-                        width: "100%",
-                      }}
-                    >
-                      <div className="product-details__weight">
-                        <span>{convertWeightUnit(item.unitWeight)} </span>
-                        <span className="size">{item.weight}</span>
+              <SwipeRow
+                key={item.barcode}
+                outerRef={setRowRef(item.barcode)}
+                onIncrement={() => update(item.barcode, item.amountInCart + 1)}
+                onDecrement={() =>
+                  update(item.barcode, Math.max(1, item.amountInCart - 1))
+                }
+                onRemove={() => removeWithFLIP(item.barcode)}
+              >
+                <div>
+                  <div
+                    className="product"
+                    onClick={() => {
+                      setCurrentBarcode(item.barcode);
+                      setModalOpen(true);
+                    }}
+                  >
+                    <div className="product-details">
+                      <div className="product-details__name">
+                        <span>
+                          {item.name.split(" ").slice(0, 3).join(" ")}
+                        </span>
                       </div>
-                      <span
+                      <div
                         style={{
-                          paddingRight: "3px",
-                          paddingLeft: "3px",
                           display: "flex",
-                          alignSelf: "normal",
+                          flexDirection: "row-reverse",
+                          alignItems: "flex-start",
+                          paddingRight: "5px",
+                          width: "100%",
                         }}
                       >
-                        |
-                      </span>
-                      <div className="product-details__brand">
-                        <span>{item.brand}</span>
+                        <div className="product-details__weight">
+                          <span>{convertWeightUnit(item.unitWeight)} </span>
+                          <span className="size">{item.weight}</span>
+                        </div>
+                        <span
+                          style={{
+                            paddingRight: "3px",
+                            paddingLeft: "3px",
+                            display: "flex",
+                            alignSelf: "normal",
+                          }}
+                        >
+                          |
+                        </span>
+                        <div className="product-details__brand">
+                          <span>{item.brand}</span>
+                        </div>
                       </div>
                     </div>
-                  </div>
 
-                  <div className="product-price">
-                    <div className="product-price__amount">
-                      <span
-                        style={{ fontSize: "0.8rem", alignSelf: "baseline" }}
-                      >
-                        'יח
-                      </span>
-                      <span>{item.amountInCart}</span>
+                    <div className="product-price">
+                      <div className="product-price__amount">
+                        <span
+                          style={{ fontSize: "0.8rem", alignSelf: "baseline" }}
+                        >
+                          'יח
+                        </span>
+                        <span>{item.amountInCart}</span>
+                      </div>
+                      <div className="product-price__total-price">
+                        <b style={{ fontSize: "1.2em" }}>₪</b>
+                        <span style={{ fontSize: "1.2rem" }}>
+                          {item.totalPrice.toFixed(2)}
+                        </span>
+                      </div>
                     </div>
-                    <div className="product-price__total-price">
-                      <b style={{ fontSize: "1.2em" }}>₪</b>
-                      <span style={{ fontSize: "1.2rem" }}>
-                        {item.totalPrice.toFixed(2)}
-                      </span>
+
+                    <div className="product-image">
+                      <Images barcode={item.barcode} />
                     </div>
                   </div>
 
-                  <div className="product-image">
-                    <Images barcode={item.barcode} />
-                  </div>
-                </div>
+                  {/* ===== totals difference visual (optional) ===== */}
+                  {hasChanged && (
+                    <div className="product-diff">
+                      <small>
+                        {`סה"כ חדש: ${newTotal.toFixed(
+                          2
+                        )} ₪ → קודם: ${currentTotal.toFixed(2)} ₪`}
+                      </small>
+                    </div>
+                  )}
 
-                {/* ===== totals difference visual (optional) ===== */}
-                {hasChanged && (
-                  <div className="product-diff">
-                    <small>
-                      {`סה"כ חדש: ${newTotal.toFixed(
-                        2
-                      )} ₪ → קודם: ${currentTotal.toFixed(2)} ₪`}
-                    </small>
-                  </div>
-                )}
-
-                <div className="update-amount">
-                  <div className="update-amount__new">
-                    <button
-                      className="update-amount__minus-button"
-                      onClick={() =>
-                        updateDraftAmount(
-                          item.barcode,
-                          Math.max(1, currentDraftAmount - 1)
-                        )
-                      }
-                    >
-                      -
-                    </button>
-
-                    <input
-                      type="text"
-                      className="amount-display"
-                      value={currentDraftAmount}
-                      readOnly
-                    />
-
-                    <button
-                      className="update-amount__plus-button"
-                      onClick={() =>
-                        updateDraftAmount(item.barcode, currentDraftAmount + 1)
-                      }
-                    >
-                      +
-                    </button>
-                  </div>
-
-                  <div className="update-amount__update_and_cencal">
-                    <div className="update-amount__update-button">
+                  <div className="update-amount">
+                    <div className="update-amount__new">
                       <button
-                        disabled={!hasChanged}
-                        onClick={() => {
-                          update(item.barcode, currentDraftAmount);
-                          clearDraftAmount(item.barcode);
+                        className="update-amount__minus-button"
+                        onMouseDown={(e) => e.stopPropagation()}
+                        onTouchStart={(e) => e.stopPropagation()}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          updateDraftAmount(
+                            item.barcode,
+                            Math.max(1, currentDraftAmount - 1)
+                          );
                         }}
                       >
-                        עדכן
+                        -
+                      </button>
+
+                      <input
+                        type="text"
+                        className="amount-display"
+                        value={currentDraftAmount}
+                        readOnly
+                      />
+
+                      <button
+                        className="update-amount__plus-button"
+                        onMouseDown={(e) => e.stopPropagation()}
+                        onTouchStart={(e) => e.stopPropagation()}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          updateDraftAmount(
+                            item.barcode,
+                            currentDraftAmount + 1
+                          );
+                        }}
+                      >
+                        +
                       </button>
                     </div>
-                    <div className="update-amount__cancel-button">
-                      <button onClick={() => clearDraftAmount(item.barcode)}>
-                        בטל
+
+                    <div className="update-amount__update_and_cencal">
+                      <div className="update-amount__update-button">
+                        <button
+                          disabled={!hasChanged}
+                          onClick={() => {
+                            update(item.barcode, currentDraftAmount);
+                            clearDraftAmount(item.barcode);
+                          }}
+                        >
+                          עדכן
+                        </button>
+                      </div>
+                      <div className="update-amount__cancel-button">
+                        <button onClick={() => clearDraftAmount(item.barcode)}>
+                          בטל
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="cart__delete-product">
+                      <button
+                        onMouseDown={(e) => e.stopPropagation()}
+                        onTouchStart={(e) => e.stopPropagation()}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          removeWithFLIP(item.barcode);
+                        }}
+                      >
+                        <img src={trashIcon} alt="Delete" />
                       </button>
                     </div>
                   </div>
 
-                  <div className="cart__delete-product">
-                    <button
-                      onClick={() => {
-                        remove(item.barcode);
-                      }}
-                    >
-                      <img src={trashIcon} alt="Delete" />
-                    </button>
-                  </div>
+                  <hr />
                 </div>
-                <hr />
-              </div>
+              </SwipeRow>
             );
           })
         )}
@@ -442,6 +516,224 @@ export default function Cart() {
         <button className="green-button__button" onClick={handleConfirmCart}>
           Confirm Cart
         </button>
+      </div>
+    </div>
+  );
+}
+
+function SwipeRow({ children, onIncrement, onDecrement, onRemove, outerRef }) {
+  const LONG_MS = 1000; // משך לחיצה ארוכה
+  const LONG_VISUAL_DELAY = 200; // אחרי 0.2s מתחילה הגדילה של המסגרת
+  const SWIPE_TRIGGER = 40; // מינימום לסווייפ קצר (לפלוס/מינוס)
+  const REMOVE_THRESHOLD = 140; // כמה לגרור ימינה למחיקה
+  const MAX_NORMAL_SHIFT = 60; // תזוזה פיזית מקסימלית בסווייפ קצר
+  const DEADZONE_NORMAL = 20; // אזור מת במצב רגיל
+  const DEADZONE_DELETE = 12; // אזור מת במצב מחיקה
+
+  const [dxDelete, setDxDelete] = useState(0);
+  const [dxNormal, setDxNormal] = useState(0);
+  const [dragging, setDragging] = useState(false);
+  const [deleteMode, setDeleteMode] = useState(false);
+  const [spring, setSpring] = useState(false);
+  const [swipeActive, setSwipeActive] = useState(false);
+  const [pressProgress, setPressProgress] = useState(0); // 0..1
+
+  const startX = useRef(0);
+  const startY = useRef(0);
+  const longPressTimer = useRef(null);
+  const rafId = useRef(null);
+  const pressStart = useRef(0);
+  const moved = useRef(0);
+
+  const clearLP = () => {
+    if (longPressTimer.current) {
+      clearTimeout(longPressTimer.current);
+      longPressTimer.current = null;
+    }
+  };
+
+  const stopRaf = () => {
+    if (rafId.current) {
+      cancelAnimationFrame(rafId.current);
+      rafId.current = null;
+    }
+  };
+
+  const tickPress = () => {
+    const now = performance.now();
+    const elapsed = now - pressStart.current;
+    if (elapsed <= LONG_VISUAL_DELAY) {
+      setPressProgress(0);
+    } else {
+      const ratio = Math.min(
+        1,
+        (elapsed - LONG_VISUAL_DELAY) / (LONG_MS - LONG_VISUAL_DELAY)
+      );
+      setPressProgress(ratio);
+    }
+    rafId.current = requestAnimationFrame(tickPress);
+  };
+
+  const begin = (clientX, clientY) => {
+    startX.current = clientX;
+    startY.current = clientY ?? 0;
+    moved.current = 0;
+    setDragging(true);
+    setDeleteMode(false);
+    setSwipeActive(false);
+    setDxDelete(0);
+    setDxNormal(0);
+    setSpring(false);
+    setPressProgress(0);
+    clearLP();
+    stopRaf();
+    pressStart.current = performance.now();
+    rafId.current = requestAnimationFrame(tickPress);
+    longPressTimer.current = setTimeout(() => {
+      setDeleteMode(true);
+      setPressProgress(1);
+    }, LONG_MS);
+  };
+
+  const move = (clientX, clientY) => {
+    if (!dragging) return;
+    const deltaX = clientX - startX.current;
+    const deltaY = (clientY ?? 0) - startY.current;
+    moved.current = deltaX;
+
+    if (deleteMode) {
+      if (!swipeActive) {
+        if (deltaX >= DEADZONE_DELETE && Math.abs(deltaX) > Math.abs(deltaY)) {
+          setSwipeActive(true);
+        } else {
+          return;
+        }
+      }
+      setDxDelete(Math.max(0, deltaX));
+      return;
+    }
+
+    if (!swipeActive) {
+      if (
+        Math.abs(deltaX) >= DEADZONE_NORMAL &&
+        Math.abs(deltaX) > Math.abs(deltaY)
+      ) {
+        setSwipeActive(true);
+      } else {
+        return;
+      }
+    }
+
+    const clamped = Math.max(
+      -MAX_NORMAL_SHIFT,
+      Math.min(MAX_NORMAL_SHIFT, deltaX)
+    );
+    setDxNormal(clamped);
+  };
+
+  const end = () => {
+    if (!dragging) return;
+    clearLP();
+    stopRaf();
+    setDragging(false);
+
+    if (deleteMode) {
+      if (dxDelete >= REMOVE_THRESHOLD) {
+        setDxDelete(260);
+        setTimeout(onRemove, 140);
+      } else {
+        if (dxDelete !== 0) {
+          setSpring(true);
+        }
+        setDxDelete(0);
+        setDeleteMode(false);
+      }
+      setSwipeActive(false);
+      setPressProgress(0);
+      return;
+    }
+
+    if (swipeActive && Math.abs(moved.current) >= SWIPE_TRIGGER) {
+      if (moved.current > 0) onIncrement();
+      else onDecrement();
+    }
+
+    if (dxNormal !== 0) {
+      setSpring(true);
+    }
+    setDxNormal(0);
+    setSwipeActive(false);
+    setPressProgress(0);
+  };
+
+  const onMouseDown = (e) => begin(e.clientX, e.clientY);
+  const onMouseMove = (e) => move(e.clientX, e.clientY);
+  const onMouseUp = end;
+  const onMouseLeave = () => dragging && end();
+
+  const onTouchStart = (e) => begin(e.touches[0].clientX, e.touches[0].clientY);
+  const onTouchMove = (e) => {
+    move(e.touches[0].clientX, e.touches[0].clientY);
+    if (swipeActive) e.preventDefault();
+  };
+  const onTouchEnd = end;
+
+  const uiDx = deleteMode ? dxDelete : dxNormal;
+  const borderRatio = pressProgress; // 0..1
+
+  const shadowStage = !deleteMode
+    ? "idle"
+    : dxDelete >= REMOVE_THRESHOLD
+    ? "armed"
+    : dxDelete > 0
+    ? "show"
+    : "idle";
+
+  return (
+    <div
+      ref={outerRef}
+      className="swipe-container"
+      onMouseDown={onMouseDown}
+      onMouseMove={onMouseMove}
+      onMouseUp={onMouseUp}
+      onMouseLeave={onMouseLeave}
+      onTouchStart={onTouchStart}
+      onTouchMove={onTouchMove}
+      onTouchEnd={onTouchEnd}
+      onContextMenu={(e) => e.preventDefault()}
+      style={{ cursor: dragging ? "grabbing" : "grab" }}
+    >
+      {/* רקע למחיקה מאחורי הכרטיסייה */}
+      <div
+        className={`shadow ${shadowStage}`}
+        style={{ width: Math.min(dxDelete, REMOVE_THRESHOLD) + 12 }}
+      >
+        {shadowStage === "show" && (
+          <span className="shadow-text">החזק 1ש׳ ואז החלק ימינה למחיקה</span>
+        )}
+        {shadowStage === "armed" && (
+          <span className="shadow-text strong">שחרר כדי למחוק</span>
+        )}
+      </div>
+
+      {/* התוכן המקורי של הכרטיסייה (product וכו') */}
+      <div
+        className={`swipe-content ${dragging ? "dragging" : ""} ${
+          spring ? "spring" : ""
+        }`}
+        style={{
+          transform: `translateX(${uiDx}px)`,
+          "--startX": `${uiDx}px`,
+          boxShadow:
+            borderRatio > 0
+              ? `0 0 0 ${1 + 3 * borderRatio}px rgba(255,59,48,${
+                  0.4 + 0.6 * borderRatio
+                })`
+              : "none",
+        }}
+        onAnimationEnd={() => setSpring(false)}
+      >
+        {children}
       </div>
     </div>
   );

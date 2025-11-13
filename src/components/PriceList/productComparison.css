@@ -1,5 +1,6 @@
 .spinner-container {
-  position: fixed; /* Overlay the spinner on top of the content */
+  position: fixed;
+  /* Overlay the spinner on top of the content */
   top: 0;
   left: 0;
   right: 0;
@@ -7,20 +8,38 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: rgba(0, 0, 0, 0.164); /* Semi-transparent black overlay */
-  z-index: 9999; /* Ensure the spinner is on top */
-  transition: opacity 0.3s ease; /* Smooth fade-in transition */
+  background-color: rgba(255, 255, 255, 0);
+  /* Semi-transparent background */
+  z-index: 9999;
+  /* Ensure the spinner is on top */
+  transition: opacity 0.3s ease;
+  /* Smooth fade-in transition */
 }
 
 .spinner-container p {
-  color: white; /* Make the loading text white to contrast with the overlay */
-  margin-left: 10px; /* Space between the spinner and the text */
-  font-size: 1.5rem; /* Make the text larger */
+  color: white;
+  /* Make the loading text white to contrast with the overlay */
+  margin-left: 10px;
+  /* Space between the spinner and the text */
+  font-size: 1.5rem;
+  /* Make the text larger */
 }
 
 .spinner-container .ant-spin-dot {
   font-size: 50px;
   color: purple;
+}
+
+.compareM-prices-container {
+  /* background-color: #cccccc38; */
+  /* do to */
+  /* background: linear-gradient(145deg, rgba(255, 255, 255, 0.35), rgba(0, 0, 0, 0.15)); */
+  /* backdrop-filter: blur(8px); */
+  border-radius: 16px;
+  /* box-shadow: inset 6px 6px 12px rgba(0, 0, 0, 0.3),
+            inset -6px -6px 12px rgba(255, 255, 255, 0.2),
+            0 0 15px rgba(0, 0, 0, 0.1); */
+  border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
 .compareM__product {
@@ -34,13 +53,16 @@
 
 .compareM__product-name {
   display: flex;
-  flex-direction: row-reverse;
-  width: 100%;
-  height: 100%;
   justify-content: center;
+  /* ממורכז אופקית */
   align-items: center;
-  margin-bottom: 1.5rem;
-  padding: 0;
+  /* ממורכז אנכית */
+  text-align: center;
+  /* טקסט ממורכז */
+  width: 100%;
+  padding: 0 1rem;
+  /* מרווח צדדים כדי שלא ייגע בקצה */
+  margin-bottom: 1rem;
 }
 
 .compareM__product-name p {
@@ -50,8 +72,14 @@
   color: #2f416e;
   text-transform: uppercase;
   margin: 0;
-  padding: 0;
+  line-height: 1.4;
+  /* שיפור מרווח בין שורות */
+  text-align: center;
+  /* גם כאן ליתר ביטחון */
+  word-break: break-word;
+  /* שבירת שורה מסודרת */
 }
+
 
 .compareM__details_label {
   display: flex;
@@ -146,29 +174,49 @@
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
 }
 
+.compareM__supermarket-details {
+  display: flex;
+  flex: 0 0 50%;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  margin-left: 1rem;
+}
+
 .compareM__supermarket-name__image {
   display: flex;
-  flex: 0 0 30%;
-  width: 100px;
-  height: 100px;
-  margin: 0;
-  padding-right: 3px;
+  justify-content: center;
+  align-items: center;
+  width: 80px;
+  height: 60px;
+  margin: 0 8px;
+  overflow: hidden;
+  border-radius: 6px;
 }
 
 .compareM__supermarket-name__image img {
-  width: 100%;
-  height: 100%;
+  max-width: 100%;
+  max-height: 100%;
   object-fit: contain;
+  display: block;
 }
+
+
+
 
 .compareM__supermarket-address {
   display: flex;
-  padding-right: 3px;
-  flex-direction: column;
+  flex-direction: row-reverse;
+  /* ✔ שורה אחת */
   justify-content: center;
   align-items: center;
-  width: 30%;
+  gap: 5px;
+  /* רווח קטן בין המילים */
+  text-align: center;
+  flex-wrap: wrap;
+  /* כדי למנוע חיתוך ארוך מדי */
 }
+
 
 .compareM__supermarket-address p {
   text-align: center;
@@ -190,13 +238,14 @@
   display: flex;
   flex-direction: row-reverse;
   width: 100%;
-  justify-content: flex-end;
+  justify-content: flex-start;
   margin-bottom: 0.5rem;
-  margin-left: 1rem;
+  margin-right: 1rem;
 }
 
 .compareM__price-unit p {
-  font-size: 1.2rem;
+  font-size: 1rem;
+  margin-left: 0.5rem;
 }
 
 .compareM__price-sale {
@@ -223,4 +272,23 @@
   flex-direction: row-reverse;
   width: 100%;
   justify-content: flex-start;
+}
+
+.compareM__product__image-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  max-height: 180px;
+  overflow: hidden;
+  margin: 1rem 0;
+}
+
+.compareM__product__image {
+  max-width: 160px;
+  max-height: 160px;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  display: block;
 }

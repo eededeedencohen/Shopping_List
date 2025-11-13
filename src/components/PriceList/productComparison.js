@@ -1,56 +1,45 @@
-import { useNavigate, useParams } from "react-router";
-import { usePriceList } from "../../context/PriceContext";
-import { Children, useEffect, useState } from "react";
+import { useEffect, useState, Children } from "react";
 import { Spin } from "antd";
+import { usePriceList } from "../../context/PriceContext";
 import ProductsImages from "../Images/ProductsImages";
 import SupermarketImage from "../Cart/supermarketImage";
-import ProductComparisonModal from "./productComparisonModal";
+// import "./PriceListNew.css";
+// import "./PriceList.css";
 import "./productComparison.css";
 
-export default function ProductComparison() {
-  const barcode = "7290019056096";
-
-  const priceFormat = (price) => {
-    return price.toFixed(2);
-  };
-
-  const unitWeightFormat = (unitWeight) => {
-    if (unitWeight === "g") {
-      return "גרם";
-    }
-    if (unitWeight === "kg") {
-      return 'ק"ג';
-    }
-    if (unitWeight === "ml") {
-      return 'מ"ל';
-    }
-    if (unitWeight === "l") {
-      return "ליטר";
-    }
-    return unitWeight;
-  };
-
-  const nav = useNavigate();
+export default function ProductComparison({ barcode }) {
   const { getPriceList } = usePriceList();
-
   const [priceList, setPriceList] = useState(undefined);
   const [product, setProduct] = useState(undefined);
 
-  useEffect(() => {
-    if (!barcode) {
-      alert("Product not found"); // change this to a beautiful alert
-      nav("/");
-      return;
+  const priceFormat = (price) => price.toFixed(2);
+
+  const unitWeightFormat = (unitWeight) => {
+    switch (unitWeight) {
+      case "g":
+        return "גרם";
+      case "kg":
+        return 'ק"ג';
+      case "ml":
+        return 'מ"ל';
+      case "l":
+        return "ליטר";
+      default:
+        return unitWeight;
     }
+  };
+
+  useEffect(() => {
+    if (!barcode) return;
 
     const fetchPriceList = async () => {
-      const priceListResponse = await getPriceList(barcode);
-      setProduct(priceListResponse.product);
-      setPriceList(priceListResponse.prices);
+      const response = await getPriceList(barcode);
+      setProduct(response.product);
+      setPriceList(response.prices);
     };
 
     fetchPriceList();
-  }, [barcode, nav, getPriceList]);
+  }, [barcode, getPriceList]);
 
   if (!priceList || !product) {
     return (
@@ -63,19 +52,21 @@ export default function ProductComparison() {
   }
 
   return (
-    <div className="compareM__prices-container">
+    <div className="compareM-prices-container">
+      {/* Product info */}
       <div className="compareM__product">
         <div className="compareM__product-name">
           <p>{product.name}</p>
         </div>
-        <div className="compareM__product__image">
-          <ProductsImages barcode={barcode} />
+        <div className="compareM__product__image-container">
+          <ProductsImages barcode={barcode} className="compareM__product__image"/>
         </div>
+
         <div className="compareM__details_label">
           <p>:נתונים</p>
         </div>
-
         <div className="compareM__line" />
+
         <div className="compareM__product-weight">
           <p style={{ marginLeft: "0.5rem" }}>{":משקל"}</p>
           <p style={{ marginLeft: "0.5rem", fontWeight: "bold" }}>
@@ -85,53 +76,52 @@ export default function ProductComparison() {
             {unitWeightFormat(product.unitWeight)}
           </p>
         </div>
-
         <div className="compareM__line" />
+
         <div className="compareM__product-brand">
           <p style={{ marginLeft: "0.5rem" }}>{":חברה/מותג"}</p>
           <p style={{ fontWeight: "bold" }}>{product.brand}</p>
         </div>
-
         <div className="compareM__line" />
+
         <div className="compareM__product-barcode">
           <p style={{ marginLeft: "0.5rem" }}>{":ברקוד"}</p>
           <p style={{ fontWeight: "bold" }}>{product.barcode}</p>
         </div>
-
         <div className="compareM__line" style={{ marginBottom: "1rem" }} />
       </div>
 
+      {/* Prices list */}
       <div className="compareM__prices-list">
         {Children.toArray(
           priceList.map((priceObject) => (
             <div className="compareM__supermarket-price-container">
-              <div className="compareM__supermarket-name__image">
-                <SupermarketImage
-                  supermarketName={priceObject.supermarket.name}
-                />
+              <div className="compareM__supermarket-details">
+                <div className="compareM__supermarket-name__image">
+                  <SupermarketImage
+                    supermarketName={priceObject.supermarket.name}
+                  />
+                </div>
+
+                <div className="compareM__supermarket-address">
+                  {priceObject.supermarket.address?.includes("https") ? (
+                    <p>{priceObject.supermarket.name}</p>
+                  ) : (
+                    <>
+                      <p>{priceObject.supermarket.address}</p>
+                      <p>{priceObject.supermarket.city}</p>
+                    </>
+                  )}
+                </div>
               </div>
-              <div className="compareM__supermarket-address">
-                <p>{priceObject.supermarket.address}</p>
-                <p>{priceObject.supermarket.city}</p>
-              </div>
+
               <div className="compareM__product-price">
                 <div className="compareM__price-unit">
                   <p>{":מחיר"}</p>
-                  <p
-                    style={{
-                      color: "#9c9c9c",
-                      marginRight: "2rem",
-                    }}
-                  >
+                  <p style={{ color: "#9c9c9c" }}>
                     {priceFormat(priceObject.price)}
                   </p>
-                  <p
-                    style={{
-                      color: "#9c9c9c",
-                    }}
-                  >
-                    ₪
-                  </p>
+                  <p style={{ color: "#9c9c9c" }}>₪</p>
                 </div>
 
                 {priceObject.discount && (

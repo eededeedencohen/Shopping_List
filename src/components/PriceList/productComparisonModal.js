@@ -9,15 +9,14 @@ const ProductComparisonModal = ({ isOpen, children, onClose }) => {
 
   const handleOverlayClick = (event) => {
     // Check if the clicked target is the overlay itself and not the modal window
-    if (event.target.className === "modal-overlay") {
-      
+    if (event.target.className === "pcm__modal-overlay") {
       onClose();
     }
   };
 
   return ReactDOM.createPortal(
-    <div className="modal-overlay" onClick={handleOverlayClick}>
-      <div className="modal-window">
+    <div className="pcm__modal-overlay" onClick={handleOverlayClick}>
+      <div className="pcm__modal-window">
         {children}
       </div>
     </div>,
