@@ -29,12 +29,14 @@
 .cart {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: stretch;
+  /* 👈 במקום center */
   background-color: #ffffff8a;
   border-radius: 10px;
   box-shadow: 0px 0px 10px 0px rgb(255, 255, 255);
   overflow-x: hidden;
 }
+
 
 .cart-operations {
   display: flex;
@@ -180,6 +182,15 @@
   border-radius: 20px;
 }
 
+.cart .products {
+  width: 100%;
+  padding-inline: 10px;
+  /* 👈 מרווח ימין+שמאל לכל הכרטיסיות */
+  box-sizing: border-box;
+}
+
+
+
 .cart .product {
   display: flex;
   /* אין צורך בשני פקודות סותרות  */
@@ -202,6 +213,7 @@
   width: 100%;
   margin: 0.5rem;
   margin-left: 0;
+  margin-top : 0;
   flex-direction: row-reverse;
 
   max-width: 100%;

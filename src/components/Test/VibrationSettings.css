@@ -1,0 +1,144 @@
+/* VibrationSettings.css */
+
+/* מיכל ראשי */
+.vibration-container {
+    padding: 1rem;
+    /* p-4 */
+    color: white;
+    /* text-white */
+    max-width: 28rem;
+    /* max-w-md (448px) */
+    margin-left: auto;
+    /* mx-auto */
+    margin-right: auto;
+    /* mx-auto */
+}
+
+/* כותרת ראשית */
+.vibration-container h1 {
+    font-size: 1.5rem;
+    /* text-2xl */
+    font-weight: 700;
+    /* font-bold */
+    margin-bottom: 1rem;
+    /* mb-4 */
+}
+
+/* סקשנים (Section) של הגדרות */
+.settings-section {
+    margin-bottom: 1.5rem;
+    /* mb-6 */
+    padding: 0.75rem;
+    /* p-3 */
+    background-color: #1f2937;
+    /* bg-gray-800 */
+    border-radius: 0.75rem;
+    /* rounded-xl */
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+    /* shadow-lg */
+}
+
+/* כותרות סקשנים */
+.settings-section h2 {
+    font-size: 1.125rem;
+    /* text-lg */
+    font-weight: 600;
+    /* font-semibold */
+    margin-bottom: 0.5rem;
+    /* mb-2 */
+}
+
+/* סטייל כללי לכפתורים */
+.vibration-button {
+    padding: 0.5rem 1rem;
+    /* px-4 py-2 */
+    border-radius: 0.75rem;
+    /* rounded-xl */
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: background-color 0.15s ease-in-out;
+}
+
+.vibration-button:hover {
+    filter: brightness(1.1);
+}
+
+/* כפתור כחול (Button Click) */
+.btn-blue {
+    background-color: #2563eb;
+    /* bg-blue-600 */
+}
+
+/* כפתור סגול (Long Press) */
+.btn-purple {
+    background-color: #9333ea;
+    /* bg-purple-600 */
+}
+
+/* כפתור אדום (Timer) */
+.btn-red {
+    background-color: #dc2626;
+    /* bg-red-600 */
+}
+
+/* קבוצות אינפוטים ותוויות */
+.input-group {
+    margin-top: 0.75rem;
+    /* mt-3 */
+    display: flex;
+    /* flex */
+    align-items: center;
+    /* items-center */
+    gap: 0.5rem;
+    /* gap-2 */
+}
+
+.flex-col-group {
+    display: flex;
+    /* flex */
+    flex-direction: column;
+    /* flex-col */
+    gap: 0.75rem;
+    /* gap-3 */
+    margin-top: 0.75rem;
+    /* mt-3 */
+}
+
+/* שדה קלט */
+.vibration-input {
+    padding: 0.25rem;
+    /* p-1 */
+    color: black;
+    /* text-black */
+    border-radius: 0.25rem;
+    /* rounded */
+    border: 1px solid #4b5563;
+    background-color: white;
+    max-width: 100px;
+    text-align: center;
+}
+
+/* אזור ההחלקה (Swipe Area) */
+.swipe-area {
+    height: 5rem;
+    /* h-20 */
+    background-color: #047857;
+    /* bg-green-700 */
+    border-radius: 0.75rem;
+    /* rounded-xl */
+    display: flex;
+    /* flex */
+    align-items: center;
+    /* items-center */
+    justify-content: center;
+    /* justify-center */
+    user-select: none;
+    /* select-none */
+    cursor: grab;
+}
+
+.swipe-area:active {
+    cursor: grabbing;
+}

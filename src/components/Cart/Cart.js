@@ -521,6 +521,21 @@ export default function Cart() {
   );
 }
 
+// ------------------------------------------------------
+// רטט להחלקה (משותף לכל השורות)
+// ------------------------------------------------------
+const SWIPE_VIBRATION_FACTOR = 5; // כמו swipeVibration ב־vibrate.js
+const SWIPE_DISTANCE_MIN_FOR_BIG = 50; // כמו swipeDistanceMin
+const SWIPE_BIG_MS = 150; // כמו bigSwipeVibration
+
+const hasVibration =
+  typeof navigator !== "undefined" && typeof navigator.vibrate === "function";
+
+const vibrate = (pattern) => {
+  if (!hasVibration) return;
+  navigator.vibrate(pattern);
+};
+
 function SwipeRow({ children, onIncrement, onDecrement, onRemove, outerRef }) {
   const LONG_MS = 1000; // משך לחיצה ארוכה
   const LONG_VISUAL_DELAY = 200; // אחרי 0.2s מתחילה הגדילה של המסגרת
@@ -544,6 +559,7 @@ function SwipeRow({ children, onIncrement, onDecrement, onRemove, outerRef }) {
   const rafId = useRef(null);
   const pressStart = useRef(0);
   const moved = useRef(0);
+  const lastDxRef = useRef(0); // תזוזה אחרונה, כדי לחשב רטט קטן
 
   const clearLP = () => {
     if (longPressTimer.current) {
@@ -578,6 +594,7 @@ function SwipeRow({ children, onIncrement, onDecrement, onRemove, outerRef }) {
     startX.current = clientX;
     startY.current = clientY ?? 0;
     moved.current = 0;
+    lastDxRef.current = 0;
     setDragging(true);
     setDeleteMode(false);
     setSwipeActive(false);
@@ -591,7 +608,9 @@ function SwipeRow({ children, onIncrement, onDecrement, onRemove, outerRef }) {
     rafId.current = requestAnimationFrame(tickPress);
     longPressTimer.current = setTimeout(() => {
       setDeleteMode(true);
-      setPressProgress(1);
+      setPressProgress(1); // הגיע לקצה
+      setDxNormal(0); // ✅ איפוס התזוזה הרגילה כשעוברים למצב מחיקה
+      setSwipeActive(false);
     }, LONG_MS);
   };
 
@@ -629,6 +648,14 @@ function SwipeRow({ children, onIncrement, onDecrement, onRemove, outerRef }) {
       Math.min(MAX_NORMAL_SHIFT, deltaX)
     );
     setDxNormal(clamped);
+
+    // ----- רטט קטן לפי מהירות ההחלקה (מצב רגיל בלבד) -----
+    const step = Math.abs(deltaX - lastDxRef.current);
+    if (step > 2 && SWIPE_VIBRATION_FACTOR > 0) {
+      const vibrateMs = Math.min(step * SWIPE_VIBRATION_FACTOR, 100);
+      vibrate(vibrateMs);
+    }
+    lastDxRef.current = deltaX;
   };
 
   const end = () => {
@@ -647,6 +674,7 @@ function SwipeRow({ children, onIncrement, onDecrement, onRemove, outerRef }) {
         }
         setDxDelete(0);
         setDeleteMode(false);
+        setDxNormal(0); // ✅ לוודא שאחרי יציאה ממצב מחיקה אין תזוזה ישנה
       }
       setSwipeActive(false);
       setPressProgress(0);
@@ -656,6 +684,12 @@ function SwipeRow({ children, onIncrement, onDecrement, onRemove, outerRef }) {
     if (swipeActive && Math.abs(moved.current) >= SWIPE_TRIGGER) {
       if (moved.current > 0) onIncrement();
       else onDecrement();
+
+      // ----- רטט גדול בסיום סווייפ, רק אם המרחק מספיק -----
+      const absMove = Math.abs(moved.current);
+      if (absMove >= SWIPE_DISTANCE_MIN_FOR_BIG && SWIPE_BIG_MS > 0) {
+        vibrate(SWIPE_BIG_MS);
+      }
     }
 
     if (dxNormal !== 0) {

@@ -16,7 +16,8 @@ import { ReactComponent as Voice2Icon } from "./voice-bot.svg";
 import { ReactComponent as WishlistIcon } from "./wishlist.svg";
 import { ReactComponent as EditIcon } from "./editing.svg";
 import { ReactComponent as DataClassificationIcon } from "./data-classification.svg";
-import { ReactComponent as BarcodeIcon} from "./barcode.svg"
+import { ReactComponent as BarcodeIcon} from "./barcode.svg";
+import { ReactComponent as VibrationIcon } from "./waves.svg";  
 function Toolbar() {
   const { totalAmount } = useCartTotals(); // ← כמות בעגלה
   const [selectedPage, setSelectedPage] = useState(window.location.pathname);
@@ -216,6 +217,18 @@ function Toolbar() {
                 <BarcodeIcon className="svg-icon" />
               </div>
               <h1>Barcode Scanner</h1>
+            </div>
+          </Link>
+          <Link to="/vibration-settings" onClick={() => handleNavClick("/vibration-settings")}>
+            <div
+              className={`nav-item ${
+                selectedPage === "/vibration-settings" ? "selected-page" : ""
+              }`}
+            >
+              <div className="nav-icon">
+                <VibrationIcon className="svg-icon" />
+              </div>
+              <h1>Vibration Settings</h1>
             </div>
           </Link>
         </div>
