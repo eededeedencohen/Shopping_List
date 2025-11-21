@@ -21,6 +21,6 @@ const MessageItem = ({ message, sender, type, data, action }) => {
       />
     );
   }
-};
+}; 
 
 export default MessageItem;

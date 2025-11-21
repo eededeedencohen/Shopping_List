@@ -29,7 +29,7 @@ const getComponentByType = (type, data, action) => {
     default:
       return null;
   }
-};
+}; 
 
 const MessageItemOperationAI = ({ message, type, data, action }) => {
   return (
