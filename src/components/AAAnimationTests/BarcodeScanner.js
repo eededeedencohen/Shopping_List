@@ -1,16 +1,23 @@
 import React, { useEffect, useRef, useState } from "react";
 import "./BarcodeScanner.css";
+import useProducts from "../../hooks/products/useProducts";
+import ProductComparisonModal from "../PriceList/productComparisonModal";
+import ProductComparison from "../PriceList/productComparison";
 
-const isBarcodeApiSupported = () => 'BarcodeDetector' in window;
+const isBarcodeApiSupported = () => "BarcodeDetector" in window;
 
 export default function BarcodeScanner() {
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
   const pinchDistanceRef = useRef(0); // Ref to store initial pinch distance
 
+  const { products } = useProducts();
+
   const [barcode, setBarcode] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
+  const [isComparisonModalOpen, setIsComparisonModalOpen] = useState(false);
+  const [selectedBarcode, setSelectedBarcode] = useState(null);
 
   // States for camera controls
   const [torchOn, setTorchOn] = useState(false);
@@ -29,7 +36,9 @@ export default function BarcodeScanner() {
       return;
     }
 
-    detectorRef.current = new window.BarcodeDetector({ formats: ['ean_13', 'code_128', 'upc_a'] });
+    detectorRef.current = new window.BarcodeDetector({
+      formats: ["ean_13", "code_128", "upc_a"],
+    });
 
     let animationFrameId;
 
@@ -37,16 +46,17 @@ export default function BarcodeScanner() {
       try {
         const constraints = {
           video: {
-            facingMode: 'environment',
+            facingMode: "environment",
             // --- ✨ MAX QUALITY REQUEST FOR GALAXY S25 ✨ ---
             width: { ideal: 4096 },
             height: { ideal: 2160 },
-            focusMode: 'continuous',
+            focusMode: "continuous",
           },
           audio: false,
         };
 
-        streamRef.current = await navigator.mediaDevices.getUserMedia(constraints);
+        streamRef.current =
+          await navigator.mediaDevices.getUserMedia(constraints);
         const video = videoRef.current;
         if (!video) return;
 
@@ -65,7 +75,7 @@ export default function BarcodeScanner() {
             step: capabilities.zoom.step,
           });
         }
-        
+
         setLoading(false);
         scanLoop();
       } catch (e) {
@@ -75,45 +85,75 @@ export default function BarcodeScanner() {
     }
 
     function scanLoop() {
-        if (!videoRef.current || !canvasRef.current || videoRef.current.paused) {
-            animationFrameId = requestAnimationFrame(scanLoop); return;
-        }
-        const video = videoRef.current, canvas = canvasRef.current;
-        const ctx = canvas.getContext('2d');
-        const cropWidth = video.videoWidth * 0.8, cropHeight = video.videoHeight * 0.25;
-        const cropX = (video.videoWidth - cropWidth) / 2, cropY = (video.videoHeight - cropHeight) / 2;
-        canvas.width = cropWidth; canvas.height = cropHeight;
-        ctx.drawImage(video, cropX, cropY, cropWidth, cropHeight, 0, 0, canvas.width, canvas.height);
-        
-        detectorRef.current.detect(canvas).then(barcodes => {
-            if (barcodes.length > 0) {
-                setBarcode(barcodes[0].rawValue);
-                stopAll();
-                return;
+      if (!videoRef.current || !canvasRef.current || videoRef.current.paused) {
+        animationFrameId = requestAnimationFrame(scanLoop);
+        return;
+      }
+      const video = videoRef.current,
+        canvas = canvasRef.current;
+      const ctx = canvas.getContext("2d");
+      const cropWidth = video.videoWidth * 0.8,
+        cropHeight = video.videoHeight * 0.25;
+      const cropX = (video.videoWidth - cropWidth) / 2,
+        cropY = (video.videoHeight - cropHeight) / 2;
+      canvas.width = cropWidth;
+      canvas.height = cropHeight;
+      ctx.drawImage(
+        video,
+        cropX,
+        cropY,
+        cropWidth,
+        cropHeight,
+        0,
+        0,
+        canvas.width,
+        canvas.height,
+      );
+
+      detectorRef.current
+        .detect(canvas)
+        .then((barcodes) => {
+          if (barcodes.length > 0) {
+            const detectedBarcode = barcodes[0].rawValue;
+            setBarcode(detectedBarcode);
+
+            // בדיקה אם הברקוד קיים ברשימת המוצרים
+            const productExists = products.some(
+              (p) => p.barcode === detectedBarcode,
+            );
+            if (productExists) {
+              setSelectedBarcode(detectedBarcode);
+              setIsComparisonModalOpen(true);
             }
-            animationFrameId = requestAnimationFrame(scanLoop);
-        }).catch(err => console.error(err));
+
+            stopAll();
+            return;
+          }
+          animationFrameId = requestAnimationFrame(scanLoop);
+        })
+        .catch((err) => console.error(err));
     }
 
     function stopAll() {
       if (animationFrameId) cancelAnimationFrame(animationFrameId);
-      if (streamRef.current) streamRef.current.getTracks().forEach(track => track.stop());
+      if (streamRef.current)
+        streamRef.current.getTracks().forEach((track) => track.stop());
     }
 
     startScan();
 
     // Cleanup function
     return () => {
-        stopAll();
+      stopAll();
     };
   }, []);
-  
+
   // --- ✨ PINCH-TO-ZOOM HANDLERS ✨ ---
   const getPinchDistance = (touches) => {
     const [touch1, touch2] = touches;
     return Math.sqrt(
       Math.pow(touch2.clientX - touch1.clientX, 2) +
-      Math.pow(touch2.clientY - touch1.clientY, 2)
+        Math.pow(touch2.clientY - touch1.clientY, 2),
     );
   };
 
@@ -128,13 +168,18 @@ export default function BarcodeScanner() {
       event.preventDefault(); // Prevent page scroll/zoom
       const newDistance = getPinchDistance(event.touches);
       const initialDistance = pinchDistanceRef.current;
-      
+
       const newZoom = zoom * (newDistance / initialDistance);
-      const clampedZoom = Math.max(zoomRange.min, Math.min(newZoom, zoomRange.max));
-      
+      const clampedZoom = Math.max(
+        zoomRange.min,
+        Math.min(newZoom, zoomRange.max),
+      );
+
       setZoom(clampedZoom);
       if (trackRef.current) {
-        trackRef.current.applyConstraints({ advanced: [{ zoom: clampedZoom }] });
+        trackRef.current.applyConstraints({
+          advanced: [{ zoom: clampedZoom }],
+        });
       }
       // Update initial distance for smoother scaling on next move
       pinchDistanceRef.current = newDistance;
@@ -146,34 +191,59 @@ export default function BarcodeScanner() {
   };
 
   // --- UI and other handlers ---
-  const toggleTorch = async () => { /* ... no changes ... */ };
+  const toggleTorch = async () => {
+    /* ... no changes ... */
+  };
+
+  const closeComparisonModal = () => {
+    setIsComparisonModalOpen(false);
+    setSelectedBarcode(null);
+  };
 
   return (
-    <div 
-      className="bq_scanner"
-      onTouchStart={handleTouchStart}
-      onTouchMove={handleTouchMove}
-      onTouchEnd={handleTouchEnd}
-    >
-      <video ref={videoRef} className="bq_feed" playsInline autoPlay muted />
-      <canvas ref={canvasRef} style={{ display: 'none' }} />
-      
-      {loading && <p className="bq_status">📷 פותח מצלמה…</p>}
-      {error && <p className="bq_status bq_error">{error}</p>}
-      {barcode && <p className="bq_status bq_success">✓ {barcode}</p>}
+    <>
+      <ProductComparisonModal
+        isOpen={isComparisonModalOpen}
+        onClose={closeComparisonModal}
+      >
+        <ProductComparison barcode={selectedBarcode} />
+      </ProductComparisonModal>
 
-      {!loading && !error && !barcode && (
-        <>
-          <div className="bq_frame"><div className="bq_line" /></div>
-          <p className="bq_zoom_prompt">לא חד? הרחק את הטלפון והשתמש בזום</p>
-        </>
-      )}
+      <div
+        className="bq_scanner"
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+      >
+        <video ref={videoRef} className="bq_feed" playsInline autoPlay muted />
+        <canvas ref={canvasRef} style={{ display: "none" }} />
 
-      {!loading && !barcode && torchAvailable && (
-        <button onClick={(e) => { e.stopPropagation(); toggleTorch(); }} className="bq_torch_button">
-          {torchOn ? "🔦 כבה פנס" : "💡 הפעל פנס"}
-        </button>
-      )}
-    </div>
+        {loading && <p className="bq_status">📷 פותח מצלמה…</p>}
+        {error && <p className="bq_status bq_error">{error}</p>}
+        {/* שידרוג לחלק הזה */}
+        {barcode && <p className="bq_status bq_success">✓ {barcode}</p>}
+
+        {!loading && !error && !barcode && (
+          <>
+            <div className="bq_frame">
+              <div className="bq_line" />
+            </div>
+            <p className="bq_zoom_prompt">לא חד? הרחק את הטלפון והשתמש בזום</p>
+          </>
+        )}
+
+        {!loading && !barcode && torchAvailable && (
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              toggleTorch();
+            }}
+            className="bq_torch_button"
+          >
+            {torchOn ? "🔦 כבה פנס" : "💡 הפעל פנס"}
+          </button>
+        )}
+      </div>
+    </>
   );
 }
