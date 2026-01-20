@@ -2,7 +2,18 @@
 import React, { useState, useEffect } from "react";
 import Modal from "../../Cart/Modal";
 
-export default function ModalSingleEdit({ isOpen, onClose, product, onSave }) {
+export default function ModalSingleEdit({
+  isOpen,
+  onClose,
+  product,
+  onSave,
+  allCategories = [],
+  allSubCategories = [],
+}) {
+  const UNCLASSIFIED_CATEGORY = "מוצרים ללא סיווג";
+  const selectableCategories = allCategories.filter(
+    (cat) => cat !== UNCLASSIFIED_CATEGORY,
+  );
   const [barcode, setBarcode] = useState("");
   const [name, setName] = useState("");
   const [brand, setBrand] = useState("");
@@ -25,6 +36,10 @@ export default function ModalSingleEdit({ isOpen, onClose, product, onSave }) {
     }
   }, [product, isOpen]);
 
+  const categoryIndex = selectableCategories.indexOf(category);
+  const subOptions =
+    categoryIndex >= 0 ? allSubCategories[categoryIndex] || [] : [];
+
   if (!isOpen || !product) return null;
 
   const handleSave = () => {
@@ -36,7 +51,7 @@ export default function ModalSingleEdit({ isOpen, onClose, product, onSave }) {
       unitWeight,
       category,
       subcategory,
-      generalName
+      generalName,
     };
     onSave(updates);
   };
@@ -67,7 +82,10 @@ export default function ModalSingleEdit({ isOpen, onClose, product, onSave }) {
       </div>
       <div>
         <label>יחידת משקל:</label>
-        <select value={unitWeight} onChange={(e) => setUnitWeight(e.target.value)}>
+        <select
+          value={unitWeight}
+          onChange={(e) => setUnitWeight(e.target.value)}
+        >
           <option value="g">גרם</option>
           <option value="kg">ק"ג</option>
           <option value="ml">מ"ל</option>
@@ -78,15 +96,48 @@ export default function ModalSingleEdit({ isOpen, onClose, product, onSave }) {
       </div>
       <div>
         <label>קטגוריה:</label>
-        <input value={category} onChange={(e) => setCategory(e.target.value)} />
+        <select
+          value={category}
+          onChange={(e) => {
+            const nextCategory = e.target.value;
+            setCategory(nextCategory);
+            const nextIndex = selectableCategories.indexOf(nextCategory);
+            const nextSubOptions =
+              nextIndex >= 0 ? allSubCategories[nextIndex] || [] : [];
+            if (!nextSubOptions.includes(subcategory)) {
+              setSubcategory("");
+            }
+          }}
+        >
+          <option value="">בחר קטגוריה</option>
+          {selectableCategories.map((cat) => (
+            <option key={cat} value={cat}>
+              {cat}
+            </option>
+          ))}
+        </select>
       </div>
       <div>
         <label>תת־קטגוריה:</label>
-        <input value={subcategory} onChange={(e) => setSubcategory(e.target.value)} />
+        <select
+          value={subcategory}
+          onChange={(e) => setSubcategory(e.target.value)}
+          disabled={!category}
+        >
+          <option value="">בחר תת־קטגוריה</option>
+          {subOptions.map((sub) => (
+            <option key={sub} value={sub}>
+              {sub}
+            </option>
+          ))}
+        </select>
       </div>
       <div>
         <label>שם כללי:</label>
-        <input value={generalName} onChange={(e) => setGeneralName(e.target.value)} />
+        <input
+          value={generalName}
+          onChange={(e) => setGeneralName(e.target.value)}
+        />
       </div>
 
       <button onClick={onClose}>בטל</button>

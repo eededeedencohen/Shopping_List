@@ -3,6 +3,90 @@
   overflow-x: hidden;
 }
 
+.mp_top-buttons,
+.mp_bulk-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  padding: 0.8rem 1rem 0.2rem;
+  justify-content: flex-end;
+}
+
+.mp_bulk-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  justify-content: flex-end;
+}
+
+.mp_btn {
+  background-color: #e6edf5;
+  color: #1f2a44;
+  border: 1px solid #cbd5e1;
+  padding: 0.35rem 0.75rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.mp_btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.mp_btn-primary {
+  background-color: #1d4ed8;
+  color: #fff;
+  border-color: #1d4ed8;
+}
+
+.mp_small-btn {
+  background-color: #0ea5e9;
+  color: #fff;
+  border: none;
+  padding: 0.2rem 0.5rem;
+  border-radius: 999px;
+  cursor: pointer;
+  font-size: 0.75rem;
+}
+
+.mp_category-summary {
+  margin: 0.6rem 1rem 0.2rem;
+  padding: 0.7rem 0.8rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  background-color: #f8fafc;
+}
+
+.mp_summary-header {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.6rem;
+  font-weight: 600;
+  color: #1f2a44;
+}
+
+.mp_summary-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 0.5rem 0.8rem;
+}
+
+.mp_summary-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  color: #334155;
+  background-color: #fff;
+  padding: 0.35rem 0.5rem;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+}
+
 /* הקונטיינר שמחזיק את כרטיסי המוצרים */
 .mp_products-container {
   position: relative;
@@ -14,7 +98,8 @@
 /* כרטיס מוצר - תצוגה בשורה */
 .mp_product-card {
   display: flex;
-  flex-direction: row-reverse; /* שתי עמודות: טקסט (ימין), תמונה (שמאל) */
+  flex-direction: row-reverse;
+  /* שתי עמודות: טקסט (ימין), תמונה (שמאל) */
   align-items: center;
 
   margin: 10px;
@@ -48,7 +133,7 @@
 .mp_product-data {
   display: flex;
   flex-direction: column;
-  align-items: flex-end; 
+  align-items: flex-end;
   justify-content: center;
 
   width: 70%;
@@ -85,13 +170,15 @@
 .mp_product-image {
   width: 30%;
   position: relative;
-  cursor: pointer; 
+  cursor: pointer;
 }
+
 .mp_product-image::before {
   content: '';
   display: block;
   padding-top: 100%;
 }
+
 .mp_product-image img {
   position: absolute;
   top: 0;
@@ -105,26 +192,61 @@
 /* Keyframes לאנימציות ההחלקה (קטגוריות/תתי קטגוריות)    */
 /* ------------------------------------------------------ */
 @keyframes middleToRight {
-  from { transform: translateX(0%); }
-  to   { transform: translateX(100%); }
+  from {
+    transform: translateX(0%);
+  }
+
+  to {
+    transform: translateX(100%);
+  }
 }
+
 @keyframes middleToLeft {
-  from { transform: translateX(0%); }
-  to   { transform: translateX(-100%); }
+  from {
+    transform: translateX(0%);
+  }
+
+  to {
+    transform: translateX(-100%);
+  }
 }
+
 @keyframes leftToRight {
-  from { transform: translateX(-100%); }
-  to   { transform: translateX(100%); }
+  from {
+    transform: translateX(-100%);
+  }
+
+  to {
+    transform: translateX(100%);
+  }
 }
+
 @keyframes rightToLeft {
-  from { transform: translateX(100%); }
-  to   { transform: translateX(-100%); }
+  from {
+    transform: translateX(100%);
+  }
+
+  to {
+    transform: translateX(-100%);
+  }
 }
+
 @keyframes rightToMiddle {
-  from { transform: translateX(100%); }
-  to   { transform: translateX(0%); }
+  from {
+    transform: translateX(100%);
+  }
+
+  to {
+    transform: translateX(0%);
+  }
 }
+
 @keyframes leftToMiddle {
-  from { transform: translateX(-100%); }
-  to   { transform: translateX(0%); }
+  from {
+    transform: translateX(-100%);
+  }
+
+  to {
+    transform: translateX(0%);
+  }
 }

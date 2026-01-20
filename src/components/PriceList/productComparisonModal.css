@@ -7,39 +7,42 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  background: rgba(0, 0, 0, 0.2);
-  backdrop-filter: blur(5.6px);
+  background: rgba(15, 23, 42, 0.45);
+  backdrop-filter: blur(8px);
+  padding: 1.5rem 1.25rem;
+  z-index: 9999;
 }
 
 .pcm__modal-window {
-  background: rgba(255, 255, 255, 0.805);
-  border-radius: 16px;
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-  backdrop-filter: blur(5.6px);
-  border: 1px solid rgba(255, 255, 255, 0.9);
-  max-width: 500px;
+  background: #f8fafc;
+  border-radius: 18px;
+  box-shadow: 0 24px 48px rgba(15, 23, 42, 0.2);
+  border: 1px solid #e2e8f0;
+  max-width: 720px;
+  width: min(88vw, 720px);
+  max-height: 84vh;
+  overflow: auto;
   position: relative;
-  animation: pcm__slide-down 0.5s ease;
+  animation: pcm__slide-down 0.35s ease;
 }
 
 .pcm__close-button-container {
   position: fixed;
-  top: 60px;
-  left: 10%;
-  transform: translateX(-50%);
-  z-index: 1;
+  top: 18px;
+  left: 18px;
+  z-index: 10000;
 }
 
 .pcm__close-button {
-  background: rgb(234, 68, 68);
+  background: #ef4444;
   color: white;
-  border: 2px solid rgb(244, 185, 179);
-  border-radius: 50%;
-  padding: 10px;
-  box-shadow: 0 0 5px #dd4141;
+  border: 1px solid #fecaca;
+  border-radius: 999px;
+  padding: 0.4rem 0.7rem;
+  box-shadow: 0 8px 16px rgba(239, 68, 68, 0.35);
   cursor: pointer;
-  /*Increase the wight a little*/
-  width: 40px;
+  width: auto;
+  font-weight: 600;
 }
 
 
@@ -55,10 +58,8 @@
 
 @media (max-width: 600px) {
   .pcm__modal-window {
-    width: 80%;
-    height: 80%;
-
-    overflow: auto;
-    /* Add this line */
+    width: 88vw;
+    height: auto;
+    max-height: 82vh;
   }
 }

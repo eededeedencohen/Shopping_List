@@ -60,13 +60,25 @@ const getFontSize = (text) => {
   return "16px";
 };
 
-const CategoryNavigation = () => {
+const CategoryNavigation = ({
+  allCategories: allCategoriesProp,
+  activeCategoryIndex: activeCategoryIndexProp,
+  setActiveCategoryIndex: setActiveCategoryIndexProp,
+  setActiveSubCategoryIndex: setActiveSubCategoryIndexProp,
+}) => {
   const {
-    allCategories,
-    activeCategoryIndex,
-    setActiveCategoryIndex,
-    setActiveSubCategoryIndex,
+    allCategories: allCategoriesCtx,
+    activeCategoryIndex: activeCategoryIndexCtx,
+    setActiveCategoryIndex: setActiveCategoryIndexCtx,
+    setActiveSubCategoryIndex: setActiveSubCategoryIndexCtx,
   } = useProductList();
+
+  const allCategories = allCategoriesProp || allCategoriesCtx;
+  const activeCategoryIndex = activeCategoryIndexProp ?? activeCategoryIndexCtx;
+  const setActiveCategoryIndex =
+    setActiveCategoryIndexProp || setActiveCategoryIndexCtx;
+  const setActiveSubCategoryIndex =
+    setActiveSubCategoryIndexProp || setActiveSubCategoryIndexCtx;
 
   const navigationRef = useRef(null);
 

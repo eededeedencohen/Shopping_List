@@ -30,6 +30,7 @@ const allCategories = [
   "גבינות",
   "יינות",
   "שמנים ורטבים",
+  "מוצרים ללא סיווג",
 ];
 
 /**
@@ -159,7 +160,7 @@ const all_sub_categories_map = {
 };
 
 const all_sub_categories = allCategories.map(
-  (cat) => all_sub_categories_map[cat] || []
+  (cat) => all_sub_categories_map[cat] || [],
 );
 
 export const ProductContextProvider = ({ children }) => {
@@ -184,7 +185,7 @@ export const ProductContextProvider = ({ children }) => {
         // כאן אפשר לחבר מידע על amount וכדומה, כרצונך
         const productsWithAmount = productsData.map((product) => {
           const amountInfo = productsAmount.find(
-            (p) => p.barcode === product.barcode
+            (p) => p.barcode === product.barcode,
           );
           return { ...product, amount: amountInfo ? amountInfo.amount : 0 };
         });
@@ -210,7 +211,7 @@ export const ProductContextProvider = ({ children }) => {
 
       const productsWithAmount = productsData.map((product) => {
         const amountInfo = productsAmount.find(
-          (p) => p.barcode === product.barcode
+          (p) => p.barcode === product.barcode,
         );
         return { ...product, amount: amountInfo ? amountInfo.amount : 0 };
       });

@@ -7,14 +7,24 @@ export default function ModalBulkEdit({
   isOpen,
   onClose,
   selectedBarcodes,
-  onApply
+  onApply,
+  allCategories = [],
+  allSubCategories = [],
 }) {
+  const UNCLASSIFIED_CATEGORY = "מוצרים ללא סיווג";
+  const selectableCategories = allCategories.filter(
+    (cat) => cat !== UNCLASSIFIED_CATEGORY,
+  );
   const [brand, setBrand] = useState("");
   const [weight, setWeight] = useState("");
   const [unitWeight, setUnitWeight] = useState("");
   const [category, setCategory] = useState("");
   const [subcategory, setSubcategory] = useState("");
   const [generalName, setGeneralName] = useState("");
+
+  const categoryIndex = selectableCategories.indexOf(category);
+  const subOptions =
+    categoryIndex >= 0 ? allSubCategories[categoryIndex] || [] : [];
 
   if (!isOpen) return null;
 
@@ -51,7 +61,10 @@ export default function ModalBulkEdit({
       </div>
       <div>
         <label>יחידת משקל:</label>
-        <select value={unitWeight} onChange={(e) => setUnitWeight(e.target.value)}>
+        <select
+          value={unitWeight}
+          onChange={(e) => setUnitWeight(e.target.value)}
+        >
           <option value="">(לא לשנות)</option>
           <option value="g">גרם</option>
           <option value="kg">ק"ג</option>
@@ -63,15 +76,48 @@ export default function ModalBulkEdit({
       </div>
       <div>
         <label>קטגוריה חדשה:</label>
-        <input value={category} onChange={(e) => setCategory(e.target.value)} />
+        <select
+          value={category}
+          onChange={(e) => {
+            const nextCategory = e.target.value;
+            setCategory(nextCategory);
+            const nextIndex = selectableCategories.indexOf(nextCategory);
+            const nextSubOptions =
+              nextIndex >= 0 ? allSubCategories[nextIndex] || [] : [];
+            if (!nextSubOptions.includes(subcategory)) {
+              setSubcategory("");
+            }
+          }}
+        >
+          <option value="">(לא לשנות)</option>
+          {selectableCategories.map((cat) => (
+            <option key={cat} value={cat}>
+              {cat}
+            </option>
+          ))}
+        </select>
       </div>
       <div>
         <label>תת־קטגוריה חדשה:</label>
-        <input value={subcategory} onChange={(e) => setSubcategory(e.target.value)} />
+        <select
+          value={subcategory}
+          onChange={(e) => setSubcategory(e.target.value)}
+          disabled={!category}
+        >
+          <option value="">(לא לשנות)</option>
+          {subOptions.map((sub) => (
+            <option key={sub} value={sub}>
+              {sub}
+            </option>
+          ))}
+        </select>
       </div>
       <div>
         <label>שם כללי חדש:</label>
-        <input value={generalName} onChange={(e) => setGeneralName(e.target.value)} />
+        <input
+          value={generalName}
+          onChange={(e) => setGeneralName(e.target.value)}
+        />
       </div>
 
       <div style={{ marginTop: "1rem" }}>

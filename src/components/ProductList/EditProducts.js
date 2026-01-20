@@ -1,5 +1,8 @@
-import React, {useState, useRef } from "react";
+import React, { useState, useRef } from "react";
 import {
+  createProduct,
+  updateProductById,
+  updateProductsByBarcode,
   deleteProductById,
 } from "../../network/editProductsService";
 
@@ -39,17 +42,23 @@ function convertWeightUnit(unit) {
 
 export default function EditProducts() {
   const {
-    products,                
+    products,
+    loadProducts,
     allCategories,
     all_sub_categories,
     activeCategoryIndex,
     setActiveCategoryIndex,
     activeSubCategoryIndex,
-    setActiveSubCategoryIndex
+    setActiveSubCategoryIndex,
   } = useProducts();
 
+  const UNCLASSIFIED_CATEGORY = "מוצרים ללא סיווג";
+  const baseCategories = allCategories.filter(
+    (cat) => cat !== UNCLASSIFIED_CATEGORY,
+  );
+
   // מצב ראשי
-  const [mode, setMode] = useState("initial"); 
+  const [mode, setMode] = useState("initial");
   // 'initial' | 'addProduct' | 'bulkEdit' | 'editSingle' | 'globalEdit'
 
   // מוצר נבחר לעריכה יחידנית
@@ -58,13 +67,16 @@ export default function EditProducts() {
   // מוצרים נבחרים (לעריכה מרובה)
   const [selectedBarcodes, setSelectedBarcodes] = useState([]);
 
+  // פתיחת מודאל עריכה מרובה
+  const [isBulkModalOpen, setIsBulkModalOpen] = useState(false);
+
   // אנימציה לקטגוריות
   const [containerStyle, setContainerStyle] = useState({});
   const startTouch = useRef({ x: 0 });
   const swipeDirection = useRef(null);
 
   // נטען קודם (אם צריך) - כאן אני מניח שה־products כבר בקונטקסט
-  
+
   // ============ אנימציות החלקה ============
   const handleTouchStart = (evt) => {
     swipeDirection.current = null;
@@ -114,8 +126,7 @@ export default function EditProducts() {
         animateRight();
       }
       window.scrollTo(0, 0);
-    }
-    else if (swipeDirection.current === "left") {
+    } else if (swipeDirection.current === "left") {
       // החלקה שמאלה
       if (activeSubCategoryIndex < totalSub - 1) {
         setActiveSubCategoryIndex(activeSubCategoryIndex + 1);
@@ -127,8 +138,7 @@ export default function EditProducts() {
         animateLeft();
       }
       window.scrollTo(0, 0);
-    }
-    else {
+    } else {
       setContainerStyle({});
     }
   };
@@ -138,13 +148,43 @@ export default function EditProducts() {
   const subCats = all_sub_categories[activeCategoryIndex] || [];
   const currentSubCategory = subCats[activeSubCategoryIndex];
 
+  const isUnclassifiedCategory = currentCategory === UNCLASSIFIED_CATEGORY;
+  const isInBaseCategory = (category) => baseCategories.includes(category);
+
   const filteredProducts = products.filter((prod) => {
+    if (isUnclassifiedCategory) {
+      return !isInBaseCategory(prod.category);
+    }
     if (prod.category !== currentCategory) return false;
     if (currentSubCategory) {
       return prod.subcategory === currentSubCategory;
     }
     return true;
   });
+
+  const categoryProducts = products.filter((prod) => {
+    if (isUnclassifiedCategory) {
+      return !isInBaseCategory(prod.category);
+    }
+    return prod.category === currentCategory;
+  });
+
+  const subCategoryStats = subCats.map((sub) => {
+    const count = categoryProducts.filter(
+      (prod) => prod.subcategory === sub,
+    ).length;
+    return { sub, count };
+  });
+
+  const uncategorizedCount = categoryProducts.filter(
+    (prod) => !prod.subcategory,
+  ).length;
+
+  const getBarcodes = (list) => list.map((p) => p.barcode).filter(Boolean);
+
+  const selectBarcodes = (barcodes) => {
+    setSelectedBarcodes(Array.from(new Set(barcodes)));
+  };
 
   // ============ כפתורים למעלה ============
   const handleAddProduct = () => {
@@ -153,6 +193,7 @@ export default function EditProducts() {
   const handleBulkEdit = () => {
     setMode("bulkEdit");
     setSelectedBarcodes([]);
+    setIsBulkModalOpen(false);
   };
   const handleGlobalEdit = () => {
     setMode("globalEdit");
@@ -163,34 +204,61 @@ export default function EditProducts() {
     setMode("initial");
     setSelectedProduct(null);
     setSelectedBarcodes([]);
+    setIsBulkModalOpen(false);
   };
 
-  // ============ "ערוך" במוצר יחיד =========== 
+  // ============ "ערוך" במוצר יחיד ===========
   const handleEditSingle = (product) => {
     setSelectedProduct(product);
     setMode("editSingle");
   };
 
-  // ============ מחיקה מוצר =========== 
+  // ============ מחיקה מוצר ===========
   const handleDeleteProduct = async (id) => {
     try {
       await deleteProductById(id);
-      // כאן מומלץ להסירו גם מהסטייט (אם שמרת products כאן)
-      // בקונטקסט useProducts אולי יש פונקציה לעדכן...
-      // or if the context is read-only, you'd do something else
-      // For simplicity:
-      // setProducts(prev => prev.filter(p => p._id !== id));
+      await loadProducts();
     } catch (err) {
       console.error("Error deleting product:", err);
     }
+  };
+
+  const handleOpenBulkModal = () => {
+    if (!selectedBarcodes.length) return;
+    setIsBulkModalOpen(true);
+  };
+
+  const handleSelectAllFiltered = () => {
+    selectBarcodes(getBarcodes(filteredProducts));
+  };
+
+  const handleSelectAllCategory = () => {
+    selectBarcodes(getBarcodes(categoryProducts));
+  };
+
+  const handleSelectSubCategory = (sub) => {
+    const productsInSub = categoryProducts.filter(
+      (prod) => prod.subcategory === sub,
+    );
+    selectBarcodes(getBarcodes(productsInSub));
   };
 
   // ============ Render ============
   return (
     <div className="mp_products-wrapper">
       {/* ניווט קטגוריות */}
-      <CategoryNavigation />
-      <SubCategoryNavigation />
+      <CategoryNavigation
+        allCategories={allCategories}
+        activeCategoryIndex={activeCategoryIndex}
+        setActiveCategoryIndex={setActiveCategoryIndex}
+        setActiveSubCategoryIndex={setActiveSubCategoryIndex}
+      />
+      <SubCategoryNavigation
+        all_sub_categories={all_sub_categories}
+        activeCategoryIndex={activeCategoryIndex}
+        activeSubCategoryIndex={activeSubCategoryIndex}
+        setActiveSubCategoryIndex={setActiveSubCategoryIndex}
+      />
 
       {/* כפתורי מצב בראש הדף */}
       {mode === "initial" && (
@@ -206,6 +274,65 @@ export default function EditProducts() {
           </button>
         </div>
       )}
+
+      {mode === "bulkEdit" && (
+        <div className="mp_bulk-toolbar">
+          <div className="mp_bulk-actions">
+            <button className="mp_btn" onClick={handleSelectAllFiltered}>
+              בחר את כל המוצגים
+            </button>
+            <button className="mp_btn" onClick={handleSelectAllCategory}>
+              בחר את כל הקטגוריה
+            </button>
+            <button className="mp_btn" onClick={() => setSelectedBarcodes([])}>
+              נקה בחירה
+            </button>
+            <button
+              className="mp_btn mp_btn-primary"
+              onClick={handleOpenBulkModal}
+              disabled={!selectedBarcodes.length}
+            >
+              עריכה למוצרים שנבחרו ({selectedBarcodes.length})
+            </button>
+            <button className="mp_btn" onClick={handleCloseAll}>
+              סיום עריכה מרובה
+            </button>
+          </div>
+        </div>
+      )}
+
+      <div className="mp_category-summary">
+        <div className="mp_summary-header">
+          <div className="mp_summary-title">
+            תתי קטגוריות בקטגוריה: {currentCategory || "לא נבחר"}
+          </div>
+          <div className="mp_summary-count">
+            סה"כ מוצרים: {categoryProducts.length}
+          </div>
+        </div>
+        <div className="mp_summary-list">
+          {subCategoryStats.map(({ sub, count }) => (
+            <div key={sub} className="mp_summary-item">
+              <span>
+                {sub} ({count})
+              </span>
+              {mode === "bulkEdit" && count > 0 && (
+                <button
+                  className="mp_small-btn"
+                  onClick={() => handleSelectSubCategory(sub)}
+                >
+                  בחר
+                </button>
+              )}
+            </div>
+          ))}
+          {uncategorizedCount > 0 && (
+            <div className="mp_summary-item">
+              <span>ללא תת־קטגוריה ({uncategorizedCount})</span>
+            </div>
+          )}
+        </div>
+      </div>
 
       <div
         className="mp_products-container"
@@ -228,15 +355,33 @@ export default function EditProducts() {
 
               {/* כפתור "ערוך" ו"מחק" (רק במצב initial) */}
               {mode === "initial" && (
-                <div style={{ marginTop: "0.5rem", display: "flex", gap: "0.5rem" }}>
+                <div
+                  style={{
+                    marginTop: "0.5rem",
+                    display: "flex",
+                    gap: "0.5rem",
+                  }}
+                >
                   <button
-                    style={{ backgroundColor: "#008cba", color: "#fff", border: "none", padding: "0.3rem 0.6rem", borderRadius: "4px" }}
+                    style={{
+                      backgroundColor: "#008cba",
+                      color: "#fff",
+                      border: "none",
+                      padding: "0.3rem 0.6rem",
+                      borderRadius: "4px",
+                    }}
                     onClick={() => handleEditSingle(prod)}
                   >
                     ערוך
                   </button>
                   <button
-                    style={{ backgroundColor: "#f44336", color: "#fff", border: "none", padding: "0.3rem 0.6rem", borderRadius: "4px" }}
+                    style={{
+                      backgroundColor: "#f44336",
+                      color: "#fff",
+                      border: "none",
+                      padding: "0.3rem 0.6rem",
+                      borderRadius: "4px",
+                    }}
                     onClick={() => handleDeleteProduct(prod._id)}
                   >
                     מחק
@@ -252,10 +397,12 @@ export default function EditProducts() {
                     checked={selectedBarcodes.includes(prod.barcode)}
                     onChange={(e) => {
                       if (e.target.checked) {
-                        setSelectedBarcodes([...selectedBarcodes, prod.barcode]);
+                        setSelectedBarcodes([
+                          ...new Set([...selectedBarcodes, prod.barcode]),
+                        ]);
                       } else {
                         setSelectedBarcodes(
-                          selectedBarcodes.filter((bc) => bc !== prod.barcode)
+                          selectedBarcodes.filter((bc) => bc !== prod.barcode),
                         );
                       }
                     }}
@@ -276,10 +423,14 @@ export default function EditProducts() {
       <ModalAddProduct
         isOpen={mode === "addProduct"}
         onClose={handleCloseAll}
+        allCategories={allCategories}
+        allSubCategories={all_sub_categories}
+        defaultCategory={isUnclassifiedCategory ? "" : currentCategory}
+        defaultSubcategory={isUnclassifiedCategory ? "" : currentSubCategory}
         onProductCreated={async (newProd) => {
           try {
-            // עדכן Products (אם אתה מחזיק אותם כאן, אחרת בקונטקסט)
-            // setProducts(prev => [...prev, res.data.product]);
+            await createProduct(newProd);
+            await loadProducts();
             handleCloseAll();
           } catch (err) {
             console.error("Error creating product:", err);
@@ -291,11 +442,13 @@ export default function EditProducts() {
         isOpen={mode === "editSingle" && selectedProduct}
         onClose={handleCloseAll}
         product={selectedProduct}
+        allCategories={allCategories}
+        allSubCategories={all_sub_categories}
         onSave={async (updates) => {
           try {
             if (!selectedProduct) return;
-            // עדכן Products
-            // setProducts(prev => prev.map(p => p._id === selectedProduct._id ? res.data.product : p));
+            await updateProductById(selectedProduct._id, updates);
+            await loadProducts();
             handleCloseAll();
           } catch (err) {
             console.error("Error updating product:", err);
@@ -304,19 +457,24 @@ export default function EditProducts() {
       />
 
       <ModalBulkEdit
-        isOpen={mode === "bulkEdit"}
-        onClose={handleCloseAll}
+        isOpen={isBulkModalOpen}
+        onClose={() => setIsBulkModalOpen(false)}
         selectedBarcodes={selectedBarcodes}
+        allCategories={allCategories}
+        allSubCategories={all_sub_categories}
         onApply={async (commonUpdates) => {
           if (!selectedBarcodes || !selectedBarcodes.length) {
-            handleCloseAll();
+            setIsBulkModalOpen(false);
             return;
           }
 
           try {
-            // עדכן products
-            // const updatedList = res.data.products;
-            // setProducts(...);
+            const payload = selectedBarcodes.map((barcode) => ({
+              barcode,
+              ...commonUpdates,
+            }));
+            await updateProductsByBarcode(payload);
+            await loadProducts();
             handleCloseAll();
           } catch (err) {
             console.error("Error in bulk edit:", err);

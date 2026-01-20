@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState } from "react";
-import { getAllProducts } from "../services/productService"
+import { getAllProducts } from "../services/productService";
 
 const ProductContext2 = createContext(null);
 
@@ -26,6 +26,7 @@ const allCategories = [
   "גבינות",
   "יינות",
   "שמנים ורטבים",
+  "מוצרים ללא סיווג",
 ];
 
 /**
@@ -155,7 +156,7 @@ const all_sub_categories_map = {
 };
 
 const all_sub_categories = allCategories.map(
-  (cat) => all_sub_categories_map[cat] || []
+  (cat) => all_sub_categories_map[cat] || [],
 );
 
 export const ProductContextProvider2 = ({ children }) => {

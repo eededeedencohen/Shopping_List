@@ -1,19 +1,31 @@
 // SubCategoryNavigation.js
-import React, { useEffect, useRef } from 'react';
-import { useProductList } from '../../hooks/appHooks';
-import './SubCategoryNavigation.css';
+import React, { useEffect, useRef } from "react";
+import { useProductList } from "../../hooks/appHooks";
+import "./SubCategoryNavigation.css";
 
 /**
  * רכיב שמציג את התתי־קטגוריות של הקטגוריה הפעילה.
  * פס גלילה דומה, עם אפשרות ללחוץ ולעבור לתת־קטגוריה אחרת.
  */
-export default function SubCategoryNavigation() {
+export default function SubCategoryNavigation({
+  all_sub_categories: allSubCategoriesProp,
+  activeCategoryIndex: activeCategoryIndexProp,
+  activeSubCategoryIndex: activeSubCategoryIndexProp,
+  setActiveSubCategoryIndex: setActiveSubCategoryIndexProp,
+}) {
   const {
-    all_sub_categories,
-    activeCategoryIndex,
-    activeSubCategoryIndex,
-    setActiveSubCategoryIndex,
+    all_sub_categories: allSubCategoriesCtx,
+    activeCategoryIndex: activeCategoryIndexCtx,
+    activeSubCategoryIndex: activeSubCategoryIndexCtx,
+    setActiveSubCategoryIndex: setActiveSubCategoryIndexCtx,
   } = useProductList();
+
+  const all_sub_categories = allSubCategoriesProp || allSubCategoriesCtx;
+  const activeCategoryIndex = activeCategoryIndexProp ?? activeCategoryIndexCtx;
+  const activeSubCategoryIndex =
+    activeSubCategoryIndexProp ?? activeSubCategoryIndexCtx;
+  const setActiveSubCategoryIndex =
+    setActiveSubCategoryIndexProp || setActiveSubCategoryIndexCtx;
 
   const navigationRef = useRef(null);
 
@@ -33,7 +45,7 @@ export default function SubCategoryNavigation() {
     const containerWidth = navigationRef.current.clientWidth;
     const scrollX =
       element.offsetLeft - (containerWidth / 2 - element.clientWidth / 2);
-    navigationRef.current.scrollTo({ left: scrollX, behavior: 'smooth' });
+    navigationRef.current.scrollTo({ left: scrollX, behavior: "smooth" });
   };
 
   // בכל שינוי של תת־קטגוריה פעילה, לגלול אליה
@@ -50,7 +62,7 @@ export default function SubCategoryNavigation() {
         <div
           key={index}
           className={`sub-nav-topic ${
-            index === activeSubCategoryIndex ? 'active-sub-topic' : ''
+            index === activeSubCategoryIndex ? "active-sub-topic" : ""
           }`}
           onClick={() => handleSubClick(index)}
         >
@@ -63,4 +75,3 @@ export default function SubCategoryNavigation() {
     </div>
   );
 }
-
