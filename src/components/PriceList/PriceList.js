@@ -3,7 +3,7 @@ import { usePriceList } from "../../context/PriceContext";
 import { Children, useEffect, useState } from "react";
 import { Spin } from "antd";
 import ProductsImages from "../Images/ProductsImages";
-import SupermarketImage from "../Cart/supermarketImage";
+import SupermarketImage from "../Images/SupermarketImage";
 import "./PriceListNew.css";
 
 import "./PriceList.css"; // Importing a CSS file for styling
@@ -37,7 +37,6 @@ export default function PriceList() {
 
   const [priceList, setPriceList] = useState(undefined);
   const [product, setProduct] = useState(undefined);
-
 
   useEffect(() => {
     if (!barcode) {
@@ -101,7 +100,7 @@ export default function PriceList() {
           <p style={{ fontWeight: "bold" }}>{product.barcode}</p>
         </div>
         {/* {add line:} */}
-        <div className="compare__line" style={{marginBottom:"1rem"}}/>
+        <div className="compare__line" style={{ marginBottom: "1rem" }} />
       </div>
       <div className="compare__prices-list">
         {Children.toArray(
@@ -155,7 +154,7 @@ export default function PriceList() {
                 )}
               </div>
             </div>
-          ))
+          )),
         )}
       </div>
     </div>
@@ -347,4 +346,3 @@ export default function PriceList() {
 //     </div>
 //   );
 // }
-

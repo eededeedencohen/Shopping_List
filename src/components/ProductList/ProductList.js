@@ -10,7 +10,10 @@ import {
 
 import "./ProductsList.css";
 
-import Image from "./Images";
+import {
+  getProductImage,
+  ProductImageDisplay,
+} from "../Images/ProductImageService";
 import CategoryNavigation from "./CategoryNavigation";
 import SubCategoryNavigation from "./SubCategoryNavigation";
 import ProductComparisonModal from "../PriceList/productComparisonModal";
@@ -147,7 +150,6 @@ function ProductsList() {
     const moveY = touch.clientY;
     const deltaX = moveX - startTouch.current.x;
     const deltaY = moveY - startTouch.current.y;
-
 
     const SWIPE_THRESHOLD = 200; // כמה רחוק נחשב כהחלקה
 

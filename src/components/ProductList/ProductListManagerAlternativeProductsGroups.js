@@ -13,7 +13,10 @@ import CategoryNavigation from "./CategoryNavigation";
 import SubCategoryNavigation from "./SubCategoryNavigation";
 
 // תמונת מוצר
-import Image from "./Images";
+import {
+  getProductImage,
+  ProductImageDisplay,
+} from "../Images/ProductImageService";
 
 // מודאלים
 import ModalAPGGroups from "./ModalAPGGroups";
@@ -90,7 +93,7 @@ function copyAllGroupsFromBtoA(apgData, barcodeB, barcodeA) {
 
   apgB.groups.forEach((groupOfB) => {
     const existing = apgA.groups.find(
-      (g) => g.groupName === groupOfB.groupName
+      (g) => g.groupName === groupOfB.groupName,
     );
     if (!existing) {
       apgA.groups.push({
@@ -219,12 +222,22 @@ function ProductListManagerAlternativeProductsGroups() {
   // 2) מצב editGroup: הוספת / הסרת מוצרים
   // -------------------------------------------------------------
   const handleAddToGroup = (barcodeB) => {
-    const newApg = addProductToGroup(apgData, activeA, activeGroupName, barcodeB);
+    const newApg = addProductToGroup(
+      apgData,
+      activeA,
+      activeGroupName,
+      barcodeB,
+    );
     setApgData(newApg);
   };
 
   const handleRemoveFromGroup = (barcodeB) => {
-    const newApg = removeProductFromGroup(apgData, activeA, activeGroupName, barcodeB);
+    const newApg = removeProductFromGroup(
+      apgData,
+      activeA,
+      activeGroupName,
+      barcodeB,
+    );
     setApgData(newApg);
   };
 
@@ -292,7 +305,12 @@ function ProductListManagerAlternativeProductsGroups() {
   };
 
   const handleConfirmCopySingleGroup = (groupName) => {
-    const newApg = copySingleGroupFromBtoA(apgData, copySourceBarcodeB, groupName, activeA);
+    const newApg = copySingleGroupFromBtoA(
+      apgData,
+      copySourceBarcodeB,
+      groupName,
+      activeA,
+    );
     setApgData(newApg);
     setShowCopyGroupsModal(false);
   };
@@ -428,7 +446,10 @@ function ProductListManagerAlternativeProductsGroups() {
           const barcode = product.barcode;
 
           // מצב initial + או copyAPG (אבל מדובר במוצר A עצמו)
-          if (mode === "initial" || (mode === "copyAPG" && barcode === activeA)) {
+          if (
+            mode === "initial" ||
+            (mode === "copyAPG" && barcode === activeA)
+          ) {
             return (
               <div key={barcode} className="apg_product-card">
                 {/* <div className="apg_product-badge">מבצע</div> אם תרצה */}

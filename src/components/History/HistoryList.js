@@ -2,8 +2,11 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
 import "./HistoryList.css";
-import Images from "../ProductList/Images";
-import SupermarketImage from "../Cart/supermarketImage";
+import {
+  getProductImage,
+  ProductImageDisplay,
+} from "../Images/ProductImageService";
+import SupermarketImage from "../Images/SupermarketImage";
 import { DOMAIN } from "../../constants";
 
 const formatDate = (dateString) => {
@@ -28,7 +31,6 @@ const weightUnitToHebrew = (weight) => {
       return weight;
   }
 };
-
 
 const formatPrice = (price) => {
   return Number(price).toFixed(2) + "₪";
@@ -96,40 +98,43 @@ const HistoryList = () => {
               </div>
             </div>
             <div className="history__product-details">
-                  <div className="history__product-name">
-                    <span>
-                      {product.name.split(" ").slice(0, 3).join(" ")}
-                    </span>
-                  </div>
-                  <div
-                    style={{
-                      display: "flex",
-                      flexDirection: "row-reverse",
-                      alignItems: "center",
-                      width: "100%",
-                    }}
-                  >
-                    <div className="history__product-weight" style={{display:"flex"}}>
-                      <span style={{marginRight:"3px"}}>{weightUnitToHebrew(product.unit)} </span>
-                      <span className="size" >{product.weight}</span>
-                    </div>
-                    <span
-                      style={{
-                        paddingRight: "3px",
-                        paddingLeft: "3px",
-                        display: "flex",
-                        alignSelf: "normal",
-                      }}
-                    >
-                      {" "}
-                      |{" "}
-                    </span>
-                    <div className="history__product-brand">
-                      <span>{product.brand}</span>
-                    </div>
-                  </div>
+              <div className="history__product-name">
+                <span>{product.name.split(" ").slice(0, 3).join(" ")}</span>
+              </div>
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "row-reverse",
+                  alignItems: "center",
+                  width: "100%",
+                }}
+              >
+                <div
+                  className="history__product-weight"
+                  style={{ display: "flex" }}
+                >
+                  <span style={{ marginRight: "3px" }}>
+                    {weightUnitToHebrew(product.unit)}{" "}
+                  </span>
+                  <span className="size">{product.weight}</span>
                 </div>
-                <div className="history__line"/>
+                <span
+                  style={{
+                    paddingRight: "3px",
+                    paddingLeft: "3px",
+                    display: "flex",
+                    alignSelf: "normal",
+                  }}
+                >
+                  {" "}
+                  |{" "}
+                </span>
+                <div className="history__product-brand">
+                  <span>{product.brand}</span>
+                </div>
+              </div>
+            </div>
+            <div className="history__line" />
           </div>
         ))}
       </div>

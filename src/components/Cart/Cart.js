@@ -6,8 +6,11 @@ import ReplaceProducts from "./ReplaceProducts";
 import ReplaceSupermarket from "./ReplaceSupermarket/ReplaceSupermarket";
 import "./Cart.css";
 import { Spin } from "antd";
-import Images from "../ProductList/Images";
-import SupermarketImage from "./supermarketImage";
+import {
+  getProductImage,
+  ProductImageDisplay,
+} from "../Images/ProductImageService";
+import SupermarketImage from "../Images/SupermarketImage";
 import trashIcon from "./trash.png";
 
 //==================================================
@@ -422,7 +425,7 @@ export default function Cart() {
                     <div className="product-diff">
                       <small>
                         {`סה"כ חדש: ${newTotal.toFixed(
-                          2
+                          2,
                         )} ₪ → קודם: ${currentTotal.toFixed(2)} ₪`}
                       </small>
                     </div>
@@ -438,7 +441,7 @@ export default function Cart() {
                           e.stopPropagation();
                           updateDraftAmount(
                             item.barcode,
-                            Math.max(1, currentDraftAmount - 1)
+                            Math.max(1, currentDraftAmount - 1),
                           );
                         }}
                       >
@@ -460,7 +463,7 @@ export default function Cart() {
                           e.stopPropagation();
                           updateDraftAmount(
                             item.barcode,
-                            currentDraftAmount + 1
+                            currentDraftAmount + 1,
                           );
                         }}
                       >
@@ -583,7 +586,7 @@ function SwipeRow({ children, onIncrement, onDecrement, onRemove, outerRef }) {
     } else {
       const ratio = Math.min(
         1,
-        (elapsed - LONG_VISUAL_DELAY) / (LONG_MS - LONG_VISUAL_DELAY)
+        (elapsed - LONG_VISUAL_DELAY) / (LONG_MS - LONG_VISUAL_DELAY),
       );
       setPressProgress(ratio);
     }
@@ -645,7 +648,7 @@ function SwipeRow({ children, onIncrement, onDecrement, onRemove, outerRef }) {
 
     const clamped = Math.max(
       -MAX_NORMAL_SHIFT,
-      Math.min(MAX_NORMAL_SHIFT, deltaX)
+      Math.min(MAX_NORMAL_SHIFT, deltaX),
     );
     setDxNormal(clamped);
 
@@ -718,10 +721,10 @@ function SwipeRow({ children, onIncrement, onDecrement, onRemove, outerRef }) {
   const shadowStage = !deleteMode
     ? "idle"
     : dxDelete >= REMOVE_THRESHOLD
-    ? "armed"
-    : dxDelete > 0
-    ? "show"
-    : "idle";
+      ? "armed"
+      : dxDelete > 0
+        ? "show"
+        : "idle";
 
   return (
     <div

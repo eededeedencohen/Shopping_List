@@ -2,7 +2,7 @@ import { useEffect, useState, Children } from "react";
 import { Spin } from "antd";
 import { usePriceList } from "../../context/PriceContext";
 import ProductsImages from "../Images/ProductsImages";
-import SupermarketImage from "../Cart/supermarketImage";
+import SupermarketImage from "../Images/SupermarketImage";
 // import "./PriceListNew.css";
 // import "./PriceList.css";
 import "./productComparison.css";
@@ -59,7 +59,10 @@ export default function ProductComparison({ barcode }) {
           <p>{product.name}</p>
         </div>
         <div className="compareM__product__image-container">
-          <ProductsImages barcode={barcode} className="compareM__product__image"/>
+          <ProductsImages
+            barcode={barcode}
+            className="compareM__product__image"
+          />
         </div>
 
         <div className="compareM__details_label">
@@ -144,7 +147,7 @@ export default function ProductComparison({ barcode }) {
                 )}
               </div>
             </div>
-          ))
+          )),
         )}
       </div>
     </div>

@@ -9,7 +9,10 @@ import {
 // ניווט קטגוריות (לדוגמה)
 import CategoryNavigation from "./CategoryNavigation";
 import SubCategoryNavigation from "./SubCategoryNavigation";
-import Image from "./Images"; // להצגת תמונות מוצרים
+import {
+  getProductImage,
+  ProductImageDisplay,
+} from "../Images/ProductImageService"; // להצגת תמונות מוצרים
 
 // אם יש לך context מוצרים
 import { useProducts } from "../../context/ProductContext";

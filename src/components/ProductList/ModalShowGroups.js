@@ -1,6 +1,9 @@
 import React, { useState } from "react";
 import Modal from "../Cart/Modal";
-import Image from "../ProductList/Images"; 
+import {
+  getProductImage,
+  ProductImageDisplay,
+} from "../Images/ProductImageService";
 import "./ModalProductsMobile.css";
 import { getAlternativeProductsGroupsDetails } from "../../network/alternativeProductsGroupsService";
 
@@ -22,8 +25,8 @@ function convertWeightUnit(unit) {
 
 function ModalShowGroups({
   isOpen,
-  onCloseNoSave,      // <--- שינוי: פונקציה לסגירה ללא שמירה
-  onApplyChanges,     // <--- שינוי: פונקציה להפעלת מצב editGroup בקומפוננטה האב
+  onCloseNoSave, // <--- שינוי: פונקציה לסגירה ללא שמירה
+  onApplyChanges, // <--- שינוי: פונקציה להפעלת מצב editGroup בקומפוננטה האב
   apgData,
   setApgData,
   barcodeA,
@@ -31,7 +34,9 @@ function ModalShowGroups({
   const [selectedGroupToShow, setSelectedGroupToShow] = useState(null);
   const [productsInGroup, setProductsInGroup] = useState([]);
 
-  const [localData, setLocalData] = useState(JSON.parse(JSON.stringify(apgData)));
+  const [localData, setLocalData] = useState(
+    JSON.parse(JSON.stringify(apgData)),
+  );
   const [isDirty, setIsDirty] = useState(false);
 
   if (!isOpen) return null;
@@ -79,7 +84,7 @@ function ModalShowGroups({
     setIsDirty(true);
 
     setProductsInGroup((prev) =>
-      prev.filter((p) => p.barcode !== barcodeToDelete)
+      prev.filter((p) => p.barcode !== barcodeToDelete),
     );
   };
 
@@ -131,7 +136,7 @@ function ModalShowGroups({
                     onClick={() =>
                       handleDeleteProductInGroup(
                         selectedGroupToShow,
-                        product.barcode
+                        product.barcode,
                       )
                     }
                     style={{ marginTop: "0.5rem" }}

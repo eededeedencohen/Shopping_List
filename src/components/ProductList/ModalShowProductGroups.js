@@ -1,6 +1,9 @@
 import React, { useState } from "react";
 import Modal from "../Cart/Modal";
-import Image from "./Images";
+import {
+  getProductImage,
+  ProductImageDisplay,
+} from "../Images/ProductImageService";
 import {
   useFullGroupsWithProduct,
   useGroupActions,
@@ -109,13 +112,11 @@ function ModalShowProductGroups({ isOpen, onClose, barcode, onSelectGroup }) {
                       }
                     />
 
-
-                    
                     <button
                       onClick={() =>
                         handleGroupRename(
                           group.groupName,
-                          renameStates[group.groupName]
+                          renameStates[group.groupName],
                         )
                       }
                     >
@@ -170,7 +171,7 @@ function ModalShowProductGroups({ isOpen, onClose, barcode, onSelectGroup }) {
                   className="scroll-arrow left"
                   onClick={() => {
                     const el = document.getElementById(
-                      `products-${group.groupName}`
+                      `products-${group.groupName}`,
                     );
                     el.scrollBy({ left: -300, behavior: "smooth" });
                   }}
@@ -195,11 +196,11 @@ function ModalShowProductGroups({ isOpen, onClose, barcode, onSelectGroup }) {
                         <div>ברקוד: {p.barcode}</div>
                       </div>
                       <button
-                      className="remove-product-from-group-btn"
+                        className="remove-product-from-group-btn"
                         onClick={() =>
                           handleRemoveProductFromGroup(
                             group.groupName,
-                            p.barcode
+                            p.barcode,
                           )
                         }
                       >
@@ -213,7 +214,7 @@ function ModalShowProductGroups({ isOpen, onClose, barcode, onSelectGroup }) {
                   className="scroll-arrow right"
                   onClick={() => {
                     const el = document.getElementById(
-                      `products-${group.groupName}`
+                      `products-${group.groupName}`,
                     );
                     el.scrollBy({ left: 300, behavior: "smooth" });
                   }}

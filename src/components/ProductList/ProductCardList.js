@@ -1,5 +1,8 @@
 /* ProductCardList.js */
-import Image from "./Images";
+import {
+  getProductImage,
+  ProductImageDisplay,
+} from "../Images/ProductImageService";
 import { convertWeightUnit } from "./ProductsList";
 import "./ProductCardList.css";
 
@@ -136,7 +139,7 @@ function ProductCardList({
               onClick={() => handleToggleAlternative(product.barcode)}
               style={{
                 backgroundColor: groupData[selectedBarcode]?.includes(
-                  product.barcode
+                  product.barcode,
                 )
                   ? "red"
                   : "green",

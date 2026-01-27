@@ -1,6 +1,9 @@
 import React, { useState } from "react";
 import Modal from "../Cart/Modal";
-import Image from "./Images";
+import {
+  getProductImage,
+  ProductImageDisplay,
+} from "../Images/ProductImageService";
 import {
   useFullGroupsWithProducts,
   useGroupActions,
@@ -114,7 +117,7 @@ function ModalShowAllGroups({ isOpen, onClose, onSelectGroup }) {
                       onClick={() =>
                         handleGroupRename(
                           group.groupName,
-                          renameStates[group.groupName]
+                          renameStates[group.groupName],
                         )
                       }
                     >
@@ -169,7 +172,7 @@ function ModalShowAllGroups({ isOpen, onClose, onSelectGroup }) {
                   className="scroll-arrow left"
                   onClick={() => {
                     const el = document.getElementById(
-                      `products-${group.groupName}`
+                      `products-${group.groupName}`,
                     );
                     el.scrollBy({ left: -300, behavior: "smooth" });
                   }}
@@ -198,7 +201,7 @@ function ModalShowAllGroups({ isOpen, onClose, onSelectGroup }) {
                         onClick={() =>
                           handleRemoveProductFromGroup(
                             group.groupName,
-                            p.barcode
+                            p.barcode,
                           )
                         }
                       >
@@ -212,7 +215,7 @@ function ModalShowAllGroups({ isOpen, onClose, onSelectGroup }) {
                   className="scroll-arrow right"
                   onClick={() => {
                     const el = document.getElementById(
-                      `products-${group.groupName}`
+                      `products-${group.groupName}`,
                     );
                     el.scrollBy({ left: 300, behavior: "smooth" });
                   }}

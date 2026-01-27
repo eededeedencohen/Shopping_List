@@ -1,7 +1,7 @@
 // // import React, { useState, useEffect } from "react";
 // import React from "react";
 // // import { useCart } from "../../../context/CartContext";
-// import SupermarketImage from "../supermarketImage";
+// import SupermarketImage from "../../Images/SupermarketImage";
 // import "./SupermarketsNames.css";
 
 // const SupermarketsNames = ({ onSelectSupermarket }) => {
@@ -293,7 +293,7 @@
 
 // export default SupermarketsNames;
 import React from "react";
-import SupermarketImage from "../supermarketImage";
+import SupermarketImage from "../../Images/SupermarketImage";
 import "./SupermarketsNames.css";
 
 const SupermarketsNames = ({ onSelectSupermarket }) => {

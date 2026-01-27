@@ -8,8 +8,11 @@ import ReplaceProducts from "./ReplaceProducts";
 import ReplaceSupermarket from "./ReplaceSupermarket/ReplaceSupermarket";
 import "./Cart.css";
 import { Spin } from "antd";
-import Images from "../ProductList/Images";
-import SupermarketImage from "./supermarketImage";
+import {
+  getProductImage,
+  ProductImageDisplay,
+} from "../Images/ProductImageService";
+import SupermarketImage from "../Images/SupermarketImage";
 import trashIcon from "./trash.png";
 
 //==================================================
@@ -229,14 +232,14 @@ export default function Cart() {
       </div>
     );
 
-    const getDraftOrCurrentAmount = (item) =>
-      draftAmounts[item.barcode] ?? item.amountInCart;
-  
-    const updateDraftAmount = (barcode, newValue) =>
-      setDraftAmounts((prev) => ({ ...prev, [barcode]: newValue }));
-  
-    const clearDraftAmount = (barcode) =>
-      setDraftAmounts(({ [barcode]: _, ...rest }) => rest);
+  const getDraftOrCurrentAmount = (item) =>
+    draftAmounts[item.barcode] ?? item.amountInCart;
+
+  const updateDraftAmount = (barcode, newValue) =>
+    setDraftAmounts((prev) => ({ ...prev, [barcode]: newValue }));
+
+  const clearDraftAmount = (barcode) =>
+    setDraftAmounts(({ [barcode]: _, ...rest }) => rest);
   ///////////////////////////////////////////////////
 
   return (
@@ -346,9 +349,6 @@ export default function Cart() {
       </div>
       <hr className="line" />
 
-
-
-      
       <div className="products">
         {cart &&
           cart.productsWithPrices.map((item, index) => (
@@ -367,7 +367,8 @@ export default function Cart() {
                 <div className="product-details">
                   <div className="product-details__name">
                     <span>
-                      {item.product.name.split(" ").slice(0, 3).join(" ")}{/* Change here */}
+                      {item.product.name.split(" ").slice(0, 3).join(" ")}
+                      {/* Change here */}
                     </span>
                   </div>
                   <div
@@ -380,8 +381,10 @@ export default function Cart() {
                     }}
                   >
                     <div className="product-details__weight">
-                      <span>{convertWeightUnit(item.product.unitWeight)} </span> {/* Change here */}
-                      <span className="size">{item.product.weight}</span> {/* Change here */}
+                      <span>{convertWeightUnit(item.product.unitWeight)} </span>{" "}
+                      {/* Change here */}
+                      <span className="size">{item.product.weight}</span>{" "}
+                      {/* Change here */}
                     </div>
                     <span
                       style={{
@@ -395,7 +398,8 @@ export default function Cart() {
                       |{" "}
                     </span>
                     <div className="product-details__brand">
-                      <span>{item.product.brand}</span>{/* Change here */}
+                      <span>{item.product.brand}</span>
+                      {/* Change here */}
                     </div>
                   </div>
                 </div>
@@ -404,12 +408,14 @@ export default function Cart() {
                     <span style={{ fontSize: "0.8rem", alignSelf: "baseline" }}>
                       'יח
                     </span>
-                    <span>{item.amount}</span>{/* Change here */}
+                    <span>{item.amount}</span>
+                    {/* Change here */}
                   </div>
                   <div className="product-price__total-price">
                     <b style={{ fontSize: "1.2em" }}>₪</b>
                     <span style={{ fontSize: "1.2rem" }}>
-                      {parseFloat(item.totalPrice).toFixed(2)} {/* Change here */}
+                      {parseFloat(item.totalPrice).toFixed(2)}{" "}
+                      {/* Change here */}
                     </span>
                   </div>
                 </div>
@@ -451,7 +457,7 @@ export default function Cart() {
                   <div className="update-amount__update-button">
                     <button
                       onClick={() => {
-                        setCurrentBarcode(item.product.barcode);  // Change here
+                        setCurrentBarcode(item.product.barcode); // Change here
                         console.log(currentBarcode);
                         handleUpdate(item.product.barcode); // Change here
                       }}
@@ -488,8 +494,6 @@ export default function Cart() {
           ))}
       </div>
 
-
-      
       <div className="green-button">
         <button className="green-button__button" onClick={handleConfirmCart}>
           Confirm Cart

@@ -1,10 +1,13 @@
 // src/components/ProductList/AlternativeProductsModal.js
 
 import React, { useState, useEffect } from "react";
-import Modal from "../Cart/Modal"; 
+import Modal from "../Cart/Modal";
 import { getAlternativeProductsDetails } from "../../network/alternative-productsService";
-import Image from "./Images"; 
-// ^ אם Images.js נמצא באותה תיקייה. 
+import {
+  getProductImage,
+  ProductImageDisplay,
+} from "../Images/ProductImageService";
+// ^ אם Images.js נמצא באותה תיקייה.
 // אם הוא במקום אחר, למשל "../Images", שנה בהתאם.
 
 /**

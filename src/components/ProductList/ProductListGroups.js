@@ -24,7 +24,10 @@ import "./ProductListGroups.css";
 import "./ProductSearch.css";
 import { useNavigate } from "react-router";
 
-import Image from "./Images";
+import {
+  getProductImage,
+  ProductImageDisplay,
+} from "../Images/ProductImageService";
 import CategoryNavigation from "./CategoryNavigation";
 import SubCategoryNavigation from "./SubCategoryNavigation";
 import ModalShowProductGroups from "./ModalShowProductGroups";
@@ -351,7 +354,7 @@ function ProductsListGroups() {
   const groupCountMap = useMemo(() => {
     const map = {};
     groups.forEach(({ barcodes }) =>
-      barcodes.forEach((bc) => (map[bc] = (map[bc] || 0) + 1))
+      barcodes.forEach((bc) => (map[bc] = (map[bc] || 0) + 1)),
     );
     return map;
   }, [groups]);
@@ -359,7 +362,7 @@ function ProductsListGroups() {
   /* 4) פונקציה נוחה לשימוש */
   const getGroupCount = useCallback(
     (barcode) => groupCountMap[barcode] || 0,
-    [groupCountMap] // ← מתעדכן רק כש-groups משתנה
+    [groupCountMap], // ← מתעדכן רק כש-groups משתנה
   );
 
   /* 5) בניית productsToRender – ממואיז */
@@ -379,7 +382,7 @@ function ProductsListGroups() {
     /* מיון לפי כמות הקבוצות (קטן→גדול) */
     if (sortByGroupCount) {
       base = [...base].sort(
-        (a, b) => getGroupCount(a.barcode) - getGroupCount(b.barcode)
+        (a, b) => getGroupCount(a.barcode) - getGroupCount(b.barcode),
       );
     }
 
@@ -405,12 +408,12 @@ function ProductsListGroups() {
       const group = groups.find((g) => g.groupName === groupName);
       return group ? group.barcodes.includes(barcode) : false;
     },
-    [groups]
+    [groups],
   );
 
   const handleUpdateGroup = async (groupName) => {
     const currentBarcodes = groups.find(
-      (g) => g.groupName === groupName
+      (g) => g.groupName === groupName,
     ).barcodes;
     // update in the server by using the updateGroup function
     try {
@@ -615,7 +618,7 @@ function ProductsListGroups() {
                           onClick={() => {
                             removeBarcodeFromGroup(
                               EditedGroup,
-                              product.barcode
+                              product.barcode,
                             );
                           }}
                         >

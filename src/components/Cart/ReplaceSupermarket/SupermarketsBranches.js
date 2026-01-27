@@ -1,8 +1,12 @@
 import React from "react";
-import SupermarketImage from "../supermarketImage";
+import SupermarketImage from "../../Images/SupermarketImage";
 import "./SupermarketsBranches.css";
 
-const SupermarketsBranches = ({ selectedSupermarket, onSelectBranch, onBack }) => {
+const SupermarketsBranches = ({
+  selectedSupermarket,
+  onSelectBranch,
+  onBack,
+}) => {
   if (!selectedSupermarket) return null;
 
   const { name, branches } = selectedSupermarket;
@@ -11,10 +15,7 @@ const SupermarketsBranches = ({ selectedSupermarket, onSelectBranch, onBack }) =
     <div className="sbn_container">
       {/* אזור כותרת דביקה (Sticky) */}
       <div className="sbn_header">
-        <SupermarketImage
-          supermarketName={name}
-          className="sbn_logo"
-        />
+        <SupermarketImage supermarketName={name} className="sbn_logo" />
         <h3 className="sbn_title">בחר סניף של </h3>
       </div>
 
