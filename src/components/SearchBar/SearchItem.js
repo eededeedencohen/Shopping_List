@@ -1,6 +1,6 @@
 import React from "react";
 import "./SearchItem.css"; // You can create a separate CSS file for styling
-import ProductsImages from "../Images/ProductsImages";
+import { ProductImageDisplay } from "../Images/ProductImageService";
 
 export const convertWeightUnit = (weightUnit) => {
   weightUnit = weightUnit.toLowerCase();
@@ -22,7 +22,6 @@ export const convertWeightUnit = (weightUnit) => {
   return weightUnit;
 };
 
-
 const getDiscountFormat = (discount) => {
   return (
     <div
@@ -41,7 +40,7 @@ const getDiscountFormat = (discount) => {
       <div>{discount.totalPrice.toFixed(2)}</div>{" "}
       {/* Total price formatted to two decimal places */}
       <div
-        style={{ fontSize: "1.1rem", fontWeight: "bold",  marginTop: "-0.3rem"}}
+        style={{ fontSize: "1.1rem", fontWeight: "bold", marginTop: "-0.3rem" }}
       >
         ₪
       </div>
@@ -49,9 +48,6 @@ const getDiscountFormat = (discount) => {
     </div>
   );
 };
-
-
-
 
 const SearchItem = ({
   product,
@@ -67,7 +63,7 @@ const SearchItem = ({
     <div className="search-item">
       <div className="search__product-card" onClick={onClick}>
         <div className="search__product-image">
-          <ProductsImages barcode={product.barcode} />
+          <ProductImageDisplay barcode={product.barcode} />
         </div>
         <div className="search__product-details">
           <div className="search__product-name">{product.name}</div>
@@ -98,7 +94,7 @@ const SearchItem = ({
               מוצר לא קיים בסופר
             </div>
           )}
-          { product.discount ? (
+          {product.discount ? (
             <div className="search__procuct-discount">
               {getDiscountFormat(product.discount)}
             </div>

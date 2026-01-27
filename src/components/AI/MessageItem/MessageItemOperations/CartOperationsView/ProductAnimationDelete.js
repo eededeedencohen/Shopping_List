@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import ProductsImages from "../../../../Images/ProductsImages";
+import { ProductImageDisplay } from "../../../../Images/ProductImageService";
 import "./ProductAnimationDelete.css";
 import CartImage from "./cart.png";
 import GarbageImage from "./garbage.png";
@@ -28,7 +28,10 @@ const ProductAnimationDelete = ({ barcode, amount }) => {
       {showProduct && (
         <div className="ppd_product">
           <div className="ppd_product-wrapper">
-            <ProductsImages barcode={barcode} className="ppd_product-image" />
+            <ProductImageDisplay
+              barcode={barcode}
+              className="ppd_product-image"
+            />
             <div className="ppd_badge">x{amount}</div>
           </div>
         </div>

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import Image from "../../../../Images/Images";
+import { ProductImageDisplay } from "../../../../Images/ProductImageService";
 // import { useCartOptimizationContext } from "../../../../../context/cart-optimizationContext";
 import { useOptimalProductsOperation } from "../../../../../hooks/optimizationHooks";
 import "./EditAlternativeProduct.css";
@@ -30,7 +30,7 @@ function EditAlternativeProduct({
         const response =
           await getReplacementProductsByGeneralNameAndSupermarketID(
             generalName,
-            supermarketID
+            supermarketID,
           );
 
         setRealProducts(response);
@@ -120,7 +120,7 @@ function EditAlternativeProduct({
     console.log("oldTotalPrice: ", DetailsOptimalProduct.totalPrice);
     console.log(
       "newTotalPrice: ",
-      getProductTotalPrice(product.price, quantity)
+      getProductTotalPrice(product.price, quantity),
     );
     console.log("supermarketID: ", supermarketID);
     console.log("- - - - - - - - - - - - - - - - - - - - - -");
@@ -131,7 +131,7 @@ function EditAlternativeProduct({
       product.product.barcode, // the new barcode
       DetailsOptimalProduct.totalPrice, // the old total price
       getProductTotalPrice(product.price, quantity), // the new total price of the product only
-      supermarketID // the supermarket id
+      supermarketID, // the supermarket id
     );
   };
 
@@ -148,7 +148,7 @@ function EditAlternativeProduct({
             onClick={() => tempFunctionPrintData(product)}
           >
             <div className="replace-product-image">
-              <Image barcode={product.product.barcode} />
+              <ProductImageDisplay barcode={product.product.barcode} />
             </div>
             <div className="replace-product-details">
               <p className="replace-product-details__name">{`${

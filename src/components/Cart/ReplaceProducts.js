@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import Image from "../ProductList/Images";
+import { ProductImageDisplay } from "../Images/ProductImageService";
 import "./ReplaceProducts.css";
 import { Spin } from "antd";
 import { useCartActions, useAlternativeProducts } from "../../hooks/appHooks";

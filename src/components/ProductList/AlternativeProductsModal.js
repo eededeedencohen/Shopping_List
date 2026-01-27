@@ -82,7 +82,7 @@ const AlternativeProductsModal = ({ isOpen, onClose, barcodes }) => {
                   marginBottom: "0.5rem",
                 }}
               >
-                <Image barcode={prod.barcode} />
+                <ProductImageDisplay barcode={prod.barcode} />
               </div>
 
               {/* שדות נוספים לפי הנתונים שלך */}

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import ProductsImages from "../../../../../Images/ProductsImages"; // params barcode and className
+import { ProductImageDisplay } from "../../../../../Images/ProductImageService"; // params barcode and className
 import "./CartPriceComparison.css"; // CSS styles for the component
 
 /* ─── MAIN COMPONENT ── */
@@ -36,7 +36,7 @@ const CartPriceComparison = ({ carts }) => {
                 >
                   {products.map((p) => (
                     <div key={p.barcode} className="cpc_productRow">
-                      <ProductsImages
+                      <ProductImageDisplay
                         barcode={p.barcode}
                         className="cpc_prodImg"
                       />

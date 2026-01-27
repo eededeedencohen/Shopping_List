@@ -2,7 +2,7 @@ import { useNavigate, useParams } from "react-router";
 import { usePriceList } from "../../context/PriceContext";
 import { Children, useEffect, useState } from "react";
 import { Spin } from "antd";
-import ProductsImages from "../Images/ProductsImages";
+import { ProductImageDisplay } from "../Images/ProductImageService";
 import SupermarketImage from "../Images/SupermarketImage";
 import "./PriceListNew.css";
 
@@ -71,7 +71,7 @@ export default function PriceList() {
           <p>{product.name}</p>
         </div>
         <div className="compare__product__image">
-          <ProductsImages barcode={barcode} />
+          <ProductImageDisplay barcode={barcode} />
         </div>
         <div className="compare__details_label">
           <p>:נתונים</p>

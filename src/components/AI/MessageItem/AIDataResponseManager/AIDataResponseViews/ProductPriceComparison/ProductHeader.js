@@ -1,15 +1,21 @@
-import React from 'react';
-import ProductsImages from '../../../../../Images/ProductsImages';
-import './ProductHeader.css';
+import React from "react";
+import { ProductImageDisplay } from "../../../../../Images/ProductImageService";
+import "./ProductHeader.css";
 
 const translateUnit = (unit) => {
   switch (unit.toLowerCase()) {
-    case 'g': return 'גרם';
-    case 'kg': return 'קילוגרם';
-    case 'l': return 'ליטר';
-    case 'ml': return 'מיליליטר';
-    case 'u': return 'יחידות';
-    default: return unit;
+    case "g":
+      return "גרם";
+    case "kg":
+      return "קילוגרם";
+    case "l":
+      return "ליטר";
+    case "ml":
+      return "מיליליטר";
+    case "u":
+      return "יחידות";
+    default:
+      return unit;
   }
 };
 

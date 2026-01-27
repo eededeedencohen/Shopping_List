@@ -185,7 +185,7 @@ function ModalShowProductGroups({ isOpen, onClose, barcode, onSelectGroup }) {
                 >
                   {group.products.map((p) => (
                     <div key={p.barcode} className="product-card">
-                      <Image barcode={p.barcode} />
+                      <ProductImageDisplay barcode={p.barcode} />
                       <div>
                         <strong>{p.name}</strong>
                         <div>קטגוריה: {p.category}</div>

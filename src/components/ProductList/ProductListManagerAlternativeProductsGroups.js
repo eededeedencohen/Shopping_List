@@ -502,7 +502,7 @@ function ProductListManagerAlternativeProductsGroups() {
                   className="apg_product-image"
                   onClick={() => moveToPriceList(barcode)}
                 >
-                  <Image barcode={barcode} />
+                  <ProductImageDisplay barcode={barcode} />
                 </div>
               </div>
             );
@@ -540,7 +540,7 @@ function ProductListManagerAlternativeProductsGroups() {
                   </div>
                 </div>
                 <div className="apg_product-image">
-                  <Image barcode={barcode} />
+                  <ProductImageDisplay barcode={barcode} />
                 </div>
               </div>
             );
@@ -578,7 +578,7 @@ function ProductListManagerAlternativeProductsGroups() {
                   </div>
                 </div>
                 <div className="apg_product-image">
-                  <Image barcode={barcode} />
+                  <ProductImageDisplay barcode={barcode} />
                 </div>
               </div>
             );
@@ -601,7 +601,7 @@ function ProductListManagerAlternativeProductsGroups() {
                   </p>
                 </div>
                 <div className="apg_product-image">
-                  <Image barcode={barcode} />
+                  <ProductImageDisplay barcode={barcode} />
                 </div>
               </div>
             );

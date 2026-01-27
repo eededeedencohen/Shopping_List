@@ -562,7 +562,7 @@ function ProductsListGroups() {
                   className="list__product-image"
                   onClick={() => moveToPriceList(product.barcode)}
                 >
-                  <Image barcode={product.barcode} />
+                  <ProductImageDisplay barcode={product.barcode} />
                 </div>
               </div>
               <div className="list__product-operations">

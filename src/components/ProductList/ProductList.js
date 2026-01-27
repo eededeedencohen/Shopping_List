@@ -441,7 +441,7 @@ function ProductsList() {
                     onClick={() => openComparisonModal(product.barcode)}
                     onContextMenu={(e) => e.preventDefault()}
                   >
-                    <Image barcode={product.barcode} />
+                    <ProductImageDisplay barcode={product.barcode} />
                   </div>
                 </div>
                 <div className="list__product-operations">

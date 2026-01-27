@@ -1,7 +1,7 @@
 import React from "react";
 import { useState } from "react";
 import { useEffect } from "react";
-import ProductsImages from "../../../../Images/ProductsImages";
+import { ProductImageDisplay } from "../../../../Images/ProductImageService";
 // import { useCartOptimizationContext } from "../../../../../context/cart-optimizationContext";
 import { useOptimalCartsOperation } from "../../../../../hooks/optimizationHooks";
 
@@ -49,7 +49,7 @@ const EditOptimalProduct = ({
 
   // useState for the editing quantity:
   const [editingQuantity, setEditingQuantity] = useState(
-    optimalProductDetails.quantity
+    optimalProductDetails.quantity,
   );
 
   const [editedTotalPrice, setEditedTotalPrice] = useState(0);
@@ -59,11 +59,11 @@ const EditOptimalProduct = ({
     const fetchProductPrice = async () => {
       const productPrice = await getPriceByProductBarcodeAndSupermarketID(
         optimalProductDetails.barcode,
-        supermarketID
+        supermarketID,
       );
       console.log(
         "optimalProductDetails.barcode",
-        optimalProductDetails.barcode
+        optimalProductDetails.barcode,
       );
       setProductPrice(productPrice);
       setIsProductPriceLoading(false);
@@ -81,7 +81,7 @@ const EditOptimalProduct = ({
       setEditedTotalPrice(
         (editingQuantity % productPrice.discount.units) * productPrice.price +
           Math.floor(editingQuantity / productPrice.discount.units) *
-            productPrice.discount.totalPrice
+            productPrice.discount.totalPrice,
       );
     }
     // case there is no discount:
@@ -105,7 +105,7 @@ const EditOptimalProduct = ({
       productDetails.product.barcode,
       supermarketID,
       editingQuantity,
-      editedTotalPrice
+      editedTotalPrice,
     );
     closeModal();
   };
@@ -124,9 +124,9 @@ const EditOptimalProduct = ({
         <div className="edit-amount__product-details">
           <div className="product-image">
             {!isReplace ? (
-              <ProductsImages barcode={productDetails.product.barcode} />
+              <ProductImageDisplay barcode={productDetails.product.barcode} />
             ) : (
-              <ProductsImages barcode={replaceProductDetails.barcode} />
+              <ProductImageDisplay barcode={replaceProductDetails.barcode} />
             )}
           </div>
           <div className="product-details">
@@ -150,7 +150,7 @@ const EditOptimalProduct = ({
                 {convertLaterToUnitWeight(
                   !isReplace
                     ? productDetails.product.unitWeight
-                    : replaceProductDetails.unitWeight
+                    : replaceProductDetails.unitWeight,
                 )}
               </div>
               <div className="separating-line">|</div>

@@ -416,7 +416,7 @@ export default function EditProducts() {
 
             {/* עמודת תמונה (משמאל) */}
             <div className="mp_product-image">
-              <Image barcode={prod.barcode} />
+              <ProductImageDisplay barcode={prod.barcode} />
             </div>
           </div>
         ))}

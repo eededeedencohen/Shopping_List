@@ -4,7 +4,7 @@ import {
   useCartActions,
   useUpdateActiveCart,
 } from "../../../../../hooks/appHooks";
-import ProductsImages from "../../../../Images/ProductsImages";
+import { ProductImageDisplay } from "../../../../Images/ProductImageService";
 import "./CartOperationsView.css";
 
 const CartOperationsView = () => {

@@ -1,6 +1,6 @@
 import React from "react";
 import Modal from "../Cart/Modal";
-import Image from "../Images/ProductsImages";
+import { ProductImageDisplay } from "../Images/ProductImageService";
 import { useGroupState, useGroupActions } from "../../hooks/appHooks";
 import { useProductList, usePriceMap } from "../../hooks/appHooks"; // ← הוסף
 
@@ -20,7 +20,7 @@ const ProductsListGroup = ({ isOpen, groupName, onClose, canEdit = false }) => {
 
   const productMap = React.useMemo(
     () => Object.fromEntries(products.map((p) => [p.barcode, p])),
-    [products]
+    [products],
   );
 
   const group = groups.find((g) => g.groupName === groupName);
@@ -38,7 +38,7 @@ const ProductsListGroup = ({ isOpen, groupName, onClose, canEdit = false }) => {
           <div className="group-modal__grid">
             {group.barcodes.map((bc) => (
               <div key={bc} className="group-modal__card">
-                <Image barcode={bc} className="group-modal__img" />
+                <ProductImageDisplay barcode={bc} className="group-modal__img" />
 
                 {/* פרטי מוצר */}
                 <div className="group-modal__info">

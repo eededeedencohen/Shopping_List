@@ -1,5 +1,5 @@
 import React from "react";
-import ProductsImages from "../Images/ProductsImages";
+import { ProductImageDisplay } from "../Images/ProductImageService";
 import "./ProductDetails.css";
 import { convertWeightUnit } from "./ProductDetailsHelpers";
 // import { useCartOptimizationContext } from "../../context/cart-optimizationContext";
@@ -8,7 +8,7 @@ export default function productDetails({ productDetails, quantity }) {
   return (
     <div className="optimal-settings__product-details">
       <div className="image">
-        <ProductsImages barcode={productDetails.barcode} />
+        <ProductImageDisplay barcode={productDetails.barcode} />
       </div>
       <div className="details">
         <div className="name">{productDetails.name}</div>
@@ -23,7 +23,9 @@ export default function productDetails({ productDetails, quantity }) {
             {" "}
             <p>{productDetails.weight}</p>{" "}
           </div>
-          <div className="unitsWeight">{convertWeightUnit(productDetails.unitWeight)}</div>
+          <div className="unitsWeight">
+            {convertWeightUnit(productDetails.unitWeight)}
+          </div>
           <div className="separating-line">|</div>
           <div className="brand">{productDetails.brand}</div>
         </div>

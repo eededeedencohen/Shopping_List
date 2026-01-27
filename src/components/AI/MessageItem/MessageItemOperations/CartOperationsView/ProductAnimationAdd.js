@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import ProductsImages from "../../../../Images/ProductsImages";
+import { ProductImageDisplay } from "../../../../Images/ProductImageService";
 import "./ProductAnimationAdd.css";
 import CartImage from "./cart.png";
 
@@ -18,7 +18,10 @@ const ProductAnimationAdd = ({ barcode, amount }) => {
       <div className="ppa_product-animation-sequence">
         <div className="ppa_product-image-container">
           <div className="ppa_product-image-wrapper">
-            <ProductsImages barcode={barcode} className="ppa_product-image" />
+            <ProductImageDisplay
+              barcode={barcode}
+              className="ppa_product-image"
+            />
             <div className="ppa_product-amount-badge">x{amount}</div>
           </div>
         </div>

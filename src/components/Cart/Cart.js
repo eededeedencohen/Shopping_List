@@ -416,7 +416,7 @@ export default function Cart() {
                     </div>
 
                     <div className="product-image">
-                      <Images barcode={item.barcode} />
+                      <ProductImageDisplay barcode={item.barcode} />
                     </div>
                   </div>
 

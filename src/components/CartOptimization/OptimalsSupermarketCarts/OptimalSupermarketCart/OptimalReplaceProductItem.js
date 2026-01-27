@@ -1,6 +1,6 @@
 import React from "react";
 import { useState, useEffect } from "react";
-import ProductsImages from "../../../Images/ProductsImages";
+import { ProductImageDisplay } from "../../../Images/ProductImageService";
 import EditOptimalProductModal from "./EditOptimalProduct/EditOptimalProductModal";
 import EditOptimalProduct from "./EditOptimalProduct/EditOptimalProduct";
 import EditAlternativeProduct from "./EditOptimalProduct/EditAlternativeProduct";
@@ -68,7 +68,7 @@ const OptimalReplaceProductItem = ({
   const summaryElement = getSummaryElement(
     DetailsOptimalProduct,
     detailsOriginProduct,
-    isExistsInOptimalCart
+    isExistsInOptimalCart,
   );
 
   if (!isProductDetailsUpdated) {
@@ -92,12 +92,12 @@ const OptimalReplaceProductItem = ({
   return (
     <div className="optimal-product-item">
       {console.log(
-        "& & & & & & & & & & & & & & & & & & & & & & & & & & & & & &"
+        "& & & & & & & & & & & & & & & & & & & & & & & & & & & & & &",
       )}
       {console.log("DetailsOptimalProduct", DetailsOptimalProduct)}
       {console.log("productDetailsA", productDetails)}
       {console.log(
-        "& & & & & & & & & & & & & & & & & & & & & & & & & & & & & &"
+        "& & & & & & & & & & & & & & & & & & & & & & & & & & & & & &",
       )}
       <EditOptimalProductModal isOpen={isModalOpen} onClose={closeModal}>
         <EditOptimalProduct
@@ -125,7 +125,7 @@ const OptimalReplaceProductItem = ({
         {console.log("DetailsOptimalProduct", DetailsOptimalProduct)}
         {console.log("productDetails", productDetails)}
         <div className="optimal-product-item__image">
-          <ProductsImages barcode={productDetails.barcode} />
+          <ProductImageDisplay barcode={productDetails.barcode} />
         </div>
         <div className="optimal-product-item__general-details">
           <div className="optimal-product-item__name">
@@ -170,7 +170,7 @@ const OptimalReplaceProductItem = ({
               {/**the price for 100 g or 100 ml */}
               <div className="label">
                 {`:מחיר ל-100 ${getConvertedUnitWeight(
-                  detailsOriginProduct.product.unitWeight
+                  detailsOriginProduct.product.unitWeight,
                 )}`}
               </div>
               <div className="value">
@@ -179,7 +179,7 @@ const OptimalReplaceProductItem = ({
                     DetailsOptimalProduct.totalPrice,
                     DetailsOptimalProduct.quantity,
                     detailsOriginProduct.product.unitWeight,
-                    detailsOriginProduct.product.weight
+                    detailsOriginProduct.product.weight,
                   )}
               </div>
             </div>
@@ -208,7 +208,7 @@ const OptimalReplaceProductItem = ({
             <div className="price-for-one-original-product">
               <div className="label">
                 {`:מחיר ל-100 ${getConvertedUnitWeight(
-                  detailsOriginProduct.product.unitWeight
+                  detailsOriginProduct.product.unitWeight,
                 )}`}
               </div>
               <div className="value">
@@ -217,7 +217,7 @@ const OptimalReplaceProductItem = ({
                     detailsOriginProduct.totalPrice,
                     detailsOriginProduct.amount,
                     detailsOriginProduct.product.unitWeight,
-                    detailsOriginProduct.product.weight
+                    detailsOriginProduct.product.weight,
                   )}
               </div>
             </div>
@@ -240,7 +240,7 @@ const OptimalReplaceProductItem = ({
           onClick={() =>
             deleteProductFromOptimalCart(
               DetailsOptimalProduct.barcode,
-              supermarketID
+              supermarketID,
             )
           }
         >

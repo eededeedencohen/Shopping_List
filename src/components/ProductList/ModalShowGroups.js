@@ -115,7 +115,7 @@ function ModalShowGroups({
             <div key={product.barcode}>
               <div className="modal-product" style={{ cursor: "default" }}>
                 <div className="modal-product-image">
-                  <Image barcode={product.barcode} />
+                  <ProductImageDisplay barcode={product.barcode} />
                 </div>
                 <div
                   className="modal-product-details"

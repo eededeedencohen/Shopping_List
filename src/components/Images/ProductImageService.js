@@ -3,6 +3,8 @@
  * במקום להשתמש ב-import עצום, משתמש בטעינה דינמית
  */
 
+import React from "react";
+
 // Cache לשמירת תמונות שכבר טענו
 const imageCache = {};
 
@@ -43,14 +45,13 @@ export const getProductImageDirect = (barcode) => {
 /**
  * רכיב React לתצוגת תמונת מוצר
  */
-import React from "react";
 
-export const ProductImageDisplay = ({
+function ProductImageDisplay({
   barcode,
   alt = "",
   className = "",
   style = {},
-}) => {
+}) {
   const imagePath = getProductImage(barcode);
 
   if (!imagePath) {
@@ -84,10 +85,8 @@ export const ProductImageDisplay = ({
       }}
     />
   );
-};
+}
 
-export default {
-  getProductImage,
-  getProductImageDirect,
-  ProductImageDisplay,
-};
+export { ProductImageDisplay };
+
+export default ProductImageDisplay;

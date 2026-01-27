@@ -1,6 +1,6 @@
 import React from "react";
 import { useState } from "react";
-import ProductsImages from "../../../Images/ProductsImages";
+import { ProductImageDisplay } from "../../../Images/ProductImageService";
 import EditOptimalProductModal from "./EditOptimalProduct/EditOptimalProductModal";
 import EditOptimalProduct from "./EditOptimalProduct/EditOptimalProduct";
 import EditAlternativeProduct from "./EditOptimalProduct/EditAlternativeProduct";
@@ -49,7 +49,7 @@ const OptimalProductItem = ({
   const summaryElement = getSummaryElement(
     DetailsOptimalProduct,
     detailsOriginProduct,
-    isExistsInOptimalCart
+    isExistsInOptimalCart,
   );
 
   return (
@@ -86,7 +86,7 @@ const OptimalProductItem = ({
       {console.log("=========================================================")} */}
       <div className="optimal-product-item__product-details">
         <div className="optimal-product-item__image">
-          <ProductsImages barcode={DetailsOptimalProduct.barcode} />
+          <ProductImageDisplay barcode={DetailsOptimalProduct.barcode} />
         </div>
         <div className="optimal-product-item__general-details">
           <div className="optimal-product-item__name">
@@ -129,7 +129,7 @@ const OptimalProductItem = ({
               {/**the price for 100 g or 100 ml */}
               <div className="label">
                 {`:מחיר ל-100 ${getConvertedUnitWeight(
-                  detailsOriginProduct.product.unitWeight
+                  detailsOriginProduct.product.unitWeight,
                 )}`}
               </div>
               <div className="value">
@@ -138,7 +138,7 @@ const OptimalProductItem = ({
                     DetailsOptimalProduct.totalPrice,
                     DetailsOptimalProduct.quantity,
                     detailsOriginProduct.product.unitWeight,
-                    detailsOriginProduct.product.weight
+                    detailsOriginProduct.product.weight,
                   )}
               </div>
             </div>
@@ -167,7 +167,7 @@ const OptimalProductItem = ({
             <div className="price-for-one-original-product">
               <div className="label">
                 {`:מחיר ל-100 ${getConvertedUnitWeight(
-                  detailsOriginProduct.product.unitWeight
+                  detailsOriginProduct.product.unitWeight,
                 )}`}
               </div>
               <div className="value">
@@ -176,7 +176,7 @@ const OptimalProductItem = ({
                     detailsOriginProduct.totalPrice,
                     detailsOriginProduct.amount,
                     detailsOriginProduct.product.unitWeight,
-                    detailsOriginProduct.product.weight
+                    detailsOriginProduct.product.weight,
                   )}
               </div>
             </div>
@@ -199,7 +199,7 @@ const OptimalProductItem = ({
           onClick={() =>
             deleteProductFromOptimalCart(
               DetailsOptimalProduct.barcode,
-              supermarketID
+              supermarketID,
             )
           }
         >

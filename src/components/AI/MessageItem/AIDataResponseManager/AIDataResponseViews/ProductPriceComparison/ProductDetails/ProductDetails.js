@@ -1,7 +1,7 @@
 // ./ProductDetails/ProductDetails.jsx
 import React from "react";
 import "./ProductDetails.css";
-import ProductsImages from "../../../../../../Images/ProductsImages";
+import { ProductImageDisplay } from "../../../../../../Images/ProductImageService";
 
 export default function ProductDetails({ product }) {
   if (!product) {
@@ -27,7 +27,11 @@ export default function ProductDetails({ product }) {
   return (
     <div className="test_pd__wrapper" dir="rtl">
       {/* תמונה */}
-      <ProductsImages barcode={barcode} alt={name} className="test_pd__image" />
+      <ProductImageDisplay
+        barcode={barcode}
+        alt={name}
+        className="test_pd__image"
+      />
 
       {/* טקסטים */}
       <div className="test_pd__info">

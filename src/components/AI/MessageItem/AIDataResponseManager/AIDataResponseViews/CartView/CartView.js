@@ -5,7 +5,7 @@
 import React, { useRef, useState } from "react";
 import { Spin } from "antd";
 import { useFullCart, useCartActions } from "../../../../../../hooks/appHooks";
-import ProductsImages from "../../../../../Images/ProductsImages";
+import { ProductImageDisplay } from "../../../../../Images/ProductImageService";
 import "./CartView.css";
 
 const money = (n) => Number(n).toFixed(2);
@@ -66,7 +66,7 @@ const CartItem = ({ data, remove, update }) => {
       onTouchEnd={onEnd}
     >
       <div className="cv_pic">
-        <ProductsImages barcode={product.barcode} />
+        <ProductImageDisplay barcode={product.barcode} />
         <span className="cv_badge">{amount}</span>
       </div>
 
