@@ -103,7 +103,7 @@ function ReplaceProducts({ barcode, closeModal, userId }) {
             onClick={() => handleProductClick(product.barcode)}
           >
             <div className="replace-product-image">
-              <Image barcode={product.barcode} />
+              <ProductImageDisplay barcode={product.barcode} />
             </div>
             <div className="replace-product-details">
               <p className="replace-product-details__name">

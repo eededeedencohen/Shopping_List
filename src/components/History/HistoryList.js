@@ -84,7 +84,7 @@ const HistoryList = () => {
         {cart.products.map((product) => (
           <div key={product.barcode} className="history__product-item">
             <div className="history__product-image">
-              <Images barcode={product.barcode} />
+              <ProductImageDisplay barcode={product.barcode} />
             </div>
             <div className="history__product-price-container">
               <div className="history__product-amount">
