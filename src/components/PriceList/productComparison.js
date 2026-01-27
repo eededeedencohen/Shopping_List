@@ -43,10 +43,11 @@ export default function ProductComparison({ barcode }) {
 
   if (!priceList || !product) {
     return (
-      <div className="spinner-container">
-        <Spin size="large">
-          <></>
-        </Spin>
+      <div className="compareM-prices-container">
+        <div className="spinner-container-modal">
+          <Spin size="large" />
+          <p>טוען מוצרים...</p>
+        </div>
       </div>
     );
   }

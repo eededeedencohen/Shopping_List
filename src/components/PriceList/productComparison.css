@@ -16,6 +16,22 @@
   /* Smooth fade-in transition */
 }
 
+.spinner-container-modal {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 3rem 2rem;
+  min-height: 300px;
+}
+
+.spinner-container-modal p {
+  color: #666;
+  font-size: 1.1rem;
+  font-weight: 500;
+}
+
 .spinner-container p {
   color: white;
   /* Make the loading text white to contrast with the overlay */

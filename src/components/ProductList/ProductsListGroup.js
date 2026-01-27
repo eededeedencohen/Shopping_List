@@ -38,7 +38,10 @@ const ProductsListGroup = ({ isOpen, groupName, onClose, canEdit = false }) => {
           <div className="group-modal__grid">
             {group.barcodes.map((bc) => (
               <div key={bc} className="group-modal__card">
-                <ProductImageDisplay barcode={bc} className="group-modal__img" />
+                <ProductImageDisplay
+                  barcode={bc}
+                  className="group-modal__img"
+                />
 
                 {/* פרטי מוצר */}
                 <div className="group-modal__info">

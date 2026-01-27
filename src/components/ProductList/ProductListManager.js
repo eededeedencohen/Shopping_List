@@ -636,7 +636,7 @@ function ProductListManager() {
   // פונקציה שבודקת אם למוצר יש רשימת חלופות ב- allAlternativeProducts
   const hasAlternativeProducts = (barcode) => {
     const alternativeProduct = allAlternativeProducts.find(
-      (item) => item.barcode === barcode
+      (item) => item.barcode === barcode,
     );
     return alternativeProduct && alternativeProduct.alternatives.length > 0;
   };
@@ -685,9 +685,8 @@ function ProductListManager() {
   const handleCloseBarcode = async (barcode) => {
     if (selectedBarcode === barcode) {
       try {
-        const existingAlternative = await getAlternativeProductByBarcode(
-          barcode
-        );
+        const existingAlternative =
+          await getAlternativeProductByBarcode(barcode);
         if (existingAlternative?.data?.alternativeProduct) {
           await updateAlternativeProductByBarcode(barcode, groupData[barcode]);
         } else {
@@ -712,7 +711,7 @@ function ProductListManager() {
         return {
           ...prevData,
           [selectedBarcode]: currentAlternatives.filter(
-            (item) => item !== barcode
+            (item) => item !== barcode,
           ),
         };
       } else {
