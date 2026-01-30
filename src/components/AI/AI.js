@@ -38,11 +38,11 @@ function playAudioWithMouthSync(
   brobotRef,
   setSpkLevel,
   currentAudioRef,
-  isAiSpeakingRef
+  isAiSpeakingRef,
 ) {
   const audio = new Audio(url);
   currentAudioRef.current = audio;
-  audio.crossOrigin = "anonymous"; 
+  audio.crossOrigin = "anonymous";
 
   const AudioCtx = window.AudioContext || window.webkitAudioContext;
   const ctx = new AudioCtx();
@@ -60,7 +60,7 @@ function playAudioWithMouthSync(
     analyser.getByteTimeDomainData(dataArray);
     const rms =
       Math.sqrt(
-        dataArray.reduce((s, v) => s + (v - 128) ** 2, 0) / dataArray.length
+        dataArray.reduce((s, v) => s + (v - 128) ** 2, 0) / dataArray.length,
       ) || 0;
 
     setSpkLevel(Math.round(rms));
@@ -124,7 +124,7 @@ export default function AI() {
     sender,
     type = "regular",
     data = null,
-    action = {}
+    action = {},
   ) => setMessages((p) => [...p, { text, sender, type, data, action }]);
   const removeLoadingMessage = () =>
     setMessages((p) => p.filter((m) => m.type !== "loading"));
@@ -134,12 +134,19 @@ export default function AI() {
   /* ------------------------------------------------------ */
   useEffect(() => {
     console.log("Microphone effect running");
-    let ctx, analyser, dataArray, rafId;
+    let ctx, analyser, dataArray, rafId, stream;
 
     navigator.mediaDevices // browser API
-      .getUserMedia({ audio: true }) // request mic access
+      .getUserMedia({
+        audio: {
+          echoCancellation: true, // ביטול הד - למנוע מהמיקרופון לשמוע את הרמקולים
+          noiseSuppression: true, // ביטול רעשי רקע
+          autoGainControl: true, // התאמה אוטומטית של עוצמת הקול
+        },
+      }) // request mic access
       // after access granted:
-      .then((stream) => {
+      .then((mediaStream) => {
+        stream = mediaStream; // שמירת ה-stream כדי לעצור אותו ב-cleanup
         // strean is the live mic data
         ctx = new (window.AudioContext || window.webkitAudioContext)(); // audio context - in short "the audio system"
         const src = ctx.createMediaStreamSource(stream); // source from mic
@@ -154,7 +161,7 @@ export default function AI() {
           const rms = // Root Mean Square
             Math.sqrt(
               dataArray.reduce((s, v) => s + (v - 128) ** 2, 0) /
-                dataArray.length
+                dataArray.length,
             ) || 0;
 
           setMicLevel(Math.round(rms));
@@ -177,9 +184,8 @@ export default function AI() {
 
           if (isRecording) {
             if (rms <= 1) {
-              if (!quietSinceRef.current)
-                quietSinceRef.current =
-                  Date.now(); // start quiet timer if not already started
+              if (!quietSinceRef.current) quietSinceRef.current = Date.now();
+              // start quiet timer if not already started
               else if (Date.now() - quietSinceRef.current >= 1000) {
                 console.log("%c⏹ STOP recording", "color: red");
                 recorderFns.current.stop();
@@ -204,8 +210,13 @@ export default function AI() {
       .catch(console.error);
 
     return () => {
+      console.log("%c🛑 Cleaning up microphone", "color: orange");
       cancelAnimationFrame(rafId);
       ctx?.close();
+      // עצירת כל ה-tracks (המיקרופון) כשיוצאים מהעמוד
+      if (stream) {
+        stream.getTracks().forEach((track) => track.stop());
+      }
     };
   }, [isRecording, micThreshold]);
 
@@ -301,7 +312,7 @@ export default function AI() {
           brobotRef,
           setSpkLevel,
           currentAudioRef,
-          isAiSpeakingRef // ← חדש
+          isAiSpeakingRef, // ← חדש
         );
     } catch (err) {
       console.error(err);
@@ -360,7 +371,7 @@ export default function AI() {
                 setMicThreshold(+e.target.value);
                 console.log(
                   "Microphone threshold changed to:",
-                  +e.target.value
+                  +e.target.value,
                 );
               }}
             />

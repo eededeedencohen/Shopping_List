@@ -8,7 +8,7 @@ import AudioRecorder from "./components/UploadRecord/AudioRecorder";
 import HistoryPage from "./components/History/HistoryPage";
 import HistoryList from "./components/History/HistoryList";
 import CategoryList from "./components/Cart/Category/CategoryList";
-import { Stats } from "./components/Stats/Stats";
+import { Stats } from "./components/Stats/Stats.jsx";
 import TouchDirection from "./components/Finger/TouchDirection";
 import SearchBar from "./components/SearchBar/SearchBar";
 import Test from "./components/Test/Test";
