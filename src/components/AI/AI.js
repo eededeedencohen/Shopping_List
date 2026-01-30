@@ -347,6 +347,35 @@ export default function AI() {
         }}
       />
 
+      {/* אינדיקטור הקלטה */}
+      {isRecording && (
+        <>
+          <div className="recording-overlay" />
+          <div className="recording-indicator">
+            <div className="recording-dot">
+              <div className="recording-waves">
+                <div className="wave"></div>
+                <div className="wave"></div>
+                <div className="wave"></div>
+              </div>
+              <div className="recording-mic-icon">🎙️</div>
+            </div>
+            <div className="recording-text">מקליט...</div>
+            <div className="recording-level-bars">
+              {[...Array(7)].map((_, i) => (
+                <div
+                  key={i}
+                  className="level-bar"
+                  style={{
+                    height: `${Math.max(5, (micLevel / 100) * 50 * (0.5 + Math.random()))}px`,
+                  }}
+                />
+              ))}
+            </div>
+          </div>
+        </>
+      )}
+
       <div className="ai-container">
         <NeuronBackground />
 

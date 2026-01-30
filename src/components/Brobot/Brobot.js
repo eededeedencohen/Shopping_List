@@ -7,8 +7,8 @@ import React, {
 } from "react";
 import "./Brobot.css";
 
-import BrobotFront from "./BrobotImages/BrobotFront.png";
-import BrobotRight from "./BrobotImages/BrobotRight.png";
+import BrobotFront from "./BrobotImages/brobotV2.svg";
+import BrobotRight from "./BrobotImages/BrobotRight.svg";
 
 function Brobot(_, ref) {
   /* ───────── state & refs ───────── */
@@ -31,10 +31,9 @@ function Brobot(_, ref) {
   const [eyeDir, setEyeDir] = useState("center"); // up|down|left|right|center
 
   useEffect(() => {
-    [BrobotFront, BrobotRight].forEach((src) => {
-      const img = new Image();
-      img.src = src;
-    });
+    // טעינה מראש של תמונת הצד בלבד (SVG נטען אוטומטית)
+    const img = new Image();
+    img.src = BrobotRight;
   }, []);
   const eyePos = {
     center: [0, 0],
