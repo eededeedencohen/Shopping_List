@@ -190,6 +190,77 @@
   }
 }
 
+/* ─────────  NEW RECORDING INDICATOR  ───────── */
+.rec-indicator-new {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  animation: fadeIn 0.3s ease-in-out forwards;
+}
+
+/* Circle Sound Wave Container */
+.circle-sound-wave {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* פס אודיו בודד */
+.sound-bar {
+  position: absolute;
+  bottom: 50%;
+  left: 50%;
+  width: 5px;
+  height: var(--height, 30%);
+  transform-origin: bottom center;
+  transform: translateX(-50%) rotate(var(--angle, 0deg)) translateY(-50%);
+  background: linear-gradient(
+    to top,
+    hsl(var(--hue, 180), 100%, 50%),
+    hsl(var(--hue, 180), 100%, 70%)
+  );
+  border-radius: 3px;
+  box-shadow: 0 0 6px hsla(var(--hue, 180), 100%, 60%, 0.8),
+              0 0 12px hsla(var(--hue, 180), 100%, 60%, 0.4);
+  animation: barPulse 0.6s ease-in-out var(--delay, 0s) infinite alternate;
+  transition: height 0.05s ease;
+}
+
+@keyframes barPulse {
+  0% {
+    opacity: 0.7;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+/* מיקרופון במרכז */
+.rec-mic-icon-center {
+  font-size: 22px;
+  position: relative;
+  z-index: 10;
+  animation: micRotate 4s linear infinite;
+  filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.7));
+}
+
+@keyframes micRotate {
+  0% {
+    transform: rotate(0deg) scale(1);
+  }
+  50% {
+    transform: rotate(180deg) scale(1.1);
+  }
+  100% {
+    transform: rotate(360deg) scale(1);
+  }
+}
+
 /* ─────────  CONTROL PANEL  ───────── */
 .brobot-panel {
   position: fixed;

@@ -165,6 +165,10 @@ export default function AI() {
             ) || 0;
 
           setMicLevel(Math.round(rms));
+          // עדכון Brobot עם רמת המיקרופון בזמן אמת
+          if (isRecording) {
+            brobotRef.current?.updateRecLevel(Math.round(rms));
+          }
 
           // ✅ תנאי חדש - לא להתחיל הקלטה כשה-AI מדבר
           if (
@@ -179,6 +183,7 @@ export default function AI() {
             speechSynthesis.cancel(); // stop any ongoing TTS - cancel all queued utterances
             recorderFns.current.start(); // start recording
             setIsRecording(true); // update state to indicate recording has started
+            brobotRef.current?.recordStart(); // 🎙️ הצגת אינדיקטור הקלטה ב-Brobot
             quietSinceRef.current = null; // reset quiet timer - reset the quiet timer - ignore any previous quiet time
           }
 
@@ -190,12 +195,9 @@ export default function AI() {
                 console.log("%c⏹ STOP recording", "color: red");
                 recorderFns.current.stop();
                 setIsRecording(false);
+                brobotRef.current?.recordStop(); // ⏹️ הסתרת אינדיקטור הקלטה ב-Brobot
                 quietSinceRef.current = null;
-                // משחרר את הנעילה אחרי שנייה
-                setTimeout(() => {
-                  recordingLock.current = false;
-                  console.log("%c🔓 UNLOCKED", "color: orange");
-                }, 1000);
+                // הנעילה תישאר עד לתשובה מהשרת
               }
             } else {
               quietSinceRef.current = null;
@@ -314,10 +316,18 @@ export default function AI() {
           currentAudioRef,
           isAiSpeakingRef, // ← חדש
         );
+
+      // 🔓 משחרר נעילה אחרי תשובה מהשרת
+      recordingLock.current = false;
+      console.log("%c🔓 UNLOCKED after server response", "color: green");
     } catch (err) {
       console.error(err);
       removeLoadingMessage();
       addMessage("⚠️ שגיאה בעיבוד ההקלטה.", "assistant");
+
+      // 🔓 משחרר נעילה גם במקרה של שגיאה
+      recordingLock.current = false;
+      console.log("%c🔓 UNLOCKED after error", "color: orange");
     }
   };
 
@@ -346,35 +356,6 @@ export default function AI() {
           return null;
         }}
       />
-
-      {/* אינדיקטור הקלטה */}
-      {isRecording && (
-        <>
-          <div className="recording-overlay" />
-          <div className="recording-indicator">
-            <div className="recording-dot">
-              <div className="recording-waves">
-                <div className="wave"></div>
-                <div className="wave"></div>
-                <div className="wave"></div>
-              </div>
-              <div className="recording-mic-icon">🎙️</div>
-            </div>
-            <div className="recording-text">מקליט...</div>
-            <div className="recording-level-bars">
-              {[...Array(7)].map((_, i) => (
-                <div
-                  key={i}
-                  className="level-bar"
-                  style={{
-                    height: `${Math.max(5, (micLevel / 100) * 50 * (0.5 + Math.random()))}px`,
-                  }}
-                />
-              ))}
-            </div>
-          </div>
-        </>
-      )}
 
       <div className="ai-container">
         <NeuronBackground />

@@ -27,6 +27,7 @@ function Brobot(_, ref) {
   const [shaking, setShaking] = useState(false);
 
   const [recording, setRecording] = useState(false);
+  const [recLevel, setRecLevel] = useState(0); // רמת מיקרופון בזמן הקלטה
 
   const [eyeDir, setEyeDir] = useState("center"); // up|down|left|right|center
 
@@ -156,6 +157,10 @@ function Brobot(_, ref) {
     recordStop() {
       stopRec();
     },
+    /* עדכון רמת הקלטה בזמן אמת */
+    updateRecLevel(level) {
+      setRecLevel(level);
+    },
   }));
 
   /* ───────── panel state ───────── */
@@ -198,10 +203,30 @@ function Brobot(_, ref) {
               />
             </>
           ) : (
-            <div className="rec-indicator">
-              {Array.from({ length: 5 }).map((_, i) => (
-                <span key={i} className="bar" style={{ "--i": i }} />
-              ))}
+            <div className="rec-indicator-new">
+              <div className="circle-sound-wave">
+                {[...Array(24)].map((_, i) => {
+                  const angle = (i / 24) * 360;
+                  // רגישות מוגברת: 30% בסיס + עד 60% נוסף
+                  const baseHeight = 30 + (recLevel / 100) * 60;
+                  const randomFactor = 0.5 + Math.random() * 1.0;
+                  const height = Math.min(baseHeight * randomFactor, 100);
+
+                  return (
+                    <div
+                      key={i}
+                      className="sound-bar"
+                      style={{
+                        '--angle': `${angle}deg`,
+                        '--height': `${height}%`,
+                        '--hue': `${180 + (i / 24) * 60}`, // ציאן לסגול
+                        '--delay': `${i * 0.02}s`
+                      }}
+                    />
+                  );
+                })}
+                <div className="rec-mic-icon-center">🎙️</div>
+              </div>
             </div>
           )}
         </div>
