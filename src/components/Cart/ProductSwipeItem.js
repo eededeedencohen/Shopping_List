@@ -1,6 +1,6 @@
 // src/components/cart/ProductSwipeItem.js
 import React, { useState, useRef } from "react";
-import "./ProductSwipeItem.css";
+import styles from "./ProductSwipeItem.module.css";
 
 export default function ProductSwipeItem({ item, onRemove, children }) {
   const [touchStart, setTouchStart] = useState({ x: 0, y: 0 });
@@ -47,7 +47,7 @@ export default function ProductSwipeItem({ item, onRemove, children }) {
   return (
     <div
       ref={rowRef}
-      className={`product-row ${status === "exiting" ? "slide-out" : ""}`}
+      className={`${styles['product-row']} ${status === "exiting" ? styles['slide-out'] : ""}`}
       style={dynamicStyle}
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}

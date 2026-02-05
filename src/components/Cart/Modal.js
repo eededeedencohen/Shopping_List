@@ -1,6 +1,6 @@
 // import React, { useEffect } from "react";
 import ReactDOM from "react-dom";
-import "./Modal.css";
+import styles from "./Modal.module.css";
 
 const Modal = ({ isOpen, children, onClose }) => {
   if (!isOpen) {
@@ -9,17 +9,17 @@ const Modal = ({ isOpen, children, onClose }) => {
 
   const handleOverlayClick = (event) => {
     // Check if the clicked target is the overlay itself and not the modal window
-    if (event.target.className === "modal-overlay") {
+    if (event.target.className === styles['modal-overlay']) {
       onClose();
     }
   };
 
   return ReactDOM.createPortal(
-    <div className="modal-overlay" onClick={handleOverlayClick}>
-      <div className="modal-window">
+    <div className={styles['modal-overlay']} onClick={handleOverlayClick}>
+      <div className={styles['modal-window']}>
         {children}
-        <div className="close-button-container">
-          <button className="close-button" onClick={onClose}>
+        <div className={styles['close-button-container']}>
+          <button className={styles['close-button']} onClick={onClose}>
             X
           </button>
         </div>

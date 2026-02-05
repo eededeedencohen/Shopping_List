@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import Modal from "./Modal";
 import ReplaceProducts from "./ReplaceProducts";
 import ReplaceSupermarket from "./ReplaceSupermarket/ReplaceSupermarket";
-import "./Cart.css";
+import styles from "./Cart.module.css";
 import { Spin } from "antd";
 import {
   getProductImage,
@@ -144,6 +144,7 @@ export default function Cart() {
 
   // Loading state
   const [isReplaceSupermarket, setIsReplaceSupermarket] = useState(false);
+  const [loadingMessage, setLoadingMessage] = useState("טוען...");
 
   // Modals
   const [isModalOpen, setModalOpen] = useState(false);
@@ -166,15 +167,15 @@ export default function Cart() {
   };
 
   const handleUpdateAndLoad = async (newSupermarketID) => {
+    setLoadingMessage("מחליף סופרמרקט...");
     setIsReplaceSupermarket(true);
     try {
-      replaceSupermarket(newSupermarketID); // רק עדכון הקונטקסט
-      // sendActiveCart(); // עדכון הקונטקסט עם הסופרמרקט החדש
+      replaceSupermarket(newSupermarketID);
     } catch (error) {
       console.error("Error replacing supermarket:", error);
     } finally {
       setIsReplaceSupermarket(false);
-      setIsReplaceSupermarketOpen(false); // סגור את המודל
+      setIsReplaceSupermarketOpen(false);
     }
   };
 
@@ -183,7 +184,8 @@ export default function Cart() {
   };
 
   const handleCheapestCart = async () => {
-    setIsReplaceSupermarket(true); // ← תפעיל ספינר
+    setLoadingMessage("מחפש את המחיר הכי זול...");
+    setIsReplaceSupermarket(true);
 
     try {
       const success = await replaceRandomCheapest(cartItems);
@@ -193,15 +195,15 @@ export default function Cart() {
     } catch (error) {
       console.error("Error optimizing cart:", error);
     } finally {
-      setIsReplaceSupermarket(false); // ← תכבה ספינר
+      setIsReplaceSupermarket(false);
     }
   };
 
   if (isReplaceSupermarket || isLoadingPrices) {
     return (
-      <div className="spinner-container">
+      <div className={styles['spinner-container']}>
         <Spin size="large"></Spin>
-        <p>מחליף סופרמרקט</p>
+        <p>{loadingMessage}</p>
       </div>
     );
   }
@@ -230,7 +232,7 @@ export default function Cart() {
   ///////////////////////////////////////////////////
 
   return (
-    <div className="cart">
+    <div className={styles.cart}>
       {console.log("cart2 in cart.js", cart)}
       <Modal isOpen={isModalOpen} onClose={() => setModalOpen(false)}>
         <ReplaceProducts
@@ -252,10 +254,10 @@ export default function Cart() {
       {/* ///////////////////////////////////////////////////////////////////////////////////////////*/}
       {/* ///////////////////////////////////////////////////////////////////////////////////////////*/}
 
-      <div className="cart-operations">
+      <div className={styles['cart-operations']}>
         {/* =============================================cart-operations_replace-supermarket START============================================= */}
         <div
-          className="cart-operations_replace-supermarket"
+          className={styles['cart-operations_replace-supermarket']}
           onClick={() => setIsReplaceSupermarketOpen(true)}
         >
           החלפת סופרמרקט{" "}
@@ -264,7 +266,7 @@ export default function Cart() {
 
         {/* ////////////////////////////////////////cart-operations_cheapest-supermarket START//////////////////////////////////////// */}
         <div
-          className="cart-operations_cheapest-supermarket"
+          className={styles['cart-operations_cheapest-supermarket']}
           onClick={() => {
             const handleOptimizeCart = async () => {
               setIsReplaceSupermarket(true); // Start loading
@@ -292,7 +294,7 @@ export default function Cart() {
 
         {/* +++++++++++++++++++++++++++++++++++++cart-operations_optimal-carts-settings START++++++++++++++++++++++++++++++++++++++++ */}
         <div
-          className="cart-operations_optimal-carts-settings"
+          className={styles['cart-operations_optimal-carts-settings']}
           onClick={() => navigate("/optimal-carts-settings")}
         >
           מעבר לאופטימיזציית עגלות
@@ -307,35 +309,35 @@ export default function Cart() {
       {/* ///////////////////////////////////////////////////////////////////////////////////////////*/}
       {/* ///////////////////////////////////////////////////////////////////////////////////////////*/}
 
-      <div className="supermarket">
+      <div className={styles.supermarket}>
         {/* <div className="supermarket-title">
           <h3>הסופרמרקט הכי משתלם לעגלה שלך</h3>
         </div> */}
-        <div className="supermarket-logo">
+        <div className={styles['supermarket-logo']}>
           <SupermarketImage supermarketName={currentSupermarket.name} />
         </div>
-        <div className="supermarket-address">
-          <div className="supermarket-address__city">
+        <div className={styles['supermarket-address']}>
+          <div className={styles['supermarket-address__city']}>
             {currentSupermarket && currentSupermarket.city}
           </div>
-          <div className="supermarket-Street__street">
+          <div className={styles['supermarket-Street__street']}>
             ,{currentSupermarket && currentSupermarket.address}
           </div>
         </div>
-        <hr className="line" />
+        <hr className={styles.line} />
       </div>
-      <div className="total-price">
-        <div className="total-price__title">
+      <div className={styles['total-price']}>
+        <div className={styles['total-price__title']}>
           <h1>סכום כולל של העגלה שלך</h1>
         </div>
-        <div className="total-price__price">
+        <div className={styles['total-price__price']}>
           <h1>{totalPrice}₪</h1>
         </div>
       </div>
-      <hr className="line" />
-      <div className="products">
+      <hr className={styles.line} />
+      <div className={styles.products}>
         {cartItems.length === 0 ? (
-          <div className="cart-test_empty">
+          <div className={styles['cart-test_empty']}>
             <p>אין מוצרים בעגלה</p>
           </div>
         ) : (
@@ -357,14 +359,14 @@ export default function Cart() {
               >
                 <div>
                   <div
-                    className="product"
+                    className={styles.product}
                     onClick={() => {
                       setCurrentBarcode(item.barcode);
                       setModalOpen(true);
                     }}
                   >
-                    <div className="product-details">
-                      <div className="product-details__name">
+                    <div className={styles['product-details']}>
+                      <div className={styles['product-details__name']}>
                         <span>
                           {item.name.split(" ").slice(0, 3).join(" ")}
                         </span>
@@ -378,9 +380,9 @@ export default function Cart() {
                           width: "100%",
                         }}
                       >
-                        <div className="product-details__weight">
+                        <div className={styles['product-details__weight']}>
                           <span>{convertWeightUnit(item.unitWeight)} </span>
-                          <span className="size">{item.weight}</span>
+                          <span className={styles.size}>{item.weight}</span>
                         </div>
                         <span
                           style={{
@@ -392,14 +394,14 @@ export default function Cart() {
                         >
                           |
                         </span>
-                        <div className="product-details__brand">
+                        <div className={styles['product-details__brand']}>
                           <span>{item.brand}</span>
                         </div>
                       </div>
                     </div>
 
-                    <div className="product-price">
-                      <div className="product-price__amount">
+                    <div className={styles['product-price']}>
+                      <div className={styles['product-price__amount']}>
                         <span
                           style={{ fontSize: "0.8rem", alignSelf: "baseline" }}
                         >
@@ -407,7 +409,7 @@ export default function Cart() {
                         </span>
                         <span>{item.amountInCart}</span>
                       </div>
-                      <div className="product-price__total-price">
+                      <div className={styles['product-price__total-price']}>
                         <b style={{ fontSize: "1.2em" }}>₪</b>
                         <span style={{ fontSize: "1.2rem" }}>
                           {item.totalPrice.toFixed(2)}
@@ -415,26 +417,32 @@ export default function Cart() {
                       </div>
                     </div>
 
-                    <div className="product-image">
+                    <div className={styles['product-image']}>
                       <ProductImageDisplay barcode={item.barcode} />
                     </div>
                   </div>
 
-                  {/* ===== totals difference visual (optional) ===== */}
+                  {/* ===== הצגת מחיר חדש בעת עריכה ===== */}
                   {hasChanged && (
-                    <div className="product-diff">
-                      <small>
-                        {`סה"כ חדש: ${newTotal.toFixed(
-                          2,
-                        )} ₪ → קודם: ${currentTotal.toFixed(2)} ₪`}
-                      </small>
+                    <div className={styles['product-diff']}>
+                      <div className={styles['product-diff__content']}>
+                        <span className={styles['product-diff__new']}>
+                          <span className={styles['product-diff__label']}>חדש:</span>
+                          <span className={styles['product-diff__value']}>{newTotal.toFixed(2)}₪</span>
+                        </span>
+                        <span className={styles['product-diff__arrow']}>←</span>
+                        <span className={styles['product-diff__old']}>
+                          <span className={styles['product-diff__label']}>קודם:</span>
+                          <span className={styles['product-diff__value']}>{currentTotal.toFixed(2)}₪</span>
+                        </span>
+                      </div>
                     </div>
                   )}
 
-                  <div className="update-amount">
-                    <div className="update-amount__new">
+                  <div className={`${styles['update-amount']} ${hasChanged ? styles['update-amount--editing'] : ''}`}>
+                    <div className={styles['update-amount__new']}>
                       <button
-                        className="update-amount__minus-button"
+                        className={styles['update-amount__minus-button']}
                         onMouseDown={(e) => e.stopPropagation()}
                         onTouchStart={(e) => e.stopPropagation()}
                         onClick={(e) => {
@@ -450,13 +458,13 @@ export default function Cart() {
 
                       <input
                         type="text"
-                        className="amount-display"
+                        className={styles['amount-display']}
                         value={currentDraftAmount}
                         readOnly
                       />
 
                       <button
-                        className="update-amount__plus-button"
+                        className={styles['update-amount__plus-button']}
                         onMouseDown={(e) => e.stopPropagation()}
                         onTouchStart={(e) => e.stopPropagation()}
                         onClick={(e) => {
@@ -471,10 +479,10 @@ export default function Cart() {
                       </button>
                     </div>
 
-                    <div className="update-amount__update_and_cencal">
-                      <div className="update-amount__update-button">
+                    {hasChanged && (
+                      <div className={styles['update-amount__update_and_cencal']}>
                         <button
-                          disabled={!hasChanged}
+                          className={styles['update-amount__update-btn']}
                           onClick={() => {
                             update(item.barcode, currentDraftAmount);
                             clearDraftAmount(item.barcode);
@@ -482,15 +490,16 @@ export default function Cart() {
                         >
                           עדכן
                         </button>
-                      </div>
-                      <div className="update-amount__cancel-button">
-                        <button onClick={() => clearDraftAmount(item.barcode)}>
+                        <button
+                          className={styles['update-amount__cancel-btn']}
+                          onClick={() => clearDraftAmount(item.barcode)}
+                        >
                           בטל
                         </button>
                       </div>
-                    </div>
+                    )}
 
-                    <div className="cart__delete-product">
+                    <div className={styles['cart__delete-product']}>
                       <button
                         onMouseDown={(e) => e.stopPropagation()}
                         onTouchStart={(e) => e.stopPropagation()}
@@ -512,14 +521,15 @@ export default function Cart() {
         )}
       </div>
 
-      <div
-        className="green-button"
-        style={{ display: cartItems.length === 0 ? "none" : "block" }}
-      >
-        <button className="green-button__button" onClick={handleConfirmCart}>
-          Confirm Cart
-        </button>
-      </div>
+      {cartItems.length > 0 && (
+        <div className={styles['confirm-footer']}>
+          <button className={styles['confirm-footer__button']} onClick={handleConfirmCart}>
+            <span className={styles['confirm-footer__icon']}>✓</span>
+            <span className={styles['confirm-footer__text']}>אישור הזמנה</span>
+            <span className={styles['confirm-footer__price']}>{totalPrice}₪</span>
+          </button>
+        </div>
+      )}
     </div>
   );
 }
@@ -534,35 +544,56 @@ const SWIPE_BIG_MS = 150; // כמו bigSwipeVibration
 const hasVibration =
   typeof navigator !== "undefined" && typeof navigator.vibrate === "function";
 
+// Chrome requires completed user gesture before vibration works
+// We track touch END (not start) to ensure the gesture is complete
+let userGestureCompleted = false;
+if (typeof document !== "undefined") {
+  const markGestureComplete = () => {
+    userGestureCompleted = true;
+    document.removeEventListener("touchend", markGestureComplete);
+    document.removeEventListener("mouseup", markGestureComplete);
+  };
+  document.addEventListener("touchend", markGestureComplete, { once: true });
+  document.addEventListener("mouseup", markGestureComplete, { once: true });
+}
+
 const vibrate = (pattern) => {
-  if (!hasVibration) return;
-  navigator.vibrate(pattern);
+  // Only vibrate if user has completed at least one gesture
+  if (!hasVibration || !userGestureCompleted) return;
+  try {
+    navigator.vibrate(pattern);
+  } catch {
+    // Silently ignore vibration errors
+  }
 };
 
 function SwipeRow({ children, onIncrement, onDecrement, onRemove, outerRef }) {
-  const LONG_MS = 1000; // משך לחיצה ארוכה
-  const LONG_VISUAL_DELAY = 200; // אחרי 0.2s מתחילה הגדילה של המסגרת
-  const SWIPE_TRIGGER = 40; // מינימום לסווייפ קצר (לפלוס/מינוס)
-  const REMOVE_THRESHOLD = 140; // כמה לגרור ימינה למחיקה
-  const MAX_NORMAL_SHIFT = 60; // תזוזה פיזית מקסימלית בסווייפ קצר
-  const DEADZONE_NORMAL = 20; // אזור מת במצב רגיל
-  const DEADZONE_DELETE = 12; // אזור מת במצב מחיקה
+  const LONG_MS = 1000;
+  const LONG_VISUAL_DELAY = 200;
+  const SWIPE_TRIGGER = 40;
+  const REMOVE_THRESHOLD = 140;
+  const MAX_NORMAL_SHIFT = 60;
+  const DEADZONE_NORMAL = 20;
+  const DEADZONE_DELETE = 12;
 
   const [dxDelete, setDxDelete] = useState(0);
   const [dxNormal, setDxNormal] = useState(0);
   const [dragging, setDragging] = useState(false);
   const [deleteMode, setDeleteMode] = useState(false);
   const [spring, setSpring] = useState(false);
+  const [springStartX, setSpringStartX] = useState(0); // שמירת המיקום לאנימציה
   const [swipeActive, setSwipeActive] = useState(false);
-  const [pressProgress, setPressProgress] = useState(0); // 0..1
+  const [pressProgress, setPressProgress] = useState(0);
 
+  const containerRef = useRef(null);
   const startX = useRef(0);
   const startY = useRef(0);
   const longPressTimer = useRef(null);
   const rafId = useRef(null);
   const pressStart = useRef(0);
   const moved = useRef(0);
-  const lastDxRef = useRef(0); // תזוזה אחרונה, כדי לחשב רטט קטן
+  const lastDxRef = useRef(0);
+  const swipeActiveRef = useRef(false);
 
   const clearLP = () => {
     if (longPressTimer.current) {
@@ -598,6 +629,7 @@ function SwipeRow({ children, onIncrement, onDecrement, onRemove, outerRef }) {
     startY.current = clientY ?? 0;
     moved.current = 0;
     lastDxRef.current = 0;
+    swipeActiveRef.current = false;
     setDragging(true);
     setDeleteMode(false);
     setSwipeActive(false);
@@ -611,38 +643,41 @@ function SwipeRow({ children, onIncrement, onDecrement, onRemove, outerRef }) {
     rafId.current = requestAnimationFrame(tickPress);
     longPressTimer.current = setTimeout(() => {
       setDeleteMode(true);
-      setPressProgress(1); // הגיע לקצה
-      setDxNormal(0); // ✅ איפוס התזוזה הרגילה כשעוברים למצב מחיקה
+      setPressProgress(1);
+      setDxNormal(0);
       setSwipeActive(false);
+      swipeActiveRef.current = false;
     }, LONG_MS);
   };
 
-  const move = (clientX, clientY) => {
+  const move = (clientX, clientY, deleteModeLocal) => {
     if (!dragging) return;
     const deltaX = clientX - startX.current;
     const deltaY = (clientY ?? 0) - startY.current;
     moved.current = deltaX;
 
-    if (deleteMode) {
-      if (!swipeActive) {
+    if (deleteModeLocal) {
+      if (!swipeActiveRef.current) {
         if (deltaX >= DEADZONE_DELETE && Math.abs(deltaX) > Math.abs(deltaY)) {
+          swipeActiveRef.current = true;
           setSwipeActive(true);
         } else {
-          return;
+          return false;
         }
       }
       setDxDelete(Math.max(0, deltaX));
-      return;
+      return true;
     }
 
-    if (!swipeActive) {
+    if (!swipeActiveRef.current) {
       if (
         Math.abs(deltaX) >= DEADZONE_NORMAL &&
         Math.abs(deltaX) > Math.abs(deltaY)
       ) {
+        swipeActiveRef.current = true;
         setSwipeActive(true);
       } else {
-        return;
+        return false;
       }
     }
 
@@ -652,71 +687,94 @@ function SwipeRow({ children, onIncrement, onDecrement, onRemove, outerRef }) {
     );
     setDxNormal(clamped);
 
-    // ----- רטט קטן לפי מהירות ההחלקה (מצב רגיל בלבד) -----
     const step = Math.abs(deltaX - lastDxRef.current);
     if (step > 2 && SWIPE_VIBRATION_FACTOR > 0) {
       const vibrateMs = Math.min(step * SWIPE_VIBRATION_FACTOR, 100);
       vibrate(vibrateMs);
     }
     lastDxRef.current = deltaX;
+    return true;
   };
 
-  const end = () => {
+  const end = (deleteModeLocal, dxDeleteLocal, dxNormalLocal) => {
     if (!dragging) return;
     clearLP();
     stopRaf();
     setDragging(false);
 
-    if (deleteMode) {
-      if (dxDelete >= REMOVE_THRESHOLD) {
+    if (deleteModeLocal) {
+      if (dxDeleteLocal >= REMOVE_THRESHOLD) {
         setDxDelete(260);
         setTimeout(onRemove, 140);
       } else {
-        if (dxDelete !== 0) {
+        if (dxDeleteLocal !== 0) {
+          // שמירת המיקום לפני האיפוס לאנימציית הקפיצה
+          setSpringStartX(dxDeleteLocal);
           setSpring(true);
         }
         setDxDelete(0);
         setDeleteMode(false);
-        setDxNormal(0); // ✅ לוודא שאחרי יציאה ממצב מחיקה אין תזוזה ישנה
+        setDxNormal(0);
       }
       setSwipeActive(false);
+      swipeActiveRef.current = false;
       setPressProgress(0);
       return;
     }
 
-    if (swipeActive && Math.abs(moved.current) >= SWIPE_TRIGGER) {
+    if (swipeActiveRef.current && Math.abs(moved.current) >= SWIPE_TRIGGER) {
       if (moved.current > 0) onIncrement();
       else onDecrement();
 
-      // ----- רטט גדול בסיום סווייפ, רק אם המרחק מספיק -----
       const absMove = Math.abs(moved.current);
       if (absMove >= SWIPE_DISTANCE_MIN_FOR_BIG && SWIPE_BIG_MS > 0) {
         vibrate(SWIPE_BIG_MS);
       }
     }
 
-    if (dxNormal !== 0) {
+    if (dxNormalLocal !== 0) {
+      // שמירת המיקום לפני האיפוס לאנימציית הקפיצה
+      setSpringStartX(dxNormalLocal);
       setSpring(true);
     }
     setDxNormal(0);
     setSwipeActive(false);
+    swipeActiveRef.current = false;
     setPressProgress(0);
   };
 
+  // Mouse handlers
   const onMouseDown = (e) => begin(e.clientX, e.clientY);
-  const onMouseMove = (e) => move(e.clientX, e.clientY);
-  const onMouseUp = end;
-  const onMouseLeave = () => dragging && end();
+  const onMouseMove = (e) => move(e.clientX, e.clientY, deleteMode);
+  const onMouseUp = () => end(deleteMode, dxDelete, dxNormal);
+  const onMouseLeave = () => dragging && end(deleteMode, dxDelete, dxNormal);
+
+  // Touch handlers - using useEffect for non-passive listener
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    const handleTouchMove = (e) => {
+      if (!dragging) return;
+      const shouldPrevent = move(e.touches[0].clientX, e.touches[0].clientY, deleteMode);
+      // Only preventDefault if the event is cancelable (not already scrolling)
+      if (shouldPrevent && swipeActiveRef.current && e.cancelable) {
+        e.preventDefault();
+      }
+    };
+
+    container.addEventListener('touchmove', handleTouchMove, { passive: false });
+
+    return () => {
+      container.removeEventListener('touchmove', handleTouchMove);
+    };
+  }, [dragging, deleteMode]);
 
   const onTouchStart = (e) => begin(e.touches[0].clientX, e.touches[0].clientY);
-  const onTouchMove = (e) => {
-    move(e.touches[0].clientX, e.touches[0].clientY);
-    if (swipeActive) e.preventDefault();
-  };
-  const onTouchEnd = end;
+  const onTouchEnd = () => end(deleteMode, dxDelete, dxNormal);
 
   const uiDx = deleteMode ? dxDelete : dxNormal;
-  const borderRatio = pressProgress; // 0..1
+  const borderRatio = pressProgress;
 
   const shadowStage = !deleteMode
     ? "idle"
@@ -726,49 +784,51 @@ function SwipeRow({ children, onIncrement, onDecrement, onRemove, outerRef }) {
         ? "show"
         : "idle";
 
+  // Combine refs
+  const setRefs = (node) => {
+    containerRef.current = node;
+    if (outerRef) outerRef(node);
+  };
+
   return (
     <div
-      ref={outerRef}
-      className="swipe-container"
+      ref={setRefs}
+      className={styles['swipe-container']}
       onMouseDown={onMouseDown}
       onMouseMove={onMouseMove}
       onMouseUp={onMouseUp}
       onMouseLeave={onMouseLeave}
       onTouchStart={onTouchStart}
-      onTouchMove={onTouchMove}
       onTouchEnd={onTouchEnd}
       onContextMenu={(e) => e.preventDefault()}
       style={{ cursor: dragging ? "grabbing" : "grab" }}
     >
-      {/* רקע למחיקה מאחורי הכרטיסייה */}
       <div
-        className={`shadow ${shadowStage}`}
+        className={`${styles.shadow} ${styles[shadowStage] || ''}`}
         style={{ width: Math.min(dxDelete, REMOVE_THRESHOLD) + 12 }}
       >
         {shadowStage === "show" && (
-          <span className="shadow-text">החזק 1ש׳ ואז החלק ימינה למחיקה</span>
+          <span className={styles['shadow-text']}>החזק 1ש׳ ואז החלק ימינה למחיקה</span>
         )}
         {shadowStage === "armed" && (
-          <span className="shadow-text strong">שחרר כדי למחוק</span>
+          <span className={`${styles['shadow-text']} ${styles.strong}`}>שחרר כדי למחוק</span>
         )}
       </div>
 
-      {/* התוכן המקורי של הכרטיסייה (product וכו') */}
       <div
-        className={`swipe-content ${dragging ? "dragging" : ""} ${
-          spring ? "spring" : ""
-        }`}
+        className={`${styles['swipe-content']} ${dragging ? styles.dragging : ""} ${spring ? styles.spring : ""}`}
         style={{
-          transform: `translateX(${uiDx}px)`,
-          "--startX": `${uiDx}px`,
+          transform: spring ? undefined : `translateX(${uiDx}px)`,
+          "--startX": `${springStartX}px`,
           boxShadow:
             borderRatio > 0
-              ? `0 0 0 ${1 + 3 * borderRatio}px rgba(255,59,48,${
-                  0.4 + 0.6 * borderRatio
-                })`
+              ? `0 0 0 ${1 + 3 * borderRatio}px rgba(255,59,48,${0.4 + 0.6 * borderRatio})`
               : "none",
         }}
-        onAnimationEnd={() => setSpring(false)}
+        onAnimationEnd={() => {
+          setSpring(false);
+          setSpringStartX(0);
+        }}
       >
         {children}
       </div>
