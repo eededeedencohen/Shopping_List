@@ -4,6 +4,11 @@ import { Link } from "react-router-dom";
 import SupermarketImage from "../Images/SupermarketImage";
 import "./HistoryPage.css";
 import { DOMAIN } from "../../constants";
+import { ReactComponent as SearchIcon } from "./search.svg";
+import { ReactComponent as ScheduleIcon } from "./schedule.svg";
+import { ReactComponent as ShoppingListIcon } from "./shopping-list.svg";
+import { ReactComponent as ShekelIcon } from "./shekel.svg";
+import { useCartOptimizationCtx } from "../../context/CartOptimizationContext";
 
 const HistoryPage = () => {
   const [history, setHistory] = useState([]);
@@ -11,6 +16,8 @@ const HistoryPage = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState("date-desc");
   const [filterSupermarket, setFilterSupermarket] = useState("all");
+
+  const { allSupermarkets, isAllSupermarketsUploaded } = useCartOptimizationCtx();
 
   useEffect(() => {
     const fetchHistory = async () => {
@@ -27,11 +34,12 @@ const HistoryPage = () => {
     fetchHistory();
   }, []);
 
-  // Get unique supermarkets for filter
-  const supermarkets = useMemo(() => {
-    const unique = [...new Set(history.map((cart) => cart.supermarketName))];
-    return unique.filter(Boolean);
-  }, [history]);
+  // Get unique supermarket names from allSupermarkets context
+  const supermarketNames = useMemo(() => {
+    if (!isAllSupermarketsUploaded || !allSupermarkets.length) return [];
+    const uniqueNames = [...new Set(allSupermarkets.map((s) => s.name))];
+    return uniqueNames.filter(Boolean);
+  }, [allSupermarkets, isAllSupermarketsUploaded]);
 
   // Calculate stats
   const stats = useMemo(() => {
@@ -99,7 +107,7 @@ const HistoryPage = () => {
     <div className="history-page-container">
       {/* Header */}
       <div className="history-page-header">
-        <h1 className="history-page-title">🧾 היסטוריית קניות</h1>
+        <h1 className="history-page-title">היסטוריית קניות</h1>
         <p className="history-page-subtitle">כל הקבלות שלך במקום אחד</p>
       </div>
 
@@ -127,13 +135,16 @@ const HistoryPage = () => {
 
       {/* Filters */}
       <div className="history-filters">
-        <input
-          type="text"
-          className="history-search-input"
-          placeholder="🔍 חפש לפי סופר, כתובת או עיר..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-        />
+        <div className="history-search-wrapper">
+          <SearchIcon className="history-search-icon" />
+          <input
+            type="text"
+            className="history-search-input"
+            placeholder="חפש לפי סופר, כתובת או עיר..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </div>
 
         <div className="history-filter-buttons">
           <button
@@ -144,7 +155,7 @@ const HistoryPage = () => {
           >
             הכל
           </button>
-          {supermarkets.slice(0, 3).map((supermarket) => (
+          {supermarketNames.map((supermarket) => (
             <button
               key={supermarket}
               className={`history-filter-btn ${
@@ -157,22 +168,29 @@ const HistoryPage = () => {
           ))}
         </div>
 
-        <select
-          className="history-sort-select"
-          value={sortBy}
-          onChange={(e) => setSortBy(e.target.value)}
-        >
-          <option value="date-desc">📅 חדש לישן</option>
-          <option value="date-asc">📅 ישן לחדש</option>
-          <option value="price-desc">💰 יקר לזול</option>
-          <option value="price-asc">💰 זול ליקר</option>
-        </select>
+        <div className="history-sort-wrapper">
+          {sortBy.includes("date") ? (
+            <ScheduleIcon className="history-sort-icon" />
+          ) : (
+            <ShekelIcon className="history-sort-icon" />
+          )}
+          <select
+            className="history-sort-select"
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value)}
+          >
+            <option value="date-desc">חדש לישן</option>
+            <option value="date-asc">ישן לחדש</option>
+            <option value="price-desc">יקר לזול</option>
+            <option value="price-asc">זול ליקר</option>
+          </select>
+        </div>
       </div>
 
       {/* History List */}
       {filteredHistory.length === 0 ? (
         <div className="history-empty">
-          <div className="history-empty-icon">🧾</div>
+          <ShoppingListIcon className="history-empty-icon" />
           <div className="history-empty-text">
             {searchTerm || filterSupermarket !== "all"
               ? "לא נמצאו תוצאות"

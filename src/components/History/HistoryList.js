@@ -5,6 +5,8 @@ import "./HistoryList.css";
 import { ProductImageDisplay } from "../Images/ProductImageService";
 import SupermarketImage from "../Images/SupermarketImage";
 import { DOMAIN } from "../../constants";
+import { ReactComponent as SearchIcon } from "./search.svg";
+import { ReactComponent as ScheduleIcon } from "./schedule.svg";
 
 const formatDate = (dateString) => {
   const dateObj = new Date(dateString);
@@ -84,13 +86,16 @@ const HistoryList = () => {
 
       {/* Search/Filter Bar */}
       <div className="receipt-filters">
-        <input
-          type="text"
-          className="receipt-search"
-          placeholder="🔍 חפש מוצר..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-        />
+        <div className="receipt-search-wrapper">
+          <SearchIcon className="receipt-search-icon" />
+          <input
+            type="text"
+            className="receipt-search"
+            placeholder="חפש מוצר..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </div>
       </div>
 
       {/* The Receipt Paper */}
@@ -98,7 +103,8 @@ const HistoryList = () => {
         {/* Header */}
         <div className="details-supermaeket-history">
           <div className="details-supermaeket-history__date">
-            📅 {formatDate(cart.date)}
+            <ScheduleIcon className="receipt-date-icon" />
+            {formatDate(cart.date)}
           </div>
           <div className="details-supermaeket-history__logo">
             <SupermarketImage supermarketName={cart.supermarketName} />
@@ -169,7 +175,7 @@ const HistoryList = () => {
 
         {/* Footer with barcode */}
         <div className="receipt-footer">
-          <div className="receipt-thank-you">✨ תודה שקניתם אצלנו! ✨</div>
+          <div className="receipt-thank-you">תודה שקניתם אצלנו!</div>
           <div className="receipt-barcode"></div>
           <div className="receipt-barcode-number">
             {generateBarcodeNumber(id)}

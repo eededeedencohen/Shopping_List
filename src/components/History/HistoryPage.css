@@ -45,13 +45,14 @@
 
 .history-page-title {
   font-family: 'Heshbon', 'VT323', monospace;
-  font-size: 2.2rem;
+  font-size: clamp(1.6rem, 8vw, 2.5rem);
   font-weight: 700;
   color: #1a1a1a;
   letter-spacing: 2px;
   margin: 0 0 5px 0;
   direction: rtl;
   text-shadow: 1px 1px 0 rgba(255,255,255,0.5);
+  white-space: nowrap;
 }
 
 .history-page-subtitle {
@@ -76,9 +77,26 @@
   animation: filters-appear 0.5s ease-out 0.2s backwards;
 }
 
+/* Search wrapper with icon */
+.history-search-wrapper {
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.history-search-icon {
+  position: absolute;
+  right: 12px;
+  width: 20px;
+  height: 20px;
+  fill: #888;
+  pointer-events: none;
+}
+
 .history-search-input {
   width: 100%;
-  padding: 12px 15px;
+  padding: 12px 40px 12px 15px;
   border: 2px solid #ddd;
   border-radius: 8px;
   font-family: 'Heshbon', 'VT323', monospace;
@@ -102,13 +120,19 @@
   display: flex;
   flex-direction: row;
   gap: 8px;
-  flex-wrap: wrap;
+  overflow-x: auto;
+  padding-bottom: 5px;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.history-filter-buttons::-webkit-scrollbar {
+  display: none;
 }
 
 .history-filter-btn {
-  flex: 1;
-  min-width: 80px;
-  padding: 10px 8px;
+  flex-shrink: 0;
+  padding: 10px 14px;
   border: 2px solid #ddd;
   border-radius: 8px;
   background: #fff;
@@ -118,6 +142,7 @@
   cursor: pointer;
   transition: all 0.2s ease;
   direction: rtl;
+  white-space: nowrap;
 }
 
 .history-filter-btn.active {
@@ -130,17 +155,46 @@
   transform: scale(0.95);
 }
 
-/* Sort dropdown */
+/* Sort dropdown wrapper */
+.history-sort-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.history-sort-icon {
+  position: absolute;
+  right: 12px;
+  width: 20px;
+  height: 20px;
+  fill: #555;
+  pointer-events: none;
+  z-index: 1;
+}
+
 .history-sort-select {
-  padding: 10px 12px;
+  padding: 12px 42px 12px 30px;
   border: 2px solid #ddd;
   border-radius: 8px;
   font-family: 'Heshbon', 'VT323', monospace;
-  font-size: 1rem;
+  font-size: 1.1rem;
   direction: rtl;
   background: #fff;
   cursor: pointer;
   outline: none;
+  width: 100%;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23555' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: left 12px center;
+  transition: border-color 0.2s ease;
+}
+
+.history-sort-select:focus {
+  border-color: #4a9eff;
 }
 
 /* Receipt paper stack background */
@@ -408,10 +462,15 @@
   font-family: 'Heshbon', 'VT323', monospace;
   color: #555;
   direction: rtl;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .history-empty-icon {
-  font-size: 4rem;
+  width: 80px;
+  height: 80px;
+  fill: #888;
   margin-bottom: 15px;
 }
 
