@@ -153,7 +153,7 @@ function ProductsList() {
     const deltaX = moveX - startTouch.current.x;
     const deltaY = moveY - startTouch.current.y;
 
-    const SWIPE_THRESHOLD = 200; // כמה רחוק נחשב כהחלקה
+    const SWIPE_THRESHOLD = 80; // כמה רחוק נחשב כהחלקה
 
     if (Math.abs(deltaX) > SWIPE_THRESHOLD) {
       swipeDirection.current = deltaX > 0 ? "right" : "left";

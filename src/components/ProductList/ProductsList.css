@@ -24,33 +24,38 @@
   --offset-top: 100px;
 }
 
-/* כרטיס מוצר - Glassmorphism */
+/* כרטיס מוצר - Glowing Glass */
 .list__product-card {
   position: relative;
   display: flex;
   flex-direction: column;
-  margin: 6px 10px;
-  padding: 8px 10px;
-  border: 1px solid rgba(255, 255, 255, 0.5);
-  border-radius: 14px;
+  margin: 10px 12px;
+  padding: 12px 14px;
+  border-radius: 16px;
 
-  /* Glassmorphism Effect - חזק יותר */
+  /* רקע זכוכית שקוף */
   background: rgba(255, 255, 255, 0.15);
-  backdrop-filter: blur(16px) saturate(180%);
-  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+
+  /* גבול זוהר */
+  border: 1.5px solid rgba(255, 255, 255, 0.5);
+
+  /* זוהר חיצוני חזק + צל */
   box-shadow:
-    0 8px 32px rgba(31, 38, 135, 0.15),
-    0 0 0 1px rgba(255, 255, 255, 0.3) inset,
-    0 2px 4px rgba(255, 255, 255, 0.2) inset;
+    /* זוהר כחול חזק */
+    0 0 15px rgba(100, 180, 255, 0.5),
+    0 0 30px rgba(100, 180, 255, 0.35),
+    0 0 45px rgba(100, 180, 255, 0.2),
+    /* צל רגיל */
+    0 4px 15px rgba(0, 0, 0, 0.1),
+    /* ברק פנימי עליון */
+    inset 0 1px 1px rgba(255, 255, 255, 0.7);
 
   overflow: hidden;
-  transition: all 0.2s ease;
+  transition: all 0.3s ease;
 }
 
-.list__product-card:active {
-  transform: scale(0.98);
-  background: rgba(255, 255, 255, 0.25);
-}
 
 /* תגית "מבצע" אלכסונית */
 .list__product-badge {
@@ -238,7 +243,7 @@
   background: linear-gradient(145deg, #4ade80, #22c55e);
 }
 .list__product-operations__add:active {
-  transform: scale(0.9);
+  animation: buttonPop 0.3s ease-out;
   background: linear-gradient(145deg, #22c55e, #16a34a);
 }
 
@@ -247,8 +252,21 @@
   background: linear-gradient(145deg, #f87171, #ef4444);
 }
 .list__product-operations__reduce:active {
-  transform: scale(0.9);
+  animation: buttonPop 0.3s ease-out;
   background: linear-gradient(145deg, #ef4444, #dc2626);
+}
+
+/* אנימציית לחיצה על כפתור */
+@keyframes buttonPop {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(0.85);
+  }
+  100% {
+    transform: scale(1);
+  }
 }
 
 /* הצגת כמות נוכחית */
