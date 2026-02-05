@@ -14,6 +14,8 @@ import {
   getProductImage,
   ProductImageDisplay,
 } from "../Images/ProductImageService";
+import plusIcon from "./plus.svg";
+import minusIcon from "./minus.svg";
 import CategoryNavigation from "./CategoryNavigation";
 import SubCategoryNavigation from "./SubCategoryNavigation";
 import ProductComparisonModal from "../PriceList/productComparisonModal";
@@ -462,7 +464,7 @@ function ProductsList() {
                       incrementAmount(product.barcode);
                     }}
                   >
-                    +
+                    <img src={plusIcon} alt="+" />
                   </div>
                   <div className="list__product-operations__quantity">
                     <span>{productAmounts[product.barcode] || 0}</span>
@@ -474,7 +476,7 @@ function ProductsList() {
                       decrementAmount(product.barcode);
                     }}
                   >
-                    -
+                    <img src={minusIcon} alt="-" />
                   </div>
                   <div></div>
                 </div>

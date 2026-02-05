@@ -5,6 +5,8 @@ import {
 } from "../Images/ProductImageService";
 import { convertWeightUnit } from "./ProductsList";
 import "./ProductCardList.css";
+import plusIcon from "./plus.svg";
+import minusIcon from "./minus.svg";
 
 /* עיצוב מחיר */
 const priceFormat = (price) =>
@@ -100,7 +102,7 @@ function ProductCardList({
             incrementAmount(product.barcode);
           }}
         >
-          +
+          <img src={plusIcon} alt="+" />
         </div>
 
         <div className="list__product-operations__quantity">
@@ -114,7 +116,7 @@ function ProductCardList({
             decrementAmount(product.barcode);
           }}
         >
-          -
+          <img src={minusIcon} alt="-" />
         </div>
 
         <div>

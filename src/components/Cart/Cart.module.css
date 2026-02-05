@@ -518,30 +518,62 @@
 }
 
 /* ============================================================================
-   UPDATE AMOUNT SECTION
+   UPDATE AMOUNT SECTION - Premium Glass Design
    ============================================================================ */
 .update-amount {
   display: flex;
-  flex-direction: row-reverse;
+  flex-direction: row;
   align-items: center;
   justify-content: space-between;
   width: 100%;
-  padding: 10px 12px;
-  background: var(--cart-neutral-50);
-  border-top: 1px solid var(--cart-neutral-100);
-  gap: 10px;
+  padding: 12px 14px;
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-top: 1px solid rgba(255, 255, 255, 0.5);
+  gap: 12px;
 }
 
-/* כשיש עריכה - הדגשה */
+/* כשיש עריכה - הדגשה עם זכוכית */
 .update-amount--editing {
-  background: linear-gradient(180deg, #fef3c7 0%, #fffbeb 100%);
-  border-top-color: var(--cart-warning-200);
+  background: linear-gradient(135deg, rgba(254, 243, 199, 0.8) 0%, rgba(255, 251, 235, 0.9) 100%);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-top: 1px solid rgba(251, 191, 36, 0.3);
 }
 
+/* כפתורי עדכון/ביטול/מחיקה - צד שמאל */
+.update-amount__update_and_cencal {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  order: 1;
+  animation: fadeSlideIn 250ms ease-out;
+}
+
+/* Delete Product Button - צד שמאל */
+.cart__delete-product {
+  order: 2;
+}
+
+/* כפתורי + - כמות - צד ימין */
 .update-amount__new {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
+  order: 3;
+  margin-right: auto;
+}
+
+@keyframes fadeSlideIn {
+  from {
+    opacity: 0;
+    transform: translateX(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
 .update-amount__plus-button,
@@ -549,16 +581,16 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 36px;
-  height: 36px;
+  width: 40px;
+  height: 40px;
   border: none;
-  border-radius: var(--cart-radius-lg);
-  font-size: 18px;
-  font-weight: 600;
+  border-radius: 12px;
+  font-size: 20px;
+  font-weight: 700;
   color: #fff;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
-  transition: transform var(--cart-transition-fast);
+  transition: all var(--cart-transition-fast);
 }
 
 .update-amount__plus-button:active,
@@ -567,56 +599,44 @@
 }
 
 .update-amount__plus-button {
-  background: linear-gradient(145deg, #10b981 0%, #059669 100%);
-  box-shadow: 0 2px 6px rgba(16, 185, 129, 0.3);
+  background: linear-gradient(145deg, #34d399 0%, #10b981 100%);
+  box-shadow:
+    0 4px 12px rgba(16, 185, 129, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
 }
 
 .update-amount__minus-button {
-  background: linear-gradient(145deg, #ef4444 0%, #dc2626 100%);
-  box-shadow: 0 2px 6px rgba(239, 68, 68, 0.3);
+  background: linear-gradient(145deg, #f87171 0%, #ef4444 100%);
+  box-shadow:
+    0 4px 12px rgba(239, 68, 68, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
 }
 
 .amount-display {
-  width: 44px;
-  height: 36px;
+  width: 52px;
+  height: 40px;
   text-align: center;
-  font-size: 16px;
-  font-weight: 700;
-  color: var(--cart-neutral-900);
-  border: 2px solid var(--cart-neutral-200);
-  border-radius: var(--cart-radius-lg);
-  background: #fff;
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--cart-neutral-800);
+  border: none;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow:
+    inset 0 2px 4px rgba(0, 0, 0, 0.06),
+    0 1px 2px rgba(255, 255, 255, 0.8);
   pointer-events: none;
-}
-
-/* כפתורי עדכון וביטול - רק כשיש שינוי */
-.update-amount__update_and_cencal {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  animation: fadeSlideIn 200ms ease-out;
-}
-
-@keyframes fadeSlideIn {
-  from {
-    opacity: 0;
-    transform: translateX(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
 }
 
 .update-amount__update-btn,
 .update-amount__cancel-btn {
-  padding: 8px 14px;
-  border-radius: var(--cart-radius-md);
+  padding: 10px 16px;
+  border-radius: 10px;
   font-size: 13px;
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
-  transition: transform var(--cart-transition-fast);
+  transition: all var(--cart-transition-fast);
 }
 
 .update-amount__update-btn:active,
@@ -625,16 +645,20 @@
 }
 
 .update-amount__update-btn {
-  background: linear-gradient(145deg, #4f46e5 0%, #6366f1 100%);
+  background: linear-gradient(145deg, #6366f1 0%, #4f46e5 100%);
   color: #fff;
   border: none;
-  box-shadow: 0 2px 6px rgba(79, 70, 229, 0.3);
+  box-shadow:
+    0 4px 12px rgba(79, 70, 229, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
 }
 
 .update-amount__cancel-btn {
-  background: #fff;
+  background: rgba(255, 255, 255, 0.8);
   color: var(--cart-neutral-600);
-  border: 1.5px solid var(--cart-neutral-200);
+  border: 1.5px solid rgba(0, 0, 0, 0.08);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
 }
 
 /* סגנונות ישנים - לא בשימוש */
@@ -643,24 +667,21 @@
   display: none;
 }
 
-/* Delete Product Button */
-.cart__delete-product {
-  margin-right: auto;
-}
-
 .cart__delete-product button {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 36px;
-  height: 36px;
+  width: 40px;
+  height: 40px;
   border: none;
-  border-radius: var(--cart-radius-lg);
-  background: linear-gradient(145deg, #ef4444 0%, #dc2626 100%);
+  border-radius: 12px;
+  background: linear-gradient(145deg, #f87171 0%, #ef4444 100%);
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
-  transition: transform var(--cart-transition-fast);
-  box-shadow: 0 2px 6px rgba(239, 68, 68, 0.3);
+  transition: all var(--cart-transition-fast);
+  box-shadow:
+    0 4px 12px rgba(239, 68, 68, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
 }
 
 .cart__delete-product button:active {
@@ -668,8 +689,8 @@
 }
 
 .cart__delete-product button img {
-  width: 16px;
-  height: 16px;
+  width: 18px;
+  height: 18px;
   filter: brightness(0) invert(1);
 }
 
@@ -872,23 +893,28 @@
   }
 
   .update-amount {
-    background: #1f1f23;
-    border-top-color: rgba(255, 255, 255, 0.06);
+    background: rgba(39, 39, 42, 0.8);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-top-color: rgba(255, 255, 255, 0.08);
   }
 
   .update-amount--editing {
-    background: linear-gradient(180deg, #422006 0%, #27272a 100%);
+    background: linear-gradient(135deg, rgba(66, 32, 6, 0.8) 0%, rgba(39, 39, 42, 0.9) 100%);
   }
 
   .amount-display {
-    background: #27272a;
-    border-color: #3f3f46;
+    background: rgba(63, 63, 70, 0.8);
+    border: none;
     color: var(--cart-neutral-100);
+    box-shadow:
+      inset 0 2px 4px rgba(0, 0, 0, 0.2),
+      0 1px 2px rgba(255, 255, 255, 0.05);
   }
 
   .update-amount__cancel-btn {
-    background: #27272a;
-    border-color: #3f3f46;
+    background: rgba(63, 63, 70, 0.6);
+    border-color: rgba(255, 255, 255, 0.1);
     color: var(--cart-neutral-300);
   }
 

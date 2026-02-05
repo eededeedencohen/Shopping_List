@@ -24,58 +24,73 @@
   --offset-top: 100px;
 }
 
-/* כרטיס מוצר */
+/* כרטיס מוצר - Glassmorphism */
 .list__product-card {
   position: relative;
   display: flex;
   flex-direction: column;
-  margin: 10px;
-  padding: 5px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  box-shadow: 0 0 10px #ccc;
-  background-color: #ffffff51;
+  margin: 6px 10px;
+  padding: 8px 10px;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: 14px;
+
+  /* Glassmorphism Effect - חזק יותר */
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  box-shadow:
+    0 8px 32px rgba(31, 38, 135, 0.15),
+    0 0 0 1px rgba(255, 255, 255, 0.3) inset,
+    0 2px 4px rgba(255, 255, 255, 0.2) inset;
+
   overflow: hidden;
-  /* זכוכית מטושטשת */
-  backdrop-filter: blur(10px) saturate(160%);
+  transition: all 0.2s ease;
+}
+
+.list__product-card:active {
+  transform: scale(0.98);
+  background: rgba(255, 255, 255, 0.25);
 }
 
 /* תגית "מבצע" אלכסונית */
 .list__product-badge {
   position: absolute;
-  top: 3px;
-  left: -27px;
-  background-color: #af4c4c90;
+  top: 4px;
+  left: -22px;
+  background: linear-gradient(135deg, #ef4444, #dc2626);
   color: white;
-  padding: 5px;
-  border-radius: 5px;
-  font-size: 0.9rem;
+  padding: 3px;
+  border-radius: 3px;
+  font-size: 0.65rem;
   text-align: center;
   transform: rotate(-45deg);
-  width: 90px;
-  font-weight: bold;
+  width: 70px;
+  font-weight: 600;
+  box-shadow: 0 2px 6px rgba(220, 38, 38, 0.4);
 }
 
 .list__product-details {
   display: flex;
   flex-direction: row;
+  align-items: center;
 }
 
 .list__product-data {
   display: flex;
   flex-direction: column;
-  justify-content: flex-start;
+  justify-content: center;
   align-items: flex-end;
-  width: 70%;
-  padding-right: 5px;
+  width: 75%;
+  padding-right: 6px;
+  gap: 1px;
 }
 
 .list__product-name {
-  font-size: 1rem;
-  font-weight: bold;
-  color: #2f416e;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #1e3a5f;
   margin: 0;
-  margin-bottom: 2px;
+  line-height: 1.2;
   text-align: end;
 }
 
@@ -87,52 +102,65 @@
 
 .list__separator {
   margin: 0 0.2rem;
-  color: #888;
+  color: #94a3b8;
+  font-size: 0.7rem;
 }
 
 .list__product-weight {
   display: flex;
   flex-direction: row-reverse;
   align-items: center;
-  font-size: 0.9rem;
-  color: #2f416e;
+  font-size: 0.75rem;
+  color: #475569;
   margin: 0;
 }
 .list__product-weight p {
-  margin-left: 3px;
+  margin-left: 2px;
 }
 
 .list__product-brand {
   display: flex;
   flex-direction: row-reverse;
   align-items: center;
-  font-size: 0.9rem;
-  color: #2f416e;
+  font-size: 0.75rem;
+  color: #475569;
   margin: 0;
 }
 .list__product-brand p {
-  margin-right: 3px;
-  font-weight: bold;
+  margin-right: 2px;
+  font-weight: 500;
 }
 
 .list__product-price {
   display: flex;
   flex-direction: row-reverse;
   align-items: center;
-  font-size: 1rem;
-  color: #a0a0a0;
-  margin-top: 5px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #64748b;
+  margin-top: 2px;
 }
 
-/* תמונת מוצר (30% ברוחב) */
+/* מחיר מבצע */
+.list__discount-price {
+  display: flex;
+  flex-direction: row-reverse;
+  align-items: center;
+  font-size: 0.9rem;
+  color: #dc2626;
+  font-weight: 600;
+  margin-top: 1px;
+}
+
+/* תמונת מוצר - קטנה יותר */
 .list__product-image {
-  width: 30%;
+  width: 22%;
   position: relative;
 }
 .list__product-image::before {
   content: "";
   display: block;
-  padding-top: 100%; /* יחס 1:1 */
+  padding-top: 85%;
 }
 .list__product-image img {
   position: absolute;
@@ -141,7 +169,9 @@
   width: 100%;
   height: 100%;
   object-fit: contain;
-  border-radius: 5px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.3);
+  padding: 3px;
 }
 
 /* אזור כפתורי + - אישור */
@@ -149,7 +179,9 @@
   display: flex;
   flex-direction: row;
   align-items: center;
-  margin-top: 5px;
+  justify-content: center;
+  margin-top: 4px;
+  gap: 6px;
 }
 
 .list__product-operations__confirm,
@@ -158,69 +190,82 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 5px;
-  padding: 10px 15px;
-  border: 2px solid #ccc;
-  border-radius: 30px;
+  margin: 0;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  transition: all 0.2s ease;
   color: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
 .list__product-operations__add,
 .list__product-operations__reduce {
-  width: 3rem;
-  height: 3rem;
-  font-size: 1.5rem;
-  padding-bottom: 1rem;
+  width: 2.2rem;
+  height: 2.2rem;
+  font-size: 1.2rem;
+  font-weight: bold;
 }
 
-/* כפתור אישור (נחשף רק כשיש שינוי) */
-.list__product-operations__confirm {
-  background-color: #808080;
-  width: 7rem;
-  margin-right: 2rem;
+.list__product-operations__add img,
+.list__product-operations__reduce img {
+  width: 14px;
+  height: 14px;
+  filter: brightness(0) invert(1);
+}
 
+/* כפתור אישור */
+.list__product-operations__confirm {
+  background-color: #6b7280;
+  width: 4.5rem;
+  height: 2rem;
+  border-radius: 16px;
+  font-size: 0.75rem;
   visibility: hidden;
   opacity: 0;
-  transition: background-color 0.5s ease, opacity 0.5s ease,
-    visibility 0s linear 0.5s;
+  transition: all 0.3s ease;
+  margin-right: auto;
 }
 
 .visible {
   opacity: 1;
   visibility: visible;
-  transition-delay: 0s;
 }
 
 /* הוספה */
 .list__product-operations__add {
-  background-color: #4caf50;
-  margin-right: 0.5rem;
+  background: linear-gradient(145deg, #4ade80, #22c55e);
 }
-.list__product-operations__add:hover {
-  background-color: #3e8e41;
+.list__product-operations__add:active {
+  transform: scale(0.9);
+  background: linear-gradient(145deg, #22c55e, #16a34a);
 }
 
 /* הפחתה */
 .list__product-operations__reduce {
-  background-color: #f44336;
-  margin-left: 0.5rem;
+  background: linear-gradient(145deg, #f87171, #ef4444);
 }
-.list__product-operations__reduce:hover {
-  background-color: #d32f2f;
+.list__product-operations__reduce:active {
+  transform: scale(0.9);
+  background: linear-gradient(145deg, #ef4444, #dc2626);
 }
 
 /* הצגת כמות נוכחית */
 .list__product-operations__quantity {
-  font-size: 1rem;
-  padding: 5px 10px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  background-color: #f2f2f2;
+  font-size: 0.85rem;
+  font-weight: 600;
+  min-width: 2rem;
+  height: 2rem;
+  padding: 0 6px;
+  border: none;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(4px);
   display: flex;
   align-items: center;
   justify-content: center;
+  color: #1e3a5f;
 }
 
 /* --------  Glass background squares  -------- */
