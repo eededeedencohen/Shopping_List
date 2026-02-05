@@ -17,7 +17,8 @@ import { ReactComponent as WishlistIcon } from "./wishlist.svg";
 import { ReactComponent as EditIcon } from "./editing.svg";
 import { ReactComponent as DataClassificationIcon } from "./data-classification.svg";
 import { ReactComponent as BarcodeIcon} from "./barcode.svg";
-import { ReactComponent as VibrationIcon } from "./waves.svg";  
+import { ReactComponent as VibrationIcon } from "./waves.svg";
+import { ReactComponent as ArchitectureIcon } from "./architecture.svg";  
 function Toolbar() {
   const { totalAmount } = useCartTotals(); // ← כמות בעגלה
   const [selectedPage, setSelectedPage] = useState(window.location.pathname);
@@ -229,6 +230,19 @@ function Toolbar() {
                 <VibrationIcon className="svg-icon" />
               </div>
               <h1>Vibration Settings</h1>
+            </div>
+          </Link>
+
+          <Link to="/architecture" onClick={() => handleNavClick("/architecture")}>
+            <div
+              className={`nav-item ${
+                selectedPage === "/architecture" ? "selected-page" : ""
+              }`}
+            >
+              <div className="nav-icon">
+                <ArchitectureIcon className="svg-icon" />
+              </div>
+              <h1>App Architecture</h1>
             </div>
           </Link>
         </div>
