@@ -112,6 +112,7 @@ function ProductsList() {
 
   const [productAmounts, setProductAmounts] = useState({});
   const [oldProductAmounts, setOldProductAmounts] = useState({});
+  const [animatingProducts, setAnimatingProducts] = useState({}); // { barcode: 'up' | 'down' }
 
   useEffect(() => {
     sendActiveCart();
@@ -261,6 +262,12 @@ function ProductsList() {
     const button = document.querySelector(`#add-to-cart-${barcode}`);
     setProductAmounts({ ...productAmounts, [barcode]: newAmount });
 
+    // אנימציה למעלה
+    setAnimatingProducts({ ...animatingProducts, [barcode]: "up" });
+    setTimeout(() => {
+      setAnimatingProducts((prev) => ({ ...prev, [barcode]: null }));
+    }, 250);
+
     if (!oldProductAmounts[barcode]) {
       changeButtonToAddProductButton(button);
     } else {
@@ -276,9 +283,18 @@ function ProductsList() {
 
   /* הורדה מהסל */
   const decrementAmount = (barcode) => {
-    const newAmount = Math.max(0, (productAmounts[barcode] || 0) - 1);
+    const currentAmount = productAmounts[barcode] || 0;
+    if (currentAmount === 0) return; // לא מפחיתים מתחת ל-0
+
+    const newAmount = currentAmount - 1;
     const button = document.querySelector(`#add-to-cart-${barcode}`);
     setProductAmounts({ ...productAmounts, [barcode]: newAmount });
+
+    // אנימציה למטה
+    setAnimatingProducts({ ...animatingProducts, [barcode]: "down" });
+    setTimeout(() => {
+      setAnimatingProducts((prev) => ({ ...prev, [barcode]: null }));
+    }, 250);
 
     if (!oldProductAmounts[barcode]) {
       if (newAmount === 0) {
@@ -467,7 +483,17 @@ function ProductsList() {
                     <img src={plusIcon} alt="+" />
                   </div>
                   <div className="list__product-operations__quantity">
-                    <span>{productAmounts[product.barcode] || 0}</span>
+                    <span
+                      className={
+                        animatingProducts[product.barcode] === "up"
+                          ? "animate-up"
+                          : animatingProducts[product.barcode] === "down"
+                          ? "animate-down"
+                          : ""
+                      }
+                    >
+                      {productAmounts[product.barcode] || 0}
+                    </span>
                   </div>
                   <div
                     className="list__product-operations__reduce"

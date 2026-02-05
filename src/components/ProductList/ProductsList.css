@@ -284,6 +284,44 @@
   align-items: center;
   justify-content: center;
   color: #1e3a5f;
+  position: relative;
+  overflow: hidden;
+}
+
+.list__product-operations__quantity span {
+  display: inline-block;
+}
+
+/* אנימציית מספר עולה */
+.list__product-operations__quantity span.animate-up {
+  animation: slideUp 0.25s ease-out;
+}
+
+/* אנימציית מספר יורד */
+.list__product-operations__quantity span.animate-down {
+  animation: slideDown 0.25s ease-out;
+}
+
+@keyframes slideUp {
+  0% {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideDown {
+  0% {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
 
 /* --------  Glass background squares  -------- */
