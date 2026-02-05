@@ -1,0 +1,229 @@
+.details-supermaeket-history {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background-image: linear-gradient(
+    to bottom,
+    rgb(255, 255, 255),
+    rgb(245, 245, 245),
+    rgb(229, 232, 204)
+  );
+  border-radius: 0 0 10px 10px;
+  padding-bottom: 0.5rem;
+}
+
+.details-supermaeket-history__date {
+  align-self: flex-start;
+  color: rgb(102, 102, 110);
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+  font-weight: bold;
+}
+
+.details-supermaeket-history__cart-icon img {
+  width: 3rem;
+  height: 3rem;
+  margin-right: 0.5rem;
+  /* background-color: rgb(186, 238, 196); */
+  border-radius: 10px;
+  padding: 3px;
+}
+
+.details-supermaeket-history__logo img {
+  width: 12rem;
+  height: 8rem;
+  margin-right: 0.5rem;
+  border-radius: 10px;
+  margin: 0;
+}
+
+.details-supermaeket-history__address {
+  display: flex;
+  flex-direction: row-reverse;
+  align-items: center;
+}
+
+.details-supermaeket-history__address h4,
+.details-supermaeket-history__address h3 {
+  margin: 2px;
+  font-size: 1.2rem;
+}
+
+.details-supermaeket-history__total-price-container {
+  display: flex;
+  flex-direction: row-reverse;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1;
+}
+
+.details-supermaeket-history__total-price-label {
+  margin-left: 3rem;
+  font-size: 1.8rem;
+  align-self: center;
+  font-weight: bold;
+}
+
+/* .details-supermaeket-history__total-price {
+  font-size: 2rem;
+  background-color: rgb(154, 157, 164);
+  font-weight: bold;
+  border-radius: 10px;
+  padding: 1px;
+} */
+
+.details-supermaeket-history__total-price {
+  font-size: 2rem;
+  background-color: rgb(154, 157, 164);
+  font-weight: bold;
+  border-radius: 10px;
+  padding: 1px;
+  position: relative; /* Needed for positioning the pseudo-element */
+  overflow: hidden; /* Prevents the shine effect from spilling out */
+}
+
+.details-supermaeket-history__total-price::before {
+  content: "";
+  position: absolute;
+  top: -50%; /* Initial position set off the bottom-right corner */
+  left: -50%;
+  width: 200%; /* Ensures full coverage when angled */
+  height: 200%; /* Ensures full coverage when angled */
+  background: linear-gradient(
+    135deg,
+    /* Angle the gradient for the shine effect */ rgba(255, 255, 255, 0) 25%,
+    /* Mostly transparent */ rgba(255, 255, 255, 0.3) 50%,
+    /* The visible part of the shine */ rgba(255, 255, 255, 0) 75%
+      /* Return to transparent */
+  );
+  animation: shine 2s linear infinite; /* Continuous animation */
+}
+
+@keyframes shine {
+  0% {
+    top: 100%; /* Start from bottom-right */
+    left: 100%;
+  }
+  100% {
+    top: -100%; /* End at top-left */
+    left: -100%;
+  }
+}
+
+.cart-history {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+/* .history__product-item {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1rem;
+} */
+.history__product-item {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid #ccc; /* Adds a bottom border */
+  padding-bottom: 1rem; /* Space between the content and the border */
+}
+
+.history__product-image {
+  width: 30%;
+  display: flex; /* Use flexbox to align the child img */
+  justify-content: flex-start; /* Align child img to the start (left) */
+  align-items: center; /* Keep the images vertically centered */
+}
+
+.history__product-image img {
+  width: 100%; /* Fixed width */
+  height: 100%; /* Fixed height */
+  object-fit: cover; /* Make sure the image covers the whole element */
+  border-radius: 0.5rem; /* Optional: if you want rounded corners */
+}
+
+.history__product-price-container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: center;
+  width: 30%;
+  color: #2f416e;
+  align-self: baseline;
+  padding-top: 0.5rem;
+  padding-right: 0.5rem;
+}
+
+.history__product-amount {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  justify-content: flex-end;
+  padding-right: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.history__product-amount span {
+  margin-right: 2px;
+  margin-left: 2px;
+  font-size: 1.2rem;
+  color: #2f416e;
+  align-self: baseline;
+}
+
+.history__product-price {
+  display: flex;
+  flex-direction: row-reverse;
+  justify-content: center;
+}
+
+.history__product-price h5 {
+  margin: 2px;
+  font-size: 1rem;
+  margin-left: 0.5rem;
+}
+
+.history__product-price p {
+  padding-right: 4px;
+  background-color: rgb(189, 189, 189);
+  color: rgb(35, 35, 35);
+  border-radius: 10px;
+  padding: 3px;
+  font-size: 1.2rem;
+}
+
+.history__product-details {
+  width: 40%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-end;
+  margin-right: 0.5rem;
+  align-self: baseline;
+  color: #2f416e;
+}
+
+.history__product-name {
+  font-size: 1rem;
+  font-weight: bold;
+  direction: rtl; /* Right-to-left direction */
+  text-align: right; /* Align text to the right */
+  white-space: normal; /* Ensure text wraps and doesn't overflow */
+}
+
+.history__product-weight {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+}
+
+.history__product-brand {
+  font-size: 1rem;
+  font-weight: bold;
+}

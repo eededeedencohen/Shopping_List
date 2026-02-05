@@ -1,119 +1,542 @@
-.history-lists {
-    padding: 0;
-    list-style: none;
-    display: flex;
-    flex-direction: column;
-    align-items: normal;
-    justify-content: center;
-    width: 100%;
-    padding: 3px;
-  }
-  
-  .cart-details {
-    width: 100%;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: center;
-    margin-top: 2rem;
-    background-color: rgb(255, 255, 255);
-    border-radius: 20px;
-    padding: 3px;
-    border: 2px solid rgb(10, 56, 81);
-    box-shadow: 0 0 10px rgb(10, 56, 81);
-  }
-  
-  .cart-details-supermarket {
-    width: 50%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-  }
-  
-  .cart-details-supermarket__image {
-    display: flex;
-    flex: 0 0 50%; 
-    width: 130px;
-    height: 130px;
-    margin: 0;
-    padding-right: 3px;
-  }
-  
-  .cart-details-supermarket__image img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-  }
-  
-  .cart-details-supermarket__address,
-  .cart-details-supermarket__city {
-    font-size: 1rem;
-    font-weight: 500;
-    margin-top: 0.5px;
-    color: rgb(10, 56, 81);
-    text-align: center;
-  }
+/* ============================================
+   SUPERMARKET RECEIPT STYLE - HISTORY PAGE
+   Mobile Only - No Media Queries
+   ============================================ */
 
-  
-  .cart-details-summery {
-    width: 50%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-  }
-  
-  .cart-details-summery__date,
-  .cart-details-summery__time,
-  .cart-details-summary__total-price {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: center;
-    align-self: flex-end;
-    margin-top: 1rem;
-  }
-  
-  .cart-details-summery__date h1,
-  .cart-details-summery__time h1,
-  .cart-details-summary__total-price h1 {
-    font-size: 1.2rem;
-    font-weight: 500;
-    margin-top: 0.5px;
-    color: rgb(10, 56, 81);
-  }
+@import url('https://fonts.googleapis.com/css2?family=VT323&family=Share+Tech+Mono&display=swap');
 
-  .cart-details-summery__date h1 {
-    margin-right: 0.5rem;
-  }
-  
-  .cart-details-summery__time h1{
-    margin-right: 1.5rem;
-  }
-
-  .cart-details-summary__total-price h1{
-    margin-right: 1rem
-
-  }
-
-
-
-  
-  .cart-details-summery__date h2,
-  .cart-details-summery__time h2,
-  .cart-details-summary__total-price h2 {
-    font-size: 1rem;
-    font-weight: 500;
-    margin-top: 0.5px;
-    color: rgb(4, 91, 137);
-    font-weight: bold;
-  }
-
-  .history-lists a, .history-lists a:visited, .history-lists a:hover, .history-lists a:active {
-    text-decoration: none; /* Removes underline */
-    color: inherit; /* Keeps the text color consistent */
+/* Hebrew Calculator Font - Heshbon */
+@font-face {
+  font-family: 'Heshbon';
+  src: url('./heshbon-regular-alefalefalef.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
 }
 
+@font-face {
+  font-family: 'Heshbon';
+  src: url('./heshbon-bold-alefalefalef.otf') format('opentype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
 
-  
+/* Page container - counter/desk background */
+.history-page-container {
+  width: 100%;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #c9c9c9 0%, #e0e0e0 50%, #d0d0d0 100%);
+  padding: 15px 10px 30px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow-x: hidden;
+}
+
+/* Page header */
+.history-page-header {
+  width: 95%;
+  max-width: 400px;
+  text-align: center;
+  margin-bottom: 15px;
+  animation: header-appear 0.5s ease-out;
+}
+
+.history-page-title {
+  font-family: 'Heshbon', 'VT323', monospace;
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: #1a1a1a;
+  letter-spacing: 2px;
+  margin: 0 0 5px 0;
+  direction: rtl;
+  text-shadow: 1px 1px 0 rgba(255,255,255,0.5);
+}
+
+.history-page-subtitle {
+  font-family: 'Heshbon', 'Share Tech Mono', monospace;
+  font-size: 1rem;
+  color: #555;
+  direction: rtl;
+}
+
+/* Filters section */
+.history-filters {
+  width: 95%;
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px;
+  background: linear-gradient(145deg, #ffffff, #f5f5f5);
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  margin-bottom: 15px;
+  animation: filters-appear 0.5s ease-out 0.2s backwards;
+}
+
+.history-search-input {
+  width: 100%;
+  padding: 12px 15px;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  font-family: 'Heshbon', 'VT323', monospace;
+  font-size: 1.1rem;
+  direction: rtl;
+  text-align: right;
+  outline: none;
+  transition: border-color 0.2s ease;
+  box-sizing: border-box;
+}
+
+.history-search-input:focus {
+  border-color: #4a9eff;
+}
+
+.history-search-input::placeholder {
+  color: #999;
+}
+
+.history-filter-buttons {
+  display: flex;
+  flex-direction: row;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.history-filter-btn {
+  flex: 1;
+  min-width: 80px;
+  padding: 10px 8px;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  background: #fff;
+  font-family: 'Heshbon', 'VT323', monospace;
+  font-size: 1rem;
+  color: #333;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  direction: rtl;
+}
+
+.history-filter-btn.active {
+  border-color: #4a9eff;
+  background: linear-gradient(145deg, #e8f4ff, #d0e8ff);
+  color: #0066cc;
+}
+
+.history-filter-btn:active {
+  transform: scale(0.95);
+}
+
+/* Sort dropdown */
+.history-sort-select {
+  padding: 10px 12px;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  font-family: 'Heshbon', 'VT323', monospace;
+  font-size: 1rem;
+  direction: rtl;
+  background: #fff;
+  cursor: pointer;
+  outline: none;
+}
+
+/* Receipt paper stack background */
+.history-lists {
+  padding: 0;
+  margin: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  width: 95%;
+  max-width: 400px;
+}
+
+/* Each receipt card - looks like actual paper */
+.history-lists a {
+  text-decoration: none;
+  color: inherit;
+  width: 100%;
+  display: block;
+}
+
+.cart-details {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin: 12px 0;
+  background:
+    /* Paper texture */
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 1px,
+      rgba(0, 0, 0, 0.008) 1px,
+      rgba(0, 0, 0, 0.008) 2px
+    ),
+    linear-gradient(180deg,
+      #fffef9 0%,
+      #fffdf5 50%,
+      #faf9f0 100%
+    );
+  border-radius: 0;
+  padding: 20px 15px 25px;
+  position: relative;
+  box-shadow:
+    0 2px 8px rgba(0, 0, 0, 0.08),
+    2px 4px 16px rgba(0, 0, 0, 0.05);
+
+  /* Torn paper effect */
+  clip-path: polygon(
+    0% 5px,
+    3% 1px,
+    6% 4px,
+    9% 0px,
+    12% 3px,
+    15% 5px,
+    18% 1px,
+    21% 4px,
+    24% 0px,
+    27% 3px,
+    30% 5px,
+    33% 1px,
+    36% 4px,
+    39% 0px,
+    42% 3px,
+    45% 5px,
+    48% 1px,
+    51% 4px,
+    54% 0px,
+    57% 3px,
+    60% 5px,
+    63% 1px,
+    66% 4px,
+    69% 0px,
+    72% 3px,
+    75% 5px,
+    78% 1px,
+    81% 4px,
+    84% 0px,
+    87% 3px,
+    90% 5px,
+    93% 1px,
+    96% 4px,
+    100% 2px,
+    100% calc(100% - 4px),
+    97% 100%,
+    94% calc(100% - 3px),
+    91% 100%,
+    88% calc(100% - 5px),
+    85% 100%,
+    82% calc(100% - 2px),
+    79% 100%,
+    76% calc(100% - 4px),
+    73% 100%,
+    70% calc(100% - 3px),
+    67% 100%,
+    64% calc(100% - 5px),
+    61% 100%,
+    58% calc(100% - 2px),
+    55% 100%,
+    52% calc(100% - 4px),
+    49% 100%,
+    46% calc(100% - 3px),
+    43% 100%,
+    40% calc(100% - 5px),
+    37% 100%,
+    34% calc(100% - 2px),
+    31% 100%,
+    28% calc(100% - 4px),
+    25% 100%,
+    22% calc(100% - 3px),
+    19% 100%,
+    16% calc(100% - 5px),
+    13% 100%,
+    10% calc(100% - 2px),
+    7% 100%,
+    4% calc(100% - 4px),
+    1% 100%,
+    0% calc(100% - 3px)
+  );
+
+  animation: receipt-slide-in 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* Receipt press effect on tap */
+.cart-details:active {
+  transform: scale(0.98);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Supermarket section */
+.cart-details-supermarket {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding-bottom: 12px;
+  border-bottom: 2px dashed #ccc;
+  margin-bottom: 12px;
+}
+
+.cart-details-supermarket__image {
+  width: 90px;
+  height: 70px;
+  margin: 0 auto 8px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.cart-details-supermarket__image img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter: grayscale(15%) contrast(1.05);
+}
+
+.cart-details-supermarket__address,
+.cart-details-supermarket__city {
+  font-family: 'Heshbon', 'Share Tech Mono', monospace;
+  font-size: 0.85rem;
+  color: #444;
+  text-align: center;
+  margin: 1px 0;
+  direction: rtl;
+}
+
+/* Summary section */
+.cart-details-summery {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 0;
+  direction: rtl;
+}
+
+.cart-details-summery__date,
+.cart-details-summery__time,
+.cart-details-summary__total-price {
+  display: flex;
+  flex-direction: row-reverse;
+  align-items: center;
+  justify-content: space-between;
+  width: 80%;
+  font-family: 'Heshbon', 'VT323', monospace;
+}
+
+.cart-details-summery__date h1,
+.cart-details-summery__time h1 {
+  font-size: 1.2rem;
+  font-weight: 400;
+  color: #1a1a1a;
+  margin: 0;
+}
+
+.cart-details-summery__date h2,
+.cart-details-summery__time h2 {
+  font-size: 1rem;
+  font-weight: 400;
+  color: #555;
+  margin: 0;
+}
+
+/* Total price - special styling */
+.cart-details-summary__total-price {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px dashed #ccc;
+}
+
+.cart-details-summary__total-price h1 {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #000;
+  margin: 0;
+  background: linear-gradient(90deg, #ffd700, #ffed4a, #ffd700);
+  background-size: 200% auto;
+  padding: 3px 10px;
+  border-radius: 4px;
+  animation: golden-shine 3s linear infinite;
+}
+
+.cart-details-summary__total-price h2 {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #333;
+  margin: 0;
+}
+
+/* Mini barcode at bottom of each receipt */
+.cart-details-barcode {
+  width: 60%;
+  height: 25px;
+  margin: 15px auto 0;
+  background:
+    repeating-linear-gradient(
+      90deg,
+      #000 0px,
+      #000 2px,
+      transparent 2px,
+      transparent 4px,
+      #000 4px,
+      #000 5px,
+      transparent 5px,
+      transparent 7px,
+      #000 7px,
+      #000 9px,
+      transparent 9px,
+      transparent 11px
+    );
+  opacity: 0.6;
+}
+
+/* Empty state */
+.history-empty {
+  text-align: center;
+  padding: 40px 20px;
+  font-family: 'Heshbon', 'VT323', monospace;
+  color: #555;
+  direction: rtl;
+}
+
+.history-empty-icon {
+  font-size: 4rem;
+  margin-bottom: 15px;
+}
+
+.history-empty-text {
+  font-size: 1.3rem;
+}
+
+/* Stats summary */
+.history-stats {
+  width: 95%;
+  max-width: 400px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  padding: 12px;
+  background: linear-gradient(145deg, #ffffff, #f5f5f5);
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  margin-bottom: 15px;
+  animation: stats-appear 0.5s ease-out 0.3s backwards;
+}
+
+.history-stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-family: 'Heshbon', 'VT323', monospace;
+}
+
+.history-stat-value {
+  font-size: 1.6rem;
+  color: #0066cc;
+  font-weight: 700;
+}
+
+.history-stat-label {
+  font-size: 0.95rem;
+  color: #555;
+  direction: rtl;
+}
+
+/* ============================================
+   ANIMATIONS
+   ============================================ */
+
+@keyframes header-appear {
+  0% {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes filters-appear {
+  0% {
+    opacity: 0;
+    transform: translateY(-15px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes stats-appear {
+  0% {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes receipt-slide-in {
+  0% {
+    opacity: 0;
+    transform: translateY(-30px) scale(0.95);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes golden-shine {
+  0% {
+    background-position: 200% center;
+  }
+  100% {
+    background-position: -200% center;
+  }
+}
+
+/* Loading state */
+.history-loading {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 60px 20px;
+  font-family: 'Heshbon', 'VT323', monospace;
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #333;
+  direction: rtl;
+}
+
+.history-loading::after {
+  content: '';
+  width: 35px;
+  height: 35px;
+  border: 3px solid #ddd;
+  border-top-color: #333;
+  border-radius: 50%;
+  margin-top: 15px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
