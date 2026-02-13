@@ -27,6 +27,7 @@
 /* כרטיס מוצר - Glowing Glass */
 .list__product-card {
   position: relative;
+  z-index: 1;
   display: flex;
   flex-direction: column;
   margin: 10px 12px;
@@ -408,10 +409,11 @@
 
 /* --------  Glass background squares  -------- */
 .glass-bg {
-  position: absolute;
+  position: fixed;
   inset: 0;
   pointer-events: none;
   overflow: hidden;
+  z-index: 0;
 }
 
 .glass-square {
