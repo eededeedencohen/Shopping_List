@@ -8,7 +8,8 @@ import {
   useUpdateActiveCart,
 } from "../../hooks/appHooks";
 
-import "./ProductsList.css";
+import styles from "./ProductsList.module.css";
+import "./ProductsListKeyframes.css";
 
 import {
   getProductImage,
@@ -50,7 +51,7 @@ const priceFormat = (price) => {
 
 const discountPriceFormat = ({ units, totalPrice }) => (
   <div
-    className="list__discount-price"
+    className={styles['list__discount-price']}
     style={{
       display: "flex",
       flexDirection: "row-reverse",
@@ -69,10 +70,10 @@ const discountPriceFormat = ({ units, totalPrice }) => (
 
 /* כפתורי הוספה/הורדה/אישור/מחיקה לסל */
 const makeVisible = (button) => {
-  button.classList.add("visible");
+  button.classList.add(styles.visible);
 };
 const makeInvisible = (button) => {
-  button.classList.remove("visible");
+  button.classList.remove(styles.visible);
 };
 const changeButtonToAddProductButton = (button) => {
   button.style.backgroundColor = "#00c200";
@@ -362,7 +363,7 @@ function ProductsList() {
 
   if (isLoadingProducts) {
     return (
-      <div className="spinner-container">
+      <div className={styles['spinner-container']}>
         <Spin size="large" />
         <p>טוען מוצרים...</p>
       </div>
@@ -371,13 +372,13 @@ function ProductsList() {
 
   return (
     <>
-      <div className="list__product-list">
+      <div className={styles['list__product-list']}>
         {/* ניווט הקטגוריות */}
         <CategoryNavigation />
         {/* ניווט תתי־קטגוריות */}
         <SubCategoryNavigation />
 
-        <div className="list__products-wrapper">
+        <div className={styles['list__products-wrapper']}>
           <ProductComparisonModal
             isOpen={isComparisonModalOpen}
             onClose={closeComparisonModal}
@@ -385,7 +386,7 @@ function ProductsList() {
             <ProductComparison barcode={selectedBarcode} />
           </ProductComparisonModal>
           <div
-            className="list__products-container"
+            className={styles['list__products-container']}
             style={containerStyle}
             onTouchStart={handleTouchStart}
             onTouchMove={handleTouchMove}
@@ -393,7 +394,7 @@ function ProductsList() {
           >
             {/* Glass background squares */}
 
-            <div className="glass-bg">
+            <div className={styles['glass-bg']}>
               {(() => {
                 // מאחסן נתונים קבועים ברינדרים הבאים
                 if (!glassSquaresRef.current.length) {
@@ -408,7 +409,7 @@ function ProductsList() {
                 return glassSquaresRef.current.map((sq, idx) => (
                   <div
                     key={idx}
-                    className="glass-square"
+                    className={styles['glass-square']}
                     style={{
                       width: `${sq.size}px`,
                       height: `${sq.size}px`,
@@ -422,31 +423,31 @@ function ProductsList() {
               })()}
             </div>
             {filteredProducts.map((product) => (
-              <div className="list__product-card" key={product.barcode}>
+              <div className={styles['list__product-card']} key={product.barcode}>
                 {product.discount && (
-                  <div className="list__product-badge">מבצע</div>
+                  <div className={styles['list__product-badge']}>מבצע</div>
                 )}
 
-                <div className="list__product-details">
-                  <div className="list__product-data">
-                    <div className="list__product-name">
+                <div className={styles['list__product-details']}>
+                  <div className={styles['list__product-data']}>
+                    <div className={styles['list__product-name']}>
                       <p>{product.name}</p>
                     </div>
-                    <div className="list__product-info">
-                      <div className="list__product-weight">
+                    <div className={styles['list__product-info']}>
+                      <div className={styles['list__product-weight']}>
                         <p>{product.weight}</p>
                         <p>{convertWeightUnit(product.unitWeight)}</p>
                       </div>
-                      <div className="list__separator">|</div>
-                      <div className="list__product-brand">
+                      <div className={styles['list__separator']}>|</div>
+                      <div className={styles['list__product-brand']}>
                         <p>{product.brand}</p>
                       </div>
                     </div>
-                    <div className="list__product-price">
+                    <div className={styles['list__product-price']}>
                       {typeof product.unitPrice === "number" ? (
                         <>
                           <p>{priceFormat(product.unitPrice)}</p>
-                          <p style={{ fontSize: "1.4rem" }}>₪</p>
+                          <p>₪</p>
                         </>
                       ) : (
                         <p>מחיר לא זמין בסופר</p>
@@ -455,17 +456,17 @@ function ProductsList() {
                     {product.discount && discountPriceFormat(product.discount)}
                   </div>
                   <div
-                    className="list__product-image"
+                    className={styles['list__product-image']}
                     onClick={() => openComparisonModal(product.barcode)}
                     onContextMenu={(e) => e.preventDefault()}
                   >
                     <ProductImageDisplay barcode={product.barcode} />
                   </div>
                 </div>
-                <div className="list__product-operations">
+                <div className={styles['list__product-operations']}>
                   <div
                     id={`add-to-cart-${product.barcode}`}
-                    className="list__product-operations__confirm"
+                    className={styles['list__product-operations__confirm']}
                     onClick={(e) => {
                       e.stopPropagation();
                       updateAmount(product.barcode);
@@ -474,7 +475,7 @@ function ProductsList() {
                     אין שינוי
                   </div>
                   <div
-                    className="list__product-operations__add"
+                    className={styles['list__product-operations__add']}
                     onClick={(e) => {
                       e.stopPropagation();
                       incrementAmount(product.barcode);
@@ -482,13 +483,13 @@ function ProductsList() {
                   >
                     <img src={plusIcon} alt="+" />
                   </div>
-                  <div className="list__product-operations__quantity">
+                  <div className={styles['list__product-operations__quantity']}>
                     <span
                       className={
                         animatingProducts[product.barcode] === "up"
-                          ? "animate-up"
+                          ? styles['animate-up']
                           : animatingProducts[product.barcode] === "down"
-                          ? "animate-down"
+                          ? styles['animate-down']
                           : ""
                       }
                     >
@@ -496,7 +497,7 @@ function ProductsList() {
                     </span>
                   </div>
                   <div
-                    className="list__product-operations__reduce"
+                    className={styles['list__product-operations__reduce']}
                     onClick={(e) => {
                       e.stopPropagation();
                       decrementAmount(product.barcode);

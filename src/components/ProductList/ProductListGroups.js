@@ -19,7 +19,8 @@ import {
 } from "../../hooks/appHooks";
 import ProductsListGroup from "./ProductsListGroup"; // ← הוסף
 
-import "./ProductsList.css";
+import styles from "./ProductsList.module.css";
+import "./ProductsListKeyframes.css";
 import "./ProductListGroups.css";
 import "./ProductSearch.css";
 import { useNavigate } from "react-router";
@@ -62,7 +63,7 @@ const priceFormat = (price) => {
 
 const discountPriceFormat = ({ units, totalPrice }) => (
   <div
-    className="list__discount-price"
+    className={styles['list__discount-price']}
     style={{
       display: "flex",
       flexDirection: "row-reverse",
@@ -81,10 +82,10 @@ const discountPriceFormat = ({ units, totalPrice }) => (
 
 /* כפתורי הוספה/הורדה/אישור/מחיקה לסל */
 const makeVisible = (button) => {
-  button.classList.add("visible");
+  button.classList.add(styles.visible);
 };
 const makeInvisible = (button) => {
-  button.classList.remove("visible");
+  button.classList.remove(styles.visible);
 };
 const changeButtonToAddProductButton = (button) => {
   button.style.backgroundColor = "#00c200";
@@ -426,7 +427,7 @@ function ProductsListGroups() {
 
   if (isLoadingProducts) {
     return (
-      <div className="spinner-container">
+      <div className={styles['spinner-container']}>
         <Spin size="large" />
         <p>טוען מוצרים...</p>
       </div>
@@ -434,7 +435,7 @@ function ProductsListGroups() {
   }
 
   return (
-    <div className="list__product-list">
+    <div className={styles['list__product-list']}>
       <button onClick={() => setIsModalAllGroupsOpen(true)}>
         הצג קבוצות מוצרים
       </button>
@@ -500,36 +501,36 @@ function ProductsListGroups() {
       <CategoryNavigation />
       {/* ניווט תתי־קטגוריות */}
       <SubCategoryNavigation />
-      <div className="list__products-wrapper">
+      <div className={styles['list__products-wrapper']}>
         <div
-          className="list__products-container"
+          className={styles['list__products-container']}
           style={containerStyle}
           onTouchStart={handleTouchStart}
           onTouchMove={handleTouchMove}
           onTouchEnd={handleTouchEnd}
         >
           {productsToRender.map((product) => (
-            <div className="list__product-card" key={product.barcode}>
+            <div className={styles['list__product-card']} key={product.barcode}>
               {product.discount && (
-                <div className="list__product-badge">מבצע</div>
+                <div className={styles['list__product-badge']}>מבצע</div>
               )}
 
-              <div className="list__product-details">
-                <div className="list__product-data">
-                  <div className="list__product-name">
+              <div className={styles['list__product-details']}>
+                <div className={styles['list__product-data']}>
+                  <div className={styles['list__product-name']}>
                     <p>{product.name}</p>
                   </div>
-                  <div className="list__product-info">
-                    <div className="list__product-weight">
+                  <div className={styles['list__product-info']}>
+                    <div className={styles['list__product-weight']}>
                       <p>{product.weight}</p>
                       <p>{convertWeightUnit(product.unitWeight)}</p>
                     </div>
-                    <div className="list__separator">|</div>
-                    <div className="list__product-brand">
+                    <div className={styles['list__separator']}>|</div>
+                    <div className={styles['list__product-brand']}>
                       <p>{product.brand}</p>
                     </div>
                   </div>
-                  <div className="list__product-price">
+                  <div className={styles['list__product-price']}>
                     {typeof product.unitPrice === "number" ? (
                       <>
                         <p>{priceFormat(product.unitPrice)}</p>
@@ -559,16 +560,16 @@ function ProductsListGroups() {
                   </div>
                 </div>
                 <div
-                  className="list__product-image"
+                  className={styles['list__product-image']}
                   onClick={() => moveToPriceList(product.barcode)}
                 >
                   <ProductImageDisplay barcode={product.barcode} />
                 </div>
               </div>
-              <div className="list__product-operations">
+              <div className={styles['list__product-operations']}>
                 <div
                   id={`add-to-cart-${product.barcode}`}
-                  className="list__product-operations__confirm"
+                  className={styles['list__product-operations__confirm']}
                   onClick={(e) => {
                     e.stopPropagation();
                     updateAmount(product.barcode);
@@ -577,7 +578,7 @@ function ProductsListGroups() {
                   אין שינוי
                 </div>
                 <div
-                  className="list__product-operations__add"
+                  className={styles['list__product-operations__add']}
                   onClick={(e) => {
                     e.stopPropagation();
                     incrementAmount(product.barcode);
@@ -585,11 +586,11 @@ function ProductsListGroups() {
                 >
                   +
                 </div>
-                <div className="list__product-operations__quantity">
+                <div className={styles['list__product-operations__quantity']}>
                   <span>{productAmounts[product.barcode] || 0}</span>
                 </div>
                 <div
-                  className="list__product-operations__reduce"
+                  className={styles['list__product-operations__reduce']}
                   onClick={(e) => {
                     e.stopPropagation();
                     decrementAmount(product.barcode);
