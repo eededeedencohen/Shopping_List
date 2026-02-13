@@ -4,7 +4,6 @@ import HomePage from "./components/HomePage/HomePage";
 import PriceList from "./components/PriceList/PriceList";
 import Cart from "./components/Cart/Cart";
 import ImageParser from "./components/ImageParser/ImageParser";
-// import UploadRecord from "./components/UploadRecord/UploadRecord";
 import AudioRecorder from "./components/UploadRecord/AudioRecorder";
 import HistoryPage from "./components/History/HistoryPage";
 import HistoryList from "./components/History/HistoryList";
@@ -18,8 +17,6 @@ import OptimalCartsSettings from "./components/CartOptimization/OptimalCartsSett
 import OptimalsSupermarketCarts from "./components/CartOptimization/OptimalsSupermarketCarts/OptimalsSupermarketCarts";
 import OptimalCart from "./components/CartOptimization/OptimalsSupermarketCarts/OptimalSupermarketCart/OptimalCart";
 import ExpenseOverview from "./components/Stats/ExpenseOverview";
-// import ProductListManager from "./components/ProductList/ProductListManager";
-// import ProductListManagerAlternativeProductsGroups from "./components/ProductList/ProductListManagerAlternativeProductsGroups";
 import EditProducts from "./components/ProductList/EditProducts";
 import AI from "./components/AI/AI";
 import ProductsListTest from "./components/HooksTest/ProductsListTest";
@@ -31,7 +28,6 @@ import AnimationTouchMove from "./components/AAAnimationTests/AnimationTouchMove
 import Chatbot from "./components/Design/Chatbot/Chatbot";
 import StatsDashboard from "./components/Design/Charts/StatsDashboard";
 import ProductsListGroups from "./components/ProductList/ProductListGroups";
-// BarcodeScanner
 import BarcodeScanner from "./components/AAAnimationTests/BarcodeScanner";
 import VibrationSettings from "./components/Test/vibrate";
 import AppArchitecture from "./components/AppArchitecture/AppArchitecture";
@@ -45,7 +41,6 @@ function Routing() {
       <Route path="/cart" element={<Cart />} />
       <Route path="/stats" element={<Stats />} />
       <Route path="/image-parser" element={<ImageParser />} />
-      {/* <Route path="/upload-record" element={<UploadRecord />} /> */}
       <Route path="/audio-recorder" element={<AudioRecorder />} />
       <Route path="/history" element={<HistoryPage />} />
       <Route path="/history/:id" element={<HistoryList />} />
@@ -67,11 +62,6 @@ function Routing() {
         element={<OptimalCart />}
       />
       <Route path="/expense-overview" element={<ExpenseOverview />} />
-      {/* <Route path="/product-list" element={<ProductListManager />} /> */}
-      {/* <Route
-        path="/alternative-products-groups"
-        element={<ProductListManagerAlternativeProductsGroups />}
-      /> */}
       <Route path="/edit-products" element={<EditProducts />} />
       <Route path="/ai" element={<AI />} />
       <Route path="/products-list-test" element={<ProductsListTest />} />
@@ -86,7 +76,6 @@ function Routing() {
       <Route path="/barcode-scanner" element={<BarcodeScanner />} />
       <Route path="/vibration-settings" element={<VibrationSettings />} />
       <Route path="/architecture" element={<AppArchitecture />} />
-      {/* Add more routes as needed */}
     </Routes>
   );
 }
