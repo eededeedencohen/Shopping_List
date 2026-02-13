@@ -128,6 +128,10 @@ export default function AI() {
   ) => setMessages((p) => [...p, { text, sender, type, data, action }]);
   const removeLoadingMessage = () =>
     setMessages((p) => p.filter((m) => m.type !== "loading"));
+  const updateLoadingMessage = (text) =>
+    setMessages((p) =>
+      p.map((m) => (m.type === "loading" ? { ...m, text } : m))
+    );
 
   /* ------------------------------------------------------ */
   /*      טריגר-קול (מיקרופון)                              */
@@ -285,16 +289,50 @@ export default function AI() {
       const formData = new FormData();
       formData.append("file", audioFile);
 
-      addMessage("⌛️ מעלה את ההקלטה…", "user", "loading");
+      addMessage("⌛️ מעלה את ההקלטה…", "loading", "loading");
 
       const res = await fetch(`${DOMAIN}/api/v1/ai/ai-response-v5`, {
         method: "POST",
         body: formData,
       });
 
+      // ── קריאת SSE stream מהשרת ──
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = "";
+      let aiResponse = null;
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split("\n\n");
+        buffer = lines.pop(); // שאריות שעדיין לא הגיעו בשלמות
+
+        for (const line of lines) {
+          const dataLine = line.replace(/^data: /, "").trim();
+          if (!dataLine) continue;
+          try {
+            const event = JSON.parse(dataLine);
+            if (event.type === "status") {
+              updateLoadingMessage(event.status);
+            } else if (event.type === "transcription") {
+              // הטקסט שזוהה מהדיבור - מציג מיד כהודעת משתמש
+              if (event.text) addMessage(event.text, "user");
+            } else if (event.type === "result") {
+              aiResponse = event.aiResponse;
+            } else if (event.type === "error") {
+              console.error("Server error:", event.message);
+            }
+          } catch (e) {
+            console.warn("SSE parse error:", e);
+          }
+        }
+      }
+
       removeLoadingMessage();
 
-      const { aiResponse } = await res.json();
       const {
         requestText = "",
         messageType = "regular",
@@ -304,7 +342,6 @@ export default function AI() {
         audioRoute,
       } = aiResponse || {};
 
-      if (requestText) addMessage(requestText, "user");
       const sender = messageType === "regular" ? "assistant" : "operation";
       addMessage(messageToUser, sender, messageType, data, actions);
 
@@ -314,7 +351,7 @@ export default function AI() {
           brobotRef,
           setSpkLevel,
           currentAudioRef,
-          isAiSpeakingRef, // ← חדש
+          isAiSpeakingRef,
         );
 
       // 🔓 משחרר נעילה אחרי תשובה מהשרת

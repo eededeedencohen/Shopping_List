@@ -1,34 +1,12 @@
-/* .message-item {
+/* כל הודעה מוצגת כבלוק גמיש עם מרווחים */
+.message-item {
   display: flex;
+  flex-direction: column;
   padding: 0.5rem 0.75rem;
   margin: 0.5rem 0;
   border-radius: 10px;
   max-width: 90%;
   word-wrap: break-word;
-}
-
-.message-item p {
-  margin: 0;
-  font-size: 1rem;
-}
-
-.message-item.loading {
-  max-width: 50%;
-  background-color: #797979;
-  color: #fff;
-  text-align: center;
-  align-self: center;
-} */
-
-/* כל הודעה מוצגת כבלוק גמיש עם מרווחים */
-.message-item {
-  display: flex;
-  flex-direction: column; /* כדי שהטקסט יהיה מעל האנימציה */
-  padding: 0.5rem 0.75rem;
-  margin: 0.5rem 0;
-  border-radius: 10px;
-  max-width: 90%;
-  word-wrap: break-word; /* שבירת טקסט ארוך */
 }
 
 /* הגדרת טקסט */
@@ -39,36 +17,55 @@
 
 /* הודעת טעינה */
 .message-item.loading {
-  max-width: 50%;
-  background-color: #e2e2e2;
-  color: #406f3b;
+  max-width: 70%;
+  background: linear-gradient(135deg, #e8f5e9 0%, #e0f2f1 100%);
+  color: #2e7d32;
   text-align: center;
   align-self: center;
+  direction: rtl;
+  border-radius: 16px;
+  padding: 14px 20px;
+  box-shadow: 0 2px 12px rgba(46, 125, 50, 0.12);
+  border: 1px solid rgba(46, 125, 50, 0.1);
 }
 
 .message-item.loading p {
-  font-size: 0.9rem;
-  font-style: italic;
-  opacity: 0.85;
+  font-size: 0.95rem;
+  font-weight: 600;
   margin-bottom: 0.5rem;
+  min-height: 1.3em;
 }
 
+/* ── אנימציית החלפת טקסט ── */
+.loading-status-text {
+  display: inline-block;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
 
-/* האנימציה עצמה */
+.loading-status-text.fade-in {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.loading-status-text.fade-out {
+  opacity: 0;
+  transform: translateY(-6px);
+}
+
+/* ── אנימציית הטעינה ── */
 .loader {
   width: 50px;
-  aspect-ratio: 1; /* יחס 1:1 */
+  aspect-ratio: 1;
   display: grid;
-  margin: 0.5rem auto; /* מרכז את האנימציה אופקית */
+  margin: 0.5rem auto;
 }
 
-/* האלמנטים שמרכיבים את האנימציה (לפני/אחרי) */
 .loader::before,
 .loader::after {
   content: "";
   grid-area: 1/1;
   --c: no-repeat radial-gradient(farthest-side, #25b09b 92%, #0000);
-  background: 
+  background:
     var(--c) 50% 0,
     var(--c) 50% 100%,
     var(--c) 100% 50%,
@@ -77,7 +74,6 @@
   animation: l12 1s infinite;
 }
 
-/* מאפיינים נוספים לאלמנט before */
 .loader::before {
   margin: 4px;
   filter: hue-rotate(45deg);
@@ -85,7 +81,6 @@
   animation-timing-function: linear;
 }
 
-/* האנימציה של הסיבוב */
 @keyframes l12 {
   100% {
     transform: rotate(0.5turn);
