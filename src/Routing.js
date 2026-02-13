@@ -1,5 +1,6 @@
 import { Route, Routes } from "react-router";
 import Home from "./pages/Home";
+import HomePage from "./components/HomePage/HomePage";
 import PriceList from "./components/PriceList/PriceList";
 import Cart from "./components/Cart/Cart";
 import ImageParser from "./components/ImageParser/ImageParser";
@@ -38,7 +39,8 @@ import AppArchitecture from "./components/AppArchitecture/AppArchitecture";
 function Routing() {
   return (
     <Routes>
-      <Route path="/" element={<Home />} />
+      <Route path="/" element={<HomePage />} />
+      <Route path="/products" element={<Home />} />
       <Route path="/priceList/:barcode" element={<PriceList />} />
       <Route path="/cart" element={<Cart />} />
       <Route path="/stats" element={<Stats />} />

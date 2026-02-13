@@ -18,7 +18,8 @@ import { ReactComponent as EditIcon } from "./editing.svg";
 import { ReactComponent as DataClassificationIcon } from "./data-classification.svg";
 import { ReactComponent as BarcodeIcon} from "./barcode.svg";
 import { ReactComponent as VibrationIcon } from "./waves.svg";
-import { ReactComponent as ArchitectureIcon } from "./architecture.svg";  
+import { ReactComponent as ArchitectureIcon } from "./architecture.svg";
+import { ReactComponent as HomeIcon } from "./home.svg";
 function Toolbar() {
   const { totalAmount } = useCartTotals(); // ← כמות בעגלה
   const [selectedPage, setSelectedPage] = useState(window.location.pathname);
@@ -88,11 +89,25 @@ function Toolbar() {
       {/* Drawer */}
       <div className={`drawer ${isOpen ? "open" : ""}`}>
         <div className="routes-icons">
-          {/* 4. כל האייטמים נשארו כפי שהיו – נוספה בדיקה ל-selected-page */}
+          {/* Home */}
           <Link to="/" onClick={() => handleNavClick("/")}>
             <div
               className={`nav-item ${
                 selectedPage === "/" ? "selected-page" : ""
+              }`}
+            >
+              <div className="nav-icon">
+                <HomeIcon className="svg-icon" />
+              </div>
+              <h1>Home</h1>
+            </div>
+          </Link>
+
+          {/* Products */}
+          <Link to="/products" onClick={() => handleNavClick("/products")}>
+            <div
+              className={`nav-item ${
+                selectedPage === "/products" ? "selected-page" : ""
               }`}
             >
               <div className="nav-icon">
