@@ -241,31 +241,64 @@
 /* הוספה */
 .list__product-operations__add {
   background: linear-gradient(145deg, #4ade80, #22c55e);
-}
-.list__product-operations__add:active {
-  animation: buttonPop 0.3s ease-out;
-  background: linear-gradient(145deg, #22c55e, #16a34a);
+  transition: box-shadow 0.2s ease;
 }
 
 /* הפחתה */
 .list__product-operations__reduce {
   background: linear-gradient(145deg, #f87171, #ef4444);
-}
-.list__product-operations__reduce:active {
-  animation: buttonPop 0.3s ease-out;
-  background: linear-gradient(145deg, #ef4444, #dc2626);
+  transition: box-shadow 0.2s ease;
 }
 
-/* אנימציית לחיצה על כפתור */
-@keyframes buttonPop {
+/* אנימציית bounce לכפתור + */
+.animate-bounce-plus {
+  animation: buttonBouncePlus 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* אנימציית bounce לכפתור - */
+.animate-bounce-minus {
+  animation: buttonBounceMinus 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes buttonBouncePlus {
   0% {
     transform: scale(1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  }
+  20% {
+    transform: scale(0.7);
   }
   50% {
-    transform: scale(0.85);
+    transform: scale(1.25);
+    box-shadow: 0 0 20px rgba(34, 197, 94, 0.6), 0 0 40px rgba(34, 197, 94, 0.3);
+  }
+  75% {
+    transform: scale(0.95);
   }
   100% {
     transform: scale(1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  }
+}
+
+@keyframes buttonBounceMinus {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  }
+  20% {
+    transform: scale(0.7);
+  }
+  50% {
+    transform: scale(1.25);
+    box-shadow: 0 0 20px rgba(239, 68, 68, 0.6), 0 0 40px rgba(239, 68, 68, 0.3);
+  }
+  75% {
+    transform: scale(0.95);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
   }
 }
 
@@ -294,33 +327,82 @@
 
 /* אנימציית מספר עולה */
 .list__product-operations__quantity span.animate-up {
-  animation: slideUp 0.25s ease-out;
+  animation: slideUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  color: #16a34a;
 }
 
 /* אנימציית מספר יורד */
 .list__product-operations__quantity span.animate-down {
-  animation: slideDown 0.25s ease-out;
+  animation: slideDown 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  color: #dc2626;
+}
+
+/* זוהר על הכמות בזמן אנימציה */
+.quantity-glow-up {
+  animation: quantityGlowUp 0.4s ease-out;
+}
+
+.quantity-glow-down {
+  animation: quantityGlowDown 0.4s ease-out;
 }
 
 @keyframes slideUp {
   0% {
-    transform: translateY(100%);
+    transform: translateY(100%) scale(0.3);
     opacity: 0;
   }
+  60% {
+    transform: translateY(-8%) scale(1.15);
+    opacity: 1;
+  }
   100% {
-    transform: translateY(0);
+    transform: translateY(0) scale(1);
     opacity: 1;
   }
 }
 
 @keyframes slideDown {
   0% {
-    transform: translateY(-100%);
+    transform: translateY(-100%) scale(0.3);
     opacity: 0;
   }
-  100% {
-    transform: translateY(0);
+  60% {
+    transform: translateY(8%) scale(1.15);
     opacity: 1;
+  }
+  100% {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes quantityGlowUp {
+  0% {
+    background: rgba(255, 255, 255, 0.5);
+    box-shadow: none;
+  }
+  40% {
+    background: rgba(34, 197, 94, 0.25);
+    box-shadow: 0 0 12px rgba(34, 197, 94, 0.4);
+  }
+  100% {
+    background: rgba(255, 255, 255, 0.5);
+    box-shadow: none;
+  }
+}
+
+@keyframes quantityGlowDown {
+  0% {
+    background: rgba(255, 255, 255, 0.5);
+    box-shadow: none;
+  }
+  40% {
+    background: rgba(239, 68, 68, 0.25);
+    box-shadow: 0 0 12px rgba(239, 68, 68, 0.4);
+  }
+  100% {
+    background: rgba(255, 255, 255, 0.5);
+    box-shadow: none;
   }
 }
 

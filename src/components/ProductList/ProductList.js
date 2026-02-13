@@ -267,7 +267,7 @@ function ProductsList() {
     setAnimatingProducts({ ...animatingProducts, [barcode]: "up" });
     setTimeout(() => {
       setAnimatingProducts((prev) => ({ ...prev, [barcode]: null }));
-    }, 250);
+    }, 400);
 
     if (!oldProductAmounts[barcode]) {
       changeButtonToAddProductButton(button);
@@ -295,7 +295,7 @@ function ProductsList() {
     setAnimatingProducts({ ...animatingProducts, [barcode]: "down" });
     setTimeout(() => {
       setAnimatingProducts((prev) => ({ ...prev, [barcode]: null }));
-    }, 250);
+    }, 400);
 
     if (!oldProductAmounts[barcode]) {
       if (newAmount === 0) {
@@ -475,7 +475,11 @@ function ProductsList() {
                     אין שינוי
                   </div>
                   <div
-                    className={styles['list__product-operations__add']}
+                    className={`${styles['list__product-operations__add']} ${
+                      animatingProducts[product.barcode] === "up"
+                        ? styles['animate-bounce-plus']
+                        : ""
+                    }`}
                     onClick={(e) => {
                       e.stopPropagation();
                       incrementAmount(product.barcode);
@@ -483,7 +487,15 @@ function ProductsList() {
                   >
                     <img src={plusIcon} alt="+" />
                   </div>
-                  <div className={styles['list__product-operations__quantity']}>
+                  <div
+                    className={`${styles['list__product-operations__quantity']} ${
+                      animatingProducts[product.barcode] === "up"
+                        ? styles['quantity-glow-up']
+                        : animatingProducts[product.barcode] === "down"
+                        ? styles['quantity-glow-down']
+                        : ""
+                    }`}
+                  >
                     <span
                       className={
                         animatingProducts[product.barcode] === "up"
@@ -497,7 +509,11 @@ function ProductsList() {
                     </span>
                   </div>
                   <div
-                    className={styles['list__product-operations__reduce']}
+                    className={`${styles['list__product-operations__reduce']} ${
+                      animatingProducts[product.barcode] === "down"
+                        ? styles['animate-bounce-minus']
+                        : ""
+                    }`}
                     onClick={(e) => {
                       e.stopPropagation();
                       decrementAmount(product.barcode);
