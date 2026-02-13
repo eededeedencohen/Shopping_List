@@ -1,5 +1,5 @@
 import React, { useRef } from "react";
-import "./CategoryExpensesChart.css";
+import styles from "./CategoryExpensesChart.module.css";
 import { PieChart, Pie, Cell, Tooltip } from "recharts";
 import CategoryExpensesChartCategory from "./CategoryExpensesChartCategory";
 
@@ -31,9 +31,9 @@ const CategoryExpensesChart = ({ data, selectedCategory, onCategorySelect }) => 
   const containerRef = useRef(null);
 
   return (
-    <div className="category-chart-container">
+    <div className={styles['category-chart-container']}>
       {/* תרשים הפאי */}
-      <div className="chart-section">
+      <div className={styles['chart-section']}>
         <PieChart width={150} height={150}>
           <Pie
             data={chartData}
@@ -62,7 +62,7 @@ const CategoryExpensesChart = ({ data, selectedCategory, onCategorySelect }) => 
       </div>
 
       {/* הרשימה של הקטגוריות */}
-      <div className="category-list-container" ref={containerRef}>
+      <div className={styles['category-list-container']} ref={containerRef}>
         {chartData.map(({ name, value, color }) => (
           <CategoryExpensesChartCategory
             key={name}

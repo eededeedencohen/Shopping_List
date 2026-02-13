@@ -1,5 +1,5 @@
 import React from "react";
-import "./BarChartWrapper.css";
+import styles from "./BarChartWrapper.module.css";
 
 const ConvertMonthYearToHebrew = (monthYear) => {
   const [year, month] = monthYear.split("-");
@@ -13,15 +13,15 @@ const ConvertMonthYearToHebrew = (monthYear) => {
 const BarChartWrapper = ({ monthYear, total, isSelected, onMonthSelect }) => {
   return (
     <div
-      className={`bar-chart-wrapper ${isSelected ? "selected" : ""}`}
+      className={`${styles['bar-chart-wrapper']} ${isSelected ? styles.selected : ""}`}
       onClick={() => onMonthSelect(monthYear)}
     >
-      <div className="bar-value">₪{total.toFixed(2)}</div>
+      <div className={styles['bar-value']}>₪{total.toFixed(2)}</div>
       <div
-        className="bar-chart"
+        className={styles['bar-chart']}
         style={{ height: `${(total / 2000) * 200}px` }}
       ></div>
-      <div className="bar-date">{ConvertMonthYearToHebrew(monthYear)}</div>
+      <div className={styles['bar-date']}>{ConvertMonthYearToHebrew(monthYear)}</div>
     </div>
   );
 };

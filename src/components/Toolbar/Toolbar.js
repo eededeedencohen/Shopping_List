@@ -166,12 +166,12 @@ function Toolbar() {
           </Link>
 
           <Link
-            to="/expense-overview"
-            onClick={() => handleNavClick("/expense-overview")}
+            to="/advanced-stats"
+            onClick={() => handleNavClick("/advanced-stats")}
           >
             <div
               className={`nav-item ${
-                selectedPage === "/expense-overview" ? "selected-page" : ""
+                selectedPage === "/advanced-stats" ? "selected-page" : ""
               }`}
             >
               <div className="nav-icon">

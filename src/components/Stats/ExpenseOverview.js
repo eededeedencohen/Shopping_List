@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import MonthlyExpensesBarChart from "./MonthlyExpensesBarChart";
 import CategoryExpensesChart from "./CategoryExpensesChart";
 import ExpenseBreakdownList from "./ExpenseBreakdownList";
-import "./ExpenseOverview.css";
+import styles from "./ExpenseOverview.module.css";
 
 // היסטוריית ההוצאות
 const data = [
@@ -1926,7 +1926,7 @@ const ExpenseOverview = () => {
   };
 
   return (
-    <div className="expense-overview">
+    <div className={styles['expense-overview']}>
       <h1>סקירת הוצאות חודשיות</h1>
       <MonthlyExpensesBarChart
         data={data}

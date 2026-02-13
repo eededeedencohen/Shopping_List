@@ -1,0 +1,12 @@
+.category-list-item{
+  --accent:#f3c3d7;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:10px;border-radius:12px;border:2px solid transparent;
+  transition:background .45s,transform .45s;border-color:var(--accent);
+  cursor:pointer;gap:10px;
+}
+.category-list-item:hover{transform:translateY(-4px)}
+.category-list-item.selected{background:var(--accent)}
+.category-list-item-content_name{font-weight:600;color:#fff;font-size:.9rem}
+.category-list-item-content_value{font-size:.75rem;color:#9ca3af}
+.category-list-item-image img{max-height:42px;filter:drop-shadow(0 0 4px rgba(0,0,0,.5))}

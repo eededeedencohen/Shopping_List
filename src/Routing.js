@@ -31,6 +31,7 @@ import ProductsListGroups from "./components/ProductList/ProductListGroups";
 import BarcodeScanner from "./components/AAAnimationTests/BarcodeScanner";
 import VibrationSettings from "./components/Test/vibrate";
 import AppArchitecture from "./components/AppArchitecture/AppArchitecture";
+import AdvancedStatsDashboard from "./components/Stats/AdvancedStatsDashboard";
 
 function Routing() {
   return (
@@ -76,6 +77,7 @@ function Routing() {
       <Route path="/barcode-scanner" element={<BarcodeScanner />} />
       <Route path="/vibration-settings" element={<VibrationSettings />} />
       <Route path="/architecture" element={<AppArchitecture />} />
+      <Route path="/advanced-stats" element={<AdvancedStatsDashboard />} />
     </Routes>
   );
 }

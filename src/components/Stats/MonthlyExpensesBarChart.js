@@ -1,5 +1,5 @@
 import React, { useRef, useEffect } from "react";
-import "./MonthlyExpensesBarChart.css";
+import styles from "./MonthlyExpensesBarChart.module.css";
 import BarChartWrapper from "./BarChartWrapper";
 
 const MonthlyExpensesBarChart = ({ data, selectedMonthYear, onMonthSelect }) => {
@@ -32,7 +32,7 @@ const MonthlyExpensesBarChart = ({ data, selectedMonthYear, onMonthSelect }) => 
   }, [selectedMonthYear]);
 
   return (
-    <div className="bar-chart-container" ref={containerRef}>
+    <div className={styles['bar-chart-container']} ref={containerRef}>
       {reversedMonthlyTotals.map(([monthYear, total]) => (
         <div
           key={monthYear}

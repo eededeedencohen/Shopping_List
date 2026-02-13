@@ -1,0 +1,18 @@
+.bar-chart-container {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-end;
+  overflow-x: auto;
+  gap: 20px;
+  padding: 10px;
+  white-space: nowrap;
+  background-color: #f9f9f9;
+  border-radius: 10px;
+  border: 1px solid #ddd;
+  scroll-behavior: smooth;
+  direction: ltr;
+}
+
+.bar-chart-container::-webkit-scrollbar {
+  display: none;
+}

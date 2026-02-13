@@ -1,5 +1,5 @@
 import React, { useRef, useEffect } from "react";
-import "./CategoryExpensesChartCategory.css";
+import styles from "./CategoryExpensesChartCategory.module.css";
 
 import dairyLogo from "./Dairy.png";
 import frozenLogo from "./Frozen.png";
@@ -79,17 +79,17 @@ const CategoryExpensesChartCategory = ({
   return (
     <div
       ref={itemRef} // מצמידים את הרפרנס
-      className={`category-list-item ${isSelected ? "selected" : ""}`}
+      className={`${styles['category-list-item']} ${isSelected ? styles.selected : ""}`}
       onClick={onClick}
       style={{ borderColor: color }}
     >
-      <div className="category-list-item-content">
-        <div className="category-list-item-content_name">{name}</div>
-        <div className="category-list-item-content_value">
+      <div className={styles['category-list-item-content']}>
+        <div className={styles['category-list-item-content_name']}>{name}</div>
+        <div className={styles['category-list-item-content_value']}>
           ₪{value.toFixed(2)}
         </div>
       </div>
-      <div className="category-list-item-image">
+      <div className={styles['category-list-item-image']}>
         <img src={getCategoryIcon(name)} 
          alt={name} />
       </div>
