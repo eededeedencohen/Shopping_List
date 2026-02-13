@@ -1,0 +1,504 @@
+/* ============================================
+   RECEIPT EDIT FORM STYLES
+   Receipt-paper aesthetic for parsed receipt
+   ============================================ */
+
+/* ── Main Container ── */
+.receipt-edit-container {
+  width: 98%;
+  max-width: 420px;
+  background:
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 1px,
+      rgba(0, 0, 0, 0.008) 1px,
+      rgba(0, 0, 0, 0.008) 2px
+    ),
+    linear-gradient(180deg, #fffef9 0%, #fffdf5 50%, #faf9f0 100%);
+  border-radius: 4px;
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.03),
+    2px 2px 8px rgba(0, 0, 0, 0.08),
+    4px 4px 20px rgba(0, 0, 0, 0.05);
+  padding: 20px 14px 24px;
+  direction: rtl;
+}
+
+/* ── Header Section ── */
+.receipt-edit-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding-bottom: 14px;
+  border-bottom: 2px dashed #ccc;
+}
+
+.receipt-edit-logo {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: #fff;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.receipt-edit-logo img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* ── Form Fields ── */
+.receipt-edit-field {
+  width: 100%;
+}
+
+.receipt-edit-field--half {
+  flex: 1;
+  min-width: 0;
+}
+
+.receipt-edit-label {
+  font-family: 'Heshbon', 'VT323', monospace;
+  font-size: 0.75rem;
+  color: #888;
+  display: block;
+  margin-bottom: 3px;
+}
+
+.receipt-edit-row {
+  display: flex;
+  gap: 10px;
+  width: 100%;
+}
+
+.receipt-edit-select {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.9);
+  font-family: 'Heshbon', 'VT323', monospace;
+  font-size: 0.9rem;
+  color: #333;
+  direction: rtl;
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M6 8L1 3h10z' fill='%23888'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: left 10px center;
+}
+
+.receipt-edit-input {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.9);
+  font-family: 'Heshbon', 'VT323', monospace;
+  font-size: 0.9rem;
+  color: #333;
+  direction: rtl;
+  box-sizing: border-box;
+}
+
+.receipt-edit-input:focus,
+.receipt-edit-select:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.15);
+}
+
+.receipt-edit-input--small {
+  margin-top: 6px;
+  font-size: 0.8rem;
+  padding: 6px 8px;
+}
+
+.receipt-edit-total-display {
+  font-family: 'Heshbon', 'VT323', monospace;
+  font-size: 1.4rem;
+  font-weight: 900;
+  color: #333;
+  text-align: center;
+  padding: 6px;
+  background: rgba(245, 245, 232, 0.8);
+  border-radius: 6px;
+}
+
+/* ── Separator ── */
+.receipt-edit-separator {
+  text-align: center;
+  font-family: 'Heshbon', 'VT323', monospace;
+  font-size: 0.8rem;
+  color: #999;
+  padding: 12px 0 8px;
+  letter-spacing: 1px;
+}
+
+/* ── Products Section ── */
+.receipt-edit-products {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* ── Product Card ── */
+.receipt-product-card {
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 8px;
+  padding: 10px 12px;
+  border-right: 3px solid #ddd;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.receipt-product-card:active {
+  transform: scale(0.99);
+}
+
+.receipt-product-card--in-db {
+  border-right-color: #4caf50;
+}
+
+.receipt-product-card--not-in-db {
+  border-right-color: #ff9800;
+}
+
+.receipt-product-card--expanded {
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+}
+
+/* ── Product Summary (collapsed) ── */
+.receipt-product-summary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.receipt-product-image {
+  width: 48px;
+  height: 48px;
+  border-radius: 6px;
+  overflow: hidden;
+  flex-shrink: 0;
+  background: #f8f8f8;
+}
+
+.receipt-product-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.receipt-product-image div {
+  min-height: 48px !important;
+  font-size: 0.5rem;
+}
+
+.receipt-product-summary-right {
+  flex: 1;
+  min-width: 0;
+}
+
+.receipt-product-summary-left {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  flex-shrink: 0;
+}
+
+.receipt-product-name {
+  font-family: 'Heshbon', 'VT323', monospace;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #333;
+  word-break: break-word;
+}
+
+.receipt-product-meta {
+  font-family: 'Heshbon', 'VT323', monospace;
+  font-size: 0.75rem;
+  color: #888;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-top: 2px;
+}
+
+.receipt-product-total {
+  font-family: 'Heshbon', 'VT323', monospace;
+  font-size: 1.05rem;
+  font-weight: 900;
+  color: #333;
+  white-space: nowrap;
+}
+
+.receipt-product-db-badge {
+  font-size: 0.65rem;
+  color: #fff;
+  background: #4caf50;
+  padding: 1px 6px;
+  border-radius: 3px;
+  font-weight: 700;
+}
+
+.receipt-product-no-db-badge {
+  font-size: 0.65rem;
+  color: #fff;
+  background: #ff9800;
+  padding: 1px 6px;
+  border-radius: 3px;
+  font-weight: 700;
+}
+
+.receipt-product-promo-badge {
+  display: inline-block;
+  font-size: 0.6rem;
+  color: #fff;
+  background: #d32f2f;
+  padding: 1px 6px;
+  border-radius: 3px;
+  font-weight: 700;
+  margin-right: 6px;
+  vertical-align: middle;
+}
+
+.receipt-product-discount-info {
+  font-family: 'Heshbon', 'VT323', monospace;
+  font-size: 0.7rem;
+  color: #d32f2f;
+  margin-top: 2px;
+}
+
+.receipt-product-saving {
+  color: #2e7d32;
+  font-weight: 700;
+}
+
+.receipt-product-original-price {
+  font-family: 'Heshbon', 'VT323', monospace;
+  font-size: 0.75rem;
+  color: #999;
+  text-decoration: line-through;
+  text-align: left;
+}
+
+.receipt-product-delete {
+  background: none;
+  border: none;
+  color: #d32f2f;
+  font-size: 1rem;
+  cursor: pointer;
+  padding: 4px 6px;
+  border-radius: 4px;
+  opacity: 0.6;
+  transition: opacity 0.2s;
+  flex-shrink: 0;
+  align-self: center;
+}
+
+.receipt-product-delete:active {
+  opacity: 1;
+  background: rgba(211, 47, 47, 0.1);
+}
+
+/* ── Product Edit Form (expanded) ── */
+.receipt-product-edit {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px dashed #ddd;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.receipt-product-edit-row {
+  display: flex;
+  gap: 8px;
+}
+
+.receipt-product-edit-field {
+  flex: 1;
+  min-width: 0;
+}
+
+.receipt-product-edit-field label {
+  font-family: 'Heshbon', 'VT323', monospace;
+  font-size: 0.7rem;
+  color: #999;
+  display: block;
+  margin-bottom: 2px;
+}
+
+.receipt-product-edit-field input,
+.receipt-product-edit-field select {
+  width: 100%;
+  padding: 6px 8px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  font-family: 'Heshbon', 'VT323', monospace;
+  font-size: 0.85rem;
+  color: #333;
+  background: #fff;
+  direction: rtl;
+  box-sizing: border-box;
+}
+
+.receipt-product-edit-field input:focus,
+.receipt-product-edit-field select:focus {
+  outline: none;
+  border-color: #667eea;
+}
+
+/* ── Add Product Button ── */
+.receipt-add-product-btn {
+  width: 100%;
+  padding: 10px;
+  border: 2px dashed #ccc;
+  border-radius: 8px;
+  background: transparent;
+  font-family: 'Heshbon', 'VT323', monospace;
+  font-size: 0.9rem;
+  color: #888;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-top: 4px;
+}
+
+.receipt-add-product-btn:active {
+  border-color: #667eea;
+  color: #667eea;
+  background: rgba(102, 126, 234, 0.05);
+}
+
+/* ── Total Section ── */
+.receipt-edit-total-section {
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 2px dashed #ccc;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.receipt-recalculate-btn {
+  padding: 8px 14px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.9);
+  font-family: 'Heshbon', 'VT323', monospace;
+  font-size: 0.85rem;
+  color: #555;
+  cursor: pointer;
+  align-self: center;
+  transition: all 0.2s;
+}
+
+.receipt-recalculate-btn:active {
+  background: #f0f0f0;
+}
+
+.receipt-edit-total-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  background: rgba(245, 245, 232, 0.8);
+  border-radius: 6px;
+}
+
+.receipt-edit-total-label {
+  font-family: 'Heshbon', 'VT323', monospace;
+  font-size: 1.1rem;
+  font-weight: 900;
+  color: #333;
+}
+
+.receipt-edit-total-input {
+  width: 100px;
+  padding: 6px 10px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-family: 'Heshbon', 'VT323', monospace;
+  font-size: 1.2rem;
+  font-weight: 900;
+  color: #333;
+  text-align: center;
+  background: #fff;
+  direction: ltr;
+}
+
+.receipt-edit-total-input:focus {
+  outline: none;
+  border-color: #667eea;
+}
+
+/* ── Validation Errors ── */
+.receipt-validation-errors {
+  margin-top: 10px;
+  padding: 10px 14px;
+  background: #fff3f3;
+  border: 1px solid #ffcdd2;
+  border-radius: 6px;
+  font-family: 'Heshbon', 'VT323', monospace;
+  font-size: 0.85rem;
+  color: #d32f2f;
+  direction: rtl;
+}
+
+.receipt-validation-errors div {
+  padding: 2px 0;
+}
+
+/* ── Action Buttons ── */
+.receipt-edit-actions {
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.receipt-confirm-btn {
+  width: 100%;
+  padding: 14px;
+  border: none;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #4caf50 0%, #2e7d32 100%);
+  color: #fff;
+  font-family: 'Heshbon', 'VT323', monospace;
+  font-size: 1.15rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+  transition: all 0.2s;
+}
+
+.receipt-confirm-btn:active {
+  transform: scale(0.97);
+}
+
+.receipt-cancel-btn {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.9);
+  color: #888;
+  font-family: 'Heshbon', 'VT323', monospace;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.receipt-cancel-btn:active {
+  background: #f0f0f0;
+}

@@ -1,0 +1,368 @@
+/* ============================================
+   RECEIPT SCANNER / IMAGE PARSER STYLES
+   Mobile Only - Receipt Aesthetic
+   ============================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=VT323&family=Share+Tech+Mono&family=Cutive+Mono&display=swap');
+
+@font-face {
+  font-family: 'Heshbon';
+  src: url('../History/heshbon-regular-alefalefalef.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Heshbon';
+  src: url('../History/heshbon-bold-alefalefalef.otf') format('opentype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ── Main Container ── */
+.scanner-container {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: linear-gradient(135deg, #d4d4d4 0%, #e8e8e8 50%, #d0d0d0 100%);
+  padding: 20px 10px 30px;
+  overflow-x: hidden;
+  position: relative;
+  direction: rtl;
+}
+
+/* ── Back Button ── */
+.scanner-back-btn {
+  position: fixed;
+  top: 15px;
+  right: 15px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.95);
+  border: none;
+  font-size: 1.3rem;
+  cursor: pointer;
+  z-index: 100;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s;
+}
+
+.scanner-back-btn:active {
+  transform: scale(0.9);
+}
+
+/* ── Page Title ── */
+.scanner-title {
+  font-family: 'Heshbon', 'VT323', monospace;
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #333;
+  margin: 10px 0 20px;
+  text-align: center;
+}
+
+/* ============================================
+   CAPTURE STEP
+   ============================================ */
+
+.scanner-capture-card {
+  width: 90%;
+  max-width: 380px;
+  background: linear-gradient(180deg, #fffef9 0%, #faf9f0 100%);
+  border-radius: 12px;
+  padding: 30px 20px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.scanner-capture-icon {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+}
+
+.scanner-capture-icon svg {
+  width: 40px;
+  height: 40px;
+  stroke: #fff;
+  fill: none;
+}
+
+.scanner-capture-text {
+  font-family: 'Heshbon', 'VT323', monospace;
+  font-size: 1.1rem;
+  color: #555;
+  text-align: center;
+}
+
+.scanner-capture-buttons {
+  display: flex;
+  gap: 14px;
+  width: 100%;
+}
+
+.scanner-capture-btn {
+  flex: 1;
+  padding: 16px 12px;
+  border: 2px dashed #bbb;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.8);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s;
+  font-family: 'Heshbon', 'VT323', monospace;
+  font-size: 0.9rem;
+  color: #555;
+}
+
+.scanner-capture-btn:active {
+  transform: scale(0.95);
+  border-color: #667eea;
+  background: rgba(102, 126, 234, 0.05);
+}
+
+.scanner-capture-btn svg {
+  width: 32px;
+  height: 32px;
+  stroke: #667eea;
+  fill: none;
+}
+
+/* Hidden file inputs */
+.scanner-hidden-input {
+  display: none;
+}
+
+/* ── Image Preview ── */
+.scanner-preview-container {
+  width: 90%;
+  max-width: 380px;
+  margin-top: 15px;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  position: relative;
+}
+
+.scanner-preview-image {
+  width: 100%;
+  max-height: 400px;
+  object-fit: contain;
+  display: block;
+  background: #f5f5f5;
+}
+
+.scanner-preview-remove {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: rgba(211, 47, 47, 0.9);
+  border: none;
+  color: #fff;
+  font-size: 1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ── Analyze Button ── */
+.scanner-analyze-btn {
+  width: 90%;
+  max-width: 380px;
+  margin-top: 15px;
+  padding: 16px;
+  border: none;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #fff;
+  font-family: 'Heshbon', 'VT323', monospace;
+  font-size: 1.2rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+  transition: all 0.2s;
+}
+
+.scanner-analyze-btn:active {
+  transform: scale(0.97);
+}
+
+.scanner-analyze-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ============================================
+   PROCESSING STEP
+   ============================================ */
+
+.scanner-processing {
+  width: 90%;
+  max-width: 380px;
+  background: linear-gradient(180deg, #fffef9 0%, #faf9f0 100%);
+  border-radius: 12px;
+  padding: 50px 20px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 25px;
+  margin-top: 40px;
+}
+
+.scanner-processing-receipt {
+  width: 60px;
+  height: 80px;
+  background: #fff;
+  border: 2px solid #ddd;
+  border-radius: 4px;
+  position: relative;
+  animation: receipt-scan 1.5s ease-in-out infinite;
+}
+
+.scanner-processing-receipt::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, #667eea, transparent);
+  animation: scan-line 1.5s ease-in-out infinite;
+}
+
+@keyframes receipt-scan {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+@keyframes scan-line {
+  0% { top: 0; }
+  100% { top: 100%; }
+}
+
+.scanner-processing-text {
+  font-family: 'Heshbon', 'VT323', monospace;
+  font-size: 1.1rem;
+  color: #555;
+  text-align: center;
+}
+
+.scanner-processing-dots {
+  display: flex;
+  gap: 6px;
+}
+
+.scanner-processing-dots span {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #667eea;
+  animation: dot-pulse 1.2s ease-in-out infinite;
+}
+
+.scanner-processing-dots span:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.scanner-processing-dots span:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes dot-pulse {
+  0%, 100% { opacity: 0.3; transform: scale(0.8); }
+  50% { opacity: 1; transform: scale(1.2); }
+}
+
+/* ============================================
+   SUCCESS STEP
+   ============================================ */
+
+.scanner-success {
+  width: 90%;
+  max-width: 380px;
+  background: linear-gradient(180deg, #e8f5e9 0%, #c8e6c9 100%);
+  border-radius: 12px;
+  padding: 50px 20px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+  margin-top: 40px;
+}
+
+.scanner-success-check {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: #2e7d32;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: check-pop 0.4s ease-out;
+}
+
+.scanner-success-check svg {
+  width: 30px;
+  height: 30px;
+  stroke: #fff;
+  fill: none;
+  stroke-width: 3;
+}
+
+@keyframes check-pop {
+  0% { transform: scale(0); }
+  60% { transform: scale(1.2); }
+  100% { transform: scale(1); }
+}
+
+.scanner-success-text {
+  font-family: 'Heshbon', 'VT323', monospace;
+  font-size: 1.2rem;
+  color: #2e7d32;
+  font-weight: 700;
+  text-align: center;
+}
+
+/* ============================================
+   ERROR STATE
+   ============================================ */
+
+.scanner-error {
+  width: 90%;
+  max-width: 380px;
+  background: #fff3f3;
+  border: 1px solid #ffcdd2;
+  border-radius: 8px;
+  padding: 12px 16px;
+  margin-top: 10px;
+  font-family: 'Heshbon', 'VT323', monospace;
+  font-size: 0.95rem;
+  color: #d32f2f;
+  text-align: center;
+  direction: rtl;
+}

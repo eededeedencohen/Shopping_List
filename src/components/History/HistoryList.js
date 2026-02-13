@@ -7,6 +7,7 @@ import SupermarketImage from "../Images/SupermarketImage";
 import { DOMAIN } from "../../constants";
 import { ReactComponent as SearchIcon } from "./search.svg";
 import { ReactComponent as ScheduleIcon } from "./schedule.svg";
+import generateReceiptPDF from "./generateReceiptPDF";
 
 const formatDate = (dateString) => {
   const dateObj = new Date(dateString);
@@ -47,6 +48,19 @@ const HistoryList = () => {
   const navigate = useNavigate();
   const [cart, setCart] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
+  const [isPrinting, setIsPrinting] = useState(false);
+
+  const handlePrintReceipt = async () => {
+    if (!cart || isPrinting) return;
+    setIsPrinting(true);
+    try {
+      await generateReceiptPDF(cart, id);
+    } catch (err) {
+      console.error("PDF generation failed:", err);
+    } finally {
+      setIsPrinting(false);
+    }
+  };
 
   useEffect(() => {
     const fetchCart = async () => {
@@ -82,6 +96,23 @@ const HistoryList = () => {
       {/* Back Button */}
       <button className="receipt-back-btn" onClick={handleBack}>
         ←
+      </button>
+
+      {/* Print Receipt PDF Button */}
+      <button
+        className={`receipt-print-btn ${isPrinting ? "printing" : ""}`}
+        onClick={handlePrintReceipt}
+        disabled={isPrinting}
+      >
+        {isPrinting ? (
+          <span className="print-spinner" />
+        ) : (
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="6 9 6 2 18 2 18 9" />
+            <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2" />
+            <rect x="6" y="14" width="12" height="8" />
+          </svg>
+        )}
       </button>
 
       {/* Search/Filter Bar */}
@@ -125,52 +156,83 @@ const HistoryList = () => {
 
         {/* Products List */}
         <div className="cart-history">
-          {filteredProducts.map((product, index) => (
-            <div
-              key={product.barcode}
-              className="history__product-item"
-              style={{ animationDelay: `${1.3 + index * 0.06}s` }}
-            >
-              {/* Image - LEFT */}
-              <div className="history__product-image">
-                <ProductImageDisplay barcode={product.barcode} />
-              </div>
+          {filteredProducts.map((product, index) => {
+            const hasPromo = product.hasDiscount && product.discount && product.discount.units > 1;
+            const regularUnitPrice = product.price || 0;
+            const regularTotal = hasPromo ? product.amount * regularUnitPrice : 0;
+            const savings = hasPromo ? regularTotal - product.totalPrice : 0;
 
-              {/* Product Name - TOP */}
-              <div className="history__product-name">
-                {product.name}
-              </div>
-
-              {/* Details - brand & weight */}
-              <div className="history__product-details">
-                {product.brand && (
-                  <>
-                    <span className="history__product-brand">{product.brand}</span>
-                    <span className="history__product-details-divider">|</span>
-                  </>
+            return (
+              <div
+                key={product.barcode}
+                className={`history__product-item ${hasPromo ? "history__product-item--promo" : ""}`}
+                style={{ animationDelay: `${1.3 + index * 0.06}s` }}
+              >
+                {/* Discount badge */}
+                {hasPromo && (
+                  <div className="history__promo-badge">מבצע</div>
                 )}
-                <div className="history__product-weight">
-                  <span>{product.weight}</span>
-                  <span style={{ marginRight: "3px" }}>
-                    {weightUnitToHebrew(product.unit)}
-                  </span>
-                </div>
-              </div>
 
-              {/* Price - RIGHT */}
-              <div className="history__product-price-container">
-                <div className="history__product-amount">
-                  <span >{product.amount}</span>
-                  <span style={{ direction: "rtl"}}>יח'</span> 
+                {/* Image - LEFT */}
+                <div className="history__product-image">
+                  <ProductImageDisplay barcode={product.barcode} />
                 </div>
-                <div className="history__product-price">
-                  <p>{formatPrice(product.totalPrice)}</p>
-                </div>
-              </div>
 
-              <div className="history__line" />
-            </div>
-          ))}
+                {/* Product Name - TOP */}
+                <div className="history__product-name">
+                  {product.name}
+                </div>
+
+                {/* Details - brand & weight */}
+                <div className="history__product-details">
+                  {product.brand && (
+                    <>
+                      <span className="history__product-brand">{product.brand}</span>
+                      <span className="history__product-details-divider">|</span>
+                    </>
+                  )}
+                  <div className="history__product-weight">
+                    <span>{product.weight}</span>
+                    <span style={{ marginRight: "3px" }}>
+                      {weightUnitToHebrew(product.unit)}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Price - RIGHT */}
+                <div className="history__product-price-container">
+                  <div className="history__product-amount">
+                    <span>{product.amount}</span>
+                    <span style={{ direction: "rtl"}}>יח'</span>
+                  </div>
+                  {hasPromo ? (
+                    <>
+                      <div className="history__product-price history__product-price--original">
+                        <p>{formatPrice(regularTotal)}</p>
+                      </div>
+                      <div className="history__promo-info">
+                        <span className="history__promo-deal">
+                          {product.discount.units} ב-{formatPrice(product.discount.totalPrice)}
+                        </span>
+                        <span className="history__promo-saving">
+                          -{formatPrice(savings)}
+                        </span>
+                      </div>
+                      <div className="history__product-price history__product-price--final">
+                        <p>{formatPrice(product.totalPrice)}</p>
+                      </div>
+                    </>
+                  ) : (
+                    <div className="history__product-price">
+                      <p>{formatPrice(product.totalPrice)}</p>
+                    </div>
+                  )}
+                </div>
+
+                <div className="history__line" />
+              </div>
+            );
+          })}
         </div>
 
         {/* Footer with barcode */}

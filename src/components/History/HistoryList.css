@@ -601,7 +601,7 @@
       transparent 20px,
       transparent 22px
     );
-  opacity: 0.75;
+  opacity: 1;
   margin-bottom: 10px;
   animation: barcode-appear 0.8s ease-out 2.5s backwards;
 }
@@ -927,7 +927,7 @@
     transform: scaleX(0);
   }
   100% {
-    opacity: 0.75;
+    opacity: 1;
     transform: scaleX(1);
   }
 }
@@ -941,6 +941,160 @@
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+/* ============================================
+   DISCOUNT / PROMOTION STYLES
+   ============================================ */
+
+/* Promo product item - subtle highlight */
+.history__product-item--promo {
+  background: linear-gradient(180deg,
+    rgba(255, 243, 243, 0.9) 0%,
+    rgba(255, 248, 248, 0.6) 100%
+  );
+  border-right: 3px solid #d32f2f;
+}
+
+/* Promo badge */
+.history__promo-badge {
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  font-family: 'Heshbon', 'VT323', monospace;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #fff;
+  background: linear-gradient(135deg, #d32f2f, #f44336);
+  padding: 2px 8px;
+  border-radius: 4px;
+  direction: rtl;
+  z-index: 2;
+  box-shadow: 0 2px 6px rgba(211, 47, 47, 0.3);
+  animation: promo-pop 0.4s ease-out backwards;
+}
+
+/* Original price - strikethrough */
+.history__product-price--original p {
+  font-size: clamp(0.7rem, 2vw, 0.85rem) !important;
+  color: #999 !important;
+  text-decoration: line-through;
+  text-decoration-color: #d32f2f;
+  background: transparent !important;
+  box-shadow: none !important;
+  padding: 2px 6px !important;
+  min-width: auto !important;
+}
+
+.history__product-price--original p::after {
+  display: none;
+}
+
+/* Promo info line */
+.history__promo-info {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+  direction: rtl;
+  margin-bottom: 2px;
+}
+
+.history__promo-deal {
+  font-family: 'Heshbon', 'VT323', monospace;
+  font-size: clamp(0.65rem, 1.8vw, 0.78rem);
+  color: #d32f2f;
+  font-weight: 700;
+  background: rgba(211, 47, 47, 0.08);
+  padding: 1px 6px;
+  border-radius: 3px;
+}
+
+.history__promo-saving {
+  font-family: 'Heshbon', 'VT323', monospace;
+  font-size: clamp(0.65rem, 1.8vw, 0.78rem);
+  color: #d32f2f;
+  font-weight: 700;
+}
+
+/* Final discounted price - bold and green-tinted */
+.history__product-price--final p {
+  background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%) !important;
+  color: #2e7d32 !important;
+  font-weight: 900 !important;
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.9),
+    0 2px 6px rgba(46, 125, 50, 0.15) !important;
+}
+
+@keyframes promo-pop {
+  0% {
+    transform: scale(0) rotate(-15deg);
+    opacity: 0;
+  }
+  60% {
+    transform: scale(1.2) rotate(3deg);
+  }
+  100% {
+    transform: scale(1) rotate(0);
+    opacity: 1;
+  }
+}
+
+/* ============================================
+   PRINT RECEIPT BUTTON
+   ============================================ */
+
+.receipt-print-btn {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: linear-gradient(145deg, #1a73e8, #1557b0);
+  border: none;
+  box-shadow:
+    0 4px 15px rgba(26, 115, 232, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  cursor: pointer;
+  z-index: 100;
+  animation: back-btn-appear 0.5s ease-out 0.5s backwards;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.receipt-print-btn:active {
+  transform: scale(0.9);
+  box-shadow: 0 2px 8px rgba(26, 115, 232, 0.3);
+}
+
+.receipt-print-btn:hover {
+  background: linear-gradient(145deg, #2979ff, #1a73e8);
+  box-shadow:
+    0 6px 20px rgba(26, 115, 232, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.receipt-print-btn.printing {
+  background: linear-gradient(145deg, #999, #777);
+  cursor: wait;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* Spinner for loading state */
+.print-spinner {
+  display: block;
+  width: 20px;
+  height: 20px;
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
 }
 
 /* Loading state */
