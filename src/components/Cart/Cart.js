@@ -11,7 +11,6 @@ import {
   ProductImageDisplay,
 } from "../Images/ProductImageService";
 import SupermarketImage from "../Images/SupermarketImage";
-import trashIcon from "./trash.png";
 
 //==================================================
 import {
@@ -233,7 +232,6 @@ export default function Cart() {
 
   return (
     <div className={styles.cart}>
-      {console.log("cart2 in cart.js", cart)}
       <Modal isOpen={isModalOpen} onClose={() => setModalOpen(false)}>
         <ReplaceProducts
           barcode={currentBarcode}
@@ -248,93 +246,63 @@ export default function Cart() {
         onSelectBranch={handleUpdateSupermarket}
       />
 
-      {/* ///////////////////////////////////////////////////////////////////////////////////////////*/}
-      {/* ///////////////////////////////////////////////////////////////////////////////////////////*/}
-      {/* ///////////////////////////////////////////////////////////////////////////////////////////*/}
-      {/* ///////////////////////////////////////////////////////////////////////////////////////////*/}
-      {/* ///////////////////////////////////////////////////////////////////////////////////////////*/}
-
-      <div className={styles['cart-operations']}>
-        {/* =============================================cart-operations_replace-supermarket START============================================= */}
-        <div
-          className={styles['cart-operations_replace-supermarket']}
-          onClick={() => setIsReplaceSupermarketOpen(true)}
-        >
-          החלפת סופרמרקט{" "}
-        </div>
-        {/* =============================================cart-operations_replace-supermarket END============================================= */}
-
-        {/* ////////////////////////////////////////cart-operations_cheapest-supermarket START//////////////////////////////////////// */}
-        <div
-          className={styles['cart-operations_cheapest-supermarket']}
-          onClick={() => {
-            const handleOptimizeCart = async () => {
-              setIsReplaceSupermarket(true); // Start loading
-              try {
-                // Code to optimize the cart goes here
-                await handleCheapestCart();
-              } catch (error) {
-                console.error("Error optimizing cart:", error);
-                // Optionally, handle the error
-              } finally {
-                setIsReplaceSupermarket(false); // Stop loading regardless of success or error
-              }
-            };
-
-            handleOptimizeCart();
-          }}
-          disabled={isReplaceSupermarket} // Disable the button when loading>
-        >
-          מחיר הכי זול
-          {isReplaceSupermarket && <div>Loading...</div>}{" "}
-          {/* Optional: Show a loading indicator */}
-        </div>
-
-        {/* ////////////////////////////////////////cart-operations_cheapest-supermarket END//////////////////////////////////////// */}
-
-        {/* +++++++++++++++++++++++++++++++++++++cart-operations_optimal-carts-settings START++++++++++++++++++++++++++++++++++++++++ */}
-        <div
-          className={styles['cart-operations_optimal-carts-settings']}
-          onClick={() => navigate("/optimal-carts-settings")}
-        >
-          מעבר לאופטימיזציית עגלות
-        </div>
-      </div>
-
-      {/* +++++++++++++++++++++++++++++++++++++cart-operations_optimal-carts-settings END++++++++++++++++++++++++++++++++++++++++ */}
-
-      {/* ///////////////////////////////////////////////////////////////////////////////////////////*/}
-      {/* ///////////////////////////////////////////////////////////////////////////////////////////*/}
-      {/* ///////////////////////////////////////////////////////////////////////////////////////////*/}
-      {/* ///////////////////////////////////////////////////////////////////////////////////////////*/}
-      {/* ///////////////////////////////////////////////////////////////////////////////////////////*/}
-
-      <div className={styles.supermarket}>
-        {/* <div className="supermarket-title">
-          <h3>הסופרמרקט הכי משתלם לעגלה שלך</h3>
-        </div> */}
-        <div className={styles['supermarket-logo']}>
-          <SupermarketImage supermarketName={currentSupermarket.name} />
-        </div>
-        <div className={styles['supermarket-address']}>
-          <div className={styles['supermarket-address__city']}>
-            {currentSupermarket && currentSupermarket.city}
+      {/* ── Sticky Top Section ── */}
+      <div className={styles['sticky-top']}>
+        {/* Operations */}
+        <div className={styles['cart-operations']}>
+          <div
+            className={styles['cart-operations_replace-supermarket']}
+            onClick={() => setIsReplaceSupermarketOpen(true)}
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M16 3h5v5"/><path d="M8 3H3v5"/><path d="M21 3l-7 7"/><path d="M3 3l7 7"/><path d="M16 21h5v-5"/><path d="M8 21H3v-5"/><path d="M21 21l-7-7"/><path d="M3 21l7-7"/></svg>
+            החלפת סופר
           </div>
-          <div className={styles['supermarket-Street__street']}>
-            ,{currentSupermarket && currentSupermarket.address}
+          <div
+            className={styles['cart-operations_cheapest-supermarket']}
+            onClick={() => {
+              const handleOptimizeCart = async () => {
+                setIsReplaceSupermarket(true);
+                try { await handleCheapestCart(); }
+                catch (error) { console.error("Error optimizing cart:", error); }
+                finally { setIsReplaceSupermarket(false); }
+              };
+              handleOptimizeCart();
+            }}
+            disabled={isReplaceSupermarket}
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+            הכי זול
+          </div>
+          <div
+            className={styles['cart-operations_optimal-carts-settings']}
+            onClick={() => navigate("/optimal-carts-settings")}
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+            אופטימיזציה
           </div>
         </div>
-        <hr className={styles.line} />
-      </div>
-      <div className={styles['total-price']}>
-        <div className={styles['total-price__title']}>
-          <h1>סכום כולל של העגלה שלך</h1>
+
+        {/* Supermarket + Price — Same Row */}
+        <div className={styles['info-row']}>
+          <div className={styles['info-row__supermarket']}>
+            <div className={styles['info-row__logo']}>
+              <SupermarketImage supermarketName={currentSupermarket.name} />
+            </div>
+            <div className={styles['info-row__details']}>
+              <span className={styles['info-row__city']}>
+                {currentSupermarket && currentSupermarket.city}
+              </span>
+              <span className={styles['info-row__address']}>
+                {currentSupermarket && currentSupermarket.address}
+              </span>
+            </div>
+          </div>
+          <div className={styles['info-row__price']}>
+            <span className={styles['info-row__price-label']}>סה״כ</span>
+            <span className={styles['info-row__price-value']}>{totalPrice}₪</span>
+          </div>
         </div>
-        <div className={styles['total-price__price']}>
-          <h1>{totalPrice}₪</h1>
-        </div>
       </div>
-      <hr className={styles.line} />
       <div className={styles.products}>
         {cartItems.length === 0 ? (
           <div className={styles['cart-test_empty']}>
@@ -357,163 +325,90 @@ export default function Cart() {
                 }
                 onRemove={() => removeWithFLIP(item.barcode)}
               >
-                <div>
-                  <div
-                    className={styles.product}
-                    onClick={() => {
-                      setCurrentBarcode(item.barcode);
-                      setModalOpen(true);
+                <div className={styles['pg']}>
+                  {/* X delete — top-left corner, always visible */}
+                  <button
+                    className={styles['pg-btn-delete']}
+                    onMouseDown={(e) => e.stopPropagation()}
+                    onTouchStart={(e) => e.stopPropagation()}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      const container = rowRefs.current.get(item.barcode);
+                      if (container) {
+                        container.style.animation = 'none';
+                        void container.offsetHeight; // force reflow
+                        container.style.animation = '';
+                        container.classList.add(styles['x-deleting']);
+                        setTimeout(() => removeWithFLIP(item.barcode), 420);
+                      } else {
+                        removeWithFLIP(item.barcode);
+                      }
                     }}
                   >
-                    <div className={styles['product-details']}>
-                      <div className={styles['product-details__name']}>
-                        <span>
-                          {item.name.split(" ").slice(0, 3).join(" ")}
-                        </span>
-                      </div>
-                      <div
-                        style={{
-                          display: "flex",
-                          flexDirection: "row-reverse",
-                          alignItems: "flex-start",
-                          paddingRight: "5px",
-                          width: "100%",
-                        }}
-                      >
-                        <div className={styles['product-details__weight']}>
-                          <span>{convertWeightUnit(item.unitWeight)} </span>
-                          <span className={styles.size}>{item.weight}</span>
-                        </div>
-                        <span
-                          style={{
-                            paddingRight: "3px",
-                            paddingLeft: "3px",
-                            display: "flex",
-                            alignSelf: "normal",
-                          }}
-                        >
-                          |
-                        </span>
-                        <div className={styles['product-details__brand']}>
-                          <span>{item.brand}</span>
-                        </div>
-                      </div>
-                    </div>
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                      <line x1="18" y1="6" x2="6" y2="18"/>
+                      <line x1="6" y1="6" x2="18" y2="18"/>
+                    </svg>
+                  </button>
 
-                    <div className={styles['product-price']}>
-                      <div className={styles['product-price__amount']}>
-                        <span
-                          style={{ fontSize: "0.8rem", alignSelf: "baseline" }}
-                        >
-                          'יח
-                        </span>
-                        <span>{item.amountInCart}</span>
-                      </div>
-                      <div className={styles['product-price__total-price']}>
-                        <b style={{ fontSize: "1.2em" }}>₪</b>
-                        <span style={{ fontSize: "1.2rem" }}>
-                          {item.totalPrice.toFixed(2)}
-                        </span>
-                      </div>
-                    </div>
-
-                    <div className={styles['product-image']}>
-                      <ProductImageDisplay barcode={item.barcode} />
-                    </div>
+                  {/* RIGHT in RTL: Image */}
+                  <div
+                    className={styles['pg-image']}
+                    onClick={() => { setCurrentBarcode(item.barcode); setModalOpen(true); }}
+                  >
+                    <ProductImageDisplay barcode={item.barcode} />
                   </div>
 
-                  {/* ===== הצגת מחיר חדש בעת עריכה ===== */}
-                  {hasChanged && (
-                    <div className={styles['product-diff']}>
-                      <div className={styles['product-diff__content']}>
-                        <span className={styles['product-diff__new']}>
-                          <span className={styles['product-diff__label']}>חדש:</span>
-                          <span className={styles['product-diff__value']}>{newTotal.toFixed(2)}₪</span>
-                        </span>
-                        <span className={styles['product-diff__arrow']}>←</span>
-                        <span className={styles['product-diff__old']}>
-                          <span className={styles['product-diff__label']}>קודם:</span>
-                          <span className={styles['product-diff__value']}>{currentTotal.toFixed(2)}₪</span>
-                        </span>
+                  {/* MIDDLE: Name + Meta */}
+                  <div
+                    className={styles['pg-details']}
+                    onClick={() => { setCurrentBarcode(item.barcode); setModalOpen(true); }}
+                  >
+                    <span className={styles['pg-details__name']}>{item.name}</span>
+                    <span className={styles['pg-details__meta']}>{item.brand} | {item.weight} {convertWeightUnit(item.unitWeight)}</span>
+                  </div>
+
+                  {/* LEFT in RTL: Units + Price */}
+                  <div className={styles['pg-controls']}>
+                    <span className={styles['pg-price__units']}>{item.amountInCart} יח'</span>
+                    {hasChanged ? (
+                      <div className={styles['pg-price__diff']}>
+                        <span className={styles['pg-price__old']}>{currentTotal.toFixed(2)}₪</span>
+                        <span className={styles['pg-price__new']}>{newTotal.toFixed(2)}₪</span>
                       </div>
-                    </div>
-                  )}
-
-                  <div className={`${styles['update-amount']} ${hasChanged ? styles['update-amount--editing'] : ''}`}>
-                    <div className={styles['update-amount__new']}>
-                      <button
-                        className={styles['update-amount__minus-button']}
-                        onMouseDown={(e) => e.stopPropagation()}
-                        onTouchStart={(e) => e.stopPropagation()}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          updateDraftAmount(
-                            item.barcode,
-                            Math.max(1, currentDraftAmount - 1),
-                          );
-                        }}
-                      >
-                        -
-                      </button>
-
-                      <input
-                        type="text"
-                        className={styles['amount-display']}
-                        value={currentDraftAmount}
-                        readOnly
-                      />
-
-                      <button
-                        className={styles['update-amount__plus-button']}
-                        onMouseDown={(e) => e.stopPropagation()}
-                        onTouchStart={(e) => e.stopPropagation()}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          updateDraftAmount(
-                            item.barcode,
-                            currentDraftAmount + 1,
-                          );
-                        }}
-                      >
-                        +
-                      </button>
-                    </div>
-
-                    {hasChanged && (
-                      <div className={styles['update-amount__update_and_cencal']}>
-                        <button
-                          className={styles['update-amount__update-btn']}
-                          onClick={() => {
-                            update(item.barcode, currentDraftAmount);
-                            clearDraftAmount(item.barcode);
-                          }}
-                        >
-                          עדכן
-                        </button>
-                        <button
-                          className={styles['update-amount__cancel-btn']}
-                          onClick={() => clearDraftAmount(item.barcode)}
-                        >
-                          בטל
-                        </button>
-                      </div>
+                    ) : (
+                      <span className={styles['pg-price__value']}>{item.totalPrice.toFixed(2)} ₪</span>
                     )}
-
-                    <div className={styles['cart__delete-product']}>
-                      <button
-                        onMouseDown={(e) => e.stopPropagation()}
-                        onTouchStart={(e) => e.stopPropagation()}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          removeWithFLIP(item.barcode);
-                        }}
-                      >
-                        <img src={trashIcon} alt="Delete" />
-                      </button>
-                    </div>
                   </div>
 
-                  <hr />
+                  {/* Row 2: +/- quantity + actions, spans full width */}
+                  <div className={styles['pg-bottom-row']}>
+                    <button
+                      className={styles['pg-btn-minus']}
+                      onMouseDown={(e) => e.stopPropagation()}
+                      onTouchStart={(e) => e.stopPropagation()}
+                      onClick={(e) => { e.stopPropagation(); updateDraftAmount(item.barcode, Math.max(1, currentDraftAmount - 1)); }}
+                    >-</button>
+                    <span className={styles['pg-qty-display']}>{currentDraftAmount}</span>
+                    <button
+                      className={styles['pg-btn-plus']}
+                      onMouseDown={(e) => e.stopPropagation()}
+                      onTouchStart={(e) => e.stopPropagation()}
+                      onClick={(e) => { e.stopPropagation(); updateDraftAmount(item.barcode, currentDraftAmount + 1); }}
+                    >+</button>
+                    {hasChanged && (
+                      <>
+                        <button
+                          className={styles['pg-btn-cancel']}
+                          onClick={() => clearDraftAmount(item.barcode)}
+                        >בטל</button>
+                        <button
+                          className={styles['pg-btn-update']}
+                          onClick={() => { update(item.barcode, currentDraftAmount); clearDraftAmount(item.barcode); }}
+                        >עדכן</button>
+                      </>
+                    )}
+                  </div>
                 </div>
               </SwipeRow>
             );
@@ -568,8 +463,8 @@ const vibrate = (pattern) => {
 };
 
 function SwipeRow({ children, onIncrement, onDecrement, onRemove, outerRef }) {
-  const LONG_MS = 1000;
-  const LONG_VISUAL_DELAY = 200;
+  const LONG_MS = 500;
+  const LONG_VISUAL_DELAY = 100;
   const SWIPE_TRIGGER = 40;
   const REMOVE_THRESHOLD = 140;
   const MAX_NORMAL_SHIFT = 60;
@@ -584,6 +479,7 @@ function SwipeRow({ children, onIncrement, onDecrement, onRemove, outerRef }) {
   const [springStartX, setSpringStartX] = useState(0); // שמירת המיקום לאנימציה
   const [swipeActive, setSwipeActive] = useState(false);
   const [pressProgress, setPressProgress] = useState(0);
+  const [flashType, setFlashType] = useState('none'); // 'none' | 'increment' | 'decrement'
 
   const containerRef = useRef(null);
   const startX = useRef(0);
@@ -723,8 +619,13 @@ function SwipeRow({ children, onIncrement, onDecrement, onRemove, outerRef }) {
     }
 
     if (swipeActiveRef.current && Math.abs(moved.current) >= SWIPE_TRIGGER) {
-      if (moved.current > 0) onIncrement();
-      else onDecrement();
+      if (moved.current > 0) {
+        onIncrement();
+        setFlashType('increment');
+      } else {
+        onDecrement();
+        setFlashType('decrement');
+      }
 
       const absMove = Math.abs(moved.current);
       if (absMove >= SWIPE_DISTANCE_MIN_FOR_BIG && SWIPE_BIG_MS > 0) {
@@ -774,7 +675,9 @@ function SwipeRow({ children, onIncrement, onDecrement, onRemove, outerRef }) {
   const onTouchEnd = () => end(deleteMode, dxDelete, dxNormal);
 
   const uiDx = deleteMode ? dxDelete : dxNormal;
-  const borderRatio = pressProgress;
+  const normalRatio = (!deleteMode && dragging && swipeActive && dxNormal !== 0)
+    ? Math.abs(dxNormal) / MAX_NORMAL_SHIFT : 0;
+  const normalDir = dxNormal > 0 ? 'increment' : 'decrement';
 
   const shadowStage = !deleteMode
     ? "idle"
@@ -805,29 +708,45 @@ function SwipeRow({ children, onIncrement, onDecrement, onRemove, outerRef }) {
     >
       <div
         className={`${styles.shadow} ${styles[shadowStage] || ''}`}
-        style={{ width: Math.min(dxDelete, REMOVE_THRESHOLD) + 12 }}
+        style={{ '--reveal-width': `${Math.min(dxDelete, REMOVE_THRESHOLD)}px` }}
       >
-        {shadowStage === "show" && (
-          <span className={styles['shadow-text']}>החזק 1ש׳ ואז החלק ימינה למחיקה</span>
-        )}
-        {shadowStage === "armed" && (
-          <span className={`${styles['shadow-text']} ${styles.strong}`}>שחרר כדי למחוק</span>
+        {(shadowStage === "show" || shadowStage === "armed") && (
+          <div className={styles['shadow-icon']}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="3 6 5 6 21 6"/>
+              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+            </svg>
+          </div>
         )}
       </div>
 
       <div
-        className={`${styles['swipe-content']} ${dragging ? styles.dragging : ""} ${spring ? styles.spring : ""}`}
+        className={`${styles['swipe-content']} ${dragging ? styles.dragging : ""} ${spring ? styles.spring : ""} ${flashType !== 'none' ? styles[`flash-${flashType}`] : ""} ${pressProgress > 0 && !deleteMode ? styles.pressing : ""} ${deleteMode ? styles['delete-active'] : ""} ${deleteMode && dxDelete >= REMOVE_THRESHOLD ? styles['delete-armed'] : ""}`}
         style={{
           transform: spring ? undefined : `translateX(${uiDx}px)`,
           "--startX": `${springStartX}px`,
+          "--press-progress": pressProgress,
           boxShadow:
-            borderRatio > 0
-              ? `0 0 0 ${1 + 3 * borderRatio}px rgba(255,59,48,${0.4 + 0.6 * borderRatio})`
-              : "none",
+            (pressProgress > 0 && !deleteMode)
+              ? `0 0 ${8 + 22 * pressProgress}px rgba(251,146,60,${0.08 + 0.32 * pressProgress}), 0 4px ${12 + 18 * pressProgress}px rgba(251,146,60,${0.05 + 0.2 * pressProgress})`
+              : normalRatio > 0
+                ? normalDir === 'increment'
+                  ? `0 0 ${8 + 16 * normalRatio}px rgba(34,197,94,${0.15 + 0.45 * normalRatio}), 0 0 0 ${1 + 2 * normalRatio}px rgba(34,197,94,${0.1 + 0.3 * normalRatio})`
+                  : `0 0 ${8 + 16 * normalRatio}px rgba(239,68,68,${0.15 + 0.45 * normalRatio}), 0 0 0 ${1 + 2 * normalRatio}px rgba(239,68,68,${0.1 + 0.3 * normalRatio})`
+                : undefined,
+          borderColor:
+            (pressProgress > 0 && !deleteMode)
+              ? `rgba(251,146,60,${0.15 + 0.35 * pressProgress})`
+              : normalRatio > 0
+                ? normalDir === 'increment'
+                  ? `rgba(34,197,94,${0.2 + 0.4 * normalRatio})`
+                  : `rgba(239,68,68,${0.2 + 0.4 * normalRatio})`
+                : undefined,
         }}
         onAnimationEnd={() => {
           setSpring(false);
           setSpringStartX(0);
+          setFlashType('none');
         }}
       >
         {children}

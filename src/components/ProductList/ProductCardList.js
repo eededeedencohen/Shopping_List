@@ -40,123 +40,106 @@ function ProductCardList({
   handleCloseBarcode,
   handleToggleAlternative,
 }) {
-  return products.map((product) => (
-    <div className="list__product-card" key={product.barcode}>
-      {product.discount && <div className="list__product-badge">מבצע</div>}
+  return products.map((product) => {
+    const qty = productAmounts[product.barcode] || 0;
 
-      <div className="list__product-details">
-        <div className="list__product-data">
-          <div className="list__product-name">
-            <p>{truncate(product.name)}</p>
-          </div>
+    return (
+      <div className="list__product-card" key={product.barcode}>
+        {product.discount && <div className="list__product-badge">מבצע</div>}
 
-          <div className="list__product-info">
-            <div className="list__product-weight">
-              <p>{product.weight}</p>
-              <p>{convertWeightUnit(product.unitWeight)}</p>
-            </div>
-            <div className="list__separator">|</div>
-            <div className="list__product-brand">
-              <p>{product.brand}</p>
-            </div>
-          </div>
-
-          <div className="list__product-price">
-            {typeof product.unitPrice === "number" ? (
-              <>
-                <p>{priceFormat(product.unitPrice)}</p>
-                <p style={{ fontSize: "1.4rem" }}>₪</p>
-              </>
-            ) : (
-              <p>מחיר לא זמין בסופר</p>
-            )}
-          </div>
-
-          {product.discount && discountPriceFormat(product.discount)}
-        </div>
-
+        {/* Col 1 (right in RTL): Image */}
         <div
           className="list__product-image"
           onClick={() => moveToPriceList(product.barcode)}
         >
           <ProductImageDisplay barcode={product.barcode} />
         </div>
+
+        {/* Col 2 (center): Name + Meta + Price */}
+        <div className="list__product-details">
+          <span className="list__product-name">{truncate(product.name)}</span>
+          <span className="list__product-meta">
+            {product.brand} | {product.weight} {convertWeightUnit(product.unitWeight)}
+          </span>
+          <div className="list__product-price-row">
+            <span className="list__product-units">{qty} יח'</span>
+            {typeof product.unitPrice === "number" ? (
+              <span className="list__product-price-value">
+                {priceFormat(product.unitPrice)} ₪
+              </span>
+            ) : (
+              <span className="list__product-price-value">מחיר לא זמין</span>
+            )}
+          </div>
+          {product.discount && discountPriceFormat(product.discount)}
+        </div>
+
+        {/* Col 3 (left in RTL): +/- quantity */}
+        <div className="list__product-quantity">
+          <div
+            className="list__btn-plus"
+            onClick={(e) => { e.stopPropagation(); incrementAmount(product.barcode); }}
+          >
+            <img src={plusIcon} alt="+" />
+          </div>
+          <span className="list__qty-display">{qty}</span>
+          <div
+            className="list__btn-minus"
+            onClick={(e) => { e.stopPropagation(); decrementAmount(product.barcode); }}
+          >
+            <img src={minusIcon} alt="-" />
+          </div>
+        </div>
+
+        {/* Row 2: Actions */}
+        <div className="list__product-actions">
+          <div
+            id={`add-to-cart-${product.barcode}`}
+            className="list__btn-confirm"
+            onClick={(e) => { e.stopPropagation(); updateAmount(product.barcode); }}
+          >
+            אין שינוי
+          </div>
+
+          <div className="list__product-group-btns">
+            {selectedBarcode === product.barcode ? (
+              <button
+                onClick={() => handleCloseBarcode(product.barcode)}
+                style={{ backgroundColor: "blue", color: "white" }}
+              >
+                Save
+              </button>
+            ) : (
+              <button
+                onClick={() => handleOpenBarcode(product.barcode)}
+                style={{ backgroundColor: "green", color: "white" }}
+              >
+                Open
+              </button>
+            )}
+
+            {selectedBarcode && selectedBarcode !== product.barcode && (
+              <button
+                onClick={() => handleToggleAlternative(product.barcode)}
+                style={{
+                  backgroundColor: groupData[selectedBarcode]?.includes(
+                    product.barcode,
+                  )
+                    ? "red"
+                    : "green",
+                  color: "white",
+                }}
+              >
+                {groupData[selectedBarcode]?.includes(product.barcode)
+                  ? "Remove"
+                  : "Add"}
+              </button>
+            )}
+          </div>
+        </div>
       </div>
-
-      <div className="list__product-operations">
-        <div
-          id={`add-to-cart-${product.barcode}`}
-          className="list__product-operations__confirm"
-          onClick={(e) => {
-            e.stopPropagation();
-            updateAmount(product.barcode);
-          }}
-        >
-          אין שינוי
-        </div>
-
-        <div
-          className="list__product-operations__add"
-          onClick={(e) => {
-            e.stopPropagation();
-            incrementAmount(product.barcode);
-          }}
-        >
-          <img src={plusIcon} alt="+" />
-        </div>
-
-        <div className="list__product-operations__quantity">
-          <span>{productAmounts[product.barcode] || 0}</span>
-        </div>
-
-        <div
-          className="list__product-operations__reduce"
-          onClick={(e) => {
-            e.stopPropagation();
-            decrementAmount(product.barcode);
-          }}
-        >
-          <img src={minusIcon} alt="-" />
-        </div>
-
-        <div>
-          {selectedBarcode === product.barcode ? (
-            <button
-              onClick={() => handleCloseBarcode(product.barcode)}
-              style={{ backgroundColor: "blue", color: "white" }}
-            >
-              Save
-            </button>
-          ) : (
-            <button
-              onClick={() => handleOpenBarcode(product.barcode)}
-              style={{ backgroundColor: "green", color: "white" }}
-            >
-              Open
-            </button>
-          )}
-
-          {selectedBarcode && selectedBarcode !== product.barcode && (
-            <button
-              onClick={() => handleToggleAlternative(product.barcode)}
-              style={{
-                backgroundColor: groupData[selectedBarcode]?.includes(
-                  product.barcode,
-                )
-                  ? "red"
-                  : "green",
-                color: "white",
-              }}
-            >
-              {groupData[selectedBarcode]?.includes(product.barcode)
-                ? "Remove"
-                : "Add"}
-            </button>
-          )}
-        </div>
-      </div>
-    </div>
-  ));
+    );
+  });
 }
 
 export default ProductCardList;

@@ -1,6 +1,6 @@
 import React from "react";
 import SupermarketImage from "../../Images/SupermarketImage";
-import "./SupermarketsBranches.css";
+import styles from "./SupermarketsBranches.module.css";
 
 const SupermarketsBranches = ({
   selectedSupermarket,
@@ -12,33 +12,55 @@ const SupermarketsBranches = ({
   const { name, branches } = selectedSupermarket;
 
   return (
-    <div className="sbn_container">
-      {/* אזור כותרת דביקה (Sticky) */}
-      <div className="sbn_header">
-        <SupermarketImage supermarketName={name} className="sbn_logo" />
-        <h3 className="sbn_title">בחר סניף של </h3>
+    <div className={styles.container}>
+      {/* Sticky header */}
+      <div className={styles.header}>
+        <div className={styles.headerContent}>
+          <div className={styles.logoWrap}>
+            <SupermarketImage supermarketName={name} className={styles.logo} />
+          </div>
+          <div className={styles.headerText}>
+            <h3 className={styles.title}>בחר סניף</h3>
+            <span className={styles.subtitle}>{branches.length} סניפים זמינים</span>
+          </div>
+        </div>
       </div>
 
-      {/* רשימת הסניפים */}
-      <div className="sbn_list">
-        <ul className="sbn_listUl">
-          {branches.map((branch) => (
-            <li key={branch.supermarketID} className="sbn_listItem">
-              <button
-                className="sbn_branchButton"
-                onClick={() => onSelectBranch(branch.supermarketID)}
-              >
-                {branch.city} - {branch.address}
-              </button>
-            </li>
-          ))}
-        </ul>
+      {/* Branch list */}
+      <div className={styles.list}>
+        {branches.map((branch, idx) => (
+          <button
+            key={branch.supermarketID}
+            className={styles.branchCard}
+            onClick={() => onSelectBranch(branch.supermarketID)}
+            style={{ animationDelay: `${idx * 0.04}s` }}
+          >
+            <div className={styles.branchIcon}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                <circle cx="12" cy="10" r="3"/>
+              </svg>
+            </div>
+            <div className={styles.branchInfo}>
+              <span className={styles.branchCity}>{branch.city}</span>
+              <span className={styles.branchAddress}>{branch.address}</span>
+            </div>
+            <div className={styles.branchArrow}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="15 18 9 12 15 6"/>
+              </svg>
+            </div>
+          </button>
+        ))}
       </div>
 
-      {/* אזור תחתון (footer) עבור כפתור "חזרה" */}
-      <div className="sbn_footer">
-        <button className="sbn_backButton" onClick={onBack}>
-          חזרה
+      {/* Footer */}
+      <div className={styles.footer}>
+        <button className={styles.backBtn} onClick={onBack}>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="9 18 15 12 9 6"/>
+          </svg>
+          חזרה לרשתות
         </button>
       </div>
     </div>
