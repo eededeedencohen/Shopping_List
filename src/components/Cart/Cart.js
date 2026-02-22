@@ -335,10 +335,15 @@ export default function Cart() {
                       e.stopPropagation();
                       const container = rowRefs.current.get(item.barcode);
                       if (container) {
-                        container.style.animation = 'none';
-                        void container.offsetHeight; // force reflow
-                        container.style.animation = '';
-                        container.classList.add(styles['x-deleting']);
+                        container.style.pointerEvents = 'none';
+                        container.animate(
+                          [
+                            { transform: 'translateX(0)', opacity: 1, filter: 'blur(0)' },
+                            { transform: 'translateX(70%) scale(0.96) rotate(1.5deg)', opacity: 0.3, filter: 'blur(1px)', offset: 0.6 },
+                            { transform: 'translateX(110%) scale(0.92) rotate(3deg)', opacity: 0, filter: 'blur(4px)' },
+                          ],
+                          { duration: 400, easing: 'cubic-bezier(0.4, 0, 0.2, 1)', fill: 'forwards' }
+                        );
                         setTimeout(() => removeWithFLIP(item.barcode), 420);
                       } else {
                         removeWithFLIP(item.barcode);
@@ -374,7 +379,7 @@ export default function Cart() {
                     {hasChanged ? (
                       <div className={styles['pg-price__diff']}>
                         <span className={styles['pg-price__old']}>{currentTotal.toFixed(2)}₪</span>
-                        <span className={styles['pg-price__new']}>{newTotal.toFixed(2)}₪</span>
+                        <span className={styles['pg-price__new']} style={currentDraftAmount < item.amountInCart ? { color: '#dc2626' } : undefined}>{newTotal.toFixed(2)}₪</span>
                       </div>
                     ) : (
                       <span className={styles['pg-price__value']}>{item.totalPrice.toFixed(2)} ₪</span>
@@ -387,14 +392,40 @@ export default function Cart() {
                       className={styles['pg-btn-minus']}
                       onMouseDown={(e) => e.stopPropagation()}
                       onTouchStart={(e) => e.stopPropagation()}
-                      onClick={(e) => { e.stopPropagation(); updateDraftAmount(item.barcode, Math.max(1, currentDraftAmount - 1)); }}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        const btn = e.currentTarget;
+                        btn.animate(
+                          [
+                            { transform: 'scale(1)', boxShadow: '0 2px 8px rgba(0,0,0,0.15)' },
+                            { transform: 'scale(0.75)', boxShadow: '0 0 0 rgba(0,0,0,0.1), inset 0 2px 4px rgba(0,0,0,0.2)', offset: 0.3 },
+                            { transform: 'scale(1.08)', boxShadow: '0 4px 16px rgba(239,68,68,0.5)', offset: 0.6 },
+                            { transform: 'scale(1)', boxShadow: '0 2px 8px rgba(0,0,0,0.15)' },
+                          ],
+                          { duration: 350, easing: 'cubic-bezier(0.22, 1, 0.36, 1)' }
+                        );
+                        updateDraftAmount(item.barcode, Math.max(1, currentDraftAmount - 1));
+                      }}
                     >-</button>
                     <span className={styles['pg-qty-display']}>{currentDraftAmount}</span>
                     <button
                       className={styles['pg-btn-plus']}
                       onMouseDown={(e) => e.stopPropagation()}
                       onTouchStart={(e) => e.stopPropagation()}
-                      onClick={(e) => { e.stopPropagation(); updateDraftAmount(item.barcode, currentDraftAmount + 1); }}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        const btn = e.currentTarget;
+                        btn.animate(
+                          [
+                            { transform: 'scale(1)', boxShadow: '0 2px 8px rgba(0,0,0,0.15)' },
+                            { transform: 'scale(0.75)', boxShadow: '0 0 0 rgba(0,0,0,0.1), inset 0 2px 4px rgba(0,0,0,0.2)', offset: 0.3 },
+                            { transform: 'scale(1.08)', boxShadow: '0 4px 16px rgba(34,197,94,0.5)', offset: 0.6 },
+                            { transform: 'scale(1)', boxShadow: '0 2px 8px rgba(0,0,0,0.15)' },
+                          ],
+                          { duration: 350, easing: 'cubic-bezier(0.22, 1, 0.36, 1)' }
+                        );
+                        updateDraftAmount(item.barcode, currentDraftAmount + 1);
+                      }}
                     >+</button>
                     {hasChanged && (
                       <>
