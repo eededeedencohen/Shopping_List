@@ -1326,8 +1326,56 @@
 .green-button { display: none !important; }
 
 /* ═══════════════════════════════════════════════════════════════
-   LOADING
+   LOADING — Orbiting Coins
    ═══════════════════════════════════════════════════════════════ */
+
+/* ── Keyframes ── */
+
+/* Coin orbit — continuous spin */
+@keyframes orbitSpin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+/* Second orbit — counter-spin, slightly slower */
+@keyframes orbitSpinReverse {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(-360deg); }
+}
+
+/* Cart bounce at center */
+@keyframes cartBounce {
+  0%, 100% { transform: translate(-50%, -50%) scale(1); }
+  50%      { transform: translate(-50%, calc(-50% - 14px)) scale(1.08); }
+}
+
+/* Pulsing rings from center */
+@keyframes ringPulse {
+  0%   { transform: translate(-50%, -50%) scale(0.4); opacity: 0.6; }
+  100% { transform: translate(-50%, -50%) scale(2.8); opacity: 0; }
+}
+
+/* Spark particles drifting upward */
+@keyframes sparkDrift {
+  0%   { opacity: 0; transform: translateY(0) scale(0); }
+  12%  { opacity: 1; transform: translateY(-8px) scale(1); }
+  80%  { opacity: 0.6; transform: translateY(-40px) scale(0.7); }
+  100% { opacity: 0; transform: translateY(-60px) scale(0); }
+}
+
+/* Text glow pulse */
+@keyframes textGlow {
+  0%, 100% { opacity: 0.8; text-shadow: 0 0 8px rgba(0,255,136,0.2); }
+  50%      { opacity: 1; text-shadow: 0 0 22px rgba(0,255,136,0.5); }
+}
+
+/* Subtle background breathe */
+@keyframes bgBreathe {
+  0%, 100% { background-position: 50% 40%; }
+  50%      { background-position: 50% 60%; }
+}
+
+/* ── Container ── */
 .spinner-container {
   position: fixed;
   inset: 0;
@@ -1336,26 +1384,169 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 20px;
-  background: rgba(255, 255, 255, 0.92);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  background: #060d18;
+  background-image:
+    radial-gradient(ellipse at 50% 45%, rgba(0,255,136,0.06) 0%, transparent 55%);
+  background-size: 100% 200%;
+  animation: bgBreathe 6s ease-in-out infinite;
+  overflow: hidden;
+  direction: rtl;
 }
 
+/* ── Spark particles ── */
+.spark-particles {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.spark-particles span {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: #00ff88;
+  box-shadow: 0 0 6px rgba(0,255,136,0.6);
+  opacity: 0;
+  animation: sparkDrift 4s ease-in-out infinite;
+}
+
+.spark-particles span:nth-child(1)  { top: 55%; left: 18%; animation-delay: 0s; }
+.spark-particles span:nth-child(2)  { top: 58%; left: 78%; animation-delay: -0.7s; }
+.spark-particles span:nth-child(3)  { top: 48%; left: 12%; animation-delay: -1.4s; width: 4px; height: 4px; }
+.spark-particles span:nth-child(4)  { top: 52%; left: 88%; animation-delay: -2.1s; }
+.spark-particles span:nth-child(5)  { top: 62%; left: 35%; animation-delay: -2.8s; width: 2px; height: 2px; }
+.spark-particles span:nth-child(6)  { top: 44%; left: 65%; animation-delay: -0.4s; }
+.spark-particles span:nth-child(7)  { top: 56%; left: 50%; animation-delay: -1.8s; width: 4px; height: 4px; }
+.spark-particles span:nth-child(8)  { top: 60%; left: 25%; animation-delay: -3.2s; }
+
+/* ── Orbit Scene (center area) ── */
+.orbit-scene {
+  position: relative;
+  width: 210px;
+  height: 210px;
+  margin-bottom: 36px;
+  z-index: 2;
+}
+
+/* ── Pulsing rings ── */
+.pulse-rings {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.pulse-rings span {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(0,255,136,0.35);
+  animation: ringPulse 3s ease-out infinite;
+}
+
+.pulse-rings span:nth-child(1) { animation-delay: 0s; }
+.pulse-rings span:nth-child(2) { animation-delay: 1s; }
+.pulse-rings span:nth-child(3) { animation-delay: 2s; }
+
+/* ── Cart emoji (center) ── */
+.orbit-cart {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  font-size: 48px;
+  animation: cartBounce 2s ease-in-out infinite;
+  filter: drop-shadow(0 0 24px rgba(0,255,136,0.3));
+  z-index: 3;
+}
+
+/* ── Primary orbit ring (6 coins, clockwise) ── */
+.orbit-ring {
+  position: absolute;
+  inset: 0;
+  animation: orbitSpin 8s linear infinite;
+}
+
+.orbit-ring span {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  margin: -14px 0 0 -14px;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 800;
+  color: #00ff88;
+  text-shadow: 0 0 8px rgba(0,255,136,0.5);
+  background: rgba(0,255,136,0.08);
+  border: 1px solid rgba(0,255,136,0.25);
+  border-radius: 50%;
+}
+
+.orbit-ring span:nth-child(1) { transform: rotate(0deg)   translateY(-90px); }
+.orbit-ring span:nth-child(2) { transform: rotate(60deg)  translateY(-90px); }
+.orbit-ring span:nth-child(3) { transform: rotate(120deg) translateY(-90px); }
+.orbit-ring span:nth-child(4) { transform: rotate(180deg) translateY(-90px); }
+.orbit-ring span:nth-child(5) { transform: rotate(240deg) translateY(-90px); }
+.orbit-ring span:nth-child(6) { transform: rotate(300deg) translateY(-90px); }
+
+/* ── Secondary orbit ring (3 coins, counter-clockwise, smaller) ── */
+.orbit-ring-inner {
+  position: absolute;
+  inset: 0;
+  animation: orbitSpinReverse 5s linear infinite;
+}
+
+.orbit-ring-inner span {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  margin: -10px 0 0 -10px;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 800;
+  color: #00ff88;
+  text-shadow: 0 0 6px rgba(0,255,136,0.4);
+  background: rgba(0,255,136,0.05);
+  border: 1px solid rgba(0,255,136,0.15);
+  border-radius: 50%;
+  opacity: 0.7;
+}
+
+.orbit-ring-inner span:nth-child(1) { transform: rotate(0deg)   translateY(-55px); }
+.orbit-ring-inner span:nth-child(2) { transform: rotate(120deg) translateY(-55px); }
+.orbit-ring-inner span:nth-child(3) { transform: rotate(240deg) translateY(-55px); }
+
+/* ── Bottom text ── */
 .spinner-container p {
-  font-size: 15px;
+  font-size: 17px;
   font-weight: 700;
-  color: #2563eb;
-  animation: pulse 1.5s ease-in-out infinite;
-  letter-spacing: 0.5px;
+  color: #00ff88;
+  letter-spacing: -0.2px;
+  animation: textGlow 2s ease-in-out infinite;
+  direction: rtl;
+  margin: 0;
+  font-family: 'Open Sans', sans-serif;
+  z-index: 2;
 }
 
-.spinner-container .ant-spin {
-  animation: spinnerOrbit 2s linear infinite;
+.scan-subtitle {
+  font-size: 13px !important;
+  font-weight: 400 !important;
+  color: rgba(0,255,136,0.45) !important;
+  animation: none !important;
+  margin-top: 8px !important;
 }
-
-.spinner-container .ant-spin-dot { font-size: 36px; }
-.spinner-container .ant-spin-dot-item { background-color: #2563eb; }
 
 /* ═══════════════════════════════════════════════════════════════
    MISC

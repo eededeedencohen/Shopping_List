@@ -5,7 +5,6 @@ import Modal from "./Modal";
 import ReplaceProducts from "./ReplaceProducts";
 import ReplaceSupermarket from "./ReplaceSupermarket/ReplaceSupermarket";
 import styles from "./Cart.module.css";
-import { Spin } from "antd";
 import {
   getProductImage,
   ProductImageDisplay,
@@ -201,8 +200,37 @@ export default function Cart() {
   if (isReplaceSupermarket || isLoadingPrices) {
     return (
       <div className={styles['spinner-container']}>
-        <Spin size="large"></Spin>
+        {/* Spark particles */}
+        <div className={styles['spark-particles']}>
+          <span /><span /><span /><span />
+          <span /><span /><span /><span />
+        </div>
+
+        {/* Center scene */}
+        <div className={styles['orbit-scene']}>
+          {/* Pulsing rings */}
+          <div className={styles['pulse-rings']}>
+            <span /><span /><span />
+          </div>
+
+          {/* Cart */}
+          <div className={styles['orbit-cart']}>🛒</div>
+
+          {/* Outer orbit — 6 coins clockwise */}
+          <div className={styles['orbit-ring']}>
+            <span>₪</span><span>₪</span><span>₪</span>
+            <span>₪</span><span>₪</span><span>₪</span>
+          </div>
+
+          {/* Inner orbit — 3 coins counter-clockwise */}
+          <div className={styles['orbit-ring-inner']}>
+            <span>₪</span><span>₪</span><span>₪</span>
+          </div>
+        </div>
+
+        {/* Text */}
         <p>{loadingMessage}</p>
+        <p className={styles['scan-subtitle']}>סורק מחירים עבורך</p>
       </div>
     );
   }

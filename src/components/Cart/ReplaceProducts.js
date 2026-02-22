@@ -1,138 +1,249 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { ProductImageDisplay } from "../Images/ProductImageService";
 import styles from "./ReplaceProducts.module.css";
-import { Spin } from "antd";
-import { useCartActions, useAlternativeProducts } from "../../hooks/appHooks";
+import {
+  useCartActions,
+  useAlternativeProducts,
+  useGetProductByBarcode,
+} from "../../hooks/appHooks";
 
-function ReplaceProducts({ barcode, closeModal, userId }) {
+const convertWeightUnit = (u) => {
+  if (!u) return "";
+  const l = u.toLowerCase();
+  if (l === "g") return "גרם";
+  if (l === "kg") return 'ק"ג';
+  if (l === "ml") return 'מ"ל';
+  if (l === "l") return "ליטר";
+  return u;
+};
+
+/** Normalize weight to grams (or ml). Returns null if can't compute. */
+const toGrams = (product) => {
+  const w = product.weight;
+  const u = (product.unitWeight || "").toLowerCase();
+  if (w == null || !u) return null;
+  if (u === "g" || u === "ml") return w;
+  if (u === "kg" || u === "l") return w * 1000;
+  return null;
+};
+
+/** Price per 100g/ml. Returns null if can't compute. */
+const pricePer100 = (product) => {
+  if (product.price == null) return null;
+  const g = toGrams(product);
+  if (!g || g <= 0) return null;
+  return (product.price / g) * 100;
+};
+
+const SORT_OPTIONS = [
+  { key: "price-asc", label: "מחיר - מהזול" },
+  { key: "price-desc", label: "מחיר - מהיקר" },
+  { key: "per100", label: "ל-100 גרם" },
+  { key: "name", label: "שם" },
+  { key: "weight", label: "משקל" },
+];
+
+function ReplaceProducts({ barcode, closeModal }) {
   const [isReplacing, setIsReplacing] = useState(false);
+  const [selectedBarcode, setSelectedBarcode] = useState(null);
+  const [sortBy, setSortBy] = useState("price-asc");
   const { replaceProduct: replaceProductNew } = useCartActions();
   const alternatives = useAlternativeProducts(barcode);
+  const currentProduct = useGetProductByBarcode(barcode);
 
-  const [delayedAlternatives, setDelayedAlternatives] = useState([]);
+  const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setDelayedAlternatives(alternatives);
-    }, 500);
-
-    return () => clearTimeout(timer);
+    const t = setTimeout(() => setReady(true), 350);
+    return () => clearTimeout(t);
   }, [alternatives, barcode]);
 
+  // Find cheapest price (the value, not a single barcode)
+  const cheapestPrice = useMemo(() => {
+    if (!alternatives.length) return null;
+    const withPrice = alternatives.filter((p) => p.price != null && p.price > 0);
+    if (!withPrice.length) return null;
+    return Math.min(...withPrice.map((p) => p.price));
+  }, [alternatives]);
+
+  // Sorted list
+  const sortedAlternatives = useMemo(() => {
+    const list = [...alternatives];
+    switch (sortBy) {
+      case "price-asc":
+        return list.sort((a, b) => {
+          if (a.price == null && b.price == null) return 0;
+          if (a.price == null) return 1;
+          if (b.price == null) return -1;
+          return a.price - b.price;
+        });
+      case "price-desc":
+        return list.sort((a, b) => {
+          if (a.price == null && b.price == null) return 0;
+          if (a.price == null) return 1;
+          if (b.price == null) return -1;
+          return b.price - a.price;
+        });
+      case "per100":
+        return list.sort((a, b) => {
+          const pa = pricePer100(a);
+          const pb = pricePer100(b);
+          if (pa == null && pb == null) return 0;
+          if (pa == null) return 1;
+          if (pb == null) return -1;
+          return pa - pb;
+        });
+      case "name":
+        return list.sort((a, b) => (a.name || "").localeCompare(b.name || "", "he"));
+      case "weight":
+        return list.sort((a, b) => (b.weight || 0) - (a.weight || 0));
+      default:
+        return list;
+    }
+  }, [alternatives, sortBy]);
+
   const handleProductClick = async (newBarcode) => {
+    setSelectedBarcode(newBarcode);
     setIsReplacing(true);
     try {
-      await new Promise((resolve) => setTimeout(resolve, 500)); // ← דיליי של שנייה
-
+      await new Promise((r) => setTimeout(r, 400));
       replaceProductNew(barcode, newBarcode);
     } catch (error) {
-      console.error("Error posting data: ", error);
+      console.error("Error replacing product:", error);
     } finally {
       setIsReplacing(false);
       closeModal();
     }
   };
 
-  if (isReplacing) {
+  // Loading state
+  if (!ready || !alternatives.length) {
     return (
-      <div className={styles['spinner-container']}>
-        <Spin size="large" />
-        <p>isReplacing...</p>
+      <div className={styles.loading}>
+        <div className={styles.loadingDots}>
+          <span />
+          <span />
+          <span />
+        </div>
+        <p className={styles.loadingText}>{"מחפש חלופות..."}</p>
       </div>
     );
   }
-
-  if (!delayedAlternatives.length) {
-    return (
-      <div className={styles['spinner-container']}>
-        <Spin size="large" />
-        <p>טוען חלופות...</p>
-      </div>
-    );
-  }
-
-  const convertWeightUnit = (weightUnit) => {
-    if (!weightUnit) return "";
-    weightUnit = weightUnit.toLowerCase();
-    if (weightUnit === "g") return "גרם";
-    if (weightUnit === "kg") return 'ק"ג';
-    if (weightUnit === "ml") return 'מ"ל';
-    if (weightUnit === "l") return "ליטר";
-    return weightUnit;
-  };
-
-  const max18Characters = (str) => {
-    if (!str) return "";
-    return str.length > 26 ? "..." + str.substring(0, 21) : str;
-  };
-
-  const priceFormat = (price) => price.toFixed(2);
-
-  const discountPriceFormat = (price) => {
-    const units = price.discount.units;
-    const totalPrice = price.discount.totalPrice;
-    return (
-      <div
-        className={styles['list__discount-price']}
-        style={{
-          display: "flex",
-          flexDirection: "row-reverse",
-          alignItems: "center",
-          color: "#ff0000",
-          fontWeight: "bold",
-        }}
-      >
-        <p style={{ marginLeft: "0.3rem" }}>{units}</p>
-        <p>{"יחידות ב"}</p>
-        <p>{" - "}</p>
-        <p>{priceFormat(totalPrice)}</p>
-        <p>{"₪"}</p>
-      </div>
-    );
-  };
-
-  console.log("alternatives", alternatives);
 
   return (
-    <div className={styles['replace-products']}>
-      <div className={styles['replace-products-header']}>
-        <h3>בחר מוצר חלופי</h3>
+    <div className={styles.root}>
+      {/* ── Header ── */}
+      <div className={styles.header}>
+        <h3 className={styles.headerTitle}>בחר מוצר חלופי</h3>
+        {currentProduct && (
+          <p className={styles.headerSub}>
+            במקום: {currentProduct.name}
+          </p>
+        )}
+        <span className={styles.headerCount}>
+          {alternatives.length} חלופות
+        </span>
       </div>
-      <div className={styles['replace-products-list']}>
-        {delayedAlternatives.map((product) => (
-          <div
-            key={product.barcode}
-            className={styles['replace-product']}
-            onClick={() => handleProductClick(product.barcode)}
+
+      {/* ── Sort Bar ── */}
+      <div className={styles.sortBar}>
+        {SORT_OPTIONS.map((opt) => (
+          <button
+            key={opt.key}
+            className={`${styles.sortBtn} ${sortBy === opt.key ? styles.sortBtnActive : ""}`}
+            onClick={() => setSortBy(opt.key)}
           >
-            <div className={styles['replace-product-image']}>
-              <ProductImageDisplay barcode={product.barcode} />
-            </div>
-            <div className={styles['replace-product-details']}>
-              <p className={styles['replace-product-details__name']}>
-                {product.name && max18Characters(product.name)}
-              </p>
-              <div className={styles['replace-product-details__information']}>
-                <p className={styles['replace-product-details__brand']}>
-                  {product.brand}
-                </p>
-                <p className={styles['replace-product-details__separator']}>|</p>
-                <p>{product.weight} {convertWeightUnit(product.unitWeight)}</p>
+            {opt.label}
+          </button>
+        ))}
+      </div>
+
+      {/* ── List ── */}
+      <div className={styles.list}>
+        {sortedAlternatives.map((product, i) => {
+          const isCheapest =
+            cheapestPrice != null &&
+            product.price != null &&
+            product.price === cheapestPrice;
+          const isSelected = product.barcode === selectedBarcode;
+          const noPrice = product.price == null;
+
+          return (
+            <div
+              key={product.barcode}
+              className={`${styles.card} ${isCheapest ? styles.cardCheapest : ""} ${isSelected ? styles.cardSelected : ""} ${noPrice ? styles.cardNoPrice : ""}`}
+              style={{ animationDelay: `${i * 50}ms` }}
+              onClick={() => !isReplacing && handleProductClick(product.barcode)}
+            >
+              {/* Cheapest badge */}
+              {isCheapest && (
+                <span className={styles.badge}>המחיר הכי טוב</span>
+              )}
+
+              {/* Image */}
+              <div className={styles.cardImage}>
+                <ProductImageDisplay barcode={product.barcode} />
               </div>
-              <div className={styles['replace-product-details__price']}>
-                {product.price ? (
-                  <>
-                    <p>{priceFormat(product.price)}</p>
-                    <p className={styles['price-currency']}>₪</p>
-                  </>
-                ) : (
-                  <p className={styles['price-unavailable']}>מחיר לא זמין</p>
+
+              {/* Info */}
+              <div className={styles.cardInfo}>
+                <span className={styles.cardName}>
+                  {product.name && product.name.length > 40
+                    ? product.name.substring(0, 37) + "..."
+                    : product.name}
+                </span>
+
+                <span className={styles.cardMeta}>
+                  {product.brand && <span>{product.brand}</span>}
+                  {product.brand && product.weight != null && (
+                    <span className={styles.cardDot} />
+                  )}
+                  {product.weight != null && (
+                    <span>
+                      {product.weight} {convertWeightUnit(product.unitWeight)}
+                    </span>
+                  )}
+                </span>
+
+                {/* Price per 100g when sorted by it */}
+                {sortBy === "per100" && pricePer100(product) != null && (
+                  <span className={styles.cardPer100}>
+                    {pricePer100(product).toFixed(2)}₪ ל-100{(product.unitWeight || "").toLowerCase() === "ml" || (product.unitWeight || "").toLowerCase() === "l" ? 'מ"ל' : "גר'"}
+                  </span>
+                )}
+
+                {/* Discount */}
+                {product.hasDiscount && product.discount && (
+                  <span className={styles.cardDiscount}>
+                    {product.discount.units} יח' ב-
+                    {product.discount.totalPrice.toFixed(2)}₪
+                  </span>
                 )}
               </div>
-              {product.hasDiscount && discountPriceFormat(product)}
+
+              {/* Price */}
+              <div className={styles.cardPrice}>
+                {noPrice ? (
+                  <span className={styles.priceNone}>לא זמין</span>
+                ) : (
+                  <>
+                    <span className={styles.priceValue}>
+                      {product.price.toFixed(2)}
+                    </span>
+                    <span className={styles.priceCurrency}>₪</span>
+                  </>
+                )}
+              </div>
+
+              {/* Selection indicator */}
+              {isSelected && (
+                <div className={styles.selectedOverlay}>
+                  <div className={styles.selectedSpinner} />
+                </div>
+              )}
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );
