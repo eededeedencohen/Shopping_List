@@ -59,7 +59,8 @@ function ProductCardList({
         <div className="list__product-details">
           <span className="list__product-name">{truncate(product.name)}</span>
           <span className="list__product-meta">
-            {product.brand} | {product.weight} {convertWeightUnit(product.unitWeight)}
+            {product.brand} | {product.weight}{" "}
+            {convertWeightUnit(product.unitWeight)}
           </span>
           <div className="list__product-price-row">
             <span className="list__product-units">{qty} יח'</span>
@@ -78,14 +79,20 @@ function ProductCardList({
         <div className="list__product-quantity">
           <div
             className="list__btn-plus"
-            onClick={(e) => { e.stopPropagation(); incrementAmount(product.barcode); }}
+            onClick={(e) => {
+              e.stopPropagation();
+              incrementAmount(product.barcode);
+            }}
           >
             <img src={plusIcon} alt="+" />
           </div>
           <span className="list__qty-display">{qty}</span>
           <div
             className="list__btn-minus"
-            onClick={(e) => { e.stopPropagation(); decrementAmount(product.barcode); }}
+            onClick={(e) => {
+              e.stopPropagation();
+              decrementAmount(product.barcode);
+            }}
           >
             <img src={minusIcon} alt="-" />
           </div>
@@ -96,7 +103,10 @@ function ProductCardList({
           <div
             id={`add-to-cart-${product.barcode}`}
             className="list__btn-confirm"
-            onClick={(e) => { e.stopPropagation(); updateAmount(product.barcode); }}
+            onClick={(e) => {
+              e.stopPropagation();
+              updateAmount(product.barcode);
+            }}
           >
             אין שינוי
           </div>
