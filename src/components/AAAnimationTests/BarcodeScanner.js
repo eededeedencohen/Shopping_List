@@ -47,7 +47,6 @@ export default function BarcodeScanner() {
         const constraints = {
           video: {
             facingMode: "environment",
-            // --- ✨ MAX QUALITY REQUEST FOR GALAXY S25 ✨ ---
             width: { ideal: 4096 },
             height: { ideal: 2160 },
             focusMode: "continuous",
@@ -68,10 +67,9 @@ export default function BarcodeScanner() {
 
         if (capabilities.torch) setTorchAvailable(true);
         if (capabilities.zoom) {
-          console.log("Zoom is supported!", capabilities.zoom);
           setZoomRange({
             min: capabilities.zoom.min,
-            max: capabilities.zoom.max > 12 ? 12 : capabilities.zoom.max, // Allow high zoom for telephoto
+            max: capabilities.zoom.max > 12 ? 12 : capabilities.zoom.max,
             step: capabilities.zoom.step,
           });
         }
@@ -117,7 +115,6 @@ export default function BarcodeScanner() {
             const detectedBarcode = barcodes[0].rawValue;
             setBarcode(detectedBarcode);
 
-            // בדיקה אם הברקוד קיים ברשימת המוצרים
             const productExists = products.some(
               (p) => p.barcode === detectedBarcode,
             );
@@ -142,13 +139,12 @@ export default function BarcodeScanner() {
 
     startScan();
 
-    // Cleanup function
     return () => {
       stopAll();
     };
   }, []);
 
-  // --- ✨ PINCH-TO-ZOOM HANDLERS ✨ ---
+  // --- Pinch-to-zoom handlers ---
   const getPinchDistance = (touches) => {
     const [touch1, touch2] = touches;
     return Math.sqrt(
@@ -165,7 +161,7 @@ export default function BarcodeScanner() {
 
   const handleTouchMove = (event) => {
     if (event.touches.length === 2) {
-      event.preventDefault(); // Prevent page scroll/zoom
+      event.preventDefault();
       const newDistance = getPinchDistance(event.touches);
       const initialDistance = pinchDistanceRef.current;
 
@@ -181,16 +177,14 @@ export default function BarcodeScanner() {
           advanced: [{ zoom: clampedZoom }],
         });
       }
-      // Update initial distance for smoother scaling on next move
       pinchDistanceRef.current = newDistance;
     }
   };
 
   const handleTouchEnd = () => {
-    pinchDistanceRef.current = 0; // Reset on release
+    pinchDistanceRef.current = 0;
   };
 
-  // --- UI and other handlers ---
   const toggleTorch = async () => {
     /* ... no changes ... */
   };
@@ -198,6 +192,13 @@ export default function BarcodeScanner() {
   const closeComparisonModal = () => {
     setIsComparisonModalOpen(false);
     setSelectedBarcode(null);
+  };
+
+  const handleScanAgain = () => {
+    setBarcode("");
+    setError("");
+    setLoading(true);
+    window.location.reload();
   };
 
   return (
@@ -209,39 +210,101 @@ export default function BarcodeScanner() {
         <ProductComparison barcode={selectedBarcode} />
       </ProductComparisonModal>
 
-      <div
-        className="bq_scanner"
-        onTouchStart={handleTouchStart}
-        onTouchMove={handleTouchMove}
-        onTouchEnd={handleTouchEnd}
-      >
-        <video ref={videoRef} className="bq_feed" playsInline autoPlay muted />
-        <canvas ref={canvasRef} style={{ display: "none" }} />
+      <div className="bq_page">
+        {/* Header */}
+        <div className="bq_header">
+          <div className="bq_header_icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M3 5h2v14H3zM7 5h1v14H7zM11 5h2v14h-2zM15 5h1v14h-1zM19 5h2v14h-2z" />
+            </svg>
+          </div>
+          <h1>סורק ברקוד</h1>
+          <p>כוון את המצלמה אל הברקוד לסריקה מהירה</p>
+        </div>
 
-        {loading && <p className="bq_status">📷 פותח מצלמה…</p>}
-        {error && <p className="bq_status bq_error">{error}</p>}
-        {/* שידרוג לחלק הזה */}
-        {barcode && <p className="bq_status bq_success">✓ {barcode}</p>}
+        {/* Scanner */}
+        <div
+          className="bq_scanner"
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
+        >
+          <video ref={videoRef} className="bq_feed" playsInline autoPlay muted />
+          <canvas ref={canvasRef} style={{ display: "none" }} />
 
-        {!loading && !error && !barcode && (
-          <>
-            <div className="bq_frame">
-              <div className="bq_line" />
+          {!loading && !error && !barcode && (
+            <>
+              <div className="bq_frame">
+                <span className="bq_corner_bl" />
+                <span className="bq_corner_br" />
+                <div className="bq_line" />
+              </div>
+              <p className="bq_zoom_prompt">לא חד? הרחק את הטלפון והשתמש בזום</p>
+            </>
+          )}
+
+          {!loading && !barcode && torchAvailable && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                toggleTorch();
+              }}
+              className="bq_torch_button"
+            >
+              {torchOn ? "🔦 כבה פנס" : "💡 הפעל פנס"}
+            </button>
+          )}
+        </div>
+
+        {/* Status bar */}
+        <div className="bq_status_bar">
+          {loading && (
+            <div className="bq_status bq_status_loading">
+              <span className="bq_spinner" />
+              פותח מצלמה…
             </div>
-            <p className="bq_zoom_prompt">לא חד? הרחק את הטלפון והשתמש בזום</p>
-          </>
+          )}
+          {error && (
+            <div className="bq_status bq_status_error">
+              ⚠️ {error}
+            </div>
+          )}
+        </div>
+
+        {/* Result card */}
+        {barcode && (
+          <div className="bq_result_card">
+            <div className="bq_result_barcode_icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M3 5h2v14H3zM7 5h1v14H7zM11 5h2v14h-2zM15 5h1v14h-1zM19 5h2v14h-2z" />
+              </svg>
+            </div>
+            <div className="bq_result_info">
+              <p className="bq_result_label">ברקוד זוהה בהצלחה</p>
+              <p className="bq_result_value">{barcode}</p>
+            </div>
+            <button className="bq_scan_again_btn" onClick={handleScanAgain}>
+              סרוק שוב
+            </button>
+          </div>
         )}
 
-        {!loading && !barcode && torchAvailable && (
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              toggleTorch();
-            }}
-            className="bq_torch_button"
-          >
-            {torchOn ? "🔦 כבה פנס" : "💡 הפעל פנס"}
-          </button>
+        {/* Tips */}
+        {!barcode && !error && (
+          <div className="bq_tips">
+            <div className="bq_tip">
+              <div className="bq_tip_icon bq_tip_icon_light">💡</div>
+              <span>ודא תאורה טובה</span>
+            </div>
+            <div className="bq_tip">
+              <div className="bq_tip_icon bq_tip_icon_zoom">🔍</div>
+              <span>צבוט לזום</span>
+            </div>
+            <div className="bq_tip">
+              <div className="bq_tip_icon bq_tip_icon_steady">📱</div>
+              <span>החזק יציב</span>
+            </div>
+          </div>
         )}
       </div>
     </>

@@ -57,7 +57,7 @@
 
 .history-page-subtitle {
   font-family: 'Heshbon', 'Share Tech Mono', monospace;
-  font-size: 1rem;
+  font-size: clamp(0.8rem, 3vw, 1rem);
   color: #555;
   direction: rtl;
 }
@@ -100,7 +100,7 @@
   border: 2px solid #ddd;
   border-radius: 8px;
   font-family: 'Heshbon', 'VT323', monospace;
-  font-size: 1.1rem;
+  font-size: clamp(0.9rem, 3vw, 1.1rem);
   direction: rtl;
   text-align: right;
   outline: none;
@@ -132,12 +132,12 @@
 
 .history-filter-btn {
   flex-shrink: 0;
-  padding: 10px 14px;
+  padding: clamp(6px, 2.5vw, 10px) clamp(10px, 3vw, 14px);
   border: 2px solid #ddd;
   border-radius: 8px;
   background: #fff;
   font-family: 'Heshbon', 'VT323', monospace;
-  font-size: 1rem;
+  font-size: clamp(0.8rem, 2.8vw, 1rem);
   color: #333;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -178,7 +178,7 @@
   border: 2px solid #ddd;
   border-radius: 8px;
   font-family: 'Heshbon', 'VT323', monospace;
-  font-size: 1.1rem;
+  font-size: clamp(0.9rem, 3vw, 1.1rem);
   direction: rtl;
   background: #fff;
   cursor: pointer;
@@ -342,8 +342,8 @@
 }
 
 .cart-details-supermarket__image {
-  width: 90px;
-  height: 70px;
+  width: clamp(65px, 22vw, 90px);
+  height: clamp(50px, 17vw, 70px);
   margin: 0 auto 8px;
   display: flex;
   justify-content: center;
@@ -360,7 +360,7 @@
 .cart-details-supermarket__address,
 .cart-details-supermarket__city {
   font-family: 'Heshbon', 'Share Tech Mono', monospace;
-  font-size: 0.85rem;
+  font-size: clamp(0.7rem, 2.5vw, 0.85rem);
   color: #444;
   text-align: center;
   margin: 1px 0;
@@ -391,7 +391,7 @@
 
 .cart-details-summery__date h1,
 .cart-details-summery__time h1 {
-  font-size: 1.2rem;
+  font-size: clamp(0.9rem, 3.2vw, 1.2rem);
   font-weight: 400;
   color: #1a1a1a;
   margin: 0;
@@ -399,7 +399,7 @@
 
 .cart-details-summery__date h2,
 .cart-details-summery__time h2 {
-  font-size: 1rem;
+  font-size: clamp(0.8rem, 2.8vw, 1rem);
   font-weight: 400;
   color: #555;
   margin: 0;
@@ -413,7 +413,7 @@
 }
 
 .cart-details-summary__total-price h1 {
-  font-size: 1.6rem;
+  font-size: clamp(1.1rem, 4.5vw, 1.6rem);
   font-weight: 700;
   color: #000;
   margin: 0;
@@ -422,10 +422,11 @@
   padding: 3px 10px;
   border-radius: 4px;
   animation: golden-shine 3s linear infinite;
+  white-space: nowrap;
 }
 
 .cart-details-summary__total-price h2 {
-  font-size: 1.2rem;
+  font-size: clamp(0.9rem, 3.2vw, 1.2rem);
   font-weight: 600;
   color: #333;
   margin: 0;
@@ -475,7 +476,7 @@
 }
 
 .history-empty-text {
-  font-size: 1.3rem;
+  font-size: clamp(1rem, 3.5vw, 1.3rem);
 }
 
 /* Stats summary */
@@ -501,13 +502,13 @@
 }
 
 .history-stat-value {
-  font-size: 1.6rem;
+  font-size: clamp(1.1rem, 4.5vw, 1.6rem);
   color: #0066cc;
   font-weight: 700;
 }
 
 .history-stat-label {
-  font-size: 0.95rem;
+  font-size: clamp(0.75rem, 2.6vw, 0.95rem);
   color: #555;
   direction: rtl;
 }
@@ -577,7 +578,7 @@
   align-items: center;
   padding: 60px 20px;
   font-family: 'Heshbon', 'VT323', monospace;
-  font-size: 1.6rem;
+  font-size: clamp(1.2rem, 4.5vw, 1.6rem);
   font-weight: 700;
   color: #333;
   direction: rtl;

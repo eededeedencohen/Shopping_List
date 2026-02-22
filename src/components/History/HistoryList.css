@@ -30,15 +30,15 @@
   flex-direction: column;
   align-items: center;
   background: linear-gradient(135deg, #d4d4d4 0%, #e8e8e8 50%, #d0d0d0 100%);
-  padding: 15px 10px 30px;
+  padding: 10px 4px 30px;
   overflow-x: hidden;
   position: relative;
 }
 
 /* The actual receipt paper */
 .receipt-paper {
-  width: 95%;
-  max-width: 380px;
+  width: 100%;
+  max-width: 400px;
   background:
     /* Paper texture */
     repeating-linear-gradient(
@@ -160,7 +160,7 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  padding: 25px 15px 20px;
+  padding: 20px 8px 15px;
   position: relative;
   border-bottom: 2px dashed #ccc;
 }
@@ -169,10 +169,10 @@
 .details-supermaeket-history::before {
   content: '** קבלה **';
   font-family: 'Heshbon', 'VT323', monospace;
-  font-size: 2.2rem;
+  font-size: clamp(1.4rem, 6vw, 2.2rem);
   font-weight: 700;
   color: #1a1a1a;
-  letter-spacing: 4px;
+  letter-spacing: clamp(1px, 1vw, 4px);
   margin-bottom: 15px;
   animation: title-pop 0.5s ease-out 0.3s backwards;
   text-shadow: 1px 1px 0 rgba(0,0,0,0.1);
@@ -183,7 +183,7 @@
   align-self: flex-end;
   font-family: 'Heshbon', 'VT323', monospace;
   color: #555;
-  font-size: 1.3rem;
+  font-size: clamp(0.95rem, 3.5vw, 1.3rem);
   margin-bottom: 12px;
   padding: 4px 10px;
   background: rgba(0, 0, 0, 0.04);
@@ -207,8 +207,8 @@
 }
 
 .details-supermaeket-history__logo img {
-  width: 130px;
-  height: 85px;
+  width: clamp(90px, 30vw, 130px);
+  height: clamp(60px, 20vw, 85px);
   object-fit: contain;
   filter: drop-shadow(0 3px 6px rgba(0,0,0,0.12));
 }
@@ -226,7 +226,7 @@
 .details-supermaeket-history__address h3 {
   margin: 3px;
   font-family: 'Heshbon', 'Share Tech Mono', monospace;
-  font-size: 0.95rem;
+  font-size: clamp(0.75rem, 2.8vw, 0.95rem);
   color: #444;
   font-weight: 400;
 }
@@ -237,8 +237,8 @@
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
-  margin-top: 18px;
-  padding: 12px 18px;
+  margin-top: 12px;
+  padding: 10px 10px;
   background: rgba(0, 0, 0, 0.04);
   border-radius: 6px;
   animation: total-reveal 0.6s ease-out 0.8s backwards;
@@ -275,7 +275,7 @@
 .cart-history {
   display: flex;
   flex-direction: column;
-  padding: 15px 12px 20px;
+  padding: 10px 4px 15px;
   position: relative;
 }
 
@@ -285,11 +285,13 @@
   display: block;
   text-align: center;
   font-family: 'Heshbon', 'VT323', monospace;
-  font-size: 1.3rem;
+  font-size: clamp(0.85rem, 3.5vw, 1.3rem);
   font-weight: 700;
   color: #555;
   margin-bottom: 15px;
-  letter-spacing: 1px;
+  letter-spacing: clamp(-0.5px, 0.3vw, 1px);
+  white-space: nowrap;
+  overflow: hidden;
   animation: items-header 0.5s ease-out 1.2s backwards;
   direction: rtl;
 }
@@ -300,13 +302,13 @@
 
 .history__product-item {
   display: grid;
-  grid-template-columns: 70px 1fr auto;
+  grid-template-columns: clamp(50px, 18vw, 70px) 1fr auto;
   grid-template-rows: auto auto;
   grid-template-areas:
     "image name price"
     "image details amount";
-  gap: 4px 12px;
-  padding: 14px 10px;
+  gap: 3px clamp(4px, 2vw, 10px);
+  padding: clamp(8px, 2.5vw, 12px) clamp(4px, 1.5vw, 8px);
   margin-bottom: 0;
   background: linear-gradient(180deg,
     rgba(255,255,255,0.8) 0%,
@@ -346,8 +348,8 @@
 
 .history__product-image {
   grid-area: image;
-  width: 65px;
-  height: 65px;
+  width: clamp(46px, 16vw, 65px);
+  height: clamp(46px, 16vw, 65px);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -483,7 +485,9 @@
   align-items: flex-end;
   justify-content: center;
   font-family: 'Heshbon', 'VT323', monospace;
-  padding-right: 5px;
+  padding-right: 0;
+  max-width: clamp(75px, 26vw, 110px);
+  overflow: hidden;
 }
 
 .history__product-amount {
@@ -496,12 +500,12 @@
 }
 
 .history__product-amount span {
-  font-size: clamp(0.75rem, 2.2vw, 0.95rem);
+  font-size: clamp(0.65rem, 2vw, 0.85rem);
   color: #555;
 }
 
 .history__product-amount span:first-child {
-  font-size: clamp(0.65rem, 1.8vw, 0.8rem);
+  font-size: clamp(0.6rem, 1.6vw, 0.75rem);
   color: #777;
 }
 
@@ -512,11 +516,11 @@
 
 .history__product-price p {
   font-family: 'Heshbon', 'VT323', monospace;
-  font-size: clamp(0.9rem, 3vw, 1.15rem);
+  font-size: clamp(0.75rem, 2.5vw, 1.05rem);
   font-weight: 700;
   color: #000;
   background: linear-gradient(135deg, #f5f5f5 0%, #e8e8e8 100%);
-  padding: 5px 10px;
+  padding: 3px clamp(4px, 1.5vw, 8px);
   border-radius: 6px;
   margin: 0;
   box-shadow:
@@ -524,7 +528,7 @@
     0 2px 6px rgba(0, 0, 0, 0.1);
   position: relative;
   overflow: hidden;
-  min-width: 60px;
+  min-width: 0;
   text-align: center;
   white-space: nowrap;
 }
@@ -553,7 +557,7 @@
 
 /* Receipt footer section */
 .receipt-footer {
-  padding: 20px 15px 25px;
+  padding: 15px 8px 20px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -564,7 +568,7 @@
 /* Thank you message */
 .receipt-thank-you {
   font-family: 'Heshbon', 'VT323', monospace;
-  font-size: 1.5rem;
+  font-size: clamp(1.1rem, 4.5vw, 1.5rem);
   font-weight: 700;
   color: #333;
   text-align: center;
@@ -682,12 +686,12 @@
 
 /* Filter bar */
 .receipt-filters {
-  width: 95%;
-  max-width: 380px;
+  width: 100%;
+  max-width: 400px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  padding: 12px;
+  gap: 8px;
+  padding: 8px;
   background: linear-gradient(145deg, #ffffff, #f0f0f0);
   border-radius: 12px;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
@@ -749,7 +753,7 @@
   border: 2px solid #ddd;
   border-radius: 8px;
   font-family: 'Heshbon', 'VT323', monospace;
-  font-size: 1.1rem;
+  font-size: clamp(0.9rem, 3vw, 1.1rem);
   direction: rtl;
   text-align: right;
   outline: none;
@@ -962,11 +966,11 @@
   top: 4px;
   left: 4px;
   font-family: 'Heshbon', 'VT323', monospace;
-  font-size: 0.7rem;
+  font-size: clamp(0.55rem, 1.8vw, 0.7rem);
   font-weight: 700;
   color: #fff;
   background: linear-gradient(135deg, #d32f2f, #f44336);
-  padding: 2px 8px;
+  padding: 2px clamp(4px, 1.5vw, 8px);
   border-radius: 4px;
   direction: rtl;
   z-index: 2;
@@ -976,13 +980,13 @@
 
 /* Original price - strikethrough */
 .history__product-price--original p {
-  font-size: clamp(0.7rem, 2vw, 0.85rem) !important;
+  font-size: clamp(0.6rem, 1.8vw, 0.78rem) !important;
   color: #999 !important;
   text-decoration: line-through;
   text-decoration-color: #d32f2f;
   background: transparent !important;
   box-shadow: none !important;
-  padding: 2px 6px !important;
+  padding: 1px 4px !important;
   min-width: auto !important;
 }
 
@@ -993,29 +997,33 @@
 /* Promo info line */
 .history__promo-info {
   display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 6px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1px;
   direction: rtl;
   margin-bottom: 2px;
 }
 
 .history__promo-deal {
   font-family: 'Heshbon', 'VT323', monospace;
-  font-size: clamp(0.65rem, 1.8vw, 0.78rem);
+  font-size: clamp(0.55rem, 1.6vw, 0.7rem);
   color: #d32f2f;
   font-weight: 700;
   background: rgba(211, 47, 47, 0.08);
-  padding: 1px 6px;
+  padding: 1px 4px;
   border-radius: 3px;
+  white-space: nowrap;
+  direction: rtl;
 }
 
 .history__promo-saving {
   font-family: 'Heshbon', 'VT323', monospace;
-  font-size: clamp(0.65rem, 1.8vw, 0.78rem);
+  font-size: clamp(0.55rem, 1.6vw, 0.7rem);
   color: #d32f2f;
   font-weight: 700;
+  white-space: nowrap;
+  direction: ltr;
+  unicode-bidi: isolate;
 }
 
 /* Final discounted price - bold and green-tinted */
@@ -1106,7 +1114,7 @@
   min-height: 100vh;
   background: linear-gradient(135deg, #d4d4d4 0%, #e8e8e8 50%, #d0d0d0 100%);
   font-family: 'Heshbon', 'VT323', monospace;
-  font-size: 2rem;
+  font-size: clamp(1.3rem, 5vw, 2rem);
   font-weight: 700;
   color: #333;
   direction: rtl;
