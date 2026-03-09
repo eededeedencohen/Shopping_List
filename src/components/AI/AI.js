@@ -100,6 +100,8 @@ export default function AI() {
   const [showMicMeter, setShowMicMeter] = useState(false);
   const [micEnabled, setMicEnabled] = useState(true);
   const [speechLanguage, setSpeechLanguage] = useState("auto"); // "auto" | "he" | "en"
+  const [ttsLanguage, setTtsLanguage] = useState("en"); // "en" | "he"
+  const [ttsVoice, setTtsVoice] = useState(""); // voice ID/name (empty = default)
 
   /* ── refs לערכים שהלופ קורא בזמן אמת ── */
   const micEnabledRef = useRef(micEnabled);
@@ -335,6 +337,10 @@ export default function AI() {
       if (speechLanguage !== "auto") {
         formData.append("language", speechLanguage);
       }
+      formData.append("ttsLanguage", ttsLanguage);
+      if (ttsVoice) {
+        formData.append("ttsVoice", ttsVoice);
+      }
 
       addMessage("מעלה את ההקלטה…", "loading", "loading");
 
@@ -490,6 +496,60 @@ export default function AI() {
                   {opt.label}
                 </button>
               ))}
+            </div>
+          </div>
+
+          <div className="settings-section">
+            <div className="settings-section-icon">&#x1f50a;</div>
+            <span className="settings-section-title">שפת תשובה קולית</span>
+
+            <div className="language-select-row">
+              {[
+                { value: "en", label: "English" },
+                { value: "he", label: "עברית" },
+              ].map((opt) => (
+                <button
+                  key={opt.value}
+                  className={`lang-btn ${ttsLanguage === opt.value ? "active" : ""}`}
+                  onClick={() => { setTtsLanguage(opt.value); setTtsVoice(""); }}
+                >
+                  {opt.label}
+                </button>
+              ))}
+            </div>
+
+            <div className="voice-select-row">
+              <span className="voice-label">קול</span>
+              <select
+                className="voice-dropdown"
+                value={ttsVoice}
+                onChange={(e) => setTtsVoice(e.target.value)}
+              >
+                {ttsLanguage === "en" ? (
+                  <>
+                    <option value="">Robot (ברירת מחדל)</option>
+                    <option value="21m00Tcm4TlvDq8ikWAM">Rachel (נקבה)</option>
+                    <option value="EXAVITQu4vr4xnSDxMaL">Bella (נקבה)</option>
+                    <option value="pNInz6obpgDQGcFmaJgB">Adam (זכר)</option>
+                    <option value="ErXwobaYiN019PkySvjV">Antoni (זכר)</option>
+                    <option value="TxGEqnHWrfWFTfGW9XjX">Josh (זכר)</option>
+                    <option value="VR6AewLTigWG4xSOukaG">Arnold (זכר)</option>
+                    <option value="29vD33N1CtxCmqQRPOHJ">Drew (זכר)</option>
+                  </>
+                ) : (
+                  <>
+                    <option value="">Alnilam - זכר (ברירת מחדל)</option>
+                    <option value="he-IL-Chirp3-HD-Puck">Puck (זכר)</option>
+                    <option value="he-IL-Chirp3-HD-Charon">Charon (זכר)</option>
+                    <option value="he-IL-Chirp3-HD-Fenrir">Fenrir (זכר)</option>
+                    <option value="he-IL-Chirp3-HD-Orus">Orus (זכר)</option>
+                    <option value="he-IL-Chirp3-HD-Aoede">Aoede (נקבה)</option>
+                    <option value="he-IL-Chirp3-HD-Kore">Kore (נקבה)</option>
+                    <option value="he-IL-Chirp3-HD-Leda">Leda (נקבה)</option>
+                    <option value="he-IL-Chirp3-HD-Zephyr">Zephyr (נקבה)</option>
+                  </>
+                )}
+              </select>
             </div>
           </div>
 

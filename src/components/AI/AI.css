@@ -199,6 +199,41 @@
   box-shadow: 0 0 8px rgba(30, 209, 255, 0.3);
 }
 
+/* ── Voice Select ── */
+.voice-select-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+}
+.voice-label {
+  font-size: 0.85rem;
+  color: #ccc;
+  white-space: nowrap;
+}
+.voice-dropdown {
+  flex: 1;
+  padding: 6px 8px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.08);
+  color: #eee;
+  font-size: 0.8rem;
+  font-family: "Heebo", sans-serif;
+  cursor: pointer;
+  outline: none;
+  transition: border-color 0.2s;
+  direction: rtl;
+}
+.voice-dropdown:hover,
+.voice-dropdown:focus {
+  border-color: rgba(30, 209, 255, 0.4);
+}
+.voice-dropdown option {
+  background: #1a1a2e;
+  color: #eee;
+}
+
 /* ── Disabled states ── */
 .disabled-row {
   opacity: 0.35;
