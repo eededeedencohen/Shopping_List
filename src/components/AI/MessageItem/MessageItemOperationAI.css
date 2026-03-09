@@ -1,16 +1,37 @@
-/* כל הודעה מוצגת כבלוק גמיש עם מרווחים */
-
-
-/* הגדרת טקסט */
-.message-item p {
-  margin: 0;
-  font-size: 1rem;
-}
+/* ╔══════════════════════════════════╗
+   ║  Operation Message (data + text) ║
+   ╚══════════════════════════════════╝ */
 
 .message-item.operation {
   padding: 0;
   max-width: 100%;
-  color: #fff;
-  text-align: center;
   align-self: center;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* ── AI message bubble above data ── */
+.op-message-bubble {
+  align-self: flex-start;
+  max-width: 85%;
+  padding: 10px 16px;
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 18px 18px 18px 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.op-message-text {
+  color: #fff;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  direction: rtl;
+}
+
+/* ── Data component wrapper ── */
+.message-item-operation-content {
+  width: 100%;
 }

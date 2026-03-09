@@ -9,22 +9,9 @@ import Brobot from "../Brobot/Brobot";
 /* ----------------------------------------------------------- */
 /*  כלי עזר: קבלת קולות לדפדפן                               */
 /* ---------------------------------------------------------- */
-/**
- *
- * @returns {Promise<SpeechSynthesisVoice[]>} A promise that resolves to
- * the list of available speech synthesis voices.
- * the structure of SpeechSynthesisVoice is:
- * {
- *  voiceURI: string,
- * name: string,
- * lang: string,
- * localService: boolean,
- * default: boolean
- * }
- */
 const getVoices = () =>
   new Promise((resolve) => {
-    const cached = speechSynthesis.getVoices(); //
+    const cached = speechSynthesis.getVoices();
     if (cached.length) return resolve(cached);
     speechSynthesis.onvoiceschanged = () =>
       resolve(speechSynthesis.getVoices());
@@ -76,7 +63,7 @@ function playAudioWithMouthSync(
   };
 
   audio.addEventListener("play", () => {
-    isAiSpeakingRef.current = true; // 🔒 נועל הקלטה
+    isAiSpeakingRef.current = true;
     console.log("%c🔊 AI is speaking...", "color: cyan");
     requestAnimationFrame(step);
   });
@@ -84,7 +71,7 @@ function playAudioWithMouthSync(
   audio.addEventListener("ended", () => {
     brobotRef.current?.talkStop();
     setSpkLevel(0);
-    isAiSpeakingRef.current = false; // 🔓 משחרר הקלטה
+    isAiSpeakingRef.current = false;
     console.log("%c✅ AI finished speaking", "color: yellow");
   });
 
@@ -105,13 +92,57 @@ export default function AI() {
   const [spkLevel, setSpkLevel] = useState(0);
   const [micThreshold, setMicThreshold] = useState(15);
 
+  /* ── הגדרות תצוגה ── */
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const [audioEnabled, setAudioEnabled] = useState(true);
+  const [showRobot, setShowRobot] = useState(true);
+  const [showRobotPanel, setShowRobotPanel] = useState(true);
+  const [showMicMeter, setShowMicMeter] = useState(false);
+  const [micEnabled, setMicEnabled] = useState(true);
+  const [speechLanguage, setSpeechLanguage] = useState("auto"); // "auto" | "he" | "en"
+
+  /* ── refs לערכים שהלופ קורא בזמן אמת ── */
+  const micEnabledRef = useRef(micEnabled);
+  const micThresholdRef = useRef(micThreshold);
+  const isRecordingRef = useRef(isRecording);
+
+  micEnabledRef.current = micEnabled;
+  micThresholdRef.current = micThreshold;
+  isRecordingRef.current = isRecording;
+
   const brobotRef = useRef(null);
   const messageEndRef = useRef(null);
   const recorderFns = useRef({ start: () => {}, stop: () => {} });
   const currentAudioRef = useRef(null);
   const quietSinceRef = useRef(null);
   const recordingLock = useRef(false);
-  const isAiSpeakingRef = useRef(false); // 🧠 האם ה-AI מדבר כרגע
+  const isAiSpeakingRef = useRef(false);
+
+  /* ── כיבוי מיקרופון → עצירת הקלטה פעילה ── */
+  useEffect(() => {
+    if (!micEnabled && isRecording) {
+      console.log("%c🚫 micEnabled OFF → stopping recording", "color: orange");
+      recorderFns.current.stop();
+      setIsRecording(false);
+      brobotRef.current?.recordStop();
+      recordingLock.current = false;
+      quietSinceRef.current = null;
+    }
+  }, [micEnabled, isRecording]);
+
+  /* ── כיבוי אודיו → עצירת השמעה פעילה ── */
+  useEffect(() => {
+    if (!audioEnabled) {
+      if (currentAudioRef.current) {
+        currentAudioRef.current.pause();
+        currentAudioRef.current = null;
+        brobotRef.current?.talkStop();
+        setSpkLevel(0);
+        isAiSpeakingRef.current = false;
+      }
+      speechSynthesis.cancel();
+    }
+  }, [audioEnabled]);
 
   /* גלילה אוטומטית */
   useEffect(() => {
@@ -137,71 +168,82 @@ export default function AI() {
   /*      טריגר-קול (מיקרופון)                              */
   /* ------------------------------------------------------ */
   useEffect(() => {
-    console.log("Microphone effect running");
-    let ctx, analyser, dataArray, rafId, stream;
+    if (!micEnabled) {
+      console.log("%c🎤 Mic disabled – no stream requested", "color: gray");
+      setMicLevel(0);
+      return;
+    }
 
-    navigator.mediaDevices // browser API
+    console.log("%c🎤 Mic enabled – requesting stream…", "color: cyan");
+    let ctx, analyser, dataArray, rafId, stream;
+    let cancelled = false;
+
+    navigator.mediaDevices
       .getUserMedia({
         audio: {
-          echoCancellation: true, // ביטול הד - למנוע מהמיקרופון לשמוע את הרמקולים
-          noiseSuppression: true, // ביטול רעשי רקע
-          autoGainControl: true, // התאמה אוטומטית של עוצמת הקול
+          echoCancellation: true,
+          noiseSuppression: true,
+          autoGainControl: true,
         },
-      }) // request mic access
-      // after access granted:
+      })
       .then((mediaStream) => {
-        stream = mediaStream; // שמירת ה-stream כדי לעצור אותו ב-cleanup
-        // strean is the live mic data
-        ctx = new (window.AudioContext || window.webkitAudioContext)(); // audio context - in short "the audio system"
-        const src = ctx.createMediaStreamSource(stream); // source from mic
+        if (cancelled) {
+          mediaStream.getTracks().forEach((t) => t.stop());
+          return;
+        }
+        stream = mediaStream;
+        console.log("%c🎤 Stream acquired", "color: lime");
+        ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const src = ctx.createMediaStreamSource(stream);
 
-        analyser = ctx.createAnalyser(); // create an analyser node for real-time analysis like reading wave in real-time, spectrum measurements etc.
-        analyser.fftSize = 2048; // set FFT size. FFT is just a way to analyze sound
-        src.connect(analyser); // connect source to analyser
+        analyser = ctx.createAnalyser();
+        analyser.fftSize = 2048;
+        src.connect(analyser);
         dataArray = new Uint8Array(analyser.frequencyBinCount);
 
         const loop = () => {
-          analyser.getByteTimeDomainData(dataArray); // assign current data to dataArray
-          const rms = // Root Mean Square
+          analyser.getByteTimeDomainData(dataArray);
+          const rms =
             Math.sqrt(
               dataArray.reduce((s, v) => s + (v - 128) ** 2, 0) /
                 dataArray.length,
             ) || 0;
 
           setMicLevel(Math.round(rms));
-          // עדכון Brobot עם רמת המיקרופון בזמן אמת
-          if (isRecording) {
+          if (isRecordingRef.current) {
             brobotRef.current?.updateRecLevel(Math.round(rms));
           }
 
-          // ✅ תנאי חדש - לא להתחיל הקלטה כשה-AI מדבר
           if (
-            !isRecording &&
-            rms >= micThreshold &&
+            !isRecordingRef.current &&
+            rms >= micThresholdRef.current &&
             !recordingLock.current &&
             !isAiSpeakingRef.current
           ) {
-            console.log("%c🎙️ START recording", "color: lime");
+            console.log(
+              "%c🎙️ START recording (rms=%d, threshold=%d)",
+              "color: lime",
+              Math.round(rms),
+              micThresholdRef.current,
+            );
             recordingLock.current = true;
-            currentAudioRef.current?.pause?.(); // pause any current audio playback
-            speechSynthesis.cancel(); // stop any ongoing TTS - cancel all queued utterances
-            recorderFns.current.start(); // start recording
-            setIsRecording(true); // update state to indicate recording has started
-            brobotRef.current?.recordStart(); // 🎙️ הצגת אינדיקטור הקלטה ב-Brobot
-            quietSinceRef.current = null; // reset quiet timer - reset the quiet timer - ignore any previous quiet time
+            currentAudioRef.current?.pause?.();
+            speechSynthesis.cancel();
+            recorderFns.current.start();
+            setIsRecording(true);
+            brobotRef.current?.recordStart();
+            quietSinceRef.current = null;
           }
 
-          if (isRecording) {
+          if (isRecordingRef.current) {
             if (rms <= 1) {
               if (!quietSinceRef.current) quietSinceRef.current = Date.now();
-              // start quiet timer if not already started
               else if (Date.now() - quietSinceRef.current >= 1000) {
-                console.log("%c⏹ STOP recording", "color: red");
+                console.log("%c⏹ STOP recording (silence timeout)", "color: red");
                 recorderFns.current.stop();
                 setIsRecording(false);
-                brobotRef.current?.recordStop(); // ⏹️ הסתרת אינדיקטור הקלטה ב-Brobot
+                brobotRef.current?.recordStop();
                 quietSinceRef.current = null;
-                // הנעילה תישאר עד לתשובה מהשרת
               }
             } else {
               quietSinceRef.current = null;
@@ -213,18 +255,19 @@ export default function AI() {
 
         ctx.resume().then(loop);
       })
-      .catch(console.error);
+      .catch((err) => console.error("getUserMedia error:", err));
 
     return () => {
-      console.log("%c🛑 Cleaning up microphone", "color: orange");
+      console.log("%c🛑 Cleaning up microphone stream", "color: orange");
+      cancelled = true;
       cancelAnimationFrame(rafId);
       ctx?.close();
-      // עצירת כל ה-tracks (המיקרופון) כשיוצאים מהעמוד
       if (stream) {
         stream.getTracks().forEach((track) => track.stop());
       }
     };
-  }, [isRecording, micThreshold]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [micEnabled]);
 
   /* ------------------------------------------------------ */
   /*      שליחת טקסט ידני                                   */
@@ -257,7 +300,7 @@ export default function AI() {
       const sender = messageType === "regular" ? "assistant" : "operation";
       addMessage(messageToUser, sender, messageType, data, actions);
 
-      if (messageToUser) {
+      if (messageToUser && audioEnabled) {
         speechSynthesis.cancel();
         const utter = new SpeechSynthesisUtterance(messageToUser);
         utter.lang = "he-IL";
@@ -273,7 +316,7 @@ export default function AI() {
     } catch (err) {
       console.error(err);
       removeLoadingMessage();
-      addMessage("⚠️ ארעה שגיאה. נסה שוב.", "assistant");
+      addMessage("שגיאה. נסה שוב.", "assistant");
     }
   };
 
@@ -288,15 +331,18 @@ export default function AI() {
       });
       const formData = new FormData();
       formData.append("file", audioFile);
+      formData.append("skipAudio", audioEnabled ? "false" : "true");
+      if (speechLanguage !== "auto") {
+        formData.append("language", speechLanguage);
+      }
 
-      addMessage("⌛️ מעלה את ההקלטה…", "loading", "loading");
+      addMessage("מעלה את ההקלטה…", "loading", "loading");
 
       const res = await fetch(`${DOMAIN}/api/v1/ai/ai-response-v5`, {
         method: "POST",
         body: formData,
       });
 
-      // ── קריאת SSE stream מהשרת ──
       const reader = res.body.getReader();
       const decoder = new TextDecoder();
       let buffer = "";
@@ -308,7 +354,7 @@ export default function AI() {
 
         buffer += decoder.decode(value, { stream: true });
         const lines = buffer.split("\n\n");
-        buffer = lines.pop(); // שאריות שעדיין לא הגיעו בשלמות
+        buffer = lines.pop();
 
         for (const line of lines) {
           const dataLine = line.replace(/^data: /, "").trim();
@@ -318,7 +364,6 @@ export default function AI() {
             if (event.type === "status") {
               updateLoadingMessage(event.status);
             } else if (event.type === "transcription") {
-              // הטקסט שזוהה מהדיבור - מציג מיד כהודעת משתמש
               if (event.text) addMessage(event.text, "user");
             } else if (event.type === "result") {
               aiResponse = event.aiResponse;
@@ -334,7 +379,6 @@ export default function AI() {
       removeLoadingMessage();
 
       const {
-        requestText = "",
         messageType = "regular",
         messageToUser = "",
         actions = {},
@@ -345,7 +389,7 @@ export default function AI() {
       const sender = messageType === "regular" ? "assistant" : "operation";
       addMessage(messageToUser, sender, messageType, data, actions);
 
-      if (audioRoute)
+      if (audioRoute && audioEnabled)
         playAudioWithMouthSync(
           `${DOMAIN}/${audioRoute}`,
           brobotRef,
@@ -354,15 +398,13 @@ export default function AI() {
           isAiSpeakingRef,
         );
 
-      // 🔓 משחרר נעילה אחרי תשובה מהשרת
       recordingLock.current = false;
       console.log("%c🔓 UNLOCKED after server response", "color: green");
     } catch (err) {
       console.error(err);
       removeLoadingMessage();
-      addMessage("⚠️ שגיאה בעיבוד ההקלטה.", "assistant");
+      addMessage("שגיאה בעיבוד ההקלטה.", "assistant");
 
-      // 🔓 משחרר נעילה גם במקרה של שגיאה
       recordingLock.current = false;
       console.log("%c🔓 UNLOCKED after error", "color: orange");
     }
@@ -397,35 +439,171 @@ export default function AI() {
       <div className="ai-container">
         <NeuronBackground />
 
-        <div>
-          <Brobot ref={brobotRef} />
+        {/* ── Dark Overlay (closes settings on click) ── */}
+        {settingsOpen && (
+          <div
+            className="settings-overlay"
+            onClick={() => setSettingsOpen(false)}
+          />
+        )}
+
+        {/* ── Settings Panel ── */}
+        <div className={`settings-panel ${settingsOpen ? "open" : ""}`}>
+          <div className="settings-header">
+            <h3 className="settings-title">הגדרות</h3>
+            <button
+              className="settings-close-btn"
+              onClick={() => setSettingsOpen(false)}
+            >
+              {"\u2715"}
+            </button>
+          </div>
+
+          <div className="settings-section">
+            <div className="settings-section-icon">&#x1f50a;</div>
+            <span className="settings-section-title">אודיו</span>
+
+            <label className="toggle-row">
+              <span>השמעת קול</span>
+              <div className={`toggle-switch ${audioEnabled ? "on" : ""}`}
+                   onClick={() => setAudioEnabled((p) => !p)}>
+                <div className="toggle-knob" />
+              </div>
+            </label>
+          </div>
+
+          <div className="settings-section">
+            <div className="settings-section-icon">&#x1f310;</div>
+            <span className="settings-section-title">שפת דיבור</span>
+
+            <div className="language-select-row">
+              {[
+                { value: "auto", label: "זיהוי אוטומטי" },
+                { value: "he", label: "עברית" },
+                { value: "en", label: "English" },
+              ].map((opt) => (
+                <button
+                  key={opt.value}
+                  className={`lang-btn ${speechLanguage === opt.value ? "active" : ""}`}
+                  onClick={() => setSpeechLanguage(opt.value)}
+                >
+                  {opt.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="settings-section">
+            <div className="settings-section-icon">&#x1f916;</div>
+            <span className="settings-section-title">רובוט</span>
+
+            <label className="toggle-row">
+              <span>הצגת רובוט</span>
+              <div className={`toggle-switch ${showRobot ? "on" : ""}`}
+                   onClick={() => setShowRobot((p) => !p)}>
+                <div className="toggle-knob" />
+              </div>
+            </label>
+
+            <label className={`toggle-row ${!showRobot ? "disabled-row" : ""}`}>
+              <span>תפריט רובוט</span>
+              <div className={`toggle-switch ${showRobot && showRobotPanel ? "on" : ""} ${!showRobot ? "disabled-switch" : ""}`}
+                   onClick={() => { if (showRobot) setShowRobotPanel((p) => !p); }}>
+                <div className="toggle-knob" />
+              </div>
+            </label>
+          </div>
+
+          <div className="settings-section">
+            <div className="settings-section-icon">&#x1f399;</div>
+            <span className="settings-section-title">מיקרופון</span>
+
+            <label className="toggle-row">
+              <span>הפעלת סף מיקרופון</span>
+              <div className={`toggle-switch ${micEnabled ? "on" : ""}`}
+                   onClick={() => setMicEnabled((p) => !p)}>
+                <div className="toggle-knob" />
+              </div>
+            </label>
+
+            <div className={`threshold-setting ${!micEnabled ? "disabled-section" : ""}`}>
+              <div className="threshold-header">
+                <span>סף מיקרופון</span>
+                <span className="threshold-value">{micThreshold}</span>
+              </div>
+              <input
+                type="range"
+                min="1"
+                max="200"
+                value={micThreshold}
+                onChange={(e) => {
+                  setMicThreshold(+e.target.value);
+                  console.log("Microphone threshold changed to:", +e.target.value);
+                }}
+                className="settings-slider"
+                disabled={!micEnabled}
+                style={{
+                  background: (() => {
+                    const pct = Math.round(((micThreshold - 1) / 199) * 100);
+                    return `linear-gradient(to right, rgba(255,255,255,0.12) ${pct}%, #1ed1ff ${pct}%)`;
+                  })()
+                }}
+              />
+            </div>
+
+            <label className="toggle-row">
+              <span>הצגת מדי אודיו</span>
+              <div className={`toggle-switch ${showMicMeter ? "on" : ""}`}
+                   onClick={() => setShowMicMeter((p) => !p)}>
+                <div className="toggle-knob" />
+              </div>
+            </label>
+          </div>
         </div>
 
-        <div className="meters">
-          <div className="mic-meter">🎙️ {micLevel}</div>
-          <div className="spk-meter">🔈 {spkLevel}</div>
-        </div>
+        {/* ── Settings Toggle Button (inside content, not on toolbar) ── */}
+        <button
+          className="settings-toggle-btn"
+          onClick={() => setSettingsOpen((p) => !p)}
+          title="הגדרות"
+        >
+          {"\u2699"}
+        </button>
 
-        <div className="threshold-control">
-          <label>
-            סף מיקרופון&nbsp;
-            <input
-              type="range"
-              min="1"
-              max="200"
-              value={micThreshold}
-              onChange={(e) => {
-                setMicThreshold(+e.target.value);
-                console.log(
-                  "Microphone threshold changed to:",
-                  +e.target.value,
-                );
-              }}
-            />
-            &nbsp;({micThreshold})
-          </label>
-        </div>
+        {/* ── Brobot ── */}
+        {showRobot && (
+          <div>
+            <Brobot ref={brobotRef} showPanel={showRobotPanel} />
+          </div>
+        )}
 
+        {/* ── Audio Meters ── */}
+        {showMicMeter && (
+          <div className="meters">
+            <div className="meter-item mic-meter">
+              <span className="meter-icon">MIC</span>
+              <div className="meter-bar-bg">
+                <div
+                  className="meter-bar-fill mic-fill"
+                  style={{ width: `${Math.min(micLevel * 2, 100)}%` }}
+                />
+              </div>
+              <span className="meter-val">{micLevel}</span>
+            </div>
+            <div className="meter-item spk-meter">
+              <span className="meter-icon">SPK</span>
+              <div className="meter-bar-bg">
+                <div
+                  className="meter-bar-fill spk-fill"
+                  style={{ width: `${Math.min(spkLevel * 2, 100)}%` }}
+                />
+              </div>
+              <span className="meter-val">{spkLevel}</span>
+            </div>
+          </div>
+        )}
+
+        {/* ── Messages ── */}
         <div className="messages-container">
           {messages.map((m, i) => (
             <MessageItem
@@ -440,6 +618,7 @@ export default function AI() {
           <div ref={messageEndRef} />
         </div>
 
+        {/* ── Input Bar ── */}
         <div className="user-text-box">
           <form onSubmit={handleOnSubmit}>
             <textarea

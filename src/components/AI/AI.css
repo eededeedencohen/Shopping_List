@@ -11,11 +11,11 @@
 
 /* ---------- AI CONTAINER ---------- */
 .ai-container {
-  position: relative; /* מאפשר שכבתיות */
+  position: relative;
   display: flex;
   flex-direction: column;
   height: 100%;
-  background: transparent; /* fallback – הקנבס מכסה */
+  background: transparent;
   color: var(--txt-light);
   padding: 6px;
   box-sizing: border-box;
@@ -29,9 +29,348 @@
   left: 0;
   width: 100%;
   height: 100%;
-  z-index: -1; /* מאחורי הממשק */
-
+  z-index: -1;
   background: linear-gradient(35deg, rgb(0, 17, 23) 0%, rgb(176, 214, 255) 95%);
+}
+
+/* ========================================= */
+/*          SETTINGS TOGGLE BUTTON           */
+/* ========================================= */
+/*         SETTINGS OVERLAY (BACKDROP)       */
+/* ========================================= */
+.settings-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 98;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(4px);
+  animation: overlayFadeIn 0.3s ease forwards;
+}
+@keyframes overlayFadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* ========================================= */
+/*          SETTINGS TOGGLE BUTTON           */
+/* ========================================= */
+.settings-toggle-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 10;
+  width: 38px;
+  height: 38px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(8px);
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s, transform 0.2s, color 0.2s;
+}
+.settings-toggle-btn:hover {
+  background: rgba(30, 209, 255, 0.25);
+  color: #fff;
+  transform: scale(1.1) rotate(30deg);
+}
+
+/* ========================================= */
+/*             SETTINGS PANEL                */
+/* ========================================= */
+.settings-panel {
+  position: fixed;
+  top: 0;
+  right: -250px;
+  width: 230px;
+  height: 100%;
+  z-index: 99;
+  background: linear-gradient(170deg, rgba(8, 20, 40, 0.97) 0%, rgba(2, 10, 25, 0.98) 100%);
+  backdrop-filter: blur(24px);
+  border-left: 1px solid rgba(30, 209, 255, 0.15);
+  padding: 0 20px 24px;
+  overflow-y: auto;
+  transition: right 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: -8px 0 40px rgba(0, 0, 0, 0.6);
+  direction: rtl;
+}
+.settings-panel.open {
+  right: 0;
+}
+
+/* ── Header ── */
+.settings-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 0 16px;
+  margin-bottom: 8px;
+  border-bottom: 1px solid rgba(30, 209, 255, 0.15);
+  position: sticky;
+  top: 0;
+  background: linear-gradient(170deg, rgba(8, 20, 40, 0.99) 0%, rgba(2, 10, 25, 0.99) 100%);
+  z-index: 1;
+}
+.settings-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  margin: 0;
+  color: #fff;
+  letter-spacing: 0.3px;
+}
+.settings-close-btn {
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s, color 0.2s;
+}
+.settings-close-btn:hover {
+  background: rgba(255, 80, 80, 0.2);
+  color: #ff6b6b;
+}
+
+/* ── Section ── */
+.settings-section {
+  margin-bottom: 14px;
+  padding: 14px;
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  transition: border-color 0.2s;
+}
+.settings-section:hover {
+  border-color: rgba(30, 209, 255, 0.15);
+}
+
+.settings-section-icon {
+  font-size: 1.1rem;
+  margin-bottom: 4px;
+}
+
+.settings-section-title {
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: rgba(30, 209, 255, 0.7);
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  margin-bottom: 10px;
+}
+
+/* ── Language Select ── */
+.language-select-row {
+  display: flex;
+  gap: 6px;
+  margin-top: 6px;
+}
+.lang-btn {
+  flex: 1;
+  padding: 6px 4px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.06);
+  color: #ccc;
+  font-size: 0.78rem;
+  font-family: "Heebo", sans-serif;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s, color 0.2s;
+}
+.lang-btn:hover {
+  background: rgba(30, 209, 255, 0.12);
+  border-color: rgba(30, 209, 255, 0.3);
+}
+.lang-btn.active {
+  background: linear-gradient(135deg, var(--grad-start), var(--grad-mid));
+  border-color: transparent;
+  color: #fff;
+  font-weight: 600;
+  box-shadow: 0 0 8px rgba(30, 209, 255, 0.3);
+}
+
+/* ── Disabled states ── */
+.disabled-row {
+  opacity: 0.35;
+  pointer-events: none;
+}
+.disabled-switch {
+  opacity: 0.4;
+  cursor: not-allowed !important;
+}
+.disabled-section {
+  opacity: 0.35;
+  pointer-events: none;
+}
+
+/* ── Toggle Row ── */
+.toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 0;
+  cursor: pointer;
+  font-size: 0.88rem;
+  color: #ddd;
+}
+.toggle-row + .toggle-row {
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+/* ── Toggle Switch ── */
+.toggle-switch {
+  position: relative;
+  width: 44px;
+  height: 24px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.12);
+  cursor: pointer;
+  transition: background 0.25s, box-shadow 0.25s;
+  flex-shrink: 0;
+}
+.toggle-switch.on {
+  background: linear-gradient(135deg, var(--grad-start), var(--grad-mid));
+  box-shadow: 0 0 10px rgba(30, 209, 255, 0.3);
+}
+.toggle-knob {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #fff;
+  transition: left 0.25s;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+}
+.toggle-switch.on .toggle-knob {
+  left: 23px;
+}
+
+/* ── Threshold Slider ── */
+.threshold-setting {
+  padding: 8px 0 4px;
+}
+.threshold-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.88rem;
+  color: #ddd;
+  margin-bottom: 8px;
+}
+.threshold-value {
+  font-weight: 700;
+  color: var(--grad-mid);
+  font-size: 0.85rem;
+  background: rgba(30, 209, 255, 0.15);
+  padding: 2px 8px;
+  border-radius: 6px;
+}
+
+.settings-slider {
+  width: 100%;
+  -webkit-appearance: none;
+  appearance: none;
+  height: 6px;
+  border-radius: 3px;
+  outline: none;
+  direction: ltr;
+}
+.settings-slider::-webkit-slider-runnable-track {
+  height: 6px;
+  border-radius: 3px;
+  background: transparent;
+}
+.settings-slider::-moz-range-track {
+  height: 6px;
+  border-radius: 3px;
+  background: transparent;
+}
+.settings-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--grad-start), var(--grad-mid));
+  cursor: pointer;
+  box-shadow: 0 0 6px rgba(30, 209, 255, 0.6);
+  margin-top: -6px;
+}
+.settings-slider::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--grad-start), var(--grad-mid));
+  cursor: pointer;
+  border: none;
+  box-shadow: 0 0 6px rgba(30, 209, 255, 0.6);
+}
+
+/* ========================================= */
+/*             AUDIO METERS                  */
+/* ========================================= */
+.meters {
+  position: fixed;
+  top: 12px;
+  left: 12px;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.meter-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(8px);
+  padding: 6px 10px;
+  border-radius: 10px;
+  font-size: 0.7rem;
+  font-family: monospace;
+  min-width: 160px;
+}
+.meter-icon {
+  font-weight: 700;
+  width: 28px;
+  text-align: center;
+  color: var(--grad-mid);
+}
+.meter-bar-bg {
+  flex: 1;
+  height: 6px;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.1);
+  overflow: hidden;
+}
+.meter-bar-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.08s linear;
+}
+.meter-bar-fill.mic-fill {
+  background: linear-gradient(90deg, #00e676, #76ff03);
+}
+.meter-bar-fill.spk-fill {
+  background: linear-gradient(90deg, #29b6f6, #00e5ff);
+}
+.meter-val {
+  width: 24px;
+  text-align: right;
+  font-weight: 600;
+  color: #ccc;
 }
 
 /* ---------- MESSAGES ---------- */
@@ -132,16 +471,13 @@
   border-radius: 2px;
 }
 
-.noise-meter {
-  position: fixed;
-  top: 8px;
-  right: 12px;
-  background: rgba(0, 0, 0, 0.6);
-  color: #0f0;
-  font-family: monospace;
-  padding: 4px 8px;
-  border-radius: 4px;
-  z-index: 9999;
+/* Settings panel scrollbar */
+.settings-panel::-webkit-scrollbar {
+  width: 4px;
+}
+.settings-panel::-webkit-scrollbar-thumb {
+  background: rgba(30, 209, 255, 0.3);
+  border-radius: 2px;
 }
 
 /* ---------- RECORDING INDICATOR ---------- */
@@ -175,7 +511,6 @@
   }
 }
 
-/* נקודה אדומה פועמת */
 .recording-dot {
   width: 80px;
   height: 80px;
@@ -204,7 +539,6 @@
   }
 }
 
-/* גלים מתרחבים */
 .recording-waves {
   position: absolute;
   top: 50%;
@@ -248,7 +582,6 @@
   }
 }
 
-/* אייקון מיקרופון */
 .recording-mic-icon {
   font-size: 40px;
   color: white;
@@ -265,7 +598,6 @@
   }
 }
 
-/* טקסט "מקליט..." */
 .recording-text {
   color: white;
   font-size: 24px;
@@ -285,7 +617,6 @@
   }
 }
 
-/* תצוגת רמת אודיו */
 .recording-level-bars {
   display: flex;
   gap: 6px;
@@ -301,7 +632,6 @@
   box-shadow: 0 0 10px rgba(255, 51, 51, 0.5);
 }
 
-/* רקע מעומעם */
 .recording-overlay {
   position: fixed;
   top: 0;

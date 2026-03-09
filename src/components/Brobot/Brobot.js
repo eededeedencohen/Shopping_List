@@ -10,7 +10,7 @@ import "./Brobot.css";
 import BrobotFront from "./BrobotImages/brobotV2.svg";
 import BrobotRight from "./BrobotImages/BrobotRight.svg";
 
-function Brobot(_, ref) {
+function Brobot({ showPanel: showPanelProp = true }, ref) {
   /* ───────── state & refs ───────── */
   const brobotRef = useRef(null);
   const dragOffset = useRef({ x: 0, y: 0 });
@@ -233,7 +233,7 @@ function Brobot(_, ref) {
       </div>
 
       {/* === control panel === */}
-      <div className={`brobot-panel ${panelOpen ? "open" : "closed"}`}>
+      {showPanelProp && <div className={`brobot-panel ${panelOpen ? "open" : "closed"}`}>
         <button className="toggle-btn" onClick={() => setPanelOpen(!panelOpen)}>
           {panelOpen ? "◀︎" : "▶︎"}
         </button>
@@ -342,7 +342,7 @@ function Brobot(_, ref) {
             </div>
           </>
         )}
-      </div>
+      </div>}
     </>
   );
 }
