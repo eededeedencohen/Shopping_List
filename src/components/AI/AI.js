@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, Fragment } from "react";
 import { ReactMediaRecorder } from "react-media-recorder-2";
 import { DOMAIN } from "../../constants";
+import { useAiSettings } from "../../context/AiSettingsContext";
 import "./AI.css";
 import MessageItem from "./MessageItem/MessageItem";
 import NeuronBackground from "./NeuronBackground";
@@ -90,18 +91,31 @@ export default function AI() {
   const [isRecording, setIsRecording] = useState(false);
   const [micLevel, setMicLevel] = useState(0);
   const [spkLevel, setSpkLevel] = useState(0);
-  const [micThreshold, setMicThreshold] = useState(15);
 
-  /* ── הגדרות תצוגה ── */
+  /* ── הגדרות תצוגה (מה-context – נשמר ב-DB) ── */
+  const { settings: aiSettings, updateSetting } = useAiSettings();
   const [settingsOpen, setSettingsOpen] = useState(false);
-  const [audioEnabled, setAudioEnabled] = useState(true);
-  const [showRobot, setShowRobot] = useState(true);
-  const [showRobotPanel, setShowRobotPanel] = useState(true);
-  const [showMicMeter, setShowMicMeter] = useState(false);
-  const [micEnabled, setMicEnabled] = useState(true);
-  const [speechLanguage, setSpeechLanguage] = useState("auto"); // "auto" | "he" | "en"
-  const [ttsLanguage, setTtsLanguage] = useState("en"); // "en" | "he"
-  const [ttsVoice, setTtsVoice] = useState(""); // voice ID/name (empty = default)
+
+  const micThreshold = aiSettings.micThreshold;
+  const setMicThreshold = (v) => updateSetting("micThreshold", typeof v === "function" ? v(micThreshold) : v);
+
+  const audioEnabled = aiSettings.audioEnabled;
+  const showRobot = aiSettings.showRobot;
+  const showRobotPanel = aiSettings.showRobotPanel;
+  const showMicMeter = aiSettings.showMicMeter;
+  const micEnabled = aiSettings.micEnabled;
+  const speechLanguage = aiSettings.speechLanguage;
+  const ttsLanguage = aiSettings.ttsLanguage;
+  const ttsVoice = aiSettings.ttsVoice;
+
+  const setAudioEnabled = (v) => updateSetting("audioEnabled", typeof v === "function" ? v(audioEnabled) : v);
+  const setShowRobot = (v) => updateSetting("showRobot", typeof v === "function" ? v(showRobot) : v);
+  const setShowRobotPanel = (v) => updateSetting("showRobotPanel", typeof v === "function" ? v(showRobotPanel) : v);
+  const setShowMicMeter = (v) => updateSetting("showMicMeter", typeof v === "function" ? v(showMicMeter) : v);
+  const setMicEnabled = (v) => updateSetting("micEnabled", typeof v === "function" ? v(micEnabled) : v);
+  const setSpeechLanguage = (v) => updateSetting("speechLanguage", typeof v === "function" ? v(speechLanguage) : v);
+  const setTtsLanguage = (v) => updateSetting("ttsLanguage", typeof v === "function" ? v(ttsLanguage) : v);
+  const setTtsVoice = (v) => updateSetting("ttsVoice", typeof v === "function" ? v(ttsVoice) : v);
 
   /* ── refs לערכים שהלופ קורא בזמן אמת ── */
   const micEnabledRef = useRef(micEnabled);
@@ -119,6 +133,16 @@ export default function AI() {
   const quietSinceRef = useRef(null);
   const recordingLock = useRef(false);
   const isAiSpeakingRef = useRef(false);
+
+  /* ── AI Client Logger ── */
+  const clientLogsRef = useRef([]);
+  const aiLog = (event, data = {}) => {
+    clientLogsRef.current.push({
+      timestamp: new Date().toISOString(),
+      event,
+      data,
+    });
+  };
 
   /* ── כיבוי מיקרופון → עצירת הקלטה פעילה ── */
   useEffect(() => {
@@ -282,68 +306,16 @@ export default function AI() {
     setTextInput("");
     addMessage(userText, "user");
     addMessage("… טוען תשובה", "loading", "loading");
+    aiLog("TEXT_SUBMIT", { userText });
 
     try {
-      const res = await fetch(`${DOMAIN}/api/v1/ai/ai-response-v4`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text: userText }),
-      });
-
-      removeLoadingMessage();
-      const { aiResponse } = await res.json();
-      const {
-        messageToUser = "",
-        messageType = "regular",
-        actions = {},
-        data = null,
-      } = aiResponse || {};
-
-      const sender = messageType === "regular" ? "assistant" : "operation";
-      addMessage(messageToUser, sender, messageType, data, actions);
-
-      if (messageToUser && audioEnabled) {
-        speechSynthesis.cancel();
-        const utter = new SpeechSynthesisUtterance(messageToUser);
-        utter.lang = "he-IL";
-        utter.rate = 1;
-        utter.voice =
-          (await getVoices()).find((v) => v.lang === "he-IL") ||
-          (await getVoices())[0];
-
-        utter.onstart = () => brobotRef.current?.talkStart();
-        utter.onend = () => brobotRef.current?.talkStop();
-        speechSynthesis.speak(utter);
-      }
-    } catch (err) {
-      console.error(err);
-      removeLoadingMessage();
-      addMessage("שגיאה. נסה שוב.", "assistant");
-    }
-  };
-
-  /* ------------------------------------------------------ */
-  /*      סוף הקלטה → שליחת אודיו                            */
-  /* ------------------------------------------------------ */
-  const handleRecordingStop = async (blobUrl) => {
-    try {
-      const audioBlob = await fetch(blobUrl).then((r) => r.blob());
-      const audioFile = new File([audioBlob], "voice.wav", {
-        type: "audio/wav",
-      });
       const formData = new FormData();
-      formData.append("file", audioFile);
+      formData.append("text", userText);
       formData.append("skipAudio", audioEnabled ? "false" : "true");
-      if (speechLanguage !== "auto") {
-        formData.append("language", speechLanguage);
-      }
       formData.append("ttsLanguage", ttsLanguage);
-      if (ttsVoice) {
-        formData.append("ttsVoice", ttsVoice);
-      }
+      if (ttsVoice) formData.append("ttsVoice", ttsVoice);
 
-      addMessage("מעלה את ההקלטה…", "loading", "loading");
-
+      const fetchStart = Date.now();
       const res = await fetch(`${DOMAIN}/api/v1/ai/ai-response-v5`, {
         method: "POST",
         body: formData,
@@ -367,22 +339,141 @@ export default function AI() {
           if (!dataLine) continue;
           try {
             const event = JSON.parse(dataLine);
+            aiLog("SSE_EVENT", { type: event.type, elapsed: Date.now() - fetchStart });
+            if (event.type === "status") {
+              updateLoadingMessage(event.status);
+            } else if (event.type === "result") {
+              aiResponse = event.aiResponse;
+            } else if (event.type === "error") {
+              aiLog("SSE_ERROR", { message: event.message });
+              console.error("Server error:", event.message);
+              removeLoadingMessage();
+              addMessage(event.message || "שגיאה בשרת. נסה שוב.", "assistant");
+              return;
+            }
+          } catch (parseErr) {
+            aiLog("SSE_PARSE_ERROR", { error: parseErr.message });
+            console.warn("SSE parse error:", parseErr);
+          }
+        }
+      }
+
+      removeLoadingMessage();
+      const totalMs = Date.now() - fetchStart;
+
+      const {
+        messageToUser = "",
+        messageType = "regular",
+        actions = {},
+        data = null,
+        audioRoute,
+      } = aiResponse || {};
+
+      aiLog("TEXT_RESPONSE", { messageType, messageToUser, hasData: !!data, audioRoute, totalMs });
+
+      const sender = messageType === "regular" ? "assistant" : "operation";
+      addMessage(messageToUser, sender, messageType, data, actions);
+
+      if (audioRoute && audioEnabled) {
+        playAudioWithMouthSync(
+          `${DOMAIN}/${audioRoute}`,
+          brobotRef,
+          setSpkLevel,
+          currentAudioRef,
+          isAiSpeakingRef,
+        );
+      } else if (messageToUser && audioEnabled && !audioRoute) {
+        speechSynthesis.cancel();
+        const utter = new SpeechSynthesisUtterance(messageToUser);
+        utter.lang = "he-IL";
+        utter.rate = 1;
+        utter.voice =
+          (await getVoices()).find((v) => v.lang === "he-IL") ||
+          (await getVoices())[0];
+        utter.onstart = () => brobotRef.current?.talkStart();
+        utter.onend = () => brobotRef.current?.talkStop();
+        speechSynthesis.speak(utter);
+      }
+    } catch (err) {
+      aiLog("TEXT_ERROR", { error: err.message });
+      console.error(err);
+      removeLoadingMessage();
+      addMessage("שגיאה. נסה שוב.", "assistant");
+    }
+  };
+
+  /* ------------------------------------------------------ */
+  /*      סוף הקלטה → שליחת אודיו                            */
+  /* ------------------------------------------------------ */
+  const handleRecordingStop = async (blobUrl) => {
+    try {
+      aiLog("AUDIO_SUBMIT", { blobUrl });
+      const audioBlob = await fetch(blobUrl).then((r) => r.blob());
+      const audioFile = new File([audioBlob], "voice.wav", {
+        type: "audio/wav",
+      });
+      const formData = new FormData();
+      formData.append("file", audioFile);
+      formData.append("skipAudio", audioEnabled ? "false" : "true");
+      if (speechLanguage !== "auto") {
+        formData.append("language", speechLanguage);
+      }
+      formData.append("ttsLanguage", ttsLanguage);
+      if (ttsVoice) {
+        formData.append("ttsVoice", ttsVoice);
+      }
+
+      addMessage("מעלה את ההקלטה…", "loading", "loading");
+
+      const fetchStart = Date.now();
+      const res = await fetch(`${DOMAIN}/api/v1/ai/ai-response-v5`, {
+        method: "POST",
+        body: formData,
+      });
+
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = "";
+      let aiResponse = null;
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split("\n\n");
+        buffer = lines.pop();
+
+        for (const line of lines) {
+          const dataLine = line.replace(/^data: /, "").trim();
+          if (!dataLine) continue;
+          try {
+            const event = JSON.parse(dataLine);
+            aiLog("SSE_EVENT", { type: event.type, elapsed: Date.now() - fetchStart });
             if (event.type === "status") {
               updateLoadingMessage(event.status);
             } else if (event.type === "transcription") {
+              aiLog("TRANSCRIPTION", { text: event.text });
               if (event.text) addMessage(event.text, "user");
             } else if (event.type === "result") {
               aiResponse = event.aiResponse;
             } else if (event.type === "error") {
+              aiLog("SSE_ERROR", { message: event.message });
               console.error("Server error:", event.message);
+              removeLoadingMessage();
+              addMessage(event.message || "שגיאה בעיבוד. נסה שוב.", "assistant");
+              recordingLock.current = false;
+              return;
             }
           } catch (e) {
+            aiLog("SSE_PARSE_ERROR", { error: e.message });
             console.warn("SSE parse error:", e);
           }
         }
       }
 
       removeLoadingMessage();
+      const totalMs = Date.now() - fetchStart;
 
       const {
         messageType = "regular",
@@ -391,6 +482,8 @@ export default function AI() {
         data = null,
         audioRoute,
       } = aiResponse || {};
+
+      aiLog("AUDIO_RESPONSE", { messageType, messageToUser, hasData: !!data, audioRoute, totalMs });
 
       const sender = messageType === "regular" ? "assistant" : "operation";
       addMessage(messageToUser, sender, messageType, data, actions);
@@ -407,6 +500,7 @@ export default function AI() {
       recordingLock.current = false;
       console.log("%c🔓 UNLOCKED after server response", "color: green");
     } catch (err) {
+      aiLog("AUDIO_ERROR", { error: err.message });
       console.error(err);
       removeLoadingMessage();
       addMessage("שגיאה בעיבוד ההקלטה.", "assistant");
@@ -420,11 +514,32 @@ export default function AI() {
   /*      איפוס                                             */
   /* ------------------------------------------------------ */
   const handleReset = async () => {
+    aiLog("RESET", { messagesCount: messages.length });
+
     setMessages([]);
     setTextInput("");
     setMicLevel(0);
     setSpkLevel(0);
-    await fetch(`${DOMAIN}/api/v1/ai/reset`, { method: "POST" });
+
+    try {
+      const res = await fetch(`${DOMAIN}/api/v1/ai/reset`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ clientLogs: clientLogsRef.current }),
+      });
+      const data = await res.json();
+      if (data.logFile) {
+        // הורדה אוטומטית של הלוג
+        const link = document.createElement("a");
+        link.href = `${DOMAIN}/api/v1/ai/logs/${data.logFile}`;
+        link.download = data.logFile;
+        link.click();
+      }
+    } catch (err) {
+      console.error("Reset error:", err);
+    }
+
+    clientLogsRef.current = [];
   };
 
   /* ------------------------------------------------------ */
