@@ -141,6 +141,28 @@
   color: #ff6b6b;
 }
 
+/* ── Test Button ── */
+.test-open-btn {
+  width: 100%;
+  margin-top: 8px;
+  padding: 10px 0;
+  border: none;
+  border-radius: 10px;
+  background: linear-gradient(135deg, var(--grad-start), var(--grad-mid));
+  color: #fff;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.15s;
+}
+.test-open-btn:hover {
+  opacity: 0.88;
+  transform: scale(1.02);
+}
+.test-open-btn:active {
+  transform: scale(0.98);
+}
+
 /* ── Section ── */
 .settings-section {
   margin-bottom: 14px;

@@ -6,6 +6,7 @@ import "./AI.css";
 import MessageItem from "./MessageItem/MessageItem";
 import NeuronBackground from "./NeuronBackground";
 import Brobot from "../Brobot/Brobot";
+import TestModal from "./TestModal/TestModal";
 
 /* ----------------------------------------------------------- */
 /*  כלי עזר: קבלת קולות לדפדפן                               */
@@ -95,6 +96,7 @@ export default function AI() {
   /* ── הגדרות תצוגה (מה-context – נשמר ב-DB) ── */
   const { settings: aiSettings, updateSetting } = useAiSettings();
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [testModalOpen, setTestModalOpen] = useState(false);
 
   const micThreshold = aiSettings.micThreshold;
   const setMicThreshold = (v) => updateSetting("micThreshold", typeof v === "function" ? v(micThreshold) : v);
@@ -484,6 +486,15 @@ export default function AI() {
         }}
       />
 
+      <TestModal
+        isOpen={testModalOpen}
+        onClose={() => setTestModalOpen(false)}
+        onRunTest={({ messageToUser, messageType, data, actions }) => {
+          const sender = messageType === "regular" ? "assistant" : "operation";
+          addMessage(messageToUser, sender, messageType, data, actions);
+        }}
+      />
+
       <div className="ai-container">
         <NeuronBackground />
 
@@ -660,6 +671,17 @@ export default function AI() {
                 <div className="toggle-knob" />
               </div>
             </label>
+          </div>
+
+          <div className="settings-section">
+            <div className="settings-section-icon">&#x1f9ea;</div>
+            <span className="settings-section-title">בדיקות</span>
+            <button
+              className="test-open-btn"
+              onClick={() => { setTestModalOpen(true); setSettingsOpen(false); }}
+            >
+              פתח טסטים
+            </button>
           </div>
         </div>
 
