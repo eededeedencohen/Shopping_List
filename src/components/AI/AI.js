@@ -309,55 +309,19 @@ export default function AI() {
     aiLog("TEXT_SUBMIT", { userText });
 
     try {
-      const formData = new FormData();
-      formData.append("text", userText);
-      formData.append("skipAudio", audioEnabled ? "false" : "true");
-      formData.append("ttsLanguage", ttsLanguage);
-      if (ttsVoice) formData.append("ttsVoice", ttsVoice);
-
       const fetchStart = Date.now();
-      const res = await fetch(`${DOMAIN}/api/v1/ai/ai-response-v5`, {
+      const res = await fetch(`${DOMAIN}/api/v1/ai/ai-response-v4`, {
         method: "POST",
-        body: formData,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          text: userText,
+          skipAudio: audioEnabled ? "false" : "true",
+          ttsLanguage,
+          ttsVoice: ttsVoice || undefined,
+        }),
       });
 
-      const reader = res.body.getReader();
-      const decoder = new TextDecoder();
-      let buffer = "";
-      let aiResponse = null;
-
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-
-        buffer += decoder.decode(value, { stream: true });
-        const lines = buffer.split("\n\n");
-        buffer = lines.pop();
-
-        for (const line of lines) {
-          const dataLine = line.replace(/^data: /, "").trim();
-          if (!dataLine) continue;
-          try {
-            const event = JSON.parse(dataLine);
-            aiLog("SSE_EVENT", { type: event.type, elapsed: Date.now() - fetchStart });
-            if (event.type === "status") {
-              updateLoadingMessage(event.status);
-            } else if (event.type === "result") {
-              aiResponse = event.aiResponse;
-            } else if (event.type === "error") {
-              aiLog("SSE_ERROR", { message: event.message });
-              console.error("Server error:", event.message);
-              removeLoadingMessage();
-              addMessage(event.message || "שגיאה בשרת. נסה שוב.", "assistant");
-              return;
-            }
-          } catch (parseErr) {
-            aiLog("SSE_PARSE_ERROR", { error: parseErr.message });
-            console.warn("SSE parse error:", parseErr);
-          }
-        }
-      }
-
+      const resData = await res.json();
       removeLoadingMessage();
       const totalMs = Date.now() - fetchStart;
 
@@ -367,7 +331,7 @@ export default function AI() {
         actions = {},
         data = null,
         audioRoute,
-      } = aiResponse || {};
+      } = resData.aiResponse || {};
 
       aiLog("TEXT_RESPONSE", { messageType, messageToUser, hasData: !!data, audioRoute, totalMs });
 
@@ -426,52 +390,12 @@ export default function AI() {
       addMessage("מעלה את ההקלטה…", "loading", "loading");
 
       const fetchStart = Date.now();
-      const res = await fetch(`${DOMAIN}/api/v1/ai/ai-response-v5`, {
+      const res = await fetch(`${DOMAIN}/api/v1/ai/ai-response-v4-audio`, {
         method: "POST",
         body: formData,
       });
 
-      const reader = res.body.getReader();
-      const decoder = new TextDecoder();
-      let buffer = "";
-      let aiResponse = null;
-
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-
-        buffer += decoder.decode(value, { stream: true });
-        const lines = buffer.split("\n\n");
-        buffer = lines.pop();
-
-        for (const line of lines) {
-          const dataLine = line.replace(/^data: /, "").trim();
-          if (!dataLine) continue;
-          try {
-            const event = JSON.parse(dataLine);
-            aiLog("SSE_EVENT", { type: event.type, elapsed: Date.now() - fetchStart });
-            if (event.type === "status") {
-              updateLoadingMessage(event.status);
-            } else if (event.type === "transcription") {
-              aiLog("TRANSCRIPTION", { text: event.text });
-              if (event.text) addMessage(event.text, "user");
-            } else if (event.type === "result") {
-              aiResponse = event.aiResponse;
-            } else if (event.type === "error") {
-              aiLog("SSE_ERROR", { message: event.message });
-              console.error("Server error:", event.message);
-              removeLoadingMessage();
-              addMessage(event.message || "שגיאה בעיבוד. נסה שוב.", "assistant");
-              recordingLock.current = false;
-              return;
-            }
-          } catch (e) {
-            aiLog("SSE_PARSE_ERROR", { error: e.message });
-            console.warn("SSE parse error:", e);
-          }
-        }
-      }
-
+      const resData = await res.json();
       removeLoadingMessage();
       const totalMs = Date.now() - fetchStart;
 
@@ -481,7 +405,10 @@ export default function AI() {
         actions = {},
         data = null,
         audioRoute,
-      } = aiResponse || {};
+        requestText,
+      } = resData.aiResponse || {};
+
+      if (requestText) addMessage(requestText, "user");
 
       aiLog("AUDIO_RESPONSE", { messageType, messageToUser, hasData: !!data, audioRoute, totalMs });
 
