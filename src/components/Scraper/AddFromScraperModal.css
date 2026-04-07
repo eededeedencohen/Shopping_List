@@ -1,0 +1,199 @@
+.afs-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(6px);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 60px;
+  overflow-y: auto;
+}
+
+.afs-modal {
+  direction: rtl;
+  background: linear-gradient(170deg, rgba(8, 20, 40, 0.98) 0%, rgba(2, 10, 25, 0.99) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  padding: 22px 20px 28px;
+  max-width: 480px;
+  width: 92%;
+  color: #fff;
+  margin-bottom: 40px;
+}
+
+.afs-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+.afs-header h2 {
+  margin: 0;
+  font-size: 1.15rem;
+  background: linear-gradient(135deg, #1b6eff, #1ed1ff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.afs-close {
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 1.3rem;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 8px;
+}
+.afs-close:hover { color: #fff; background: rgba(255, 255, 255, 0.1); }
+
+.afs-barcode-badge {
+  display: inline-block;
+  background: rgba(30, 209, 255, 0.1);
+  border: 1px solid rgba(30, 209, 255, 0.25);
+  color: #1ed1ff;
+  padding: 4px 14px;
+  border-radius: 8px;
+  font-family: monospace;
+  font-size: 0.9rem;
+  margin-bottom: 6px;
+}
+
+.afs-prices-count {
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.4);
+  margin-bottom: 16px;
+}
+
+/* ── Form ── */
+.afs-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.afs-group {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.afs-group label {
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.5);
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.afs-group input,
+.afs-group select {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  color: #fff;
+  padding: 10px 12px;
+  font-size: 0.9rem;
+  outline: none;
+  transition: border-color 0.25s;
+}
+.afs-group input:focus,
+.afs-group select:focus {
+  border-color: rgba(30, 209, 255, 0.4);
+}
+.afs-group input::placeholder { color: rgba(255, 255, 255, 0.25); }
+.afs-group select {
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23aaa' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L2 5h12z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: left 10px center;
+  padding-left: 26px;
+}
+.afs-group select option { background: #1a1f35; color: #fff; }
+
+.afs-row { display: flex; gap: 10px; }
+.afs-flex1 { flex: 1; }
+.afs-flex2 { flex: 2; }
+
+/* ── Dropzone ── */
+.afs-dropzone {
+  border: 2px dashed rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+  padding: 16px;
+  text-align: center;
+  cursor: pointer;
+  min-height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+.afs-dropzone:hover { border-color: rgba(30, 209, 255, 0.25); }
+.afs-dropzone.dragging { border-color: #1ed1ff; background: rgba(30, 209, 255, 0.06); }
+.afs-dropzone.has-image { border-style: solid; border-color: rgba(30, 209, 255, 0.2); padding: 6px; cursor: default; }
+
+.afs-dropzone-text { color: rgba(255, 255, 255, 0.3); font-size: 0.82rem; }
+.afs-dropzone-text span { font-size: 2rem; color: rgba(30, 209, 255, 0.35); display: block; }
+
+.afs-preview-wrap { position: relative; width: 100%; }
+.afs-preview { width: 100%; max-height: 180px; object-fit: contain; border-radius: 8px; }
+.afs-img-actions {
+  position: absolute; top: 4px; right: 4px;
+  display: flex; gap: 6px;
+}
+
+.afs-img-crop {
+  background: rgba(0, 0, 0, 0.6); border: none; color: #1ed1ff;
+  font-size: 0.72rem; font-weight: 600; padding: 5px 10px; border-radius: 14px;
+  cursor: pointer; transition: background 0.2s;
+}
+.afs-img-crop:hover { background: rgba(30, 209, 255, 0.2); }
+
+.afs-img-remove {
+  background: rgba(0, 0, 0, 0.6); border: none; color: #ff6b6b;
+  font-size: 1.2rem; width: 28px; height: 28px; border-radius: 50%;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+}
+
+.afs-img-btns { display: flex; gap: 8px; margin-top: 6px; }
+.afs-img-btns button {
+  flex: 1; padding: 8px 0;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px; background: rgba(255, 255, 255, 0.04);
+  color: rgba(255, 255, 255, 0.6); font-size: 0.78rem; cursor: pointer;
+  transition: all 0.2s;
+}
+.afs-img-btns button:hover { background: rgba(27, 110, 255, 0.1); color: #fff; }
+
+/* ── Error ── */
+.afs-error {
+  background: rgba(255, 77, 77, 0.12);
+  border: 1px solid rgba(255, 77, 77, 0.3);
+  color: #ff8a80;
+  padding: 8px 12px;
+  border-radius: 10px;
+  font-size: 0.82rem;
+  text-align: center;
+}
+
+/* ── Actions ── */
+.afs-actions { display: flex; gap: 10px; margin-top: 4px; }
+
+.afs-btn {
+  flex: 1; padding: 12px 0; border: none; border-radius: 12px;
+  font-size: 0.88rem; font-weight: 600; cursor: pointer; transition: all 0.2s;
+}
+.afs-btn.cancel {
+  background: rgba(255, 255, 255, 0.06); color: rgba(255, 255, 255, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+.afs-btn.cancel:hover { background: rgba(255, 255, 255, 0.1); }
+
+.afs-btn.save {
+  background: rgba(255, 255, 255, 0.06); color: rgba(255, 255, 255, 0.3); cursor: not-allowed;
+}
+.afs-btn.save.active {
+  background: linear-gradient(135deg, #1b6eff, #1ed1ff); color: #fff; cursor: pointer;
+  box-shadow: 0 4px 16px rgba(27, 110, 255, 0.3);
+}
+.afs-btn.save.active:hover { opacity: 0.9; }

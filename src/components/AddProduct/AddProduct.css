@@ -1,0 +1,411 @@
+.add-product-page {
+  direction: rtl;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #0a0e1a 0%, #121830 50%, #0d1224 100%);
+  color: #fff;
+  padding: 0 0 40px;
+}
+
+/* ── Header ── */
+.add-product-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 20px;
+  background: rgba(10, 14, 26, 0.92);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  position: sticky;
+  top: 50px;
+  z-index: 8;
+  backdrop-filter: blur(12px);
+}
+
+.add-product-header h1 {
+  margin: 0;
+  font-size: 1.2rem;
+  background: linear-gradient(135deg, #1b6eff, #1ed1ff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.add-product-back {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #fff;
+  font-size: 1.3rem;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+.add-product-back:hover {
+  background: rgba(27, 110, 255, 0.2);
+}
+
+/* ── Form ── */
+.add-product-form {
+  max-width: 520px;
+  margin: 20px auto;
+  padding: 0 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-group label {
+  font-size: 0.82rem;
+  color: rgba(255, 255, 255, 0.55);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.form-group input,
+.form-group select {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  color: #fff;
+  padding: 12px 14px;
+  font-size: 0.95rem;
+  outline: none;
+  transition: border-color 0.25s, box-shadow 0.25s;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+  border-color: rgba(30, 209, 255, 0.4);
+  box-shadow: 0 0 0 3px rgba(30, 209, 255, 0.08);
+}
+
+.form-group input::placeholder {
+  color: rgba(255, 255, 255, 0.25);
+}
+
+.form-group select {
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23aaa' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L2 5h12z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: left 12px center;
+  padding-left: 30px;
+}
+
+.form-group select option {
+  background: #1a1f35;
+  color: #fff;
+}
+
+/* ── Barcode validation ── */
+.input-error {
+  border-color: #ff4d4d !important;
+  box-shadow: 0 0 0 3px rgba(255, 77, 77, 0.12) !important;
+}
+
+.input-success {
+  border-color: #00c853 !important;
+  box-shadow: 0 0 0 3px rgba(0, 200, 83, 0.1) !important;
+}
+
+.validation-msg {
+  font-size: 0.78rem;
+  font-weight: 500;
+}
+.validation-msg.error { color: #ff6b6b; }
+.validation-msg.success { color: #00e676; }
+
+/* ── Row layout ── */
+.form-row {
+  display: flex;
+  gap: 12px;
+}
+.flex-1 { flex: 1; }
+.flex-2 { flex: 2; }
+
+/* ── Image dropzone ── */
+.image-dropzone {
+  border: 2px dashed rgba(255, 255, 255, 0.15);
+  border-radius: 16px;
+  padding: 24px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s;
+  min-height: 160px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.image-dropzone:hover {
+  border-color: rgba(30, 209, 255, 0.3);
+  background: rgba(27, 110, 255, 0.04);
+}
+
+.image-dropzone.dragging {
+  border-color: #1ed1ff;
+  background: rgba(30, 209, 255, 0.08);
+  transform: scale(1.01);
+}
+
+.image-dropzone.has-image {
+  border-style: solid;
+  border-color: rgba(30, 209, 255, 0.2);
+  padding: 8px;
+  cursor: default;
+}
+
+.dropzone-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  color: rgba(255, 255, 255, 0.35);
+  font-size: 0.85rem;
+}
+
+.dropzone-icon {
+  font-size: 2.5rem;
+  line-height: 1;
+  color: rgba(30, 209, 255, 0.4);
+}
+
+.image-preview-wrap {
+  position: relative;
+  width: 100%;
+}
+
+.image-preview {
+  width: 100%;
+  max-height: 250px;
+  object-fit: contain;
+  border-radius: 10px;
+}
+
+.image-actions {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  display: flex;
+  gap: 6px;
+}
+
+.image-remove {
+  background: rgba(0, 0, 0, 0.65);
+  border: none;
+  color: #ff6b6b;
+  font-size: 1.4rem;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+}
+.image-remove:hover {
+  background: rgba(255, 50, 50, 0.3);
+}
+
+.image-edit {
+  background: rgba(0, 0, 0, 0.65);
+  border: none;
+  color: #1ed1ff;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 6px 12px;
+  border-radius: 16px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.image-edit:hover {
+  background: rgba(30, 209, 255, 0.2);
+}
+
+/* ── Crop Modal ── */
+.crop-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.crop-modal {
+  direction: rtl;
+  background: linear-gradient(170deg, rgba(8, 20, 40, 0.97) 0%, rgba(2, 10, 25, 0.98) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  padding: 20px;
+  max-width: 540px;
+  width: 92%;
+  color: #fff;
+}
+
+.crop-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.crop-header h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  background: linear-gradient(135deg, #1b6eff, #1ed1ff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.crop-close {
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 1.3rem;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 8px;
+}
+.crop-close:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.crop-canvas-wrap {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 12px;
+}
+
+.crop-canvas-wrap canvas {
+  border-radius: 10px;
+  max-width: 100%;
+}
+
+.crop-info {
+  text-align: center;
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 0.78rem;
+  margin-bottom: 14px;
+  font-family: monospace;
+}
+
+.crop-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.crop-btn {
+  flex: 1;
+  padding: 11px 0;
+  border: none;
+  border-radius: 12px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.crop-btn.cancel {
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+.crop-btn.cancel:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.crop-btn.apply {
+  background: linear-gradient(135deg, #1b6eff, #1ed1ff);
+  color: #fff;
+}
+.crop-btn.apply:hover {
+  opacity: 0.9;
+}
+
+/* ── Image buttons ── */
+.image-buttons {
+  display: flex;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.img-btn {
+  flex: 1;
+  padding: 10px 0;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.05);
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.82rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.img-btn:hover {
+  background: rgba(27, 110, 255, 0.12);
+  border-color: rgba(30, 209, 255, 0.25);
+  color: #fff;
+}
+
+/* ── Messages ── */
+.msg {
+  padding: 12px 16px;
+  border-radius: 12px;
+  font-size: 0.9rem;
+  text-align: center;
+}
+.success-msg {
+  background: rgba(0, 200, 83, 0.12);
+  border: 1px solid rgba(0, 200, 83, 0.3);
+  color: #69f0ae;
+}
+.error-msg {
+  background: rgba(255, 77, 77, 0.12);
+  border: 1px solid rgba(255, 77, 77, 0.3);
+  color: #ff8a80;
+}
+
+/* ── Submit ── */
+.submit-btn {
+  padding: 14px 0;
+  border: none;
+  border-radius: 14px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: not-allowed;
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.3);
+  transition: all 0.3s;
+  margin-top: 4px;
+}
+
+.submit-btn.active {
+  cursor: pointer;
+  background: linear-gradient(135deg, #1b6eff, #1ed1ff);
+  color: #fff;
+  box-shadow: 0 4px 20px rgba(27, 110, 255, 0.3);
+}
+
+.submit-btn.active:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 24px rgba(27, 110, 255, 0.4);
+}
+
+.submit-btn.active:active {
+  transform: translateY(0);
+}

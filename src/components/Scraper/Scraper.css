@@ -1,0 +1,451 @@
+.scraper-page {
+  direction: rtl;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #0a0e1a 0%, #121830 50%, #0d1224 100%);
+  color: #fff;
+  padding: 60px 16px 40px;
+}
+
+.scraper-header h1 {
+  font-size: 1.2rem;
+  margin: 0 0 20px;
+  background: linear-gradient(135deg, #1b6eff, #1ed1ff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.scraper-input-row {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.scraper-input-wrap {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.scraper-input {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  color: #fff;
+  padding: 12px 14px;
+  font-size: 0.95rem;
+  outline: none;
+  transition: border-color 0.25s, box-shadow 0.25s;
+  box-sizing: border-box;
+}
+.scraper-input:focus {
+  border-color: rgba(30, 209, 255, 0.4);
+}
+.scraper-input::placeholder {
+  color: rgba(255, 255, 255, 0.25);
+}
+.scraper-input.input-exists {
+  border-color: #00c853;
+  box-shadow: 0 0 0 3px rgba(0, 200, 83, 0.1);
+}
+.scraper-input.input-new {
+  border-color: #ffa726;
+  box-shadow: 0 0 0 3px rgba(255, 167, 38, 0.1);
+}
+
+.scraper-validation {
+  font-size: 0.75rem;
+  font-weight: 500;
+  padding-right: 4px;
+}
+.scraper-validation.exists {
+  color: #69f0ae;
+}
+.scraper-validation.new {
+  color: #ffd54f;
+}
+
+.scraper-btn {
+  padding: 0 24px;
+  border: none;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #1b6eff, #1ed1ff);
+  color: #fff;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s;
+  white-space: nowrap;
+}
+.scraper-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.scraper-btn.loading {
+  opacity: 0.6;
+}
+
+.scraper-error {
+  background: rgba(255, 77, 77, 0.12);
+  border: 1px solid rgba(255, 77, 77, 0.3);
+  color: #ff8a80;
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-size: 0.85rem;
+  margin-bottom: 12px;
+}
+
+.scraper-url {
+  margin-bottom: 12px;
+  font-size: 0.8rem;
+}
+.scraper-url a {
+  color: #1ed1ff;
+  word-break: break-all;
+}
+
+/* ── Product Card ── */
+.scraper-product-card {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  padding: 12px 14px;
+  margin-bottom: 14px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 14px;
+}
+
+.scraper-product-image {
+  width: 70px;
+  height: 70px;
+  flex-shrink: 0;
+  border-radius: 10px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.03);
+}
+.scraper-product-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.scraper-product-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.scraper-product-name {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #fff;
+}
+
+.scraper-product-detail {
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.scraper-product-barcode {
+  font-size: 0.72rem;
+  color: rgba(30, 209, 255, 0.5);
+  font-family: monospace;
+}
+
+.scraper-update-btn {
+  margin-top: 6px;
+  padding: 7px 16px;
+  border: none;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #00c853, #69f0ae);
+  color: #0a0e1a;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s;
+  align-self: flex-start;
+}
+.scraper-update-btn:hover {
+  opacity: 0.85;
+}
+.scraper-update-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.scraper-add-product-btn {
+  margin-top: 6px;
+  padding: 7px 16px;
+  border: none;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #1b6eff, #1ed1ff);
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s;
+  align-self: flex-start;
+}
+.scraper-add-product-btn:hover {
+  opacity: 0.85;
+}
+
+.scraper-success {
+  background: rgba(0, 200, 83, 0.12);
+  border: 1px solid rgba(0, 200, 83, 0.3);
+  color: #69f0ae;
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-size: 0.85rem;
+  margin-bottom: 12px;
+  text-align: center;
+}
+
+/* ── Tabs ── */
+.scraper-tabs {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+
+.scraper-tab {
+  flex: 1;
+  padding: 10px 0;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.03);
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.scraper-tab.active {
+  background: rgba(27, 110, 255, 0.12);
+  border-color: rgba(30, 209, 255, 0.3);
+  color: #1ed1ff;
+}
+
+/* ── Stats ── */
+.scraper-stats {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.stat {
+  padding: 5px 12px;
+  border-radius: 8px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.6);
+}
+.stat.matched {
+  background: rgba(0, 200, 83, 0.1);
+  color: #69f0ae;
+}
+.stat.unmatched {
+  background: rgba(255, 77, 77, 0.1);
+  color: #ff8a80;
+}
+.stat.db {
+  background: rgba(30, 209, 255, 0.1);
+  color: #80d8ff;
+}
+
+/* ── Price Cards ── */
+.price-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.price-card {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 12px;
+  padding: 12px 14px;
+  transition: border-color 0.2s;
+}
+.price-card:hover {
+  border-color: rgba(30, 209, 255, 0.15);
+}
+.price-card.unmatched {
+  border-color: rgba(255, 77, 77, 0.2);
+}
+
+.price-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 6px;
+}
+
+.price-card-store {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.store-name {
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: #fff;
+}
+
+.branch-name {
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.price-card-prices {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.price-column {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 1px;
+}
+
+.price-label {
+  font-size: 0.62rem;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.3);
+  letter-spacing: 0.5px;
+}
+
+.regular-price {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+.discount-price {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #ff6b6b;
+}
+
+.db-price {
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.db-discount {
+  font-size: 0.78rem;
+  color: rgba(255, 107, 107, 0.5);
+}
+
+.price-diff {
+  align-self: center;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 6px;
+}
+.price-diff.up {
+  background: rgba(255, 77, 77, 0.15);
+  color: #ff8a80;
+}
+.price-diff.down {
+  background: rgba(0, 200, 83, 0.15);
+  color: #69f0ae;
+}
+
+.no-db-badge {
+  font-size: 0.7rem;
+  padding: 2px 8px;
+  border-radius: 6px;
+  background: rgba(255, 193, 7, 0.12);
+  color: #ffd54f;
+}
+
+.price-card-bottom {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.price-address {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.35);
+}
+
+.discount-info {
+  font-size: 0.72rem;
+  padding: 2px 8px;
+  border-radius: 6px;
+  background: rgba(255, 107, 107, 0.12);
+  color: #ff8a80;
+}
+
+.supermarket-id {
+  font-size: 0.7rem;
+  color: rgba(30, 209, 255, 0.5);
+  font-family: monospace;
+}
+
+.no-match-badge {
+  font-size: 0.7rem;
+  padding: 2px 8px;
+  border-radius: 6px;
+  background: rgba(255, 77, 77, 0.12);
+  color: #ff8a80;
+}
+
+/* ── HTML Tab ── */
+.scraper-result {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+.scraper-result-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 14px;
+  background: rgba(255, 255, 255, 0.04);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.scraper-copy {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #1ed1ff;
+  padding: 4px 14px;
+  border-radius: 8px;
+  font-size: 0.78rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.scraper-copy:hover {
+  background: rgba(30, 209, 255, 0.12);
+}
+
+.scraper-html {
+  margin: 0;
+  padding: 14px;
+  font-size: 0.75rem;
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.7);
+  max-height: 60vh;
+  overflow: auto;
+  white-space: pre-wrap;
+  word-break: break-all;
+  direction: ltr;
+  text-align: left;
+}

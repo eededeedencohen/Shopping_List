@@ -117,6 +117,20 @@ function Toolbar() {
             </div>
           </Link>
 
+          {/* Products Server */}
+          <Link to="/products-server" onClick={() => handleNavClick("/products-server")}>
+            <div
+              className={`nav-item ${
+                selectedPage === "/products-server" ? "selected-page" : ""
+              }`}
+            >
+              <div className="nav-icon">
+                <GroceryIcon2 className="svg-icon" />
+              </div>
+              <h1>Products (Server)</h1>
+            </div>
+          </Link>
+
           <Link
             to="/products-list-groups"
             onClick={() => handleNavClick("/products-list-groups")}

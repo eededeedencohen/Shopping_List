@@ -19,6 +19,15 @@ export const getAllProducts = async () => {
   }
 };
 
-// test for the function:
-
-getAllProducts().then((products) => console.log(products)).catch((err) => console.error(err));
+export const createProduct = async (productData) => {
+  try {
+    const res = await httpClient.post("/products", JSON.stringify(productData), {
+      headers: { "Content-Type": "application/json" },
+    });
+    const payload = normalize(res.data);
+    return payload?.data?.product;
+  } catch (err) {
+    console.error("Failed to create product:", err.message);
+    throw err;
+  }
+};

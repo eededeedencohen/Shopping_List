@@ -32,6 +32,9 @@ import BarcodeScanner from "./components/AAAnimationTests/BarcodeScanner";
 import VibrationSettings from "./components/Test/vibrate";
 import AppArchitecture from "./components/AppArchitecture/AppArchitecture";
 import AdvancedStatsDashboard from "./components/Stats/AdvancedStatsDashboard";
+import ProductsListServer from "./components/ProductList/ProductListServer";
+import AddProduct from "./components/AddProduct/AddProduct";
+import Scraper from "./components/Scraper/Scraper";
 
 function Routing() {
   return (
@@ -78,6 +81,9 @@ function Routing() {
       <Route path="/vibration-settings" element={<VibrationSettings />} />
       <Route path="/architecture" element={<AppArchitecture />} />
       <Route path="/advanced-stats" element={<AdvancedStatsDashboard />} />
+      <Route path="/products-server" element={<ProductsListServer />} />
+      <Route path="/add-product" element={<AddProduct />} />
+      <Route path="/scraper" element={<Scraper />} />
     </Routes>
   );
 }
