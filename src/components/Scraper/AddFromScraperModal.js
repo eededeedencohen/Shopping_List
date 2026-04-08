@@ -1,7 +1,8 @@
-import React, { useState, useRef, useCallback } from "react";
+import React, { useState, useRef, useCallback, useEffect } from "react";
 import ReactDOM from "react-dom";
 import { DOMAIN } from "../../constants";
 import { useProductList } from "../../hooks/appHooks";
+import { useAddProductDefaults } from "../../context/AddProductDefaultsContext";
 import ImageCropModal from "../AddProduct/ImageCropModal";
 import "./AddFromScraperModal.css";
 
@@ -16,6 +17,7 @@ const UNIT_OPTIONS = [
 
 function AddFromScraperModal({ isOpen, onClose, barcode, scrapedPrices, onSaved }) {
   const { allCategories, all_sub_categories } = useProductList();
+  const { defaults, updateDefault, loaded } = useAddProductDefaults();
 
   const [name, setName] = useState("");
   const [brand, setBrand] = useState("");
@@ -24,6 +26,15 @@ function AddFromScraperModal({ isOpen, onClose, barcode, scrapedPrices, onSaved 
   const [generalName, setGeneralName] = useState("");
   const [categoryIndex, setCategoryIndex] = useState(0);
   const [subCategoryIndex, setSubCategoryIndex] = useState(0);
+
+  // Load saved defaults
+  useEffect(() => {
+    if (loaded) {
+      setGeneralName(defaults.generalName || "");
+      setCategoryIndex(defaults.categoryIndex || 0);
+      setSubCategoryIndex(defaults.subCategoryIndex || 0);
+    }
+  }, [loaded, defaults.generalName, defaults.categoryIndex, defaults.subCategoryIndex]);
 
   const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
@@ -64,6 +75,39 @@ function AddFromScraperModal({ isOpen, onClose, barcode, scrapedPrices, onSaved 
   }, [handleImageFile]);
 
   const removeImage = () => { setImageFile(null); setImagePreview(null); };
+
+  // Long press to paste from clipboard (mobile)
+  const longPressTimer = useRef(null);
+  const pasteTargetRef = useRef(null);
+
+  const handleLongPressStart = () => {
+    longPressTimer.current = setTimeout(() => {
+      if (navigator.clipboard && navigator.clipboard.read) {
+        navigator.clipboard.read().then((clipboardItems) => {
+          for (const item of clipboardItems) {
+            const imageType = item.types.find((t) => t.startsWith("image/"));
+            if (imageType) {
+              item.getType(imageType).then((blob) => {
+                const file = new File([blob], "pasted-image.png", { type: imageType });
+                handleImageFile(file);
+              });
+              return;
+            }
+          }
+        }).catch(() => {
+          const el = pasteTargetRef.current;
+          if (el) { el.innerHTML = ""; el.focus(); document.execCommand("paste"); }
+        });
+      } else {
+        const el = pasteTargetRef.current;
+        if (el) { el.innerHTML = ""; el.focus(); document.execCommand("paste"); }
+      }
+    }, 600);
+  };
+
+  const handleLongPressEnd = () => {
+    if (longPressTimer.current) clearTimeout(longPressTimer.current);
+  };
 
   const [showCrop, setShowCrop] = useState(false);
   const handleCropDone = (croppedFile, croppedPreview) => {
@@ -147,14 +191,14 @@ function AddFromScraperModal({ isOpen, onClose, barcode, scrapedPrices, onSaved 
 
           <div className="afs-group">
             <label>שם כללי</label>
-            <input type="text" value={generalName} onChange={(e) => setGeneralName(e.target.value)}
+            <input type="text" value={generalName} onChange={(e) => { setGeneralName(e.target.value); updateDefault("generalName", e.target.value); }}
               placeholder="לדוגמה: חטיפים" />
           </div>
 
           <div className="afs-row">
             <div className="afs-group afs-flex2">
               <label>משקל</label>
-              <input type="number" value={weight} onChange={(e) => setWeight(e.target.value)} placeholder="0" min="0" />
+              <input type="number" step="0.1" value={weight} onChange={(e) => setWeight(e.target.value)} placeholder="0" min="0" />
             </div>
             <div className="afs-group afs-flex1">
               <label>יחידה</label>
@@ -168,7 +212,7 @@ function AddFromScraperModal({ isOpen, onClose, barcode, scrapedPrices, onSaved 
 
           <div className="afs-group">
             <label>קטגוריה</label>
-            <select value={categoryIndex} onChange={(e) => { setCategoryIndex(Number(e.target.value)); setSubCategoryIndex(0); }}>
+            <select value={categoryIndex} onChange={(e) => { const val = Number(e.target.value); setCategoryIndex(val); setSubCategoryIndex(0); updateDefault("categoryIndex", val); updateDefault("subCategoryIndex", 0); }}>
               {allCategories.map((cat, i) => (
                 <option key={cat} value={i}>{cat}</option>
               ))}
@@ -177,7 +221,7 @@ function AddFromScraperModal({ isOpen, onClose, barcode, scrapedPrices, onSaved 
 
           <div className="afs-group">
             <label>תת-קטגוריה</label>
-            <select value={subCategoryIndex} onChange={(e) => setSubCategoryIndex(Number(e.target.value))}>
+            <select value={subCategoryIndex} onChange={(e) => { const val = Number(e.target.value); setSubCategoryIndex(val); updateDefault("subCategoryIndex", val); }}>
               {subCategories.length === 0 ? (
                 <option value={0}>אין תת-קטגוריות</option>
               ) : (
@@ -196,6 +240,10 @@ function AddFromScraperModal({ isOpen, onClose, barcode, scrapedPrices, onSaved 
               onDragLeave={handleDragLeave}
               onDrop={handleDrop}
               onClick={() => !imagePreview && fileInputRef.current?.click()}
+              onTouchStart={handleLongPressStart}
+              onTouchEnd={handleLongPressEnd}
+              onTouchCancel={handleLongPressEnd}
+              onContextMenu={(e) => e.preventDefault()}
             >
               {imagePreview ? (
                 <div className="afs-preview-wrap">
@@ -208,9 +256,27 @@ function AddFromScraperModal({ isOpen, onClose, barcode, scrapedPrices, onSaved 
               ) : (
                 <div className="afs-dropzone-text">
                   <span>+</span>
-                  <p>גרור, הדבק, או לחץ</p>
+                  <p>גרור, הדבק (Ctrl+V),</p>
+                  <p>לחיצה ארוכה להדבקה</p>
+                  <p>או לחץ לבחירה</p>
                 </div>
               )}
+              <div
+                ref={pasteTargetRef}
+                contentEditable
+                onPaste={(e) => {
+                  e.preventDefault();
+                  const items = e.clipboardData?.items;
+                  if (!items) return;
+                  for (const item of items) {
+                    if (item.type.startsWith("image/")) {
+                      handleImageFile(item.getAsFile());
+                      break;
+                    }
+                  }
+                }}
+                style={{ position: "absolute", opacity: 0, width: 0, height: 0, overflow: "hidden" }}
+              />
             </div>
             <input ref={fileInputRef} type="file" accept="image/*" style={{ display: "none" }} onChange={(e) => handleImageFile(e.target.files[0])} />
             <div className="afs-img-btns">

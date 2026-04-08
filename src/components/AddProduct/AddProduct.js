@@ -1,6 +1,7 @@
-import React, { useState, useMemo, useRef, useCallback } from "react";
+import React, { useState, useMemo, useRef, useCallback, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useProductList } from "../../hooks/appHooks";
+import { useAddProductDefaults } from "../../context/AddProductDefaultsContext";
 import { createProduct } from "../../services/productService";
 import { DOMAIN } from "../../constants";
 import ImageCropModal from "./ImageCropModal";
@@ -18,6 +19,7 @@ const UNIT_OPTIONS = [
 function AddProduct() {
   const navigate = useNavigate();
   const { products, allCategories, all_sub_categories } = useProductList();
+  const { defaults, updateDefault, loaded } = useAddProductDefaults();
 
   const [barcode, setBarcode] = useState("");
   const [name, setName] = useState("");
@@ -27,6 +29,15 @@ function AddProduct() {
   const [generalName, setGeneralName] = useState("");
   const [categoryIndex, setCategoryIndex] = useState(0);
   const [subCategoryIndex, setSubCategoryIndex] = useState(0);
+
+  // Load saved defaults from server
+  useEffect(() => {
+    if (loaded) {
+      setGeneralName(defaults.generalName || "");
+      setCategoryIndex(defaults.categoryIndex || 0);
+      setSubCategoryIndex(defaults.subCategoryIndex || 0);
+    }
+  }, [loaded, defaults.generalName, defaults.categoryIndex, defaults.subCategoryIndex]);
 
   const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
@@ -87,24 +98,42 @@ function AddProduct() {
 
   // Long press to paste from clipboard
   const longPressTimer = useRef(null);
+  const pasteTargetRef = useRef(null);
+
   const handleLongPressStart = () => {
-    longPressTimer.current = setTimeout(async () => {
-      try {
-        const clipboardItems = await navigator.clipboard.read();
-        for (const item of clipboardItems) {
-          const imageType = item.types.find((t) => t.startsWith("image/"));
-          if (imageType) {
-            const blob = await item.getType(imageType);
-            const file = new File([blob], "pasted-image.png", { type: imageType });
-            handleImageFile(file);
-            break;
+    longPressTimer.current = setTimeout(() => {
+      // Try Clipboard API first (works on HTTPS + supported browsers)
+      if (navigator.clipboard && navigator.clipboard.read) {
+        navigator.clipboard.read().then((clipboardItems) => {
+          for (const item of clipboardItems) {
+            const imageType = item.types.find((t) => t.startsWith("image/"));
+            if (imageType) {
+              item.getType(imageType).then((blob) => {
+                const file = new File([blob], "pasted-image.png", { type: imageType });
+                handleImageFile(file);
+              });
+              return;
+            }
           }
-        }
-      } catch (err) {
-        console.log("Clipboard paste not available:", err.message);
+        }).catch(() => {
+          // Fallback: focus hidden contentEditable and trigger paste
+          triggerFallbackPaste();
+        });
+      } else {
+        triggerFallbackPaste();
       }
     }, 600);
   };
+
+  const triggerFallbackPaste = () => {
+    const el = pasteTargetRef.current;
+    if (!el) return;
+    el.innerHTML = "";
+    el.focus();
+    document.execCommand("paste");
+    // The onPaste handler on the page will catch it
+  };
+
   const handleLongPressEnd = () => {
     if (longPressTimer.current) clearTimeout(longPressTimer.current);
   };
@@ -167,15 +196,12 @@ function AddProduct() {
 
       setSuccessMsg(`"${name}" (${barcode}) נוסף בהצלחה!`);
 
-      // Reset form
+      // Reset form (keep category, subcategory, generalName for batch entry)
       setBarcode("");
       setName("");
       setBrand("");
       setWeight("");
       setUnitWeight("g");
-      setGeneralName("");
-      setCategoryIndex(0);
-      setSubCategoryIndex(0);
       removeImage();
     } catch (err) {
       setErrorMsg(err.message || "אירעה שגיאה");
@@ -246,7 +272,7 @@ function AddProduct() {
           <input
             type="text"
             value={generalName}
-            onChange={(e) => setGeneralName(e.target.value)}
+            onChange={(e) => { setGeneralName(e.target.value); updateDefault("generalName", e.target.value); }}
             placeholder="לדוגמה: חטיפים"
           />
         </div>
@@ -257,6 +283,7 @@ function AddProduct() {
             <label>משקל</label>
             <input
               type="number"
+              step="0.1"
               value={weight}
               onChange={(e) => setWeight(e.target.value)}
               placeholder="0"
@@ -279,8 +306,11 @@ function AddProduct() {
           <select
             value={categoryIndex}
             onChange={(e) => {
-              setCategoryIndex(Number(e.target.value));
+              const val = Number(e.target.value);
+              setCategoryIndex(val);
               setSubCategoryIndex(0);
+              updateDefault("categoryIndex", val);
+              updateDefault("subCategoryIndex", 0);
             }}
           >
             {allCategories.map((cat, i) => (
@@ -294,7 +324,7 @@ function AddProduct() {
           <label>תת-קטגוריה</label>
           <select
             value={subCategoryIndex}
-            onChange={(e) => setSubCategoryIndex(Number(e.target.value))}
+            onChange={(e) => { const val = Number(e.target.value); setSubCategoryIndex(val); updateDefault("subCategoryIndex", val); }}
           >
             {subCategories.length === 0 ? (
               <option value={0}>אין תת-קטגוריות</option>
@@ -340,6 +370,22 @@ function AddProduct() {
                 <p>או לחץ לבחירה</p>
               </div>
             )}
+            <div
+              ref={pasteTargetRef}
+              contentEditable
+              onPaste={(e) => {
+                e.preventDefault();
+                const items = e.clipboardData?.items;
+                if (!items) return;
+                for (const item of items) {
+                  if (item.type.startsWith("image/")) {
+                    handleImageFile(item.getAsFile());
+                    break;
+                  }
+                }
+              }}
+              style={{ position: "absolute", opacity: 0, width: 0, height: 0, overflow: "hidden" }}
+            />
           </div>
 
           <input

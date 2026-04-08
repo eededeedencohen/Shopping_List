@@ -51,6 +51,39 @@ function Scraper() {
     }
   };
 
+  const [deleting, setDeleting] = useState(false);
+
+  const handleDeleteProduct = async () => {
+    if (!prices?.barcode || deleting) return;
+    if (!window.confirm(`למחוק את המוצר ${prices.barcode} + כל המחירים שלו?`)) return;
+    setDeleting(true);
+    setSavedMsg("");
+
+    try {
+      const res = await fetch(`${DOMAIN}/api/v1/scraper/product/${prices.barcode}`, {
+        method: "DELETE",
+      });
+      const data = await res.json();
+
+      if (data.status === "success") {
+        setSavedMsg(
+          `נמחק: מוצר (${data.data.productDeleted}), ` +
+          `מחירים (${data.data.pricesDeleted}), ` +
+          `תמונה (${data.data.imageDeleted})`
+        );
+        setPrices(null);
+        setHtml("");
+        setUrl("");
+      } else {
+        setSavedMsg("שגיאה: " + data.message);
+      }
+    } catch (err) {
+      setSavedMsg("שגיאה: " + err.message);
+    } finally {
+      setDeleting(false);
+    }
+  };
+
   const barcodeSet = useMemo(() => {
     const set = new Set();
     if (products) products.forEach((p) => set.add(p.barcode));
@@ -150,6 +183,13 @@ function Scraper() {
                   disabled={updating}
                 >
                   {updating ? "מעדכן..." : "עדכן את כל המחירים"}
+                </button>
+                <button
+                  className="scraper-delete-btn"
+                  onClick={handleDeleteProduct}
+                  disabled={deleting}
+                >
+                  {deleting ? "מוחק..." : "מחק מוצר + מחירים"}
                 </button>
               </>
             ) : (

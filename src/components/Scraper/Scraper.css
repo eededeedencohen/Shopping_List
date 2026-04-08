@@ -176,6 +176,27 @@
   cursor: not-allowed;
 }
 
+.scraper-delete-btn {
+  margin-top: 6px;
+  padding: 7px 16px;
+  border: none;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #ff4444, #ff6b6b);
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s;
+  align-self: flex-start;
+}
+.scraper-delete-btn:hover {
+  opacity: 0.85;
+}
+.scraper-delete-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .scraper-add-product-btn {
   margin-top: 6px;
   padding: 7px 16px;
