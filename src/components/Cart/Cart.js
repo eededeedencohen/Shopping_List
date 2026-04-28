@@ -549,6 +549,7 @@ function SwipeRow({ children, onIncrement, onDecrement, onRemove, outerRef }) {
   const moved = useRef(0);
   const lastDxRef = useRef(0);
   const swipeActiveRef = useRef(false);
+  const draggingRef = useRef(false);
 
   const clearLP = () => {
     if (longPressTimer.current) {
@@ -585,6 +586,7 @@ function SwipeRow({ children, onIncrement, onDecrement, onRemove, outerRef }) {
     moved.current = 0;
     lastDxRef.current = 0;
     swipeActiveRef.current = false;
+    draggingRef.current = true;
     setDragging(true);
     setDeleteMode(false);
     setSwipeActive(false);
@@ -606,7 +608,7 @@ function SwipeRow({ children, onIncrement, onDecrement, onRemove, outerRef }) {
   };
 
   const move = (clientX, clientY, deleteModeLocal) => {
-    if (!dragging) return;
+    if (!draggingRef.current) return;
     const deltaX = clientX - startX.current;
     const deltaY = (clientY ?? 0) - startY.current;
     moved.current = deltaX;
@@ -652,7 +654,12 @@ function SwipeRow({ children, onIncrement, onDecrement, onRemove, outerRef }) {
   };
 
   const end = (deleteModeLocal, dxDeleteLocal, dxNormalLocal) => {
-    if (!dragging) return;
+    if (!draggingRef.current) return;
+    draggingRef.current = false;
+    const movedAtEnd = moved.current;
+    const wasSwipeActive = swipeActiveRef.current;
+    moved.current = 0;
+    swipeActiveRef.current = false;
     clearLP();
     stopRaf();
     setDragging(false);
@@ -677,8 +684,8 @@ function SwipeRow({ children, onIncrement, onDecrement, onRemove, outerRef }) {
       return;
     }
 
-    if (swipeActiveRef.current && Math.abs(moved.current) >= SWIPE_TRIGGER) {
-      if (moved.current > 0) {
+    if (wasSwipeActive && Math.abs(movedAtEnd) >= SWIPE_TRIGGER) {
+      if (movedAtEnd > 0) {
         onIncrement();
         setFlashType('increment');
       } else {
@@ -686,7 +693,7 @@ function SwipeRow({ children, onIncrement, onDecrement, onRemove, outerRef }) {
         setFlashType('decrement');
       }
 
-      const absMove = Math.abs(moved.current);
+      const absMove = Math.abs(movedAtEnd);
       if (absMove >= SWIPE_DISTANCE_MIN_FOR_BIG && SWIPE_BIG_MS > 0) {
         vibrate(SWIPE_BIG_MS);
       }
@@ -707,7 +714,7 @@ function SwipeRow({ children, onIncrement, onDecrement, onRemove, outerRef }) {
   const onMouseDown = (e) => begin(e.clientX, e.clientY);
   const onMouseMove = (e) => move(e.clientX, e.clientY, deleteMode);
   const onMouseUp = () => end(deleteMode, dxDelete, dxNormal);
-  const onMouseLeave = () => dragging && end(deleteMode, dxDelete, dxNormal);
+  const onMouseLeave = () => draggingRef.current && end(deleteMode, dxDelete, dxNormal);
 
   // Touch handlers - using useEffect for non-passive listener
   useEffect(() => {
@@ -715,7 +722,7 @@ function SwipeRow({ children, onIncrement, onDecrement, onRemove, outerRef }) {
     if (!container) return;
 
     const handleTouchMove = (e) => {
-      if (!dragging) return;
+      if (!draggingRef.current) return;
       const shouldPrevent = move(e.touches[0].clientX, e.touches[0].clientY, deleteMode);
       // Only preventDefault if the event is cancelable (not already scrolling)
       if (shouldPrevent && swipeActiveRef.current && e.cancelable) {
