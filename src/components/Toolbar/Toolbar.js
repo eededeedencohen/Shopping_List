@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import SearchBar from "../SearchBar/SearchBar";
 import SearchModal from "../SearchBar/SearchModal";
@@ -6,8 +6,8 @@ import { useCartTotals } from "../../hooks/appHooks";
 import useVibrate from "../../hooks/useVibrate";
 import "./Toolbar.css";
 
-import cartIcon from "./cart.svg";
 import SearchIcon from "./search.svg";
+import { ReactComponent as ShoppingCartIcon } from "../Cart/Icons/shopping-cart.svg";
 import { ReactComponent as GroceryIcon2 } from "./grocery2.svg";
 import { ReactComponent as AiIcon2 } from "./robot.svg";
 import { ReactComponent as PieChartIcon } from "./pie-chart.svg";
@@ -28,15 +28,30 @@ function Toolbar() {
 
   const vibrate = useVibrate();
 
-  /* אפקט פופ */
+  /* אפקט פופ + פלאש צבע (ירוק בהוספה, אדום בהורדה) */
   const [pop, setPop] = useState(false);
+  const [direction, setDirection] = useState(null); // 'up' | 'down' | null
+  const prevAmountRef = useRef(null);
   useEffect(() => {
-    if (totalAmount > 0) {
-      // תפעיל רק אם ״יש מה להראות״
-      setPop(true);
-      const t = setTimeout(() => setPop(false), 300); // משך האנימציה
-      return () => clearTimeout(t);
+    // דילוג על הריצה הראשונה כדי לא להבהב בטעינה
+    if (prevAmountRef.current === null) {
+      prevAmountRef.current = totalAmount;
+      return;
     }
+
+    const prev = prevAmountRef.current;
+    prevAmountRef.current = totalAmount;
+
+    if (totalAmount === prev || totalAmount === 0) return;
+
+    setDirection(totalAmount > prev ? "up" : "down");
+    setPop(true);
+
+    const t = setTimeout(() => {
+      setPop(false);
+      setDirection(null);
+    }, 320);
+    return () => clearTimeout(t);
   }, [totalAmount]);
 
   /* ניווט */
@@ -77,9 +92,13 @@ function Toolbar() {
       {/* עגלה */}
       <Link to="/cart" onClick={handleCartClick}>
         <div className="cart-icon">
-          <img src={cartIcon} alt="Cart" />
+          <ShoppingCartIcon className="cart-icon__svg" aria-hidden="true" />
           {totalAmount > 0 && (
-            <span className={`cart-badge ${pop ? "pop" : ""}`}>
+            <span
+              className={`cart-badge ${pop ? "pop" : ""} ${
+                direction ? `cart-badge--${direction}` : ""
+              } ${String(totalAmount).length >= 3 ? "cart-badge--small" : ""}`}
+            >
               {totalAmount}
             </span>
           )}
