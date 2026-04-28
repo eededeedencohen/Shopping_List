@@ -7,6 +7,11 @@ import MessageItem from "./MessageItem/MessageItem";
 import NeuronBackground from "./NeuronBackground";
 import Brobot from "../Brobot/Brobot";
 import TestModal from "./TestModal/TestModal";
+import { ReactComponent as VolumeIcon } from "./icons/volume.svg";
+import { ReactComponent as LanguageIcon } from "./icons/language.svg";
+import { ReactComponent as RobotIcon } from "./icons/robot.svg";
+import { ReactComponent as MicrophoneIcon } from "./icons/microphone.svg";
+import { ReactComponent as TestTubeIcon } from "./icons/test-tube.svg";
 
 /* ----------------------------------------------------------- */
 /*  כלי עזר: קבלת קולות לדפדפן                               */
@@ -519,8 +524,12 @@ export default function AI() {
           </div>
 
           <div className="settings-section">
-            <div className="settings-section-icon">&#x1f50a;</div>
-            <span className="settings-section-title">אודיו</span>
+            <div className="settings-section-header">
+              <div className="settings-section-icon">
+                <VolumeIcon className="settings-section-svg" />
+              </div>
+              <span className="settings-section-title">אודיו</span>
+            </div>
 
             <label className="toggle-row">
               <span>השמעת קול</span>
@@ -532,8 +541,12 @@ export default function AI() {
           </div>
 
           <div className="settings-section">
-            <div className="settings-section-icon">&#x1f310;</div>
-            <span className="settings-section-title">שפת דיבור</span>
+            <div className="settings-section-header">
+              <div className="settings-section-icon">
+                <LanguageIcon className="settings-section-svg" />
+              </div>
+              <span className="settings-section-title">שפת דיבור</span>
+            </div>
 
             <div className="language-select-row">
               {[
@@ -553,8 +566,12 @@ export default function AI() {
           </div>
 
           <div className="settings-section">
-            <div className="settings-section-icon">&#x1f50a;</div>
-            <span className="settings-section-title">שפת תשובה קולית</span>
+            <div className="settings-section-header">
+              <div className="settings-section-icon">
+                <VolumeIcon className="settings-section-svg" />
+              </div>
+              <span className="settings-section-title">שפת תשובה קולית</span>
+            </div>
 
             <div className="language-select-row">
               {[
@@ -607,8 +624,12 @@ export default function AI() {
           </div>
 
           <div className="settings-section">
-            <div className="settings-section-icon">&#x1f916;</div>
-            <span className="settings-section-title">רובוט</span>
+            <div className="settings-section-header">
+              <div className="settings-section-icon">
+                <RobotIcon className="settings-section-svg" />
+              </div>
+              <span className="settings-section-title">רובוט</span>
+            </div>
 
             <label className="toggle-row">
               <span>הצגת רובוט</span>
@@ -628,8 +649,12 @@ export default function AI() {
           </div>
 
           <div className="settings-section">
-            <div className="settings-section-icon">&#x1f399;</div>
-            <span className="settings-section-title">מיקרופון</span>
+            <div className="settings-section-header">
+              <div className="settings-section-icon">
+                <MicrophoneIcon className="settings-section-svg" />
+              </div>
+              <span className="settings-section-title">מיקרופון</span>
+            </div>
 
             <label className="toggle-row">
               <span>הפעלת סף מיקרופון</span>
@@ -674,8 +699,12 @@ export default function AI() {
           </div>
 
           <div className="settings-section">
-            <div className="settings-section-icon">&#x1f9ea;</div>
-            <span className="settings-section-title">בדיקות</span>
+            <div className="settings-section-header">
+              <div className="settings-section-icon">
+                <TestTubeIcon className="settings-section-svg" />
+              </div>
+              <span className="settings-section-title">בדיקות</span>
+            </div>
             <button
               className="test-open-btn"
               onClick={() => { setTestModalOpen(true); setSettingsOpen(false); }}
