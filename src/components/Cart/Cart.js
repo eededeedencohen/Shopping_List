@@ -10,6 +10,10 @@ import {
   ProductImageDisplay,
 } from "../Images/ProductImageService";
 import SupermarketImage from "../Images/SupermarketImage";
+import { ReactComponent as AlterIcon } from "./Icons/alter.svg";
+import { ReactComponent as LowPriceIcon } from "./Icons/low-price.svg";
+import { ReactComponent as OptimizationIcon } from "./Icons/optimization.svg";
+import { ReactComponent as ShoppingCartIcon } from "./Icons/shopping-cart.svg";
 
 //==================================================
 import {
@@ -200,37 +204,21 @@ export default function Cart() {
   if (isReplaceSupermarket || isLoadingPrices) {
     return (
       <div className={styles['spinner-container']}>
-        {/* Spark particles */}
-        <div className={styles['spark-particles']}>
-          <span /><span /><span /><span />
-          <span /><span /><span /><span />
+        <div className={styles['loader-stage']}>
+          <div className={styles['loader-glow']} />
+          <div className={styles['loader-cart']}>
+            <ShoppingCartIcon />
+          </div>
+          <div className={styles['loader-scanline']} />
         </div>
 
-        {/* Center scene */}
-        <div className={styles['orbit-scene']}>
-          {/* Pulsing rings */}
-          <div className={styles['pulse-rings']}>
+        <div className={styles['loader-text']}>
+          <p className={styles['loader-title']}>{loadingMessage}</p>
+          <p className={styles['loader-subtitle']}>סורק מחירים עבורך</p>
+          <div className={styles['loader-dots']}>
             <span /><span /><span />
           </div>
-
-          {/* Cart */}
-          <div className={styles['orbit-cart']}>🛒</div>
-
-          {/* Outer orbit — 6 coins clockwise */}
-          <div className={styles['orbit-ring']}>
-            <span>₪</span><span>₪</span><span>₪</span>
-            <span>₪</span><span>₪</span><span>₪</span>
-          </div>
-
-          {/* Inner orbit — 3 coins counter-clockwise */}
-          <div className={styles['orbit-ring-inner']}>
-            <span>₪</span><span>₪</span><span>₪</span>
-          </div>
         </div>
-
-        {/* Text */}
-        <p>{loadingMessage}</p>
-        <p className={styles['scan-subtitle']}>סורק מחירים עבורך</p>
       </div>
     );
   }
@@ -282,7 +270,7 @@ export default function Cart() {
             className={styles['cart-operations_replace-supermarket']}
             onClick={() => setIsReplaceSupermarketOpen(true)}
           >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M16 3h5v5"/><path d="M8 3H3v5"/><path d="M21 3l-7 7"/><path d="M3 3l7 7"/><path d="M16 21h5v-5"/><path d="M8 21H3v-5"/><path d="M21 21l-7-7"/><path d="M3 21l7-7"/></svg>
+            <AlterIcon className={styles['cart-operations__icon']} />
             החלפת סופר
           </div>
           <div
@@ -298,14 +286,14 @@ export default function Cart() {
             }}
             disabled={isReplaceSupermarket}
           >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+            <LowPriceIcon className={styles['cart-operations__icon']} />
             הכי זול
           </div>
           <div
             className={styles['cart-operations_optimal-carts-settings']}
             onClick={() => navigate("/optimal-carts-settings")}
           >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+            <OptimizationIcon className={styles['cart-operations__icon']} />
             אופטימיזציה
           </div>
         </div>
