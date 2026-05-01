@@ -315,7 +315,7 @@ export default function Cart() {
           </div>
           <div className={styles['info-row__price']}>
             <span className={styles['info-row__price-label']}>סה״כ</span>
-            <span className={styles['info-row__price-value']}>{totalPrice}₪</span>
+            <span className={styles['info-row__price-value']}>₪{totalPrice}</span>
           </div>
         </div>
       </div>
@@ -394,11 +394,11 @@ export default function Cart() {
                     <span className={styles['pg-price__units']}>{item.amountInCart} יח'</span>
                     {hasChanged ? (
                       <div className={styles['pg-price__diff']}>
-                        <span className={styles['pg-price__old']}>{currentTotal.toFixed(2)}₪</span>
-                        <span className={styles['pg-price__new']} style={currentDraftAmount < item.amountInCart ? { color: '#dc2626' } : undefined}>{newTotal.toFixed(2)}₪</span>
+                        <span className={styles['pg-price__old']}>₪{currentTotal.toFixed(2)}</span>
+                        <span className={styles['pg-price__new']} style={currentDraftAmount < item.amountInCart ? { color: '#dc2626' } : undefined}>₪{newTotal.toFixed(2)}</span>
                       </div>
                     ) : (
-                      <span className={styles['pg-price__value']}>{item.totalPrice.toFixed(2)} ₪</span>
+                      <span className={styles['pg-price__value']}>₪{item.totalPrice.toFixed(2)}</span>
                     )}
                   </div>
 
@@ -468,7 +468,7 @@ export default function Cart() {
           <button className={styles['confirm-footer__button']} onClick={handleConfirmCart}>
             <span className={styles['confirm-footer__icon']}>✓</span>
             <span className={styles['confirm-footer__text']}>אישור הזמנה</span>
-            <span className={styles['confirm-footer__price']}>{totalPrice}₪</span>
+            <span className={styles['confirm-footer__price']}>₪{totalPrice}</span>
           </button>
         </div>
       )}

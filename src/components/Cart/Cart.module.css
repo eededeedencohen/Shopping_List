@@ -379,12 +379,13 @@
 
 .cart-operations > div {
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 9px;
+  gap: 8px;
   flex: 1;
-  height: 56px;
-  padding: 0 12px;
+  min-height: 76px;
+  padding: 4px 4px;
   border-radius: 16px;
   font-size: 14px;
   font-weight: 700;
@@ -432,8 +433,8 @@
 }
 
 .cart-operations__icon {
-  width: 22px;
-  height: 22px;
+  width: 38px;
+  height: 38px;
   display: block;
 }
 
@@ -443,60 +444,66 @@
   fill: currentColor;
 }
 
-/* Primary — Replace supermarket */
+/* Shared solid-tile treatment for all three buttons */
+.cart-operations_replace-supermarket,
+.cart-operations_cheapest-supermarket,
+.cart-operations_optimal-carts-settings {
+  color: #fff;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.14);
+}
+
+.cart-operations_replace-supermarket svg,
+.cart-operations_cheapest-supermarket svg,
+.cart-operations_optimal-carts-settings svg {
+  color: #fff;
+}
+
+/* Replace supermarket — blue */
 .cart-operations_replace-supermarket {
   background: linear-gradient(160deg, #3b82f6 0%, #2563eb 55%, #1d4ed8 100%);
-  color: #fff;
   border: 1px solid rgba(29, 78, 216, 0.6);
   box-shadow:
     0 6px 16px rgba(37, 99, 235, 0.32),
-    0 1px 0 rgba(255, 255, 255, 0.25) inset,
-    0 -2px 6px rgba(29, 78, 216, 0.35) inset;
-  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.12);
+    0 1px 0 rgba(255, 255, 255, 0.22) inset,
+    0 -2px 6px rgba(29, 78, 216, 0.32) inset;
 }
 
 .cart-operations_replace-supermarket:active {
   box-shadow:
     0 2px 8px rgba(37, 99, 235, 0.28),
-    0 1px 0 rgba(255, 255, 255, 0.2) inset;
+    0 1px 0 rgba(255, 255, 255, 0.18) inset;
 }
 
-/* Secondary — Cheapest cart */
+/* Cheapest cart — green */
 .cart-operations_cheapest-supermarket {
-  background: linear-gradient(160deg, #ffffff 0%, #ecfdf5 100%);
-  color: #047857;
-  border: 1px solid rgba(16, 185, 129, 0.32);
+  background: linear-gradient(160deg, #34d399 0%, #10b981 55%, #047857 100%);
+  border: 1px solid rgba(4, 120, 87, 0.6);
   box-shadow:
-    0 4px 12px rgba(16, 185, 129, 0.14),
-    0 1px 0 rgba(255, 255, 255, 0.9) inset;
-}
-
-.cart-operations_cheapest-supermarket svg {
-  color: #10b981;
+    0 6px 16px rgba(16, 185, 129, 0.32),
+    0 1px 0 rgba(255, 255, 255, 0.22) inset,
+    0 -2px 6px rgba(4, 120, 87, 0.32) inset;
 }
 
 .cart-operations_cheapest-supermarket:active {
-  background: linear-gradient(160deg, #ecfdf5 0%, #d1fae5 100%);
-  box-shadow: 0 2px 6px rgba(16, 185, 129, 0.18);
-}
-
-/* Tertiary — Optimization */
-.cart-operations_optimal-carts-settings {
-  background: linear-gradient(160deg, #ffffff 0%, #eef2ff 100%);
-  color: #4338ca;
-  border: 1px solid rgba(99, 102, 241, 0.32);
   box-shadow:
-    0 4px 12px rgba(99, 102, 241, 0.14),
-    0 1px 0 rgba(255, 255, 255, 0.9) inset;
+    0 2px 8px rgba(16, 185, 129, 0.28),
+    0 1px 0 rgba(255, 255, 255, 0.18) inset;
 }
 
-.cart-operations_optimal-carts-settings svg {
-  color: #6366f1;
+/* Optimization — indigo/purple */
+.cart-operations_optimal-carts-settings {
+  background: linear-gradient(160deg, #818cf8 0%, #6366f1 55%, #4338ca 100%);
+  border: 1px solid rgba(67, 56, 202, 0.6);
+  box-shadow:
+    0 6px 16px rgba(99, 102, 241, 0.32),
+    0 1px 0 rgba(255, 255, 255, 0.22) inset,
+    0 -2px 6px rgba(67, 56, 202, 0.32) inset;
 }
 
 .cart-operations_optimal-carts-settings:active {
-  background: linear-gradient(160deg, #eef2ff 0%, #e0e7ff 100%);
-  box-shadow: 0 2px 6px rgba(99, 102, 241, 0.18);
+  box-shadow:
+    0 2px 8px rgba(99, 102, 241, 0.28),
+    0 1px 0 rgba(255, 255, 255, 0.18) inset;
 }
 
 /* ── Info Row: Supermarket + Price — one compact line ──────── */
@@ -1335,6 +1342,7 @@
   width: 100%;
   height: 50px;
   padding: 0 20px;
+  direction: rtl;
   border: none;
   border-radius: 14px;
   background:
@@ -1360,27 +1368,30 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 26px;
-  height: 26px;
-  background: rgba(255, 255, 255, 0.2);
+  width: 28px;
+  height: 28px;
+  background: rgba(255, 255, 255, 0.22);
   border-radius: 50%;
-  font-size: 13px;
+  font-size: 14px;
   color: #fff;
 }
 
 .confirm-footer__text {
-  font-size: 15px;
+  font-size: 16.5px;
   font-weight: 700;
+  letter-spacing: -0.2px;
   color: #fff;
 }
 
 .confirm-footer__price {
   padding: 5px 12px;
-  background: rgba(255, 255, 255, 0.2);
-  border-radius: 18px;
-  font-size: 14px;
+  background: rgba(255, 255, 255, 0.18);
+  border-radius: 999px;
+  font-size: 16px;
   font-weight: 700;
+  letter-spacing: -0.1px;
   color: #fff;
+  font-variant-numeric: tabular-nums;
 }
 
 .green-button { display: none !important; }
