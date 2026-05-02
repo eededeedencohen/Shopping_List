@@ -14,6 +14,7 @@ import { CartOptimizationProvider } from "./context/CartOptimizationContext";
 import { AiSettingsProvider } from "./context/AiSettingsContext";
 import { AddProductDefaultsProvider } from "./context/AddProductDefaultsContext";
 import { ProductsLayoutProvider } from "./context/ProductsLayoutContext";
+import { CartCardLayoutProvider } from "./context/CartCardLayoutContext";
 
 const root = createRoot(document.getElementById("root"));
 
@@ -31,7 +32,9 @@ root.render(
                       <AiSettingsProvider>
                         <AddProductDefaultsProvider>
                           <ProductsLayoutProvider>
-                            <App />
+                            <CartCardLayoutProvider>
+                              <App />
+                            </CartCardLayoutProvider>
                           </ProductsLayoutProvider>
                         </AddProductDefaultsProvider>
                       </AiSettingsProvider>

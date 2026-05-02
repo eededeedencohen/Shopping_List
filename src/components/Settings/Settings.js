@@ -1,8 +1,9 @@
 import React from "react";
 import "./Settings.css";
 import { useProductsLayout } from "../../context/ProductsLayoutContext";
+import { useCartCardLayout } from "../../context/CartCardLayoutContext";
 
-const LAYOUT_OPTIONS = [
+const PRODUCTS_LAYOUT_OPTIONS = [
   {
     value: "list",
     label: "רשימה",
@@ -15,7 +16,20 @@ const LAYOUT_OPTIONS = [
   },
 ];
 
-function LayoutPreview({ value }) {
+const CART_CARD_LAYOUT_OPTIONS = [
+  {
+    value: "default",
+    label: "מורחבת",
+    description: "כפתורי +/- ועדכון בשורה נפרדת מתחת",
+  },
+  {
+    value: "compact",
+    label: "קומפקטית",
+    description: "ללא שורת כפתורים — שינוי כמות בהחלקה",
+  },
+];
+
+function ProductsLayoutPreview({ value }) {
   if (value === "list") {
     return (
       <div className="layout-preview layout-preview--list">
@@ -30,8 +44,41 @@ function LayoutPreview({ value }) {
   );
 }
 
+function CartCardPreview({ value }) {
+  if (value === "default") {
+    return (
+      <div className="cart-card-preview cart-card-preview--default">
+        <div className="cart-card-preview__top">
+          <span className="cart-card-preview__line" />
+          <span className="cart-card-preview__img" />
+        </div>
+        <div className="cart-card-preview__bottom">
+          <span className="cart-card-preview__btn cart-card-preview__btn--minus" />
+          <span className="cart-card-preview__btn cart-card-preview__btn--plus" />
+          <span className="cart-card-preview__btn cart-card-preview__btn--cancel" />
+        </div>
+      </div>
+    );
+  }
+  return (
+    <div className="cart-card-preview cart-card-preview--compact">
+      <div className="cart-card-preview__top">
+        <span className="cart-card-preview__line" />
+        <span className="cart-card-preview__img" />
+      </div>
+      <div className="cart-card-preview__inline">
+        <span className="cart-card-preview__chip" />
+        <span className="cart-card-preview__chip cart-card-preview__chip--accent" />
+      </div>
+    </div>
+  );
+}
+
 export default function Settings() {
-  const { layout, setLayout } = useProductsLayout();
+  const { layout: productsLayout, setLayout: setProductsLayout } =
+    useProductsLayout();
+  const { layout: cartCardLayout, setLayout: setCartCardLayout } =
+    useCartCardLayout();
 
   return (
     <div className="settings-page">
@@ -52,19 +99,52 @@ export default function Settings() {
               בחר כיצד יוצגו המוצרים בעמוד המוצרים
             </p>
             <div className="layout-options">
-              {LAYOUT_OPTIONS.map((opt) => {
-                const active = layout === opt.value;
+              {PRODUCTS_LAYOUT_OPTIONS.map((opt) => {
+                const active = productsLayout === opt.value;
                 return (
                   <button
                     key={opt.value}
                     type="button"
                     className={`layout-option ${active ? "is-active" : ""}`}
-                    onClick={() => setLayout(opt.value)}
+                    onClick={() => setProductsLayout(opt.value)}
                     aria-pressed={active}
                   >
-                    <LayoutPreview value={opt.value} />
+                    <ProductsLayoutPreview value={opt.value} />
                     <span className="layout-option__label">{opt.label}</span>
-                    <span className="layout-option__desc">{opt.description}</span>
+                    <span className="layout-option__desc">
+                      {opt.description}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+
+        <section className="settings-card">
+          <header className="settings-card__header">
+            <span className="settings-card__title">תצוגת כרטיסיית מוצר בעגלה</span>
+          </header>
+          <div className="settings-card__body">
+            <p className="settings-card__hint">
+              בחר את צורת הכרטיסייה של מוצרי העגלה
+            </p>
+            <div className="layout-options">
+              {CART_CARD_LAYOUT_OPTIONS.map((opt) => {
+                const active = cartCardLayout === opt.value;
+                return (
+                  <button
+                    key={opt.value}
+                    type="button"
+                    className={`layout-option ${active ? "is-active" : ""}`}
+                    onClick={() => setCartCardLayout(opt.value)}
+                    aria-pressed={active}
+                  >
+                    <CartCardPreview value={opt.value} />
+                    <span className="layout-option__label">{opt.label}</span>
+                    <span className="layout-option__desc">
+                      {opt.description}
+                    </span>
                   </button>
                 );
               })}

@@ -1,0 +1,221 @@
+/* ═══════════════════════════════════════════════════════════════
+   Supermarket Switch — focused loading state on the TARGET store
+   ═══════════════════════════════════════════════════════════════ */
+
+.container {
+  position: fixed;
+  inset: 0;
+  z-index: 220;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 36px;
+  padding: 0 24px;
+  direction: rtl;
+  background:
+    radial-gradient(circle at 50% 38%, rgba(59, 130, 246, 0.12) 0%, transparent 55%),
+    linear-gradient(180deg, #ffffff 0%, #f1f5fb 100%);
+  font-family: "Heebo", "Open Sans", -apple-system, sans-serif;
+  color: #0f172a;
+  animation: switchFadeIn 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes switchFadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* ─── Stage (logo + rings + glow + scanline) ──────────────── */
+.stage {
+  position: relative;
+  width: 200px;
+  height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.glow {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle, rgba(37, 99, 235, 0.32) 0%, rgba(37, 99, 235, 0.08) 50%, transparent 72%);
+  filter: blur(2px);
+  animation: switchGlow 2.4s ease-in-out infinite;
+}
+
+@keyframes switchGlow {
+  0%, 100% { transform: scale(1);    opacity: 0.55; }
+  50%      { transform: scale(1.12); opacity: 0.85; }
+}
+
+/* Pulsing concentric rings expanding outward */
+.rings {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.rings span {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 110px;
+  height: 110px;
+  margin: -55px 0 0 -55px;
+  border-radius: 50%;
+  border: 2px solid rgba(37, 99, 235, 0.45);
+  opacity: 0;
+  animation: ringPulse 2.6s ease-out infinite;
+}
+
+.rings span:nth-child(1) { animation-delay: 0s; }
+.rings span:nth-child(2) { animation-delay: 0.85s; }
+.rings span:nth-child(3) { animation-delay: 1.7s; }
+
+@keyframes ringPulse {
+  0%   { transform: scale(0.55); opacity: 0.7; }
+  70%  { opacity: 0.15; }
+  100% { transform: scale(1.85); opacity: 0; }
+}
+
+/* Logo container — clean white card with rounded corners */
+.logoCard {
+  position: relative;
+  z-index: 2;
+  width: 110px;
+  height: 110px;
+  border-radius: 22px;
+  background: #ffffff;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  box-shadow:
+    0 14px 36px rgba(15, 23, 42, 0.18),
+    0 4px 10px rgba(15, 23, 42, 0.08),
+    0 1px 0 rgba(255, 255, 255, 0.7) inset;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 14px;
+  overflow: hidden;
+  animation: logoFloat 2.4s ease-in-out infinite;
+}
+
+.logoCard img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+@keyframes logoFloat {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-6px); }
+}
+
+/* Vertical scanline sweeping across the logo */
+.scanline {
+  position: absolute;
+  z-index: 3;
+  top: 50%;
+  left: 50%;
+  width: 110px;
+  height: 110px;
+  margin: -55px 0 0 -55px;
+  border-radius: 22px;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.scanline::after {
+  content: "";
+  position: absolute;
+  top: -100%;
+  left: 0;
+  right: 0;
+  height: 100%;
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    rgba(59, 130, 246, 0) 30%,
+    rgba(59, 130, 246, 0.55) 50%,
+    rgba(59, 130, 246, 0) 70%,
+    transparent 100%
+  );
+  mix-blend-mode: screen;
+  animation: switchScan 1.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+@keyframes switchScan {
+  0%   { transform: translateY(0);    opacity: 0; }
+  20%  { opacity: 1; }
+  80%  { opacity: 1; }
+  100% { transform: translateY(220%); opacity: 0; }
+}
+
+/* ─── Text + dots ─────────────────────────────────────────── */
+.text {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  text-align: center;
+}
+
+.title {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #0f172a;
+  letter-spacing: -0.3px;
+  animation: titlePulse 2.4s ease-in-out infinite;
+}
+
+@keyframes titlePulse {
+  0%, 100% { opacity: 0.85; }
+  50%      { opacity: 1; }
+}
+
+.subtitle {
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #64748b;
+}
+
+.dots {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-top: 8px;
+}
+
+.dots span {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #2563eb;
+  animation: dotPulse 1.2s ease-in-out infinite;
+}
+
+.dots span:nth-child(1) { animation-delay: 0s; }
+.dots span:nth-child(2) { animation-delay: 0.18s; }
+.dots span:nth-child(3) { animation-delay: 0.36s; }
+
+@keyframes dotPulse {
+  0%, 100% { transform: scale(0.6); opacity: 0.35; }
+  50%      { transform: scale(1);   opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .container,
+  .glow,
+  .rings span,
+  .logoCard,
+  .scanline::after,
+  .title,
+  .dots span {
+    animation: none !important;
+  }
+}

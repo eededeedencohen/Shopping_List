@@ -27,6 +27,9 @@ import {
 } from "../../hooks/appHooks";
 
 import { calculateTotalPrice } from "../../utils/priceCalculations";
+import { useCartCardLayout } from "../../context/CartCardLayoutContext";
+import CheapestComparison from "./CheapestComparison";
+import SupermarketSwitchLoader from "./SupermarketSwitchLoader";
 
 //==================================================
 
@@ -50,6 +53,9 @@ export const convertWeightUnit = (weightUnit) => {
 // export the function convertWeightUnit:
 
 export default function Cart() {
+  const { layout: cartCardLayout } = useCartCardLayout();
+  const isCompactCard = cartCardLayout === "compact";
+
   const { cart, isLoading } = useCartState(); // ← קיבלנו גם cart
 
   // const { totalAmount, totalPrice } = useCartTotals();
@@ -148,6 +154,13 @@ export default function Cart() {
   const [isReplaceSupermarket, setIsReplaceSupermarket] = useState(false);
   const [loadingMessage, setLoadingMessage] = useState("טוען...");
 
+  // Cheapest-cart before/after comparison screen
+  const [comparisonData, setComparisonData] = useState(null);
+  const beforeStateRef = useRef(null);
+
+  // Manual supermarket switch — focused loader showing the target store
+  const [switchTarget, setSwitchTarget] = useState(null);
+
   // Modals
   const [isModalOpen, setModalOpen] = useState(false);
   const [isReplaceSupermarketOpen, setIsReplaceSupermarketOpen] =
@@ -155,10 +168,94 @@ export default function Cart() {
 
   const [currentBarcode, setCurrentBarcode] = useState(null);
 
+  /* Sticky top moves 1:1 with scroll — every pixel of scroll-down
+     pushes it up by one pixel; every pixel of scroll-up reveals it
+     by one pixel. Clamped between fully visible (0) and fully
+     hidden (-headerHeight). DOM is written directly via refs so we
+     don't re-render React on every scroll pixel.
+     Listens on window/document because .cart grows with content
+     (no max-height) so the document is the scroll container. */
+  const cartRef = useRef(null);
+  const stickyTopRef = useRef(null);
+  const lastScrollYRef = useRef(0);
+  const offsetRef = useRef(0);
+  const rafIdRef = useRef(null);
+
+  useEffect(() => {
+    const cartEl = cartRef.current;
+    if (!cartEl) return;
+
+    lastScrollYRef.current = cartEl.scrollTop;
+
+    const apply = () => {
+      rafIdRef.current = null;
+      const stickyEl = stickyTopRef.current;
+      if (!stickyEl) return;
+      const headerHeight = stickyEl.offsetHeight;
+      const y = cartEl.scrollTop;
+      const delta = y - lastScrollYRef.current;
+      lastScrollYRef.current = y;
+      let next = offsetRef.current - delta;
+      if (next < -headerHeight) next = -headerHeight;
+      else if (next > 0) next = 0;
+      offsetRef.current = next;
+      stickyEl.style.transform = `translateY(${next}px)`;
+    };
+
+    const handleScroll = () => {
+      if (rafIdRef.current != null) return;
+      rafIdRef.current = requestAnimationFrame(apply);
+    };
+
+    cartEl.addEventListener("scroll", handleScroll, { passive: true });
+    return () => {
+      cartEl.removeEventListener("scroll", handleScroll);
+      if (rafIdRef.current != null) cancelAnimationFrame(rafIdRef.current);
+    };
+  }, []);
+
   useEffect(() => {
     sendActiveCart();
     console.log(cart);
   }, [cart, sendActiveCart]); // ← מופעל רק כש-cart משתנה
+
+  /* Detect when a price-fetch finishes (loading: true → false) and
+     react accordingly:
+       - Cheapest-cart flow: build the before/after comparison.
+       - Manual switch flow: dismiss the target-store loader. */
+  const wasLoadingPricesRef = useRef(false);
+  useEffect(() => {
+    const wasLoading = wasLoadingPricesRef.current;
+    wasLoadingPricesRef.current = isLoadingPrices;
+
+    if (!wasLoading || isLoadingPrices) return;
+
+    // Cheapest-cart comparison
+    if (
+      beforeStateRef.current &&
+      currentSupermarket?.supermarketID &&
+      currentSupermarket.supermarketID !==
+        beforeStateRef.current.supermarket.supermarketID
+    ) {
+      const before = beforeStateRef.current;
+      const after = {
+        supermarket: {
+          name: currentSupermarket.name,
+          supermarketID: currentSupermarket.supermarketID,
+        },
+        price: parseFloat(totalPrice) || 0,
+      };
+      beforeStateRef.current = null;
+      setComparisonData({ before, after });
+      setIsReplaceSupermarket(false);
+    }
+
+    // Manual supermarket switch — dismiss the focused loader
+    if (switchTarget) {
+      setSwitchTarget(null);
+      setIsReplaceSupermarket(false);
+    }
+  }, [isLoadingPrices, currentSupermarket, totalPrice, switchTarget]);
 
   const handleConfirmCart = async () => {
     try {
@@ -176,16 +273,34 @@ export default function Cart() {
     } catch (error) {
       console.error("Error replacing supermarket:", error);
     } finally {
-      setIsReplaceSupermarket(false);
       setIsReplaceSupermarketOpen(false);
     }
   };
 
-  const handleUpdateSupermarket = async (supermarketID) => {
-    await handleUpdateAndLoad(supermarketID);
+  const handleUpdateSupermarket = async (branchInfo) => {
+    /* Branch info now arrives as { supermarketID, name, city, address }
+       — we capture the target so the loader can spotlight it while the
+       new prices fetch. */
+    if (branchInfo && typeof branchInfo === "object") {
+      setSwitchTarget(branchInfo);
+      await handleUpdateAndLoad(branchInfo.supermarketID);
+    } else {
+      // Backwards compat: someone passing just an ID
+      await handleUpdateAndLoad(branchInfo);
+    }
   };
 
   const handleCheapestCart = async () => {
+    /* Snapshot the current supermarket + price before swapping so the
+       comparison screen can show "before" once new prices have loaded. */
+    beforeStateRef.current = {
+      supermarket: {
+        name: currentSupermarket?.name || "",
+        supermarketID: currentSupermarket?.supermarketID || "",
+      },
+      price: parseFloat(totalPrice) || 0,
+    };
+
     setLoadingMessage("מחפש את המחיר הכי זול...");
     setIsReplaceSupermarket(true);
 
@@ -193,13 +308,32 @@ export default function Cart() {
       const success = await replaceRandomCheapest(cartItems);
       if (!success) {
         console.warn("לא נמצאו סופרים מתאימים לעגלה");
+        beforeStateRef.current = null;
+        setIsReplaceSupermarket(false);
       }
+      /* If success — the loader stays up until isLoadingPrices flips
+         false (the useEffect above takes over and shows the comparison). */
     } catch (error) {
       console.error("Error optimizing cart:", error);
-    } finally {
+      beforeStateRef.current = null;
       setIsReplaceSupermarket(false);
     }
   };
+
+  if (comparisonData) {
+    return (
+      <CheapestComparison
+        before={comparisonData.before}
+        after={comparisonData.after}
+        durationMs={4200}
+        onClose={() => setComparisonData(null)}
+      />
+    );
+  }
+
+  if (switchTarget) {
+    return <SupermarketSwitchLoader target={switchTarget} />;
+  }
 
   if (isReplaceSupermarket || isLoadingPrices) {
     return (
@@ -247,7 +381,7 @@ export default function Cart() {
   ///////////////////////////////////////////////////
 
   return (
-    <div className={styles.cart}>
+    <div ref={cartRef} className={styles.cart}>
       <Modal isOpen={isModalOpen} onClose={() => setModalOpen(false)}>
         <ReplaceProducts
           barcode={currentBarcode}
@@ -263,7 +397,7 @@ export default function Cart() {
       />
 
       {/* ── Sticky Top Section ── */}
-      <div className={styles['sticky-top']}>
+      <div ref={stickyTopRef} className={styles['sticky-top']}>
         {/* Operations */}
         <div className={styles['cart-operations']}>
           <div
@@ -341,7 +475,11 @@ export default function Cart() {
                 }
                 onRemove={() => removeWithFLIP(item.barcode)}
               >
-                <div className={styles['pg']}>
+                <div
+                  className={`${styles['pg']} ${
+                    isCompactCard ? styles['pg--compact'] : ""
+                  }`}
+                >
                   {/* X delete — top-left corner, always visible */}
                   <button
                     className={styles['pg-btn-delete']}
@@ -387,6 +525,30 @@ export default function Cart() {
                   >
                     <span className={styles['pg-details__name']}>{item.name}</span>
                     <span className={styles['pg-details__meta']}>{item.brand} | {item.weight} {convertWeightUnit(item.unitWeight)}</span>
+
+                    {/* Compact mode — inline unit price + promo */}
+                    {isCompactCard && (
+                      <span className={styles['pg-details__inline-info']}>
+                        {typeof item.unitPrice === "number" ? (
+                          <span className={styles['pg-side-info__unit-price']}>
+                            ₪{item.unitPrice.toFixed(2)} ליח'
+                          </span>
+                        ) : (
+                          <span className={styles['pg-side-info__unavailable']}>
+                            מחיר לא זמין בסופר
+                          </span>
+                        )}
+                        {item.hasDiscount && item.discount && (
+                          <span className={styles['pg-promo']}>
+                            <span className={styles['pg-promo__tag']}>מבצע</span>
+                            <span className={styles['pg-promo__text']}>
+                              {item.discount.units} ב-₪
+                              {Number(item.discount.totalPrice).toFixed(2)}
+                            </span>
+                          </span>
+                        )}
+                      </span>
+                    )}
                   </div>
 
                   {/* LEFT in RTL: Units + Price */}
@@ -402,7 +564,29 @@ export default function Cart() {
                     )}
                   </div>
 
-                  {/* Row 2: +/- quantity + actions, spans full width */}
+                  {/* Row 2: bottom controls + side info — only in default layout */}
+                  {!isCompactCard && (
+                  <div className={styles['pg-row2']}>
+                    <div className={styles['pg-side-info']}>
+                      {typeof item.unitPrice === "number" ? (
+                        <span className={styles['pg-side-info__unit-price']}>
+                          ₪{item.unitPrice.toFixed(2)} ליח'
+                        </span>
+                      ) : (
+                        <span className={styles['pg-side-info__unavailable']}>
+                          מחיר לא זמין בסופר
+                        </span>
+                      )}
+                      {item.hasDiscount && item.discount && (
+                        <span className={styles['pg-promo']}>
+                          <span className={styles['pg-promo__tag']}>מבצע</span>
+                          <span className={styles['pg-promo__text']}>
+                            {item.discount.units} ב-₪
+                            {Number(item.discount.totalPrice).toFixed(2)}
+                          </span>
+                        </span>
+                      )}
+                    </div>
                   <div className={styles['pg-bottom-row']}>
                     <button
                       className={styles['pg-btn-minus']}
@@ -456,6 +640,8 @@ export default function Cart() {
                       </>
                     )}
                   </div>
+                  </div>
+                  )}
                 </div>
               </SwipeRow>
             );
