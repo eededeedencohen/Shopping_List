@@ -19,6 +19,7 @@
   min-height: calc(100vh - var(--offset-top));
 }
 
+
 /* אם יש לך offset-top */
 :root {
   --offset-top: 100px;

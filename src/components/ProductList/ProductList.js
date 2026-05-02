@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Spin } from "antd";
 import {
   useCartState,
@@ -7,8 +7,11 @@ import {
   useProductList,
   useUpdateActiveCart,
 } from "../../hooks/appHooks";
+import { useProductsLayout } from "../../context/ProductsLayoutContext";
+import useVibrate from "../../hooks/useVibrate";
 
-import styles from "./ProductsList.module.css";
+import listStyles from "./ProductsList.module.css";
+import gridStyles from "./ProductsListGrid.module.css";
 import "./ProductsListKeyframes.css";
 
 import {
@@ -49,7 +52,7 @@ const priceFormat = (price) => {
   return price.toFixed(2);
 };
 
-const discountPriceFormat = ({ units, totalPrice }) => (
+const discountPriceFormat = ({ units, totalPrice }, styles) => (
   <div
     className={styles['list__discount-price']}
     style={{
@@ -68,12 +71,14 @@ const discountPriceFormat = ({ units, totalPrice }) => (
   </div>
 );
 
-/* כפתורי הוספה/הורדה/אישור/מחיקה לסל */
+/* כפתורי הוספה/הורדה/אישור/מחיקה לסל
+   ה-class `visible` קיים רק בתצוגת הרשימה — הכפתור לא מוצג ברשת,
+   אז משתמשים תמיד ב-listStyles להצגה/הסתרה. */
 const makeVisible = (button) => {
-  button.classList.add(styles.visible);
+  if (button && listStyles.visible) button.classList.add(listStyles.visible);
 };
 const makeInvisible = (button) => {
-  button.classList.remove(styles.visible);
+  if (button && listStyles.visible) button.classList.remove(listStyles.visible);
 };
 const changeButtonToAddProductButton = (button) => {
   button.style.backgroundColor = "#00c200";
@@ -102,6 +107,26 @@ function ProductsList() {
   const { productsWithDetails, isLoadingProducts } = useEnrichedProducts();
   const { cart } = useCartState();
   const { sendActiveCart } = useUpdateActiveCart();
+  const { layout } = useProductsLayout();
+  const vibrate = useVibrate();
+  /* בתצוגת רשימה משתמשים ב-listStyles בלבד (התנהגות מקורית).
+     בתצוגת רשת מצרפים את ה-classes משני המודולים, כך ש-listStyles
+     מספק את הבסיס וה-gridStyles מבצע override רק על המקומות
+     הספציפיים לפריסת הרשת. */
+  const styles = useMemo(() => {
+    if (layout !== "grid") return listStyles;
+    const keys = new Set([
+      ...Object.keys(listStyles),
+      ...Object.keys(gridStyles),
+    ]);
+    const merged = {};
+    keys.forEach((key) => {
+      const a = listStyles[key] || "";
+      const b = gridStyles[key] || "";
+      merged[key] = `${a} ${b}`.trim();
+    });
+    return merged;
+  }, [layout]);
   const {
     activeCategoryIndex,
     activeSubCategoryIndex,
@@ -347,6 +372,30 @@ function ProductsList() {
     setOldProductAmounts({ ...oldProductAmounts, [barcode]: amount });
   };
 
+  /* תצוגת רשת — +/- מעדכנים את העגלה ישירות, בלי כפתור אישור */
+  const directIncrement = (product) => {
+    const current = product.amountInCart || 0;
+    vibrate(120);
+    setAnimatingProducts((prev) => ({ ...prev, [product.barcode]: "up" }));
+    setTimeout(() => {
+      setAnimatingProducts((prev) => ({ ...prev, [product.barcode]: null }));
+    }, 400);
+    if (current === 0) add(product.barcode, 1);
+    else update(product.barcode, current + 1);
+  };
+
+  const directDecrement = (product) => {
+    const current = product.amountInCart || 0;
+    if (current <= 0) return;
+    vibrate(120);
+    setAnimatingProducts((prev) => ({ ...prev, [product.barcode]: "down" }));
+    setTimeout(() => {
+      setAnimatingProducts((prev) => ({ ...prev, [product.barcode]: null }));
+    }, 400);
+    if (current === 1) remove(product.barcode);
+    else update(product.barcode, current - 1);
+  };
+
   /* סינון מוצרים לפי קטגוריה ותת־קטגוריה פעילים */
   const currentCategory = allCategories[activeCategoryIndex];
   const subCats = all_sub_categories[activeCategoryIndex] || [];
@@ -452,7 +501,7 @@ function ProductsList() {
                         <p>מחיר לא זמין בסופר</p>
                       )}
                     </div>
-                    {product.discount && discountPriceFormat(product.discount)}
+                    {product.discount && discountPriceFormat(product.discount, styles)}
                   </div>
                   <div
                     className={styles['list__product-image']}
@@ -481,7 +530,8 @@ function ProductsList() {
                     }`}
                     onClick={(e) => {
                       e.stopPropagation();
-                      incrementAmount(product.barcode);
+                      if (layout === "grid") directIncrement(product);
+                      else incrementAmount(product.barcode);
                     }}
                   >
                     <img src={plusIcon} alt="+" />
@@ -504,7 +554,9 @@ function ProductsList() {
                           : ""
                       }
                     >
-                      {productAmounts[product.barcode] || 0}
+                      {layout === "grid"
+                        ? product.amountInCart || 0
+                        : productAmounts[product.barcode] || 0}
                     </span>
                   </div>
                   <div
@@ -515,7 +567,8 @@ function ProductsList() {
                     }`}
                     onClick={(e) => {
                       e.stopPropagation();
-                      decrementAmount(product.barcode);
+                      if (layout === "grid") directDecrement(product);
+                      else decrementAmount(product.barcode);
                     }}
                   >
                     <img src={minusIcon} alt="-" />
