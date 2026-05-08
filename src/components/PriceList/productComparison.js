@@ -3,6 +3,7 @@ import { Spin } from "antd";
 import { usePriceList } from "../../context/PriceContext";
 import { ProductImageDisplay } from "../Images/ProductImageService";
 import SupermarketImage from "../Images/SupermarketImage";
+import AddFromScraperModal from "../Scraper/AddFromScraperModal";
 import { DOMAIN } from "../../constants";
 import "./productComparison.css";
 
@@ -45,7 +46,9 @@ export default function ProductComparison({ barcode }) {
   const [priceList, setPriceList] = useState(undefined);
   const [product, setProduct] = useState(undefined);
   const [scrapedImage, setScrapedImage] = useState(null);
+  const [rawScrapedPrices, setRawScrapedPrices] = useState([]);
   const [source, setSource] = useState("loading"); // "loading" | "db" | "scraper" | "empty"
+  const [addModalOpen, setAddModalOpen] = useState(false);
 
   useEffect(() => {
     if (!barcode) return;
@@ -88,11 +91,9 @@ export default function ProductComparison({ barcode }) {
             __synthetic: true,
           });
           setScrapedImage(data.scrapedImageDataUri || null);
-          setPriceList(
-            Array.isArray(data.prices)
-              ? data.prices.map(adaptScrapedPrice)
-              : []
-          );
+          const rawPrices = Array.isArray(data.prices) ? data.prices : [];
+          setRawScrapedPrices(rawPrices);
+          setPriceList(rawPrices.map(adaptScrapedPrice));
           setSource("scraper");
           return;
         }
@@ -120,6 +121,22 @@ export default function ProductComparison({ barcode }) {
     };
   }, [barcode, getPriceList]);
 
+  const handleSaved = async () => {
+    setAddModalOpen(false);
+    try {
+      const dbResponse = await getPriceList(barcode);
+      if (dbResponse && dbResponse.product) {
+        setProduct(dbResponse.product);
+        setPriceList(dbResponse.prices || []);
+        setScrapedImage(null);
+        setRawScrapedPrices([]);
+        setSource("db");
+      }
+    } catch {
+      /* noop — user can re-open the modal to retry */
+    }
+  };
+
   if (!priceList || !product) {
     return (
       <div className="compareM-prices-container">
@@ -132,6 +149,7 @@ export default function ProductComparison({ barcode }) {
   }
 
   return (
+    <>
     <div className="compareM-prices-container">
       {/* Product info */}
       <div className="compareM__product">
@@ -154,8 +172,28 @@ export default function ProductComparison({ barcode }) {
         </div>
 
         {source === "scraper" && (
-          <div className="compareM__source-badge">
-            המוצר אינו במאגר — המחירים נשלפו מ-chp.co.il בזמן אמת
+          <div className="compareM__scraper-notice">
+            <div className="compareM__source-badge">
+              המוצר אינו במאגר — המחירים נשלפו מ-chp.co.il בזמן אמת
+            </div>
+            <button
+              type="button"
+              className="compareM__add-to-db-btn"
+              onClick={() => setAddModalOpen(true)}
+            >
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M12 5v14M5 12h14" />
+              </svg>
+              הוסף את המוצר למאגר
+            </button>
           </div>
         )}
 
@@ -259,5 +297,18 @@ export default function ProductComparison({ barcode }) {
         </div>
       )}
     </div>
+
+    {addModalOpen && (
+      <AddFromScraperModal
+        isOpen={addModalOpen}
+        onClose={() => setAddModalOpen(false)}
+        barcode={barcode}
+        scrapedPrices={rawScrapedPrices}
+        initialName={product?.name || ""}
+        initialImageDataUri={scrapedImage}
+        onSaved={handleSaved}
+      />
+    )}
+    </>
   );
 }

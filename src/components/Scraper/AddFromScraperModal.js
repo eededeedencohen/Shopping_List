@@ -15,11 +15,11 @@ const UNIT_OPTIONS = [
   { value: "t", label: "טון" },
 ];
 
-function AddFromScraperModal({ isOpen, onClose, barcode, scrapedPrices, onSaved }) {
+function AddFromScraperModal({ isOpen, onClose, barcode, scrapedPrices, onSaved, initialName = "", initialImageDataUri = null }) {
   const { allCategories, all_sub_categories } = useProductList();
   const { defaults, updateDefault, loaded } = useAddProductDefaults();
 
-  const [name, setName] = useState("");
+  const [name, setName] = useState(initialName || "");
   const [brand, setBrand] = useState("");
   const [weight, setWeight] = useState("");
   const [unitWeight, setUnitWeight] = useState("g");
@@ -35,6 +35,29 @@ function AddFromScraperModal({ isOpen, onClose, barcode, scrapedPrices, onSaved 
       setSubCategoryIndex(defaults.subCategoryIndex || 0);
     }
   }, [loaded, defaults.generalName, defaults.categoryIndex, defaults.subCategoryIndex]);
+
+  // Convert prefilled scraped image (data URI) into a real File so it can be submitted.
+  useEffect(() => {
+    if (!isOpen || !initialImageDataUri) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch(initialImageDataUri);
+        const blob = await res.blob();
+        if (cancelled) return;
+        const file = new File([blob], `${barcode || "scraped"}.jpg`, {
+          type: blob.type || "image/jpeg",
+        });
+        setImageFile(file);
+        setImagePreview(initialImageDataUri);
+      } catch {
+        /* ignore — user can still upload manually */
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [isOpen, initialImageDataUri, barcode]);
 
   const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
