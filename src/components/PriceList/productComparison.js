@@ -249,32 +249,50 @@ export default function ProductComparison({ barcode }) {
   return (
     <>
     <div className="compareM-prices-container">
-      {/* ── Hero (minimal) ──────────────────────── */}
+      {/* ── Hero (compact product card) ─────────── */}
       <header className="compareM__hero">
-        <div className="compareM__hero-image">
-          {scrapedImage ? (
-            <img
-              src={scrapedImage}
-              alt={product.name}
-              className="compareM__hero-image-img"
-            />
-          ) : (
-            <ProductImageDisplay
-              barcode={barcode}
-              className="compareM__hero-image-img"
-            />
-          )}
+        <div className="compareM__hero-card">
+          <div className="compareM__hero-image">
+            {scrapedImage ? (
+              <img
+                src={scrapedImage}
+                alt={product.name}
+                className="compareM__hero-image-img"
+              />
+            ) : (
+              <ProductImageDisplay
+                barcode={barcode}
+                className="compareM__hero-image-img"
+              />
+            )}
+          </div>
+
+          <div className="compareM__hero-info">
+            <h2 className="compareM__hero-title">{product.name}</h2>
+            {(product.brand ||
+              (product.weight !== "" &&
+                product.weight !== undefined &&
+                product.weight !== 0)) && (
+              <p className="compareM__hero-subtitle">
+                {product.brand && <span>{product.brand}</span>}
+                {product.brand &&
+                  product.weight !== "" &&
+                  product.weight !== undefined &&
+                  product.weight !== 0 && (
+                    <span className="compareM__dot" aria-hidden="true">·</span>
+                  )}
+                {product.weight !== "" &&
+                  product.weight !== undefined &&
+                  product.weight !== 0 && (
+                    <span>
+                      {product.weight} {unitWeightFormat(product.unitWeight)}
+                    </span>
+                  )}
+              </p>
+            )}
+            <p className="compareM__hero-barcode">{product.barcode}</p>
+          </div>
         </div>
-
-        <h2 className="compareM__hero-title">{product.name}</h2>
-
-        <p className="compareM__hero-meta">
-          {product.weight !== "" && product.weight !== undefined && product.weight !== 0 && (
-            <span>{product.weight} {unitWeightFormat(product.unitWeight)}</span>
-          )}
-          {product.brand && <span>{product.brand}</span>}
-          <span className="compareM__hero-meta-barcode">ברקוד {product.barcode}</span>
-        </p>
 
         {source === "scraper" && (
           <div className="compareM__scraper-notice">
@@ -393,10 +411,24 @@ export default function ProductComparison({ barcode }) {
 
                       <div className="compareM__price-row-info">
                         <p className="compareM__price-row-name">
-                          {priceObject.supermarket.name}
+                          <span className="compareM__price-row-name-text">
+                            {priceObject.supermarket.name}
+                          </span>
                           {branchCount > 1 && (
                             <span className="compareM__branch-count-pill">
                               {branchCount} סניפים
+                              <svg
+                                className="compareM__branch-pill-chevron"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="2.6"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                aria-hidden="true"
+                              >
+                                <polyline points="6 9 12 15 18 9" />
+                              </svg>
                             </span>
                           )}
                         </p>
@@ -404,11 +436,6 @@ export default function ProductComparison({ barcode }) {
                           <p className="compareM__price-row-address">
                             {priceObject.supermarket.address}
                             {priceObject.supermarket.city ? `, ${priceObject.supermarket.city}` : ""}
-                          </p>
-                        )}
-                        {branchCount > 1 && (
-                          <p className="compareM__price-row-address compareM__price-row-grouphint">
-                            {isExpanded ? "הצגת הסניפים" : "אותו מחיר בכל הסניפים — לחץ להצגה"}
                           </p>
                         )}
                         {priceObject.discount && (
@@ -439,13 +466,6 @@ export default function ProductComparison({ barcode }) {
                         {showingUnitPrice && (
                           <span className="compareM__price-row-strike">
                             ₪{priceFormat(priceObject.price)}
-                          </span>
-                        )}
-                        {branchCount > 1 && (
-                          <span className="compareM__group-chevron" aria-hidden="true">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
-                              <polyline points="6 9 12 15 18 9" />
-                            </svg>
                           </span>
                         )}
                       </div>
