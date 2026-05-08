@@ -46,44 +46,41 @@ const LoadingCart = () => {
         <div className="lc-mesh" />
       </div>
 
-      <div className="lc-card">
-        {/* Scanner orb */}
-        <div
-          className="lc-scanner"
-          role="status"
-          aria-label="טוען חישוב עגלה אופטימלית"
-        >
-          <span className="lc-ripple lc-ripple-1" />
-          <span className="lc-ripple lc-ripple-2" />
-          <span className="lc-ripple lc-ripple-3" />
+      <div
+        className="lc-scanner"
+        role="status"
+        aria-label="טוען חישוב עגלה אופטימלית"
+      >
+        <span className="lc-ripple lc-ripple-1" />
+        <span className="lc-ripple lc-ripple-2" />
+        <span className="lc-ripple lc-ripple-3" />
 
-          <div className="lc-orbit">
-            <span className="lc-dot lc-dot-blue" />
-            <span className="lc-dot lc-dot-purple" />
-            <span className="lc-dot lc-dot-green" />
-          </div>
-
-          <div className="lc-core">
-            <CartIcon />
-          </div>
+        <div className="lc-orbit">
+          <span className="lc-dot lc-dot-blue" />
+          <span className="lc-dot lc-dot-purple" />
+          <span className="lc-dot lc-dot-green" />
         </div>
 
-        <h2 className="lc-title">
-          מחשבים את העגלה
-          <span className="lc-title-accent"> הזולה ביותר</span>
-        </h2>
-
-        <p className="lc-status" key={idx}>
-          {MESSAGES[idx]}
-        </p>
-
-        <div className="lc-progress" aria-hidden="true">
-          <span className="lc-progress-dot" />
-          <span className="lc-progress-dot" />
-          <span className="lc-progress-dot" />
-          <span className="lc-progress-dot" />
-          <span className="lc-progress-dot" />
+        <div className="lc-core">
+          <CartIcon />
         </div>
+      </div>
+
+      <h2 className="lc-title">
+        מחשבים את העגלה
+        <span className="lc-title-accent"> הזולה ביותר</span>
+      </h2>
+
+      <p className="lc-status" key={idx}>
+        {MESSAGES[idx]}
+      </p>
+
+      <div className="lc-progress" aria-hidden="true">
+        <span className="lc-progress-dot" />
+        <span className="lc-progress-dot" />
+        <span className="lc-progress-dot" />
+        <span className="lc-progress-dot" />
+        <span className="lc-progress-dot" />
       </div>
     </div>
   );

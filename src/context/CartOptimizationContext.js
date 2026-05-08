@@ -99,6 +99,9 @@ export const CartOptimizationProvider = ({ children }) => {
 
   /* ─────────────────────── SERVER‑SIDE ACTIONS ─────────────────────── */
   const calculateOptimalCarts = async () => {
+    /* Critical: reset the "calculated" flag before kicking off so the
+       LoadingCart shows on EVERY calculation, not just the first one. */
+    setIsOptimalCartsCalculated(false);
     setOptimalCarts([]);
     try {
       const { data } = await getOptimalSupermarketCarts(

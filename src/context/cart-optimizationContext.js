@@ -78,6 +78,9 @@ export const CartOptimizationContextProvider = ({ children }) => {
    * @summary - Update the useStates of the optimal carts
    */
   const calculateOptimalsCarts = async () => {
+    /* Reset the "calculated" flag so the LoadingCart shows on every call,
+       not just the first one. */
+    setIsOptimalCartsCalculated(false);
     setOptimalCarts([]); // Clear the optimal carts
     // step 1: using getOptimalSupermarketCarts to get the optimal carts. ofcourse using try and catch:
     try {
