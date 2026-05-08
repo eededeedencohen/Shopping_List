@@ -170,32 +170,66 @@ const OptimalReplaceProductItem = ({
         />
       </EditOptimalProductModal>
 
-      <header className="opi-header">
-        <div className="opi-product-img">
-          <ProductImageDisplay
-            barcode={productDetails.barcode}
-            className="opi-product-img-el"
-          />
+      <header className="opi-rp-header">
+        <span className="opi-replaced-pill">
+          <SwapIcon />
+          הוחלף ב
+        </span>
+
+        {/* Alternative product */}
+        <div className="opi-rp-block opi-rp-block--alt">
+          <div className="opi-rp-img">
+            <ProductImageDisplay
+              barcode={productDetails.barcode}
+              className="opi-rp-img-el"
+            />
+          </div>
+          <div className="opi-rp-info">
+            <span className="opi-rp-tag opi-rp-tag--alt">המוצר החלופי</span>
+            <h3 className="opi-rp-name">{productDetails.name}</h3>
+            <p className="opi-rp-meta">
+              {productDetails.brand && <span>{productDetails.brand}</span>}
+              {productDetails.weight !== undefined &&
+                productDetails.weight !== "" &&
+                productDetails.weight !== 0 && (
+                  <span>
+                    {productDetails.weight} {replacementUnitLabel}
+                  </span>
+                )}
+            </p>
+          </div>
         </div>
-        <div className="opi-product-info">
-          <span className="opi-replaced-pill">
-            <SwapIcon />
-            הוחלף ב
-          </span>
-          <h3 className="opi-product-name">{productDetails.name}</h3>
-          <p className="opi-product-meta">
-            {productDetails.brand && <span>{productDetails.brand}</span>}
-            {productDetails.weight !== undefined &&
-              productDetails.weight !== "" &&
-              productDetails.weight !== 0 && (
-                <span>
-                  {productDetails.weight} {replacementUnitLabel}
-                </span>
-              )}
-          </p>
-          <p className="opi-replaced-from">
-            במקום: <strong>{original.name}</strong>
-          </p>
+
+        {/* Connector */}
+        <div className="opi-rp-connector" aria-hidden="true">
+          <span className="opi-rp-connector-line" />
+          <span className="opi-rp-connector-label">במקום</span>
+          <span className="opi-rp-connector-line" />
+        </div>
+
+        {/* Original product */}
+        <div className="opi-rp-block opi-rp-block--orig">
+          <div className="opi-rp-img">
+            <ProductImageDisplay
+              barcode={original.barcode}
+              className="opi-rp-img-el"
+            />
+          </div>
+          <div className="opi-rp-info">
+            <span className="opi-rp-tag opi-rp-tag--orig">המוצר המקורי</span>
+            <h3 className="opi-rp-name">{original.name}</h3>
+            <p className="opi-rp-meta">
+              {original.brand && <span>{original.brand}</span>}
+              {original.weight !== undefined &&
+                original.weight !== "" &&
+                original.weight !== 0 && (
+                  <span>
+                    {original.weight}{" "}
+                    {getConvertedUnitWeight(original.unitWeight)}
+                  </span>
+                )}
+            </p>
+          </div>
         </div>
       </header>
 
