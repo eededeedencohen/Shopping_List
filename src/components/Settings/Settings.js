@@ -1,7 +1,9 @@
-import React from "react";
+import React, { useState } from "react";
 import "./Settings.css";
 import { useProductsLayout } from "../../context/ProductsLayoutContext";
 import { useCartCardLayout } from "../../context/CartCardLayoutContext";
+import { useAvailabilityMeta } from "../../hooks/useProductAvailability";
+import { rebuildAvailabilityIndex } from "../../services/productAvailabilityService";
 
 const PRODUCTS_LAYOUT_OPTIONS = [
   {
@@ -74,11 +76,53 @@ function CartCardPreview({ value }) {
   );
 }
 
+function formatRelativeTime(iso) {
+  if (!iso) return "טרם עודכן";
+  const ts = new Date(iso).getTime();
+  if (Number.isNaN(ts)) return "טרם עודכן";
+  const diffMs = Date.now() - ts;
+  const diffMin = Math.round(diffMs / 60000);
+  if (diffMin < 1) return "לפני רגע";
+  if (diffMin < 60) return `לפני ${diffMin} ${diffMin === 1 ? "דקה" : "דקות"}`;
+  const diffHr = Math.round(diffMin / 60);
+  if (diffHr < 24) return `לפני ${diffHr} ${diffHr === 1 ? "שעה" : "שעות"}`;
+  const diffDay = Math.round(diffHr / 24);
+  if (diffDay < 30) return `לפני ${diffDay} ${diffDay === 1 ? "יום" : "ימים"}`;
+  const d = new Date(iso);
+  return d.toLocaleDateString("he-IL");
+}
+
 export default function Settings() {
   const { layout: productsLayout, setLayout: setProductsLayout } =
     useProductsLayout();
   const { layout: cartCardLayout, setLayout: setCartCardLayout } =
     useCartCardLayout();
+
+  const { meta, isLoading: isMetaLoading, refetch: refetchMeta } =
+    useAvailabilityMeta();
+  const [isRebuilding, setIsRebuilding] = useState(false);
+  const [rebuildStatus, setRebuildStatus] = useState(null); // { kind, message }
+
+  const handleRebuild = async () => {
+    if (isRebuilding) return;
+    setIsRebuilding(true);
+    setRebuildStatus(null);
+    try {
+      const result = await rebuildAvailabilityIndex();
+      await refetchMeta();
+      setRebuildStatus({
+        kind: "success",
+        message: `עודכנו ${result.productCount || 0} מוצרים`,
+      });
+    } catch (err) {
+      setRebuildStatus({
+        kind: "error",
+        message: "העדכון נכשל. נסה שוב.",
+      });
+    } finally {
+      setIsRebuilding(false);
+    }
+  };
 
   return (
     <div className="settings-page">
@@ -149,6 +193,70 @@ export default function Settings() {
                 );
               })}
             </div>
+          </div>
+        </section>
+
+        <section className="settings-card">
+          <header className="settings-card__header">
+            <span className="settings-card__title">עדכון נתונים</span>
+          </header>
+          <div className="settings-card__body">
+            <p className="settings-card__hint">
+              עדכון אינדקס הזמינות של המוצרים בסופרים — משמש להצגה רק של
+              סופרים שמכילים את כל מוצרי העגלה.
+            </p>
+
+            <div className="settings-row">
+              <span className="settings-row__label">עודכן לאחרונה</span>
+              <span className="settings-row__value">
+                {isMetaLoading
+                  ? "טוען…"
+                  : formatRelativeTime(meta && meta.updatedAt)}
+              </span>
+            </div>
+            <div className="settings-row">
+              <span className="settings-row__label">מוצרים באינדקס</span>
+              <span className="settings-row__value">
+                {isMetaLoading ? "—" : (meta && meta.productCount) || 0}
+              </span>
+            </div>
+
+            <button
+              type="button"
+              className={`settings-rebuild-btn ${
+                isRebuilding ? "is-loading" : ""
+              }`}
+              onClick={handleRebuild}
+              disabled={isRebuilding}
+            >
+              {isRebuilding ? (
+                <span className="settings-rebuild-spinner" aria-hidden />
+              ) : (
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.4"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden="true"
+                >
+                  <polyline points="23 4 23 10 17 10" />
+                  <polyline points="1 20 1 14 7 14" />
+                  <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15" />
+                </svg>
+              )}
+              {isRebuilding ? "מעדכן…" : "עדכן עכשיו"}
+            </button>
+
+            {rebuildStatus && (
+              <div
+                className={`settings-rebuild-status settings-rebuild-status--${rebuildStatus.kind}`}
+                role="status"
+              >
+                {rebuildStatus.message}
+              </div>
+            )}
           </div>
         </section>
 

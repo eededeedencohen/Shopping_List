@@ -180,6 +180,118 @@
   font-variant-numeric: tabular-nums;
 }
 
+/* ── Availability filter (only stores carrying entire cart) ── */
+.availabilityFilter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 10px;
+  padding: 8px 12px;
+  border: 1px solid rgba(37, 99, 235, 0.18);
+  border-radius: 12px;
+  background: linear-gradient(180deg, rgba(37, 99, 235, 0.05) 0%, rgba(255, 255, 255, 0.6) 100%);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.availabilityFilter:hover {
+  border-color: rgba(37, 99, 235, 0.32);
+}
+
+.availabilityFilterText {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #1e293b;
+  letter-spacing: -0.1px;
+  flex: 1;
+  min-width: 0;
+}
+
+.availabilitySpinner {
+  width: 12px;
+  height: 12px;
+  border: 2px solid rgba(37, 99, 235, 0.18);
+  border-top-color: #2563eb;
+  border-radius: 50%;
+  animation: availabilitySpinnerSpin 0.8s linear infinite;
+  flex-shrink: 0;
+}
+
+@keyframes availabilitySpinnerSpin {
+  to { transform: rotate(360deg); }
+}
+
+.availabilitySwitch {
+  position: relative;
+  display: inline-flex;
+  width: 38px;
+  height: 22px;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.18);
+  flex-shrink: 0;
+  transition: background 0.2s ease;
+}
+
+.availabilitySwitch input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.availabilityKnob {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #ffffff;
+  box-shadow: 0 2px 4px rgba(15, 23, 42, 0.2);
+  transition: left 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.availabilitySwitchOn {
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+}
+
+.availabilitySwitchOn .availabilityKnob {
+  left: 18px;
+}
+
+/* ── Notice when the availability index has gaps ───────────── */
+.indexNotice {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-top: 8px;
+  padding: 9px 12px;
+  border: 1px solid rgba(245, 158, 11, 0.32);
+  border-radius: 10px;
+  background: linear-gradient(180deg, rgba(254, 243, 199, 0.7) 0%, rgba(255, 255, 255, 0.5) 100%);
+  color: #92400e;
+  font-size: 0.78rem;
+  font-weight: 600;
+  line-height: 1.45;
+  letter-spacing: -0.1px;
+}
+
+.indexNotice svg {
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  margin-top: 1px;
+  color: #d97706;
+}
+
 /* ── Grid ───────────────────────────────────────────────────── */
 .grid {
   display: grid;

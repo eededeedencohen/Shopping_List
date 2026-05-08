@@ -1,6 +1,8 @@
 import React, { useMemo, useState } from "react";
 import SupermarketImage from "../../Images/SupermarketImage";
 import { useSupermarkets } from "../../../hooks/optimizationHooks";
+import { useCartItems } from "../../../hooks/appHooks";
+import { useEligibleSupermarkets } from "../../../hooks/useProductAvailability";
 import styles from "./SupermarketsNames.module.css";
 
 const SORT_OPTIONS = [
@@ -10,8 +12,35 @@ const SORT_OPTIONS = [
 
 const SupermarketsNames = ({ onSelectSupermarket }) => {
   const { allSupermarkets, isAllSupermarketsUploaded } = useSupermarkets();
+  const cartItems = useCartItems();
+  const cartBarcodes = useMemo(
+    () => (cartItems || []).map((item) => item.barcode).filter(Boolean),
+    [cartItems]
+  );
+  const hasCart = cartBarcodes.length > 0;
+
   const [query, setQuery] = useState("");
   const [sortBy, setSortBy] = useState("popular");
+  const [onlyAvailable, setOnlyAvailable] = useState(true);
+
+  const {
+    eligibleIDs,
+    missingBarcodes,
+    isLoading: isAvailLoading,
+  } = useEligibleSupermarkets(hasCart ? cartBarcodes : []);
+  const eligibleSet = useMemo(
+    () => (eligibleIDs ? new Set(eligibleIDs) : null),
+    [eligibleIDs]
+  );
+
+  /* `missingBarcodes` lists cart products with no price docs anywhere
+     in the DB — those are real data gaps, not an index issue. The
+     filter is computed live from prices, so a non-empty list here
+     genuinely means those products aren't sold by any supermarket
+     we know about. Surface a friendly notice in that case. */
+  const missingCount = missingBarcodes ? missingBarcodes.length : 0;
+  const allMissing = missingCount > 0 && missingCount === cartBarcodes.length;
+  const someMissing = missingCount > 0 && missingCount < cartBarcodes.length;
 
   const supermarketsArray = useMemo(() => {
     if (!allSupermarkets || !allSupermarkets.length) return [];
@@ -38,6 +67,21 @@ const SupermarketsNames = ({ onSelectSupermarket }) => {
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     let list = supermarketsArray;
+
+    /* Availability filter — only show chains/branches that carry every
+       cart product. Computed live against priceModel on the backend, so
+       no rebuild prerequisite. */
+    if (hasCart && onlyAvailable && eligibleSet) {
+      list = list
+        .map((chain) => ({
+          ...chain,
+          branches: chain.branches.filter((b) =>
+            eligibleSet.has(b.supermarketID)
+          ),
+        }))
+        .filter((chain) => chain.branches.length > 0);
+    }
+
     if (q) list = list.filter((s) => s.name.toLowerCase().includes(q));
 
     const sorted = [...list];
@@ -48,7 +92,7 @@ const SupermarketsNames = ({ onSelectSupermarket }) => {
       sorted.sort((a, b) => b.branches.length - a.branches.length);
     }
     return sorted;
-  }, [supermarketsArray, query, sortBy]);
+  }, [supermarketsArray, query, sortBy, hasCart, onlyAvailable, eligibleSet]);
 
   if (!isAllSupermarketsUploaded) {
     return (
@@ -143,6 +187,57 @@ const SupermarketsNames = ({ onSelectSupermarket }) => {
             {filtered.length} {filtered.length === 1 ? "רשת" : "רשתות"}
           </span>
         </div>
+
+        {hasCart && (
+          <label className={styles.availabilityFilter}>
+            <span className={styles.availabilityFilterText}>
+              רק סופרים שמכילים את כל המוצרים בעגלה
+              {isAvailLoading && (
+                <span
+                  className={styles.availabilitySpinner}
+                  aria-hidden="true"
+                />
+              )}
+            </span>
+            <span
+              className={`${styles.availabilitySwitch} ${
+                onlyAvailable ? styles.availabilitySwitchOn : ""
+              }`}
+              role="switch"
+              aria-checked={onlyAvailable}
+            >
+              <input
+                type="checkbox"
+                checked={onlyAvailable}
+                onChange={(e) => setOnlyAvailable(e.target.checked)}
+              />
+              <span className={styles.availabilityKnob} />
+            </span>
+          </label>
+        )}
+
+        {hasCart && onlyAvailable && missingCount > 0 && !isAvailLoading && (
+          <div className={styles.indexNotice}>
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
+              <circle cx="12" cy="12" r="10" />
+              <line x1="12" y1="8" x2="12" y2="13" />
+              <circle cx="12" cy="16" r="0.6" fill="currentColor" />
+            </svg>
+            <span>
+              {allMissing
+                ? "המוצרים בעגלה אינם נמכרים באף סופר במאגר."
+                : `${missingCount} ${missingCount === 1 ? "מוצר" : "מוצרים"} בעגלה לא נמכרים בשום סופר במאגר ולכן הסינון לא נאכף.`}
+            </span>
+          </div>
+        )}
       </div>
 
       {filtered.length === 0 ? (
@@ -159,7 +254,16 @@ const SupermarketsNames = ({ onSelectSupermarket }) => {
             <circle cx="11" cy="11" r="7" />
             <line x1="21" y1="21" x2="16.65" y2="16.65" />
           </svg>
-          <span>לא נמצאו תוצאות עבור "{query}"</span>
+          {query ? (
+            <span>לא נמצאו תוצאות עבור "{query}"</span>
+          ) : hasCart && onlyAvailable && missingCount === 0 ? (
+            <span>
+              אף סופר במאגר לא מכיל את כל המוצרים שבעגלה. כבה את הסינון
+              לראות את כל הרשתות.
+            </span>
+          ) : (
+            <span>לא נמצאו תוצאות</span>
+          )}
         </div>
       ) : (
         <div className={styles.grid}>
