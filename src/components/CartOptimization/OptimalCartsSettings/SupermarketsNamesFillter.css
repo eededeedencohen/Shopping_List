@@ -1,44 +1,53 @@
 /* ═══════════════════════════════════════════════
    Chains grid (inside the supermarket-filter modal)
+   • Card communicates state via tint, top accent and chip color
    ═══════════════════════════════════════════════ */
 
 .snf-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 10px;
+  gap: 12px;
+  font-family: "Heebo", "Open Sans", Arial, sans-serif;
 }
 
-@media (min-width: 480px) {
+@media (min-width: 600px) {
   .snf-grid { grid-template-columns: repeat(3, 1fr); }
 }
 
-@media (min-width: 720px) {
+@media (min-width: 820px) {
   .snf-grid { grid-template-columns: repeat(4, 1fr); }
 }
 
+/* ── Card ───────────────────────────────────── */
 .snf-item {
+  position: relative;
   display: flex;
   flex-direction: column;
-  align-items: stretch;
-  gap: 8px;
-  padding: 12px 12px 11px;
+  align-items: center;
+  gap: 10px;
+  padding: 18px 12px 12px;
   background: #ffffff;
   border: 1px solid rgba(15, 23, 42, 0.08);
-  border-radius: 14px;
-  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.05);
+  border-radius: 18px;
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.05);
   cursor: pointer;
-  font-family: "Heebo", "Open Sans", Arial, sans-serif;
+  text-align: center;
+  font-family: inherit;
   -webkit-appearance: none;
   appearance: none;
   outline: none;
   -webkit-tap-highlight-color: transparent;
-  text-align: center;
-  transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+  overflow: hidden;
+  transition:
+    transform 0.22s ease,
+    box-shadow 0.22s ease,
+    border-color 0.22s ease,
+    background 0.22s ease;
 }
 
 .snf-item:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.1);
+  transform: translateY(-3px);
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.12);
   border-color: rgba(37, 99, 235, 0.25);
 }
 
@@ -46,21 +55,73 @@
   transform: scale(0.98);
 }
 
-.snf-item.is-all {
-  border-color: rgba(16, 185, 129, 0.45);
-  background: linear-gradient(180deg, #ecfdf5 0%, #ffffff 100%);
+/* Top accent line (1px under the rounded corner) */
+.snf-item::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: transparent;
+  transition: background 0.22s ease;
 }
 
+/* ── State: partial (some branches selected) ── */
+.snf-item.is-partial {
+  background: linear-gradient(180deg, #eff6ff 0%, #ffffff 65%);
+  border-color: rgba(37, 99, 235, 0.32);
+  box-shadow:
+    0 6px 18px rgba(37, 99, 235, 0.16),
+    0 1px 0 rgba(255, 255, 255, 0.85) inset;
+}
+
+.snf-item.is-partial::before {
+  background: linear-gradient(90deg, #3b82f6, #1d4ed8);
+}
+
+/* ── State: all branches selected ──────────── */
+.snf-item.is-all {
+  background: linear-gradient(180deg, #ecfdf5 0%, #ffffff 70%);
+  border-color: rgba(16, 185, 129, 0.42);
+  box-shadow:
+    0 8px 22px rgba(16, 185, 129, 0.22),
+    0 1px 0 rgba(255, 255, 255, 0.85) inset;
+}
+
+.snf-item.is-all::before {
+  background: linear-gradient(90deg, #10b981, #047857);
+}
+
+/* ── Logo frame ─────────────────────────────── */
 .snf-img-wrap {
-  width: 100%;
-  height: 56px;
+  position: relative;
+  width: 72px;
+  height: 72px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #f8fafc;
-  border-radius: 10px;
-  padding: 5px;
+  background: #ffffff;
   border: 1px solid #f1f5f9;
+  border-radius: 16px;
+  padding: 8px;
+  box-shadow:
+    0 2px 6px rgba(15, 23, 42, 0.06),
+    0 0 0 1px rgba(255, 255, 255, 0.85) inset;
+}
+
+.snf-item.is-partial .snf-img-wrap {
+  border-color: rgba(37, 99, 235, 0.25);
+  box-shadow:
+    0 2px 8px rgba(37, 99, 235, 0.18),
+    0 0 0 1px rgba(255, 255, 255, 0.85) inset;
+}
+
+.snf-item.is-all .snf-img-wrap {
+  border-color: rgba(16, 185, 129, 0.32);
+  box-shadow:
+    0 3px 10px rgba(16, 185, 129, 0.22),
+    0 0 0 1px rgba(255, 255, 255, 0.85) inset;
 }
 
 .snf-img {
@@ -69,59 +130,120 @@
   width: auto;
   height: auto;
   object-fit: contain;
+  display: block;
 }
 
+/* Floating check badge on the logo when fully selected */
+.snf-img-check {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #10b981 0%, #047857 100%);
+  color: #ffffff;
+  border: 2px solid #ffffff;
+  border-radius: 50%;
+  box-shadow: 0 3px 8px rgba(16, 185, 129, 0.5);
+  animation: snf-pop 0.28s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.snf-img-check svg {
+  width: 12px;
+  height: 12px;
+}
+
+@keyframes snf-pop {
+  from { transform: scale(0); }
+  to   { transform: scale(1); }
+}
+
+/* ── Chain name ─────────────────────────────── */
 .snf-name {
-  font-size: 0.82rem;
-  font-weight: 700;
+  font-size: 0.92rem;
+  font-weight: 800;
   color: #0f172a;
+  letter-spacing: -0.2px;
+  line-height: 1.25;
   unicode-bidi: plaintext;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  word-break: break-word;
+  max-width: 100%;
+}
+
+/* ── Bottom row: count + arrow ──────────────── */
+.snf-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  gap: 6px;
+  padding-top: 4px;
+  border-top: 1px dashed rgba(15, 23, 42, 0.08);
+}
+
+.snf-item.is-partial .snf-bottom { border-top-color: rgba(37, 99, 235, 0.18); }
+.snf-item.is-all     .snf-bottom { border-top-color: rgba(16, 185, 129, 0.22); }
+
+.snf-count-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  color: #64748b;
+  font-size: 0.74rem;
+  font-weight: 800;
   letter-spacing: -0.1px;
 }
 
-.snf-progress {
-  width: 100%;
-  height: 5px;
-  background: #f1f5f9;
-  border-radius: 3px;
-  overflow: hidden;
-}
-
-.snf-progress-fill {
-  height: 100%;
-  background: linear-gradient(90deg, #10b981 0%, #34d399 100%);
-  transition: width 0.3s ease;
-}
-
-.snf-item.is-all .snf-progress-fill {
-  background: linear-gradient(90deg, #059669 0%, #10b981 100%);
-}
-
-.snf-count {
-  display: inline-flex;
-  align-items: baseline;
-  justify-content: center;
-  gap: 1px;
-  font-size: 0.78rem;
-  font-weight: 700;
-  color: #64748b;
+.snf-count-chip-num {
+  direction: ltr;
+  unicode-bidi: bidi-override;
   font-variant-numeric: tabular-nums;
 }
 
-.snf-count-sep {
-  color: #cbd5e1;
-  font-weight: 600;
-  margin: 0 2px;
+.snf-count-chip-icon {
+  width: 11px;
+  height: 11px;
+  flex-shrink: 0;
 }
 
-.snf-item.is-all .snf-count {
-  color: #059669;
+.snf-item.is-partial .snf-count-chip {
+  background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+  border-color: rgba(37, 99, 235, 0.32);
+  color: #1d4ed8;
 }
 
-/* States */
+.snf-item.is-all .snf-count-chip {
+  background: linear-gradient(135deg, #10b981 0%, #047857 100%);
+  border-color: #047857;
+  color: #ffffff;
+  box-shadow: 0 2px 6px rgba(16, 185, 129, 0.36);
+}
+
+.snf-arrow {
+  width: 18px;
+  height: 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #94a3b8;
+}
+
+.snf-arrow svg {
+  width: 13px;
+  height: 13px;
+}
+
+.snf-item.is-partial .snf-arrow { color: #1d4ed8; }
+.snf-item.is-all     .snf-arrow { color: #047857; }
+
+/* ── States (loading / empty) ───────────────── */
 .snf-loading,
 .snf-empty {
   display: flex;
@@ -129,7 +251,7 @@
   align-items: center;
   gap: 12px;
   text-align: center;
-  padding: 32px 16px;
+  padding: 48px 16px;
   font-size: 0.95rem;
   font-weight: 500;
   color: #64748b;
