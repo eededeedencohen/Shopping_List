@@ -3,8 +3,13 @@ import { ReactMediaRecorder } from "react-media-recorder-2";
 import { DOMAIN } from "../../constants";
 import { useAiSettings } from "../../context/AiSettingsContext";
 import "./AI.css";
+import "./themes.css";
 import MessageItem from "./MessageItem/MessageItem";
 import NeuronBackground from "./NeuronBackground";
+import AuroraBackground from "./AuroraBackground";
+import GalaxyBackground from "./GalaxyBackground";
+import CyberBackground from "./CyberBackground";
+import { useAITheme } from "../../context/AIThemeContext";
 import Brobot from "../Brobot/Brobot";
 import TestModal from "./TestModal/TestModal";
 import { ReactComponent as VolumeIcon } from "./icons/volume.svg";
@@ -97,6 +102,9 @@ export default function AI() {
   const [isRecording, setIsRecording] = useState(false);
   const [micLevel, setMicLevel] = useState(0);
   const [spkLevel, setSpkLevel] = useState(0);
+
+  /* ── ערכת נושא (background + accent) ── */
+  const { theme: aiTheme } = useAITheme();
 
   /* ── הגדרות תצוגה (מה-context – נשמר ב-DB) ── */
   const { settings: aiSettings, updateSetting } = useAiSettings();
@@ -500,8 +508,11 @@ export default function AI() {
         }}
       />
 
-      <div className="ai-container">
-        <NeuronBackground />
+      <div className={`ai-container theme-${aiTheme}`}>
+        {aiTheme === "neurons" && <NeuronBackground />}
+        {aiTheme === "aurora" && <AuroraBackground />}
+        {aiTheme === "galaxy" && <GalaxyBackground />}
+        {aiTheme === "cyber" && <CyberBackground />}
 
         {/* ── Dark Overlay (closes settings on click) ── */}
         {settingsOpen && (

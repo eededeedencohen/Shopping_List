@@ -1,0 +1,106 @@
+.cyber-bg {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  background: linear-gradient(180deg, #1a0033 0%, #2d0050 35%, #ff006e 75%, #ff8c00 100%);
+}
+
+.cyber-stars {
+  position: absolute;
+  inset: 0 0 50% 0;
+  background-image:
+    radial-gradient(1px 1px at 10% 20%, white, transparent),
+    radial-gradient(1px 1px at 30% 60%, white, transparent),
+    radial-gradient(2px 2px at 50% 30%, white, transparent),
+    radial-gradient(1px 1px at 70% 80%, white, transparent),
+    radial-gradient(1px 1px at 90% 40%, white, transparent),
+    radial-gradient(1.5px 1.5px at 15% 70%, white, transparent),
+    radial-gradient(1px 1px at 60% 10%, white, transparent),
+    radial-gradient(1px 1px at 85% 25%, white, transparent),
+    radial-gradient(2px 2px at 40% 50%, white, transparent),
+    radial-gradient(1px 1px at 95% 65%, white, transparent),
+    radial-gradient(1px 1px at 25% 35%, white, transparent),
+    radial-gradient(1.5px 1.5px at 55% 85%, white, transparent);
+  animation: cyber-twinkle 4s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes cyber-twinkle {
+  0%,
+  100% { opacity: 0.7; }
+  50%  { opacity: 1; }
+}
+
+.cyber-sun-wrap {
+  position: absolute;
+  top: 22%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 280px;
+  height: 280px;
+  pointer-events: none;
+}
+
+.cyber-sun {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: linear-gradient(180deg, #ffea00 0%, #ff8c00 50%, #ff006e 100%);
+  box-shadow: 0 0 100px 20px rgba(255, 0, 110, 0.4);
+}
+
+.cyber-sun::before {
+  content: "";
+  position: absolute;
+  inset: 50% 0 0 0;
+  background: repeating-linear-gradient(
+    180deg,
+    transparent 0px,
+    transparent 10px,
+    rgba(26, 0, 51, 0.65) 10px,
+    rgba(26, 0, 51, 0.65) 14px,
+    transparent 14px,
+    transparent 30px,
+    rgba(26, 0, 51, 0.55) 30px,
+    rgba(26, 0, 51, 0.55) 36px,
+    transparent 36px,
+    transparent 60px,
+    rgba(26, 0, 51, 0.45) 60px,
+    rgba(26, 0, 51, 0.45) 70px
+  );
+  border-radius: 0 0 140px 140px;
+}
+
+.cyber-grid-wrap {
+  position: absolute;
+  inset: 50% -20% 0 -20%;
+  perspective: 350px;
+  transform-style: preserve-3d;
+  pointer-events: none;
+}
+
+.cyber-grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255, 0, 200, 0.65) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 230, 255, 0.65) 1px, transparent 1px);
+  background-size: 60px 60px;
+  transform: rotateX(60deg) translateZ(0);
+  transform-origin: top center;
+  animation: cyber-grid-scroll 4s linear infinite;
+  filter: drop-shadow(0 0 4px rgba(255, 0, 200, 0.5));
+}
+
+@keyframes cyber-grid-scroll {
+  from { background-position: 0 0; }
+  to   { background-position: 0 60px; }
+}
+
+.cyber-haze {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 50% 70%, transparent 30%, rgba(15, 0, 35, 0.4) 100%);
+  pointer-events: none;
+}

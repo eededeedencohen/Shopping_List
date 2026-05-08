@@ -3,6 +3,7 @@ import "./Settings.css";
 import { useProductsLayout } from "../../context/ProductsLayoutContext";
 import { useCartCardLayout } from "../../context/CartCardLayoutContext";
 import { usePriceCompareLayout } from "../../context/PriceCompareLayoutContext";
+import { useAITheme } from "../../context/AIThemeContext";
 import { useAvailabilityMeta } from "../../hooks/useProductAvailability";
 import { rebuildAvailabilityIndex } from "../../services/productAvailabilityService";
 
@@ -16,6 +17,29 @@ const PRODUCTS_LAYOUT_OPTIONS = [
     value: "grid",
     label: "רשת",
     description: "שני מוצרים בכל שורה — תצוגה קומפקטית",
+  },
+];
+
+const AI_THEME_OPTIONS = [
+  {
+    value: "neurons",
+    label: "נוירונים",
+    description: "חלקיקים זוהרים מחוברים — קלאסי וטכנולוגי",
+  },
+  {
+    value: "aurora",
+    label: "זוהר צפוני",
+    description: "ענני צבע נעים בתנועה איטית — חולמני",
+  },
+  {
+    value: "galaxy",
+    label: "גלקסיה",
+    description: "כוכבים מנצנצים, ערפילית וכוכבי שביט",
+  },
+  {
+    value: "cyber",
+    label: "סייבר",
+    description: "סינתווייב — שמש ניאון וגריד פרספקטיבה",
   },
 ];
 
@@ -56,6 +80,45 @@ function ProductsLayoutPreview({ value }) {
   return (
     <div className="layout-preview layout-preview--grid">
       <span /><span /><span /><span />
+    </div>
+  );
+}
+
+function AIThemePreview({ value }) {
+  return (
+    <div className={`ai-theme-preview ai-theme-preview--${value}`}>
+      {value === "neurons" && (
+        <>
+          <span className="ai-theme-preview__dot ai-theme-preview__dot-1" />
+          <span className="ai-theme-preview__dot ai-theme-preview__dot-2" />
+          <span className="ai-theme-preview__dot ai-theme-preview__dot-3" />
+          <span className="ai-theme-preview__dot ai-theme-preview__dot-4" />
+        </>
+      )}
+      {value === "aurora" && (
+        <>
+          <span className="ai-theme-preview__blob ai-theme-preview__blob-1" />
+          <span className="ai-theme-preview__blob ai-theme-preview__blob-2" />
+          <span className="ai-theme-preview__blob ai-theme-preview__blob-3" />
+        </>
+      )}
+      {value === "galaxy" && (
+        <>
+          <span className="ai-theme-preview__star ai-theme-preview__star-1" />
+          <span className="ai-theme-preview__star ai-theme-preview__star-2" />
+          <span className="ai-theme-preview__star ai-theme-preview__star-3" />
+          <span className="ai-theme-preview__star ai-theme-preview__star-4" />
+          <span className="ai-theme-preview__star ai-theme-preview__star-5" />
+          <span className="ai-theme-preview__star ai-theme-preview__star-6" />
+          <span className="ai-theme-preview__comet" />
+        </>
+      )}
+      {value === "cyber" && (
+        <>
+          <span className="ai-theme-preview__sun" />
+          <span className="ai-theme-preview__grid" />
+        </>
+      )}
     </div>
   );
 }
@@ -147,6 +210,7 @@ export default function Settings() {
     useCartCardLayout();
   const { layout: priceCompareLayout, setLayout: setPriceCompareLayout } =
     usePriceCompareLayout();
+  const { theme: aiTheme, setTheme: setAITheme } = useAITheme();
 
   const { meta, isLoading: isMetaLoading, refetch: refetchMeta } =
     useAvailabilityMeta();
@@ -235,6 +299,37 @@ export default function Settings() {
                     aria-pressed={active}
                   >
                     <CartCardPreview value={opt.value} />
+                    <span className="layout-option__label">{opt.label}</span>
+                    <span className="layout-option__desc">
+                      {opt.description}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+
+        <section className="settings-card">
+          <header className="settings-card__header">
+            <span className="settings-card__title">ערכת נושא ל-AI</span>
+          </header>
+          <div className="settings-card__body">
+            <p className="settings-card__hint">
+              בחר רקע ופלטת צבעים לעמוד ה-AI — הצ׳אט, הכפתורים וכל המראה
+            </p>
+            <div className="layout-options layout-options--quad">
+              {AI_THEME_OPTIONS.map((opt) => {
+                const active = aiTheme === opt.value;
+                return (
+                  <button
+                    key={opt.value}
+                    type="button"
+                    className={`layout-option ${active ? "is-active" : ""}`}
+                    onClick={() => setAITheme(opt.value)}
+                    aria-pressed={active}
+                  >
+                    <AIThemePreview value={opt.value} />
                     <span className="layout-option__label">{opt.label}</span>
                     <span className="layout-option__desc">
                       {opt.description}

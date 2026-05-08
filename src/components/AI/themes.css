@@ -1,0 +1,158 @@
+/* ═══════════════════════════════════════════════
+   AI Theme overrides — accent re-tinting per theme
+   ═══════════════════════════════════════════════ */
+
+/* ── Aurora: purple/magenta accent ────────────── */
+.ai-container.theme-aurora {
+  --grad-start: #b06cff;
+  --grad-mid:   #ff5fbf;
+  --grad-end:   #1a0033;
+}
+
+.ai-container.theme-aurora .settings-toggle-btn {
+  border-color: rgba(176, 108, 255, 0.30);
+  background: rgba(176, 108, 255, 0.10);
+}
+.ai-container.theme-aurora .settings-toggle-btn:hover {
+  background: rgba(176, 108, 255, 0.22);
+  border-color: rgba(255, 95, 191, 0.55);
+}
+.ai-container.theme-aurora .settings-section:hover {
+  border-color: rgba(176, 108, 255, 0.32);
+}
+.ai-container.theme-aurora .settings-section-icon {
+  background: linear-gradient(135deg, rgba(176, 108, 255, 0.30), rgba(255, 95, 191, 0.20));
+  border-color: rgba(176, 108, 255, 0.35);
+}
+.ai-container.theme-aurora .settings-section-svg,
+.ai-container.theme-aurora .settings-section-svg path,
+.ai-container.theme-aurora .settings-section-svg polygon,
+.ai-container.theme-aurora .settings-section-svg circle,
+.ai-container.theme-aurora .settings-section-svg g {
+  fill: #ff8be0;
+  filter: drop-shadow(0 0 6px rgba(255, 95, 191, 0.55));
+}
+.ai-container.theme-aurora .lang-btn:hover,
+.ai-container.theme-aurora .voice-dropdown:hover,
+.ai-container.theme-aurora .voice-dropdown:focus {
+  border-color: rgba(176, 108, 255, 0.45);
+}
+.ai-container.theme-aurora .lang-btn.active {
+  background: linear-gradient(135deg, #b06cff, #ff5fbf);
+  border-color: rgba(255, 95, 191, 0.5);
+  box-shadow: 0 4px 14px rgba(176, 108, 255, 0.36);
+}
+.ai-container.theme-aurora .test-open-btn {
+  border-color: rgba(176, 108, 255, 0.5);
+  background: linear-gradient(135deg, #b06cff, #ff5fbf);
+  box-shadow: 0 6px 18px rgba(176, 108, 255, 0.32),
+              0 1px 0 rgba(255, 255, 255, 0.18) inset;
+}
+.ai-container.theme-aurora .toggle-switch.on {
+  background: linear-gradient(135deg, #b06cff, #ff5fbf);
+}
+
+/* ── Galaxy: deep blue/violet accent ──────────── */
+.ai-container.theme-galaxy {
+  --grad-start: #6a82fb;
+  --grad-mid:   #fc5c7d;
+  --grad-end:   #050015;
+}
+
+.ai-container.theme-galaxy .settings-toggle-btn {
+  border-color: rgba(106, 130, 251, 0.30);
+  background: rgba(106, 130, 251, 0.10);
+}
+.ai-container.theme-galaxy .settings-toggle-btn:hover {
+  background: rgba(106, 130, 251, 0.22);
+  border-color: rgba(252, 92, 125, 0.55);
+}
+.ai-container.theme-galaxy .settings-section:hover {
+  border-color: rgba(106, 130, 251, 0.32);
+}
+.ai-container.theme-galaxy .settings-section-icon {
+  background: linear-gradient(135deg, rgba(106, 130, 251, 0.30), rgba(252, 92, 125, 0.20));
+  border-color: rgba(106, 130, 251, 0.35);
+}
+.ai-container.theme-galaxy .settings-section-svg,
+.ai-container.theme-galaxy .settings-section-svg path,
+.ai-container.theme-galaxy .settings-section-svg polygon,
+.ai-container.theme-galaxy .settings-section-svg circle,
+.ai-container.theme-galaxy .settings-section-svg g {
+  fill: #a5b4fc;
+  filter: drop-shadow(0 0 6px rgba(106, 130, 251, 0.55));
+}
+.ai-container.theme-galaxy .lang-btn:hover,
+.ai-container.theme-galaxy .voice-dropdown:hover,
+.ai-container.theme-galaxy .voice-dropdown:focus {
+  border-color: rgba(106, 130, 251, 0.45);
+}
+.ai-container.theme-galaxy .lang-btn.active {
+  background: linear-gradient(135deg, #6a82fb, #fc5c7d);
+  border-color: rgba(252, 92, 125, 0.5);
+  box-shadow: 0 4px 14px rgba(106, 130, 251, 0.36);
+}
+.ai-container.theme-galaxy .test-open-btn {
+  border-color: rgba(106, 130, 251, 0.5);
+  background: linear-gradient(135deg, #6a82fb, #fc5c7d);
+  box-shadow: 0 6px 18px rgba(106, 130, 251, 0.32),
+              0 1px 0 rgba(255, 255, 255, 0.18) inset;
+}
+.ai-container.theme-galaxy .toggle-switch.on {
+  background: linear-gradient(135deg, #6a82fb, #fc5c7d);
+}
+
+/* ── Cyber: neon magenta + cyan accent ─────────── */
+.ai-container.theme-cyber {
+  --grad-start: #ff00c8;
+  --grad-mid:   #00e6ff;
+  --grad-end:   #1a0033;
+}
+
+.ai-container.theme-cyber .settings-toggle-btn {
+  border-color: rgba(255, 0, 200, 0.40);
+  background: rgba(255, 0, 200, 0.12);
+}
+.ai-container.theme-cyber .settings-toggle-btn:hover {
+  background: rgba(0, 230, 255, 0.22);
+  border-color: rgba(0, 230, 255, 0.55);
+}
+.ai-container.theme-cyber .settings-section:hover {
+  border-color: rgba(255, 0, 200, 0.40);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.06) inset,
+    0 10px 28px rgba(0, 0, 0, 0.3),
+    0 0 0 1px rgba(0, 230, 255, 0.18);
+}
+.ai-container.theme-cyber .settings-section-icon {
+  background: linear-gradient(135deg, rgba(255, 0, 200, 0.30), rgba(0, 230, 255, 0.22));
+  border-color: rgba(255, 0, 200, 0.45);
+  box-shadow: 0 0 18px rgba(255, 0, 200, 0.25);
+}
+.ai-container.theme-cyber .settings-section-svg,
+.ai-container.theme-cyber .settings-section-svg path,
+.ai-container.theme-cyber .settings-section-svg polygon,
+.ai-container.theme-cyber .settings-section-svg circle,
+.ai-container.theme-cyber .settings-section-svg g {
+  fill: #ff5cd8;
+  filter: drop-shadow(0 0 8px rgba(255, 0, 200, 0.7));
+}
+.ai-container.theme-cyber .lang-btn:hover,
+.ai-container.theme-cyber .voice-dropdown:hover,
+.ai-container.theme-cyber .voice-dropdown:focus {
+  border-color: rgba(0, 230, 255, 0.55);
+}
+.ai-container.theme-cyber .lang-btn.active {
+  background: linear-gradient(135deg, #ff00c8, #00e6ff);
+  border-color: rgba(0, 230, 255, 0.55);
+  box-shadow: 0 4px 14px rgba(255, 0, 200, 0.4);
+}
+.ai-container.theme-cyber .test-open-btn {
+  border-color: rgba(0, 230, 255, 0.55);
+  background: linear-gradient(135deg, #ff00c8, #00e6ff);
+  box-shadow: 0 6px 18px rgba(255, 0, 200, 0.4),
+              0 1px 0 rgba(255, 255, 255, 0.2) inset;
+}
+.ai-container.theme-cyber .toggle-switch.on {
+  background: linear-gradient(135deg, #ff00c8, #00e6ff);
+}
