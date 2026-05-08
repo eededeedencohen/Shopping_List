@@ -235,32 +235,55 @@
 /* ── Toggle: regular vs per-unit ─────────────── */
 .compareM__price-mode {
   display: flex;
-  align-items: center;
-  gap: 2px;
+  align-items: stretch;
+  gap: 0;
   padding: 3px;
-  background: #f3f4f6;
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
   border-radius: 10px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .compareM__price-mode button {
-  flex: 1;
-  padding: 7px 10px;
+  flex: 1 1 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 10px;
   background: transparent;
-  border: none;
-  border-radius: 8px;
-  color: #6b7280;
+  border: 0;
+  border-radius: 7px;
+  color: #64748b;
   font-family: inherit;
-  font-size: 0.83rem;
+  font-size: 0.82rem;
   font-weight: 600;
-  cursor: pointer;
-  transition: background 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
   letter-spacing: -0.1px;
+  line-height: 1.15;
+  text-align: center;
+  white-space: nowrap;
+  cursor: pointer;
+  outline: none;
+  -webkit-appearance: none;
+  appearance: none;
+  -webkit-tap-highlight-color: transparent;
+  transition: background 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.compareM__price-mode button:not(.active):hover {
+  color: #111827;
+}
+
+.compareM__price-mode button:focus-visible {
+  outline: 2px solid rgba(37, 99, 235, 0.45);
+  outline-offset: 1px;
 }
 
 .compareM__price-mode button.active {
-  background: #ffffff;
-  color: #111827;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+  background: #111827;
+  color: #ffffff;
+  box-shadow: 0 2px 5px rgba(17, 24, 39, 0.18);
+  cursor: default;
 }
 
 /* ── Prices list ─────────────────────────────── */
@@ -373,11 +396,10 @@
 }
 
 .compareM__price-row-name-text {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
   max-width: 100%;
-  min-width: 0;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+  line-height: 1.3;
 }
 
 .compareM__branch-count-pill {
@@ -419,10 +441,10 @@
   font-size: 0.78rem;
   color: #6b7280;
   font-weight: 500;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
   unicode-bidi: plaintext;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+  line-height: 1.35;
 }
 
 .compareM__price-row-discount {
@@ -537,10 +559,10 @@
 }
 
 .compareM__group-branch-text {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
   flex: 1;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+  line-height: 1.4;
 }
 
 /* ── Empty state ─────────────────────────────── */
