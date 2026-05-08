@@ -52,6 +52,28 @@
   background: linear-gradient(135deg, #b06cff, #ff5fbf);
 }
 
+/* — Aurora chat — */
+.ai-container.theme-aurora .message-item.user {
+  background: linear-gradient(135deg, #b06cff 0%, #ff5fbf 100%);
+  box-shadow: 0 4px 14px rgba(176, 108, 255, 0.32);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+}
+.ai-container.theme-aurora .message-item.assistant,
+.ai-container.theme-aurora .op-message-bubble {
+  border-color: rgba(176, 108, 255, 0.30);
+  box-shadow: 0 2px 14px rgba(176, 108, 255, 0.20);
+}
+.ai-container.theme-aurora .user-text-box {
+  border-color: rgba(176, 108, 255, 0.36);
+  box-shadow: 0 4px 14px rgba(176, 108, 255, 0.22),
+              0 0 8px rgba(255, 255, 255, 0.4) inset;
+}
+.ai-container.theme-aurora .user-text-box button[type="submit"] {
+  box-shadow: 0 5px 14px rgba(255, 95, 191, 0.45),
+              0 0 12px rgba(176, 108, 255, 0.35),
+              inset 0 0 4px rgba(255, 255, 255, 0.7);
+}
+
 /* ── Galaxy: deep blue/violet accent ──────────── */
 .ai-container.theme-galaxy {
   --grad-start: #6a82fb;
@@ -100,6 +122,28 @@
 }
 .ai-container.theme-galaxy .toggle-switch.on {
   background: linear-gradient(135deg, #6a82fb, #fc5c7d);
+}
+
+/* — Galaxy chat — */
+.ai-container.theme-galaxy .message-item.user {
+  background: linear-gradient(135deg, #6a82fb 0%, #fc5c7d 100%);
+  box-shadow: 0 4px 14px rgba(106, 130, 251, 0.32);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+}
+.ai-container.theme-galaxy .message-item.assistant,
+.ai-container.theme-galaxy .op-message-bubble {
+  border-color: rgba(106, 130, 251, 0.30);
+  box-shadow: 0 2px 14px rgba(106, 130, 251, 0.20);
+}
+.ai-container.theme-galaxy .user-text-box {
+  border-color: rgba(106, 130, 251, 0.36);
+  box-shadow: 0 4px 14px rgba(106, 130, 251, 0.22),
+              0 0 8px rgba(255, 255, 255, 0.4) inset;
+}
+.ai-container.theme-galaxy .user-text-box button[type="submit"] {
+  box-shadow: 0 5px 14px rgba(252, 92, 125, 0.45),
+              0 0 12px rgba(106, 130, 251, 0.35),
+              inset 0 0 4px rgba(255, 255, 255, 0.7);
 }
 
 /* ── Cyber: neon magenta + cyan accent ─────────── */
@@ -155,4 +199,29 @@
 }
 .ai-container.theme-cyber .toggle-switch.on {
   background: linear-gradient(135deg, #ff00c8, #00e6ff);
+}
+
+/* — Cyber chat — */
+.ai-container.theme-cyber .message-item.user {
+  background: linear-gradient(135deg, #ff00c8 0%, #00e6ff 100%);
+  box-shadow: 0 4px 14px rgba(255, 0, 200, 0.40),
+              0 0 20px rgba(0, 230, 255, 0.20);
+  border: 1px solid rgba(0, 230, 255, 0.32);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.18);
+}
+.ai-container.theme-cyber .message-item.assistant,
+.ai-container.theme-cyber .op-message-bubble {
+  border-color: rgba(0, 230, 255, 0.34);
+  box-shadow: 0 2px 14px rgba(255, 0, 200, 0.18),
+              0 0 0 1px rgba(0, 230, 255, 0.14) inset;
+}
+.ai-container.theme-cyber .user-text-box {
+  border-color: rgba(255, 0, 200, 0.34);
+  box-shadow: 0 4px 14px rgba(255, 0, 200, 0.26),
+              0 0 0 1px rgba(0, 230, 255, 0.20) inset;
+}
+.ai-container.theme-cyber .user-text-box button[type="submit"] {
+  box-shadow: 0 5px 14px rgba(255, 0, 200, 0.50),
+              0 0 14px rgba(0, 230, 255, 0.45),
+              inset 0 0 4px rgba(255, 255, 255, 0.7);
 }
