@@ -22,7 +22,7 @@ const ReplaceIcon = (props) => (
     viewBox="0 0 24 24"
     fill="none"
     stroke="currentColor"
-    strokeWidth="2.2"
+    strokeWidth="2.4"
     strokeLinecap="round"
     strokeLinejoin="round"
     aria-hidden="true"
@@ -40,7 +40,7 @@ const PackageIcon = (props) => (
     viewBox="0 0 24 24"
     fill="none"
     stroke="currentColor"
-    strokeWidth="2.2"
+    strokeWidth="2.4"
     strokeLinecap="round"
     strokeLinejoin="round"
     aria-hidden="true"
@@ -51,6 +51,37 @@ const PackageIcon = (props) => (
     <polyline points="3.27 6.96 12 12.01 20.73 6.96" />
   </svg>
 );
+
+function RuleSection({ icon, iconColor, title, hint, options, value, onChange, ariaLabel }) {
+  return (
+    <div className="optx-rule-section">
+      <div className="optx-rule-row">
+        <div className={`optx-rule-icon optx-rule-icon--${iconColor}`}>{icon}</div>
+        <div className="optx-rule-text">
+          <h3 className="optx-rule-title">{title}</h3>
+          <p className="optx-rule-hint">{hint}</p>
+        </div>
+      </div>
+      <div className="optx-segmented" role="tablist" aria-label={ariaLabel}>
+        {options.map((opt) => {
+          const active = value === opt.value;
+          return (
+            <button
+              key={opt.value}
+              type="button"
+              className={`optx-seg ${active ? "is-active" : ""}`}
+              onClick={() => onChange(opt.value)}
+              role="tab"
+              aria-selected={active}
+            >
+              {opt.label}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
 
 const ProductsGeneralSettings = () => {
   const { canReplaceSettings, canRoundUpSettings } = useSettings();
@@ -74,69 +105,31 @@ const ProductsGeneralSettings = () => {
   };
 
   return (
-    <>
-      <section className="optx-rule-card">
-        <header className="optx-rule-header">
-          <div className="optx-rule-icon optx-rule-icon--green">
-            <ReplaceIcon />
-          </div>
-          <div className="optx-rule-text">
-            <h3 className="optx-rule-title">החלפת מוצרים</h3>
-            <p className="optx-rule-hint">
-              מצא חלופה משתלמת יותר — גם אם המוצר המקורי זמין
-            </p>
-          </div>
-        </header>
-        <div className="optx-segmented" role="tablist" aria-label="החלפת מוצרים">
-          {REPLACE_OPTIONS.map((opt) => {
-            const active = canReplaceSettings === opt.value;
-            return (
-              <button
-                key={opt.value}
-                type="button"
-                className={`optx-seg ${active ? "is-active" : ""}`}
-                onClick={() => handleReplace(opt.value)}
-                role="tab"
-                aria-selected={active}
-              >
-                {opt.label}
-              </button>
-            );
-          })}
-        </div>
-      </section>
+    <section className="optx-rules-card">
+      <RuleSection
+        icon={<ReplaceIcon />}
+        iconColor="green"
+        title="החלפת מוצרים"
+        hint="מצא חלופה משתלמת — גם אם המוצר זמין"
+        options={REPLACE_OPTIONS}
+        value={canReplaceSettings}
+        onChange={handleReplace}
+        ariaLabel="החלפת מוצרים"
+      />
 
-      <section className="optx-rule-card">
-        <header className="optx-rule-header">
-          <div className="optx-rule-icon optx-rule-icon--amber">
-            <PackageIcon />
-          </div>
-          <div className="optx-rule-text">
-            <h3 className="optx-rule-title">עיגול כמות במבצע</h3>
-            <p className="optx-rule-hint">
-              הוסף יחידות אם המבצע משתלם יותר (למשל "3 ב-25 ₪")
-            </p>
-          </div>
-        </header>
-        <div className="optx-segmented" role="tablist" aria-label="עיגול כמות במבצע">
-          {ROUND_UP_OPTIONS.map((opt) => {
-            const active = canRoundUpSettings === opt.value;
-            return (
-              <button
-                key={opt.value}
-                type="button"
-                className={`optx-seg ${active ? "is-active" : ""}`}
-                onClick={() => handleRoundUp(opt.value)}
-                role="tab"
-                aria-selected={active}
-              >
-                {opt.label}
-              </button>
-            );
-          })}
-        </div>
-      </section>
-    </>
+      <div className="optx-rules-divider" />
+
+      <RuleSection
+        icon={<PackageIcon />}
+        iconColor="amber"
+        title="עיגול כמות במבצע"
+        hint='הוסף יחידות אם משתלם (3 ב-25 ₪)'
+        options={ROUND_UP_OPTIONS}
+        value={canRoundUpSettings}
+        onChange={handleRoundUp}
+        ariaLabel="עיגול כמות במבצע"
+      />
+    </section>
   );
 };
 

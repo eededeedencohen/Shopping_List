@@ -14,7 +14,7 @@ const ProductIcon = (props) => (
     viewBox="0 0 24 24"
     fill="none"
     stroke="currentColor"
-    strokeWidth="2"
+    strokeWidth="2.2"
     strokeLinecap="round"
     strokeLinejoin="round"
     aria-hidden="true"
@@ -30,7 +30,7 @@ const FilterIcon = (props) => (
     viewBox="0 0 24 24"
     fill="none"
     stroke="currentColor"
-    strokeWidth="2"
+    strokeWidth="2.2"
     strokeLinecap="round"
     strokeLinejoin="round"
     aria-hidden="true"
@@ -55,6 +55,17 @@ const ChevronIcon = (props) => (
   </svg>
 );
 
+const SparkleIcon = (props) => (
+  <svg
+    viewBox="0 0 24 24"
+    fill="currentColor"
+    aria-hidden="true"
+    {...props}
+  >
+    <path d="M12 2l1.8 6.2L20 10l-6.2 1.8L12 18l-1.8-6.2L4 10l6.2-1.8z" />
+  </svg>
+);
+
 const OptimalCartsSettings = () => {
   const navigate = useNavigate();
   const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
@@ -64,55 +75,70 @@ const OptimalCartsSettings = () => {
   const selectedCount = supermarketIDs.length;
   const totalCount = allSupermarkets.length;
 
-  const filterSubtitle =
+  const filterHint =
     totalCount === 0
       ? "טוען רשתות…"
       : selectedCount === 0
-      ? `כל ${totalCount} הסניפים יושוו`
-      : `${selectedCount} מתוך ${totalCount} סניפים נבחרו`;
+      ? `כל ${totalCount} הסניפים`
+      : `${selectedCount}/${totalCount} סניפים`;
 
   return (
     <div className="optx-page">
-      <header className="optx-header">
-        <h1 className="optx-title">אופטימיזציית עגלות</h1>
-        <p className="optx-subtitle">
-          בחר את כללי החישוב והחנויות לפני שנמצא את העגלה הזולה ביותר
-        </p>
+      {/* Animated aurora background */}
+      <div className="optx-bg" aria-hidden="true">
+        <div className="optx-blob optx-blob-1" />
+        <div className="optx-blob optx-blob-2" />
+        <div className="optx-blob optx-blob-3" />
+        <div className="optx-mesh" />
+      </div>
+
+      {/* Hero */}
+      <header className="optx-hero">
+        <span className="optx-hero-eyebrow">
+          <SparkleIcon className="optx-hero-eyebrow-icon" />
+          אופטימיזציה חכמה
+        </span>
+        <h1 className="optx-hero-title">
+          מצא את העגלה{" "}
+          <span className="optx-hero-accent">הזולה ביותר</span>
+        </h1>
       </header>
 
-      <button
-        type="button"
-        className="optx-action-card"
-        onClick={() => navigate("/products-settings")}
-      >
-        <span className="optx-action-icon optx-action-icon--blue">
-          <ProductIcon />
-        </span>
-        <span className="optx-action-text">
-          <span className="optx-action-title">הגדרות לפי מוצר</span>
-          <span className="optx-action-subtitle">
-            לעגל / להחליף בנפרד עבור כל מוצר
+      {/* Top action pills */}
+      <div className="optx-pills-row">
+        <button
+          type="button"
+          className="optx-pill optx-pill--blue"
+          onClick={() => navigate("/products-settings")}
+        >
+          <span className="optx-pill-icon">
+            <ProductIcon />
           </span>
-        </span>
-        <ChevronIcon className="optx-action-chevron" />
-      </button>
+          <span className="optx-pill-text">
+            <span className="optx-pill-title">לפי מוצר</span>
+            <span className="optx-pill-hint">הגדרות פרטניות</span>
+          </span>
+          <ChevronIcon className="optx-pill-arrow" />
+        </button>
 
+        <button
+          type="button"
+          className="optx-pill optx-pill--purple"
+          onClick={() => setIsFilterModalOpen(true)}
+        >
+          <span className="optx-pill-icon">
+            <FilterIcon />
+          </span>
+          <span className="optx-pill-text">
+            <span className="optx-pill-title">סופרמרקטים</span>
+            <span className="optx-pill-hint">{filterHint}</span>
+          </span>
+          <ChevronIcon className="optx-pill-arrow" />
+        </button>
+      </div>
+
+      {/* Combined rules card */}
       <ProductsGeneralSettings />
-
-      <button
-        type="button"
-        className="optx-action-card"
-        onClick={() => setIsFilterModalOpen(true)}
-      >
-        <span className="optx-action-icon optx-action-icon--purple">
-          <FilterIcon />
-        </span>
-        <span className="optx-action-text">
-          <span className="optx-action-title">סינון סופרמרקטים</span>
-          <span className="optx-action-subtitle">{filterSubtitle}</span>
-        </span>
-        <ChevronIcon className="optx-action-chevron" />
-      </button>
 
       <SupermarketsFilterModal
         isOpen={isFilterModalOpen}

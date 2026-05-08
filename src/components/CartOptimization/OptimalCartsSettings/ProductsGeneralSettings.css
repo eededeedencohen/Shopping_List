@@ -1,23 +1,53 @@
-/* ── Rule card (replace / round-up) ─────────── */
-.optx-rule-card {
+/* ═══════════════════════════════════════════════
+   Combined rules card (replace + round-up)
+   ═══════════════════════════════════════════════ */
+
+.optx-rules-card {
+  position: relative;
   margin-bottom: 12px;
   padding: 14px 14px 14px;
   border: 1px solid rgba(15, 23, 42, 0.08);
-  border-radius: 16px;
-  background: rgba(255, 255, 255, 0.92);
-  backdrop-filter: blur(14px) saturate(140%);
-  -webkit-backdrop-filter: blur(14px) saturate(140%);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(18px) saturate(160%);
+  -webkit-backdrop-filter: blur(18px) saturate(160%);
   box-shadow:
-    0 4px 14px rgba(15, 23, 42, 0.06),
+    0 12px 28px rgba(15, 23, 42, 0.10),
     0 1px 0 rgba(255, 255, 255, 0.85) inset;
   font-family: "Heebo", "Open Sans", Arial, sans-serif;
+  overflow: hidden;
 }
 
-.optx-rule-header {
+/* Iridescent glowing top border */
+.optx-rules-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(168, 85, 247, 0.6) 25%,
+    rgba(59, 130, 246, 0.6) 50%,
+    rgba(16, 185, 129, 0.6) 75%,
+    transparent 100%
+  );
+  opacity: 0.7;
+}
+
+/* ── Single rule section ─────────────────────── */
+.optx-rule-section {
   display: flex;
-  align-items: flex-start;
+  flex-direction: column;
   gap: 10px;
-  margin-bottom: 12px;
+}
+
+.optx-rule-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 .optx-rule-icon {
@@ -26,25 +56,31 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 11px;
+  border-radius: 12px;
   flex-shrink: 0;
+  color: #ffffff;
+  position: relative;
 }
 
 .optx-rule-icon svg {
-  width: 18px;
-  height: 18px;
+  width: 17px;
+  height: 17px;
+  position: relative;
+  z-index: 1;
 }
 
 .optx-rule-icon--green {
   background: linear-gradient(135deg, #10b981 0%, #047857 100%);
-  color: #fff;
-  box-shadow: 0 4px 10px rgba(16, 185, 129, 0.3);
+  box-shadow:
+    0 5px 14px rgba(16, 185, 129, 0.42),
+    0 0 0 1px rgba(255, 255, 255, 0.28) inset;
 }
 
 .optx-rule-icon--amber {
   background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-  color: #fff;
-  box-shadow: 0 4px 10px rgba(245, 158, 11, 0.3);
+  box-shadow:
+    0 5px 14px rgba(245, 158, 11, 0.42),
+    0 0 0 1px rgba(255, 255, 255, 0.28) inset;
 }
 
 .optx-rule-text {
@@ -54,22 +90,36 @@
 }
 
 .optx-rule-title {
-  margin: 0 0 2px;
-  font-size: 0.98rem;
-  font-weight: 700;
+  margin: 0 0 1px;
+  font-size: 0.95rem;
+  font-weight: 800;
   color: #0f172a;
-  letter-spacing: -0.1px;
+  letter-spacing: -0.2px;
+  line-height: 1.2;
 }
 
 .optx-rule-hint {
   margin: 0;
-  font-size: 0.78rem;
+  font-size: 0.72rem;
   font-weight: 500;
   color: #64748b;
-  line-height: 1.4;
+  line-height: 1.3;
+  letter-spacing: -0.1px;
 }
 
-/* ── Segmented control ──────────────────────── */
+/* ── Divider ─────────────────────────────────── */
+.optx-rules-divider {
+  height: 1px;
+  margin: 12px 0;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(15, 23, 42, 0.08),
+    transparent
+  );
+}
+
+/* ── Segmented control — vibrant active state ── */
 .optx-segmented {
   display: flex;
   align-items: stretch;
@@ -85,14 +135,14 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 9px 6px;
+  padding: 8px 6px;
   border: 0;
   border-radius: 9px;
   background: transparent;
   color: #64748b;
   font-family: inherit;
-  font-size: 0.82rem;
-  font-weight: 600;
+  font-size: 0.78rem;
+  font-weight: 700;
   letter-spacing: -0.1px;
   text-align: center;
   white-space: nowrap;
@@ -101,22 +151,27 @@
   -webkit-appearance: none;
   appearance: none;
   -webkit-tap-highlight-color: transparent;
-  transition: background 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
+  transition: background 0.18s ease, color 0.18s ease, box-shadow 0.18s ease, transform 0.15s;
 }
 
 .optx-seg:not(.is-active):hover {
   color: #0f172a;
 }
 
-.optx-seg.is-active {
-  background: #ffffff;
-  color: #0f172a;
-  box-shadow:
-    0 1px 3px rgba(0, 0, 0, 0.08),
-    0 0 0 1px rgba(0, 0, 0, 0.04);
+.optx-seg:active {
+  transform: scale(0.97);
 }
 
-/* keep legacy class names dead — they're no longer rendered */
+.optx-seg.is-active {
+  background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 60%, #3b82f6 100%);
+  color: #ffffff;
+  box-shadow:
+    0 3px 10px rgba(37, 99, 235, 0.45),
+    0 0 0 1px rgba(255, 255, 255, 0.3) inset;
+  font-weight: 800;
+}
+
+/* legacy classes — neutralized */
 .products-general-settings,
 .can-replace-general-settings,
 .can-round-up-general-settings,
@@ -124,4 +179,16 @@
 .some-products,
 .no-products {
   all: revert;
+}
+
+/* ── Tighten on small phones ────────────────── */
+@media (max-height: 620px) {
+  .optx-rules-card { padding: 11px 12px; margin-bottom: 9px; }
+  .optx-rules-divider { margin: 9px 0; }
+  .optx-rule-section { gap: 8px; }
+  .optx-rule-icon { width: 34px; height: 34px; }
+  .optx-rule-icon svg { width: 15px; height: 15px; }
+  .optx-rule-title { font-size: 0.88rem; }
+  .optx-rule-hint { font-size: 0.68rem; }
+  .optx-seg { padding: 7px 5px; font-size: 0.74rem; }
 }
