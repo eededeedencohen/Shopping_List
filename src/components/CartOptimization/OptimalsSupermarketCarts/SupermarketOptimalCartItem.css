@@ -1,107 +1,290 @@
-.supermarket-optimal-cart-item {
+/* ═══════════════════════════════════════════════
+   Supermarket-cart card (per-supermarket result)
+   ═══════════════════════════════════════════════ */
+
+.socc-card {
+  position: relative;
   display: flex;
   flex-direction: column;
-  margin-bottom: 1rem;
-  background-color: #f0f0f0;
-  border-radius: 10px;
-  padding: 5px;
+  padding: 14px 16px 14px;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(14px) saturate(140%);
+  -webkit-backdrop-filter: blur(14px) saturate(140%);
+  box-shadow:
+    0 4px 14px rgba(15, 23, 42, 0.06),
+    0 1px 0 rgba(255, 255, 255, 0.85) inset;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 0.18s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  font-family: "Heebo", "Open Sans", Arial, sans-serif;
 }
 
-.optimal-cart-details {
+.socc-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.12);
+  border-color: rgba(37, 99, 235, 0.22);
+}
+
+.socc-card:active {
+  transform: scale(0.99);
+}
+
+.socc-card.is-cheapest {
+  background: linear-gradient(180deg, #f0fdf4 0%, #ffffff 100%);
+  border-color: rgba(16, 185, 129, 0.4);
+  box-shadow:
+    0 6px 20px rgba(16, 185, 129, 0.18),
+    0 1px 0 rgba(255, 255, 255, 0.9) inset;
+}
+
+.socc-best-badge {
+  position: absolute;
+  top: -10px;
+  right: 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px 4px 8px;
+  background: linear-gradient(135deg, #10b981 0%, #047857 100%);
+  color: #ffffff;
+  font-size: 0.72rem;
+  font-weight: 800;
+  border-radius: 999px;
+  box-shadow: 0 4px 10px rgba(16, 185, 129, 0.4);
+  letter-spacing: -0.1px;
+  z-index: 1;
+}
+
+.socc-best-badge svg {
+  width: 12px;
+  height: 12px;
+  flex-shrink: 0;
+}
+
+/* ── Main row ───────────────────────────────── */
+.socc-main {
+  display: grid;
+  grid-template-columns: 64px 1fr auto;
+  gap: 12px;
+  align-items: center;
+}
+
+.socc-logo-wrap {
+  position: relative;
+  width: 64px;
+  height: 64px;
   display: flex;
-  flex-direction: row-reverse;
+  align-items: center;
+  justify-content: center;
+  background: #f8fafc;
+  border: 1px solid #f1f5f9;
+  border-radius: 14px;
+  overflow: hidden;
+  padding: 6px;
 }
 
-.supermarket-details {
-  display: flex;
-  flex-direction: column;
-  width: 50%;
+.socc-card.is-cheapest .socc-logo-wrap {
+  background: #ffffff;
+  border-color: rgba(16, 185, 129, 0.25);
 }
 
-.supermarket-name {
-  width: 100%; /* Full width of the supermarket-details */
-  height: 0; /* Initially set to 0 */
-  padding-top: 30%; /* Adjust this percentage to control the height */
-  position: relative; /* positioned relative to the supermarket-details div */
-  overflow: hidden; /* Hide the overflowing image */
-}
-
-.supermarket-name img {
-  position: absolute; 
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+.socc-logo {
   max-width: 100%;
   max-height: 100%;
-  object-fit: contain; /* Maintains the aspect ratio */
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  display: block;
 }
 
-.supermarket-address {
-  text-align: center;
-  font-size: 1rem;
-  color: #101010;
-  font-weight: bold;
-}
-
-.supermarket-city {
-  text-align: center;
-  font-size: 1rem;
-  color: #101010;
-  font-weight: bold;
-}
-
-.total-price-details {
-  display: flex;
-  align-items: flex-start;
+.socc-rank {
+  position: absolute;
+  top: -6px;
+  left: -6px;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 6px;
+  display: inline-flex;
+  align-items: center;
   justify-content: center;
-  flex-direction: row-reverse;
-  width: 50%;
+  background: #ffffff;
+  color: #1d4ed8;
+  border: 1.5px solid rgba(37, 99, 235, 0.3);
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.08);
 }
 
-.total-price-text {
-  text-align: center;
-  font-size: 1.2rem;
-  font-weight: bold;
-  color: #004008;
-  margin-left: 4px;
-}
-
-.total-price-number {
-  text-align: center;
-  font-size: 1.2rem;
-  font-weight: bold;
-  color: #004008;
-}
-
-.non-exists-products {
+.socc-info {
   display: flex;
   flex-direction: column;
-  margin-right: 1rem;
-  margin-top: 0.5rem;
+  gap: 2px;
+  min-width: 0;
+  text-align: right;
 }
 
-.non-exists-products-text {
-  display: flex;
-  flex-direction: row-reverse;
-
+.socc-name {
+  margin: 0;
   font-size: 1rem;
-  font-weight: bold;
-  color: #630000;
-  margin-left: 4px;
+  font-weight: 800;
+  color: #0f172a;
+  letter-spacing: -0.2px;
+  unicode-bidi: plaintext;
+  word-break: break-word;
 }
 
-.non-exists-products-names {
+.socc-address {
+  margin: 0;
+  font-size: 0.78rem;
+  color: #64748b;
+  font-weight: 500;
+  unicode-bidi: plaintext;
+}
+
+.socc-stock {
+  margin: 2px 0 0;
+  font-size: 0.74rem;
+  font-weight: 600;
+  color: #475569;
+  unicode-bidi: plaintext;
+}
+
+.socc-stock-missing {
+  color: #b45309;
+  font-weight: 700;
+}
+
+/* ── Price column ───────────────────────────── */
+.socc-price-block {
   display: flex;
-  flex-direction: row-reverse;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  padding-inline-start: 10px;
+  border-inline-start: 1px solid rgba(15, 23, 42, 0.08);
+}
+
+.socc-price {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 2px;
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: #0f172a;
+  letter-spacing: -0.5px;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.socc-card.is-cheapest .socc-price {
+  color: #047857;
+}
+
+.socc-price-currency {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #94a3b8;
+}
+
+.socc-card.is-cheapest .socc-price-currency {
+  color: #059669;
+}
+
+.socc-savings {
+  font-size: 0.74rem;
+  font-weight: 800;
+  color: #047857;
+  background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+  padding: 2px 8px;
+  border-radius: 999px;
+  white-space: nowrap;
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  letter-spacing: -0.1px;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Missing-products list (chips) ─────────── */
+.socc-missing {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px dashed rgba(15, 23, 42, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  text-align: right;
+}
+
+.socc-missing-label {
+  font-size: 0.74rem;
+  font-weight: 700;
+  color: #b45309;
+  letter-spacing: -0.1px;
+}
+
+.socc-missing-tags {
+  display: flex;
   flex-wrap: wrap;
-  justify-content: flex-start;
-  align-content: flex-start;
+  gap: 5px;
 }
 
+.socc-missing-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 9px;
+  background: #fff7ed;
+  color: #9a3412;
+  border: 1px solid #fed7aa;
+  border-radius: 999px;
+  font-size: 0.74rem;
+  font-weight: 600;
+  letter-spacing: -0.1px;
+  unicode-bidi: plaintext;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.socc-missing-tag--more {
+  background: #f1f5f9;
+  color: #475569;
+  border-color: #e2e8f0;
+  font-weight: 700;
+}
+
+/* ── Responsive ────────────────────────────── */
+@media (max-width: 380px) {
+  .socc-main {
+    grid-template-columns: 56px 1fr auto;
+    gap: 10px;
+  }
+  .socc-logo-wrap {
+    width: 56px;
+    height: 56px;
+  }
+  .socc-price {
+    font-size: 1.2rem;
+  }
+}
+
+/* legacy classes — neutralized */
+.supermarket-optimal-cart-item,
+.optimal-cart-details,
+.supermarket-details,
+.supermarket-name,
+.supermarket-address,
+.supermarket-city,
+.total-price-details,
+.total-price-text,
+.total-price-number,
+.non-exists-products,
+.non-exists-products-text,
+.non-exists-products-names,
 .non-exists-product {
-  text-align: center;
-  font-size: 1rem;
-  color: #630000;
-  margin-left: 4px; /* Adjust if necessary for spacing */
-  margin-bottom: 4px; /* Add this for vertical spacing between rows */
+  all: revert;
 }

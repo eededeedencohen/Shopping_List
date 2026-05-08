@@ -1,27 +1,73 @@
 import React from "react";
 import "./SupermarketDetails.css";
-// Import the logo component:
 import SupermarketLogo from "../../../../components/Images/SupermarketImage";
 
-const SupermarketDetails = ({ supermarketDetails }) => {
-  const { name: supermarketName, address: supermarketAddress, city: supermarketCity } = supermarketDetails;
+const SupermarketDetails = ({ supermarketDetails, totals }) => {
+  const {
+    name: supermarketName,
+    address: supermarketAddress,
+    city: supermarketCity,
+  } = supermarketDetails || {};
+
+  const showSavings = totals && totals.savings > 0;
 
   return (
-    <div className="optimal-cart">
-      {console.log("supermarketName: ", supermarketName)}
-      <div className="optimal-cart__supermarket-logo">
-        <SupermarketLogo supermarketName={supermarketName} />
-        {console.log("supermarketDetails: ", supermarketDetails)}
-      </div>
-      <div className="optimal-cart__supermarket-info">
-        <div className="optimal-cart__supermarket-address">
-          {supermarketAddress}
+    <section className="ocv-summary">
+      <div className="ocv-summary-top">
+        <div className="ocv-summary-logo-wrap">
+          <SupermarketLogo
+            supermarketName={supermarketName}
+            className="ocv-summary-logo"
+          />
         </div>
-        <div className="optimal-cart__supermarket-city">
-          {supermarketCity}
+        <div className="ocv-summary-info">
+          <h2 className="ocv-summary-name">{supermarketName}</h2>
+          {(supermarketAddress || supermarketCity) && (
+            <p className="ocv-summary-address">
+              {supermarketAddress}
+              {supermarketCity ? `, ${supermarketCity}` : ""}
+            </p>
+          )}
         </div>
       </div>
-    </div>
+
+      {totals && (
+        <div className="ocv-summary-stats">
+          <div className="ocv-summary-stat">
+            <span className="ocv-summary-stat-label">סה"כ עגלה</span>
+            <span className="ocv-summary-stat-value">
+              <span className="ocv-summary-stat-currency">₪</span>
+              {totals.optimalTotal.toFixed(2)}
+            </span>
+          </div>
+
+          {totals.originalTotal > 0 && (
+            <div className="ocv-summary-stat">
+              <span className="ocv-summary-stat-label">עגלה מקורית</span>
+              <span className="ocv-summary-stat-value ocv-summary-stat-value--muted">
+                <span className="ocv-summary-stat-currency">₪</span>
+                {totals.originalTotal.toFixed(2)}
+              </span>
+            </div>
+          )}
+
+          {showSavings && (
+            <div className="ocv-summary-stat ocv-summary-stat--savings">
+              <span className="ocv-summary-stat-label">חיסכון</span>
+              <span className="ocv-summary-stat-value">
+                <span className="ocv-summary-stat-currency">₪</span>
+                {totals.savings.toFixed(2)}
+              </span>
+            </div>
+          )}
+
+          <div className="ocv-summary-stat">
+            <span className="ocv-summary-stat-label">פריטים</span>
+            <span className="ocv-summary-stat-value">{totals.itemCount}</span>
+          </div>
+        </div>
+      )}
+    </section>
   );
 };
 

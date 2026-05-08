@@ -1,5 +1,156 @@
-.list-optimals-supermarket-carts{
-    display: flex;
-    flex-direction: column;
-    width: 100%;
+/* ═══════════════════════════════════════════════
+   Optimal-supermarket-carts — main page
+   ═══════════════════════════════════════════════ */
+
+.osc-page {
+  position: fixed;
+  top: var(--toolbar-h, 40px);
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 0;
+
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  padding: 18px 14px 28px;
+
+  font-family: "Heebo", "Open Sans", Arial, sans-serif;
+  direction: rtl;
+  color: #0f172a;
+
+  background:
+    radial-gradient(circle at 18% -8%, rgba(37, 99, 235, 0.16) 0%, transparent 55%),
+    radial-gradient(circle at 92% 110%, rgba(168, 85, 247, 0.15) 0%, transparent 55%),
+    linear-gradient(180deg, #eef4fc 0%, #e3edf8 60%, #d8e6f5 100%);
 }
+
+/* ── Header ─────────────────────────────────── */
+.osc-header {
+  margin-bottom: 14px;
+  padding: 4px;
+}
+
+.osc-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 10px;
+  padding: 6px 14px 6px 10px;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.85);
+  color: #1d4ed8;
+  font-family: inherit;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+  transition: background 0.15s, border-color 0.15s, transform 0.15s, box-shadow 0.15s;
+}
+
+.osc-back:hover {
+  background: rgba(255, 255, 255, 0.96);
+  border-color: rgba(37, 99, 235, 0.28);
+  box-shadow: 0 4px 10px rgba(15, 23, 42, 0.06);
+}
+
+.osc-back:active {
+  transform: scale(0.97);
+}
+
+.osc-back svg {
+  width: 13px;
+  height: 13px;
+}
+
+.osc-title {
+  margin: 0 0 2px;
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: #0f172a;
+  letter-spacing: -0.3px;
+}
+
+.osc-subtitle {
+  margin: 0 0 14px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #64748b;
+}
+
+/* ── Savings banner ─────────────────────────── */
+.osc-savings-banner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  margin-bottom: 14px;
+  border: 1px solid rgba(16, 185, 129, 0.32);
+  border-radius: 14px;
+  background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+  box-shadow:
+    0 4px 14px rgba(16, 185, 129, 0.18),
+    0 1px 0 rgba(255, 255, 255, 0.7) inset;
+}
+
+.osc-savings-banner-icon {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #10b981 0%, #047857 100%);
+  color: #ffffff;
+  border-radius: 10px;
+  flex-shrink: 0;
+  box-shadow: 0 4px 10px rgba(16, 185, 129, 0.4);
+}
+
+.osc-savings-banner-icon svg {
+  width: 18px;
+  height: 18px;
+}
+
+.osc-savings-banner-text {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 6px;
+  flex: 1;
+  unicode-bidi: plaintext;
+}
+
+.osc-savings-banner-line {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #065f46;
+}
+
+.osc-savings-banner-amount {
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: #047857;
+  letter-spacing: -0.3px;
+  font-variant-numeric: tabular-nums;
+}
+
+.osc-savings-banner-percent {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #059669;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Carts list ─────────────────────────────── */
+.osc-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* legacy classes — neutralized */
+.list-optimals-supermarket-carts { all: revert; }

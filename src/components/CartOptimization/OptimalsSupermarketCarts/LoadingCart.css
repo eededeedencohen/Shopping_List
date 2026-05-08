@@ -1,0 +1,113 @@
+.lc-page {
+  position: fixed;
+  top: var(--toolbar-h, 40px);
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+
+  font-family: "Heebo", "Open Sans", Arial, sans-serif;
+  direction: rtl;
+
+  background:
+    radial-gradient(circle at 20% 0%, rgba(37, 99, 235, 0.16) 0%, transparent 55%),
+    radial-gradient(circle at 80% 100%, rgba(168, 85, 247, 0.14) 0%, transparent 55%),
+    linear-gradient(180deg, #eef4fc 0%, #e3edf8 100%);
+}
+
+.lc-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+  padding: 32px 28px;
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(14px) saturate(140%);
+  -webkit-backdrop-filter: blur(14px) saturate(140%);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  box-shadow:
+    0 18px 48px -12px rgba(15, 23, 42, 0.18),
+    0 1px 0 rgba(255, 255, 255, 0.85) inset;
+  text-align: center;
+  max-width: 360px;
+  width: 100%;
+}
+
+/* Orbit animation */
+.lc-orbit {
+  position: relative;
+  width: 100px;
+  height: 100px;
+}
+
+.lc-core {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 18px;
+  height: 18px;
+  margin-top: -9px;
+  margin-left: -9px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  box-shadow:
+    0 0 16px rgba(37, 99, 235, 0.55),
+    0 0 32px rgba(37, 99, 235, 0.3);
+  animation: lc-pulse 1.4s ease-in-out infinite;
+}
+
+.lc-ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 1.5px solid transparent;
+  border-top-color: #3b82f6;
+}
+
+.lc-ring-1 {
+  animation: lc-spin 1.6s linear infinite;
+}
+.lc-ring-2 {
+  inset: 12px;
+  border-top-color: #a855f7;
+  animation: lc-spin 2.4s linear infinite reverse;
+}
+.lc-ring-3 {
+  inset: 24px;
+  border-top-color: #10b981;
+  animation: lc-spin 1.2s linear infinite;
+}
+
+@keyframes lc-spin { to { transform: rotate(360deg); } }
+@keyframes lc-pulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50%      { transform: scale(1.18); opacity: 0.85; }
+}
+
+.lc-title {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #0f172a;
+  letter-spacing: -0.2px;
+}
+
+.lc-status {
+  margin: 0;
+  min-height: 1.4em;
+  font-size: 0.92rem;
+  font-weight: 500;
+  color: #64748b;
+  animation: lc-fade 0.4s ease-out;
+}
+
+@keyframes lc-fade {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}

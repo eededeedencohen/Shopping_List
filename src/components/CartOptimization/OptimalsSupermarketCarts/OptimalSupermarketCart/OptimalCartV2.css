@@ -1,0 +1,42 @@
+.ocv-page {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 4px 4px 18px;
+  font-family: "Heebo", "Open Sans", Arial, sans-serif;
+  direction: rtl;
+}
+
+.ocv-back {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 14px 6px 10px;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.85);
+  color: #1d4ed8;
+  font-family: inherit;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+  transition: background 0.15s, border-color 0.15s, transform 0.15s, box-shadow 0.15s;
+}
+
+.ocv-back:hover {
+  background: rgba(255, 255, 255, 0.96);
+  border-color: rgba(37, 99, 235, 0.28);
+  box-shadow: 0 4px 10px rgba(15, 23, 42, 0.06);
+}
+
+.ocv-back:active { transform: scale(0.97); }
+
+.ocv-back svg {
+  width: 13px;
+  height: 13px;
+}
