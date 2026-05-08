@@ -1,6 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
 import "./BarcodeScanner.css";
-import useProducts from "../../hooks/products/useProducts";
 import ProductComparisonModal from "../PriceList/productComparisonModal";
 import ProductComparison from "../PriceList/productComparison";
 
@@ -10,8 +9,6 @@ export default function BarcodeScanner() {
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
   const pinchDistanceRef = useRef(0); // Ref to store initial pinch distance
-
-  const { products } = useProducts();
 
   const [barcode, setBarcode] = useState("");
   const [error, setError] = useState("");
@@ -115,13 +112,12 @@ export default function BarcodeScanner() {
             const detectedBarcode = barcodes[0].rawValue;
             setBarcode(detectedBarcode);
 
-            const productExists = products.some(
-              (p) => p.barcode === detectedBarcode,
-            );
-            if (productExists) {
-              setSelectedBarcode(detectedBarcode);
-              setIsComparisonModalOpen(true);
-            }
+            /* Open the comparison modal regardless of whether the
+               product is in our DB. ProductComparison falls back to
+               the live scraper for unknown barcodes and renders the
+               same UI (name + image + prices). */
+            setSelectedBarcode(detectedBarcode);
+            setIsComparisonModalOpen(true);
 
             stopAll();
             return;

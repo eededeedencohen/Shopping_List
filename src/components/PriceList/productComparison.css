@@ -1,3 +1,27 @@
+.compareM__source-badge {
+  display: block;
+  text-align: center;
+  margin: 6px 14px 12px;
+  padding: 7px 12px;
+  border-radius: 10px;
+  background: rgba(245, 158, 11, 0.12);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  color: #92400e;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: -0.1px;
+  direction: rtl;
+}
+
+.compareM__empty-prices {
+  padding: 24px 16px;
+  text-align: center;
+  color: #94a3b8;
+  font-size: 0.9rem;
+  font-weight: 600;
+  direction: rtl;
+}
+
 .spinner-container {
   position: fixed;
   /* Overlay the spinner on top of the content */
