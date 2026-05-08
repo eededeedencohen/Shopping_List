@@ -59,12 +59,33 @@ const OptimalReplaceProductItem = ({
   const [isModalOpen2, setIsModalOpen2] = useState(false);
 
   useEffect(() => {
-    if (isExistsInOptimalCart) {
-      getProductByBarcode(DetailsOptimalProduct.barcode).then((res) => {
-        setProductDetails(res);
+    let cancelled = false;
+
+    // No alternative to fetch — mark loaded so the card moves on
+    if (!isExistsInOptimalCart || !DetailsOptimalProduct.barcode) {
+      setIsProductDetailsUpdated(true);
+      return undefined;
+    }
+
+    // Reset loading state when the barcode changes
+    setIsProductDetailsUpdated(false);
+
+    Promise.resolve(getProductByBarcode(DetailsOptimalProduct.barcode))
+      .then((res) => {
+        if (cancelled) return;
+        setProductDetails(res || {});
+        setIsProductDetailsUpdated(true);
+      })
+      .catch((err) => {
+        if (cancelled) return;
+        console.error("Failed to load alternative product:", err);
+        setProductDetails({});
         setIsProductDetailsUpdated(true);
       });
-    }
+
+    return () => {
+      cancelled = true;
+    };
   }, [
     isExistsInOptimalCart,
     DetailsOptimalProduct.barcode,
@@ -73,10 +94,25 @@ const OptimalReplaceProductItem = ({
 
   if (!isProductDetailsUpdated) {
     return (
-      <div className="opi-card opi-card--loading">
-        <div className="opi-loading-spinner" />
-        <p className="opi-loading-text">טוען פרטי מוצר חלופי…</p>
-      </div>
+      <article className="opi-card opi-card--skeleton" aria-busy="true" aria-label="טוען פרטי מוצר חלופי">
+        <header className="opi-header">
+          <div className="opi-skel opi-skel-img" />
+          <div className="opi-skel-info">
+            <div className="opi-skel opi-skel-pill" />
+            <div className="opi-skel opi-skel-line opi-skel-line--lg" />
+            <div className="opi-skel opi-skel-line opi-skel-line--md" />
+          </div>
+        </header>
+        <div className="opi-comparison">
+          <div className="opi-skel opi-skel-side" />
+          <div className="opi-skel opi-skel-side" />
+        </div>
+        <div className="opi-actions">
+          <div className="opi-skel opi-skel-action" />
+          <div className="opi-skel opi-skel-action" />
+          <div className="opi-skel opi-skel-action" />
+        </div>
+      </article>
     );
   }
 
