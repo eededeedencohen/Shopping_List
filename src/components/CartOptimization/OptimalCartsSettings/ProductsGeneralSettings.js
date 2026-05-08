@@ -83,7 +83,7 @@ const ProductsGeneralSettings = () => {
           <div className="optx-rule-text">
             <h3 className="optx-rule-title">החלפת מוצרים</h3>
             <p className="optx-rule-hint">
-              החלף מוצרים שאינם זמינים בסופר חלופי משתלם
+              מצא חלופה משתלמת יותר — גם אם המוצר המקורי זמין
             </p>
           </div>
         </header>

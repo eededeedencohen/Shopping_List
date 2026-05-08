@@ -11,9 +11,13 @@
   margin-top: auto;
 }
 
-/* The track — premium pill */
+/* The track — premium pill.
+   direction: ltr is critical — the parent page is RTL, which would
+   otherwise flip the knob's natural starting edge and break the JS
+   that expects positive-x drag. */
 .slide-track {
   position: relative;
+  direction: ltr;
   width: 100%;
   max-width: 480px;
   height: 64px;
@@ -95,19 +99,16 @@
 
 .slide-knob:active { cursor: grabbing; }
 
-/* Chevron arrow inside the knob, pointing in the slide direction (left in RTL) */
-.slide-knob::before {
-  content: "";
+/* SVG arrow inside the knob — points in the slide direction (right) */
+.slide-knob-arrow {
   position: absolute;
   top: 50%;
   left: 50%;
-  width: 12px;
-  height: 12px;
-  border-left: 2.6px solid #1d4ed8;
-  border-bottom: 2.6px solid #1d4ed8;
-  transform: translate(-50%, -50%) rotate(45deg);
-  transform-origin: center;
-  border-radius: 1px;
+  width: 18px;
+  height: 18px;
+  transform: translate(-50%, -50%);
+  color: #1d4ed8;
+  pointer-events: none;
 }
 
 /* Trailing fill — already JS-bound to width via x */

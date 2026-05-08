@@ -94,7 +94,20 @@ export default function CalculationOptimalCarts() {
           style={{ x, scale }}
           whileTap={{ scale: 0.92 }}
           onDragEnd={handleEnd} // ← החישוב מתבצע רק כאן
-        />
+        >
+          <svg
+            className="slide-knob-arrow"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="3"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+          >
+            <polyline points="9 18 15 12 9 6" />
+          </svg>
+        </motion.div>
       </div>
     </div>
   );
