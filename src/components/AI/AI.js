@@ -9,6 +9,9 @@ import NeuronBackground from "./NeuronBackground";
 import AuroraBackground from "./AuroraBackground";
 import GalaxyBackground from "./GalaxyBackground";
 import CyberBackground from "./CyberBackground";
+import DawnBackground from "./DawnBackground";
+import CloudsBackground from "./CloudsBackground";
+import BloomBackground from "./BloomBackground";
 import { useAITheme } from "../../context/AIThemeContext";
 import Brobot from "../Brobot/Brobot";
 import TestModal from "./TestModal/TestModal";
@@ -513,6 +516,9 @@ export default function AI() {
         {aiTheme === "aurora" && <AuroraBackground />}
         {aiTheme === "galaxy" && <GalaxyBackground />}
         {aiTheme === "cyber" && <CyberBackground />}
+        {aiTheme === "dawn" && <DawnBackground />}
+        {aiTheme === "clouds" && <CloudsBackground />}
+        {aiTheme === "bloom" && <BloomBackground />}
 
         {/* ── Dark Overlay (closes settings on click) ── */}
         {settingsOpen && (

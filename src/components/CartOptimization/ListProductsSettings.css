@@ -1,5 +1,115 @@
-.list-products-settings{
-    display: flex;
-    flex-direction: column;
-    width: 100%;
+.lps-page {
+  position: fixed;
+  top: var(--toolbar-h, 40px);
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 0;
+
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  padding: 18px 14px 28px;
+
+  font-family: "Heebo", "Open Sans", Arial, sans-serif;
+  direction: rtl;
+  color: #0f172a;
+
+  background:
+    radial-gradient(circle at 20% 0%, rgba(37, 99, 235, 0.14) 0%, transparent 55%),
+    radial-gradient(circle at 90% 110%, rgba(168, 85, 247, 0.14) 0%, transparent 55%),
+    linear-gradient(180deg, #eef4fc 0%, #e3edf8 100%);
 }
+
+.lps-header {
+  margin-bottom: 14px;
+  padding: 4px;
+}
+
+.lps-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 10px;
+  padding: 6px 14px 6px 10px;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.85);
+  color: #1d4ed8;
+  font-family: inherit;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+  transition: background 0.15s, border-color 0.15s, transform 0.15s, box-shadow 0.15s;
+}
+
+.lps-back:hover {
+  background: rgba(255, 255, 255, 0.96);
+  border-color: rgba(37, 99, 235, 0.28);
+  box-shadow: 0 4px 10px rgba(15, 23, 42, 0.06);
+}
+
+.lps-back:active {
+  transform: scale(0.97);
+}
+
+.lps-back svg {
+  width: 13px;
+  height: 13px;
+}
+
+.lps-title {
+  margin: 0 0 2px;
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: #0f172a;
+  letter-spacing: -0.3px;
+}
+
+.lps-subtitle {
+  margin: 0;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #64748b;
+}
+
+.lps-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.lps-loading {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 60px 20px;
+}
+
+.lps-spinner {
+  width: 36px;
+  height: 36px;
+  border: 3px solid rgba(37, 99, 235, 0.15);
+  border-top-color: #2563eb;
+  border-radius: 50%;
+  animation: lps-spin 0.85s linear infinite;
+}
+
+@keyframes lps-spin { to { transform: rotate(360deg); } }
+
+.lps-loading p {
+  margin: 0;
+  font-size: 0.95rem;
+  color: #64748b;
+  font-weight: 500;
+}
+
+/* legacy */
+.list-products-settings { all: unset; }

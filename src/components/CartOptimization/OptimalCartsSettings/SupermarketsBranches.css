@@ -1,97 +1,196 @@
-/* רשימת סניפים (RTL כברירת-מחדל) */
-.sb-list {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-  direction: rtl;
-}
-
-/* כרטיס/שורה בודדת */
-.sb-item {
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
-  padding: 12px 10px;
-  background: #ffffff;
-  border: 1px solid #e5e8ec;
-  border-radius: 10px;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
-  cursor: pointer;
-  transition: box-shadow 0.25s, transform 0.25s;
-}
-
-.sb-item:hover {
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
-  transform: translateY(-2px);
-}
-
-/* צ׳קבוקס — בגלל השפה RTL הוא נמצא מימין */
-.sb-checkbox {
-  /* מסירים עיצוב ברירת-מחדל ומגדירים גודל נוח */
-  width: 20px;
-  height: 20px;
-  accent-color: #2196f3; /* צבע כחול נעים */
-  margin-top: 3px; /* יישור אנכי לטקסט */
-}
-
-/* מידע טקסטואלי */
-.sb-info {
-  display: flex;
-  flex-direction: column;
-  font-family: inherit;
-}
-
-.sb-address {
-  font-weight: 700;
-  color: #00695c; /* ירוק-כחול לקריאות */
-}
-
-.sb-city {
-  font-size: 0.85rem;
-  color: #424242;
-}
-
-/* הודעות עזר */
-.sb-loading,
-.sb-empty {
-  text-align: center;
-  padding: 1rem;
-  font-weight: 500;
-}
+/* ═══════════════════════════════════════════════
+   Branches list (drilled-into chain)
+   ═══════════════════════════════════════════════ */
 
 .sb-wrapper {
   display: flex;
   flex-direction: column;
-  height: 100%;
-}
-
-.sb-header {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 12px;
-}
-
-.sb-back {
-  border: 0;
-  background: transparent;
-  font-size: 1.2rem;
-  cursor: pointer;
-  color: #2196f3;
-}
-
-.sb-title {
-  margin: 0;
-  font-size: 1.1rem;
-}
-
-.sb-list {
-  flex: 1;
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
+  gap: 12px;
+  font-family: "Heebo", "Open Sans", Arial, sans-serif;
   direction: rtl;
 }
 
-/* השאר (sb-item, sb-checkbox, sb-info…) נשארו כפי שהיו */
+.sb-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 4px 2px 8px;
+  border-bottom: 1px dashed rgba(15, 23, 42, 0.08);
+}
+
+.sb-counter {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 3px;
+  font-size: 0.82rem;
+  color: #64748b;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.sb-counter-num {
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.sb-counter-sep {
+  color: #cbd5e1;
+}
+
+.sb-counter-text {
+  margin-inline-start: 4px;
+  font-weight: 500;
+}
+
+.sb-toggle-all {
+  padding: 6px 12px;
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  border-radius: 999px;
+  color: #1d4ed8;
+  font-family: inherit;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+  transition: background 0.15s, border-color 0.15s, color 0.15s, transform 0.15s;
+}
+
+.sb-toggle-all:hover {
+  background: #e0e7ff;
+  border-color: #c7d2fe;
+}
+
+.sb-toggle-all.is-on {
+  background: #fef2f2;
+  border-color: #fecaca;
+  color: #b91c1c;
+}
+
+.sb-toggle-all:active {
+  transform: scale(0.96);
+}
+
+.sb-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.sb-item {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  background: #ffffff;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 12px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: background 0.15s, border-color 0.15s, transform 0.15s;
+}
+
+.sb-item:hover {
+  border-color: rgba(37, 99, 235, 0.25);
+  background: #fafbff;
+}
+
+.sb-item:active {
+  transform: scale(0.99);
+}
+
+.sb-item.is-checked {
+  background: linear-gradient(180deg, #ecfdf5 0%, #ffffff 100%);
+  border-color: rgba(16, 185, 129, 0.4);
+}
+
+.sb-checkbox {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+  width: 0;
+  height: 0;
+}
+
+.sb-checkmark {
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #ffffff;
+  border: 2px solid #cbd5e1;
+  border-radius: 7px;
+  flex-shrink: 0;
+  color: transparent;
+  transition: all 0.18s ease;
+}
+
+.sb-checkmark svg {
+  width: 13px;
+  height: 13px;
+}
+
+.sb-item.is-checked .sb-checkmark {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  border-color: #059669;
+  color: #ffffff;
+  box-shadow: 0 2px 6px rgba(16, 185, 129, 0.4);
+}
+
+.sb-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  text-align: right;
+  unicode-bidi: plaintext;
+}
+
+.sb-address {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: #0f172a;
+  letter-spacing: -0.1px;
+}
+
+.sb-city {
+  font-size: 0.78rem;
+  color: #64748b;
+  font-weight: 500;
+}
+
+/* States */
+.sb-loading,
+.sb-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  text-align: center;
+  padding: 32px 16px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #64748b;
+}
+
+.sb-spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid rgba(37, 99, 235, 0.15);
+  border-top-color: #2563eb;
+  border-radius: 50%;
+  animation: sb-spin 0.85s linear infinite;
+}
+
+@keyframes sb-spin { to { transform: rotate(360deg); } }

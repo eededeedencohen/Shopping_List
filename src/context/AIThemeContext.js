@@ -2,7 +2,15 @@ import { createContext, useContext, useEffect, useState } from "react";
 
 const STORAGE_KEY = "aiTheme";
 const DEFAULT_THEME = "neurons";
-const VALID_THEMES = ["neurons", "aurora", "galaxy", "cyber"];
+const VALID_THEMES = [
+  "neurons",
+  "aurora",
+  "galaxy",
+  "cyber",
+  "dawn",
+  "clouds",
+  "bloom",
+];
 
 const AIThemeContext = createContext({
   theme: DEFAULT_THEME,

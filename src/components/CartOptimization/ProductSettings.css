@@ -1,75 +1,154 @@
-.product-settings {
+/* ═══════════════════════════════════════════════
+   Product card (per-product settings)
+   ═══════════════════════════════════════════════ */
+
+.ps-card {
+  padding: 14px 16px 16px;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(14px) saturate(140%);
+  -webkit-backdrop-filter: blur(14px) saturate(140%);
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 18px;
+  box-shadow:
+    0 4px 14px rgba(15, 23, 42, 0.06),
+    0 1px 0 rgba(255, 255, 255, 0.85) inset;
+  font-family: "Heebo", "Open Sans", Arial, sans-serif;
+}
+
+.ps-options {
   display: flex;
   flex-direction: column;
-  border: 1px solid #aeaeae;
-  border-radius: 8px;
-  background-color: #f9f9f9;
-  box-shadow: 0px 1px 8px 0px rgba(0, 0, 0, 0.5);
-  padding: 10px 3px 10px 3px;
-  margin: 5px;
-  margin-bottom: 1rem;
+  gap: 8px;
+  margin-bottom: 8px;
 }
 
-.product-settings .can-round-up {
+/* iOS-style toggle row */
+.ps-toggle {
+  position: relative;
   display: flex;
-  flex-direction: row-reverse;
   align-items: center;
   justify-content: space-between;
-  margin-top: 10px;
-  margin-bottom: 10px;
+  gap: 12px;
+  padding: 12px 14px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: background 0.18s ease, border-color 0.18s ease;
 }
 
-.product-settings .can-round-up .explanation {
-  font-size: 1rem;
-  color: #54006c;
-  margin-right: 3px;
-  font-weight: bold;
+.ps-toggle.is-on {
+  background: linear-gradient(180deg, #ecfdf5 0%, #f0fdf4 100%);
+  border-color: rgba(16, 185, 129, 0.32);
 }
 
-.product-settings .checkbox {
+.ps-toggle-text {
+  flex: 1;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  gap: 2px;
+  text-align: right;
+  min-width: 0;
 }
 
-.product-settings .checkbox input[type="checkbox"] {
-  width: 1.2rem;
-  height: 1.2rem;
+.ps-toggle-label {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: #0f172a;
+  letter-spacing: -0.1px;
 }
 
-.product-settings .can-replace {
+.ps-toggle-hint {
+  font-size: 0.74rem;
+  font-weight: 500;
+  color: #64748b;
+  line-height: 1.35;
+}
+
+.ps-toggle-input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+  width: 0;
+  height: 0;
+}
+
+.ps-toggle-track {
+  position: relative;
+  width: 44px;
+  height: 26px;
+  background: #cbd5e1;
+  border-radius: 999px;
+  transition: background 0.22s ease;
+  flex-shrink: 0;
+}
+
+.ps-toggle.is-on .ps-toggle-track {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  box-shadow: 0 2px 6px rgba(16, 185, 129, 0.35);
+}
+
+.ps-toggle-thumb {
+  position: absolute;
+  top: 3px;
+  /* RTL convention: thumb starts on the right (off), slides to left when on */
+  right: 3px;
+  width: 20px;
+  height: 20px;
+  background: #ffffff;
+  border-radius: 50%;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.22);
+  transition: right 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.ps-toggle.is-on .ps-toggle-thumb {
+  right: calc(100% - 23px);
+}
+
+/* Replace-only block */
+.ps-replace-options {
+  margin-top: 4px;
+  padding-top: 14px;
+  border-top: 1px dashed rgba(15, 23, 42, 0.08);
   display: flex;
-  flex-direction: row-reverse;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 10px;
+  flex-direction: column;
+  gap: 14px;
 }
 
-.product-settings .can-replace .explanation {
-  font-size: 1rem;
-  color: #54006c;
-  margin-right: 3px;
-  font-weight: bold;
-}
-
-/* תגיות קבוצות */
-.group-tags {
+/* Tags */
+.ps-tags {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
-  margin: 8px 0 14px;
+  padding-top: 2px;
 }
 
+.ps-tag {
+  background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+  color: #1d4ed8;
+  font-size: 0.74rem;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(37, 99, 235, 0.2);
+  letter-spacing: -0.1px;
+}
+
+.ps-tags-state {
+  font-size: 0.78rem;
+  color: #94a3b8;
+  font-style: italic;
+  font-weight: 500;
+}
+
+/* legacy class names — neutralized to avoid old styles bleeding through */
+.product-settings,
+.product-settings .can-round-up,
+.product-settings .can-replace,
+.product-settings .checkbox,
+.product-settings .explanation,
+.group-tags,
 .tag {
-  background: #e0f2f1;
-  color: #00695c;
-  font-size: 0.75rem;
-  padding: 4px 8px;
-  border-radius: 12px;
-}
-
-.no-tags,
-.loading {
-  font-size: 0.75rem;
-  color: #777;
+  all: revert;
 }

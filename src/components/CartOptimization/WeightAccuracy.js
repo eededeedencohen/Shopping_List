@@ -1,11 +1,16 @@
 import React, { useState } from "react";
-// import { useCartOptimizationContext } from "../../context/cart-optimizationContext";
 import { useSettingsOperations } from "../../hooks/optimizationHooks";
 import {
   formatProductWeight,
   reverseFormatProductWeight,
 } from "./WeightAccuracyHelpers";
 import "./WeightAccuracy.css";
+
+const unitLabel = (unit) => {
+  if (unit === "g" || unit === "kg") return "גרם";
+  if (unit === "ml" || unit === "l") return 'מ"ל';
+  return unit || "";
+};
 
 export default function WeightAccuracy({
   barcode,
@@ -14,8 +19,6 @@ export default function WeightAccuracy({
   currentWeightGain,
   currentWeightLoss,
 }) {
-  // const { changeMaxWeightGain, changeMaxWeightLoss } =
-  //   useCartOptimizationContext();
   const { changeMaxWeightGain, changeMaxWeightLoss } = useSettingsOperations();
   const [tempWeightGain, setTempWeightGain] = useState(
     formatProductWeight(productWeight + currentWeightGain, productUnitWeight)
@@ -24,68 +27,69 @@ export default function WeightAccuracy({
     formatProductWeight(productWeight - currentWeightLoss, productUnitWeight)
   );
 
-  const handleWeightGainChange = (event) => {
-    setTempWeightGain(event.target.value);
-  };
+  const baseWeight = formatProductWeight(productWeight, productUnitWeight);
 
-  const handleWeightLossChange = (event) => {
-    setTempWeightLoss(event.target.value);
-  };
+  const handleWeightGainChange = (e) => setTempWeightGain(Number(e.target.value));
+  const handleWeightLossChange = (e) => setTempWeightLoss(Number(e.target.value));
 
-  const handleWeightGainMouseUp = () => {
-    let newMaxWeightGain = reverseFormatProductWeight(
+  const handleWeightGainCommit = () => {
+    const newMaxWeightGain = reverseFormatProductWeight(
       tempWeightGain,
       productUnitWeight
     );
     changeMaxWeightGain(barcode, newMaxWeightGain - productWeight);
   };
 
-  const handleWeightLossMouseUp = () => {
-    let newMaxWeightLoss = reverseFormatProductWeight(
+  const handleWeightLossCommit = () => {
+    const newMaxWeightLoss = reverseFormatProductWeight(
       tempWeightLoss,
       productUnitWeight
     );
     changeMaxWeightLoss(barcode, productWeight - newMaxWeightLoss);
   };
 
+  const unit = unitLabel(productUnitWeight);
+
   return (
-    <div className="product-settings__weight-accuracy">
-      <div className="title">:טווח משקל של מוצר חלופי</div>
-      <div className="weight-accuracy">
-        <div className="max-weight-gain">
-          <input
-            type="range"
-            step={5}
-            min={formatProductWeight(productWeight, productUnitWeight)}
-            max={formatProductWeight(productWeight, productUnitWeight) * 2} // TODO: find the product with the same generalName and get its weight
-            defaultValue={tempWeightGain}
-            onChange={handleWeightGainChange}
-            onMouseUp={handleWeightGainMouseUp}
-            onTouchEnd={handleWeightGainMouseUp}
-            className="weight-gain-value"
-          />
-          <div className="weight-gain-display">{tempWeightGain}</div>
-          <div className="unit-weight-gain">
-            {productUnitWeight === "g" ? "גרם" : 'מ"ל'}
-          </div>
+    <div className="wa-wrapper">
+      <h4 className="wa-title">טווח משקל למוצר חלופי</h4>
+
+      <div className="wa-slider wa-slider--up">
+        <div className="wa-row">
+          <span className="wa-cap">עד</span>
+          <span className="wa-val">{tempWeightGain}</span>
+          <span className="wa-unit">{unit}</span>
         </div>
-        <div className="max-weight-loss">
-          <input
-            type="range"
-            step={5}
-            min={0}
-            max={formatProductWeight(productWeight, productUnitWeight)}
-            defaultValue={tempWeightLoss}
-            onChange={handleWeightLossChange}
-            onMouseUp={handleWeightLossMouseUp}
-            onTouchEnd={handleWeightLossMouseUp}
-            className="weight-loss-value"
-          />
-          <div className="weight-loss-display">{tempWeightLoss}</div>
-          <div className="unit-weight-loss">
-            {productUnitWeight === "g" ? "גרם" : 'מ"ל'}
-          </div>
+        <input
+          type="range"
+          step={5}
+          min={baseWeight}
+          max={baseWeight * 2}
+          defaultValue={tempWeightGain}
+          onChange={handleWeightGainChange}
+          onMouseUp={handleWeightGainCommit}
+          onTouchEnd={handleWeightGainCommit}
+          className="wa-range wa-range--up"
+        />
+      </div>
+
+      <div className="wa-slider wa-slider--down">
+        <div className="wa-row">
+          <span className="wa-cap">מינימום</span>
+          <span className="wa-val">{tempWeightLoss}</span>
+          <span className="wa-unit">{unit}</span>
         </div>
+        <input
+          type="range"
+          step={5}
+          min={0}
+          max={baseWeight}
+          defaultValue={tempWeightLoss}
+          onChange={handleWeightLossChange}
+          onMouseUp={handleWeightLossCommit}
+          onTouchEnd={handleWeightLossCommit}
+          className="wa-range wa-range--down"
+        />
       </div>
     </div>
   );

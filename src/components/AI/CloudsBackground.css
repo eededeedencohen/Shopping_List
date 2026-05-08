@@ -1,0 +1,38 @@
+.clouds-bg {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  background: linear-gradient(180deg, #87ceeb 0%, #b0e0ff 35%, #d8eeff 70%, #f4faff 100%);
+}
+
+.cloud {
+  position: absolute;
+  background: radial-gradient(
+    ellipse at 50% 60%,
+    rgba(255, 255, 255, 0.95) 0%,
+    rgba(255, 255, 255, 0.7) 45%,
+    transparent 75%
+  );
+  border-radius: 50%;
+  filter: blur(10px);
+  will-change: transform;
+  pointer-events: none;
+}
+
+.cloud-1 { top: 8%;  width: 240px; height: 100px; animation: cloud-drift-rtl 55s linear infinite; }
+.cloud-2 { top: 22%; width: 300px; height: 120px; animation: cloud-drift-ltr 70s linear infinite; }
+.cloud-3 { top: 40%; width: 200px; height: 80px;  animation: cloud-drift-rtl 48s linear infinite; }
+.cloud-4 { top: 58%; width: 260px; height: 100px; animation: cloud-drift-ltr 60s linear infinite; }
+.cloud-5 { top: 72%; width: 220px; height: 90px;  animation: cloud-drift-rtl 52s linear infinite; }
+.cloud-6 { top: 14%; width: 170px; height: 70px;  animation: cloud-drift-ltr 42s linear infinite; }
+
+@keyframes cloud-drift-ltr {
+  from { transform: translateX(-40%); }
+  to   { transform: translateX(140vw); }
+}
+
+@keyframes cloud-drift-rtl {
+  from { transform: translateX(140vw); }
+  to   { transform: translateX(-40%); }
+}

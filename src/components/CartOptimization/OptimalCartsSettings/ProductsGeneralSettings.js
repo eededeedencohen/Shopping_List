@@ -5,8 +5,55 @@ import {
 } from "../../../hooks/optimizationHooks";
 import "./ProductsGeneralSettings.css";
 
+const REPLACE_OPTIONS = [
+  { value: "all", label: "כל המוצרים" },
+  { value: "bySelect", label: "מוצרים שנבחרו" },
+  { value: "none", label: "ללא" },
+];
+
+const ROUND_UP_OPTIONS = [
+  { value: "all", label: "כל המוצרים" },
+  { value: "bySelect", label: "מוצרים שנבחרו" },
+  { value: "none", label: "ללא" },
+];
+
+const ReplaceIcon = (props) => (
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2.2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    aria-hidden="true"
+    {...props}
+  >
+    <polyline points="17 1 21 5 17 9" />
+    <path d="M3 11V9a4 4 0 0 1 4-4h14" />
+    <polyline points="7 23 3 19 7 15" />
+    <path d="M21 13v2a4 4 0 0 1-4 4H3" />
+  </svg>
+);
+
+const PackageIcon = (props) => (
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2.2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    aria-hidden="true"
+    {...props}
+  >
+    <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
+    <line x1="12" y1="22.08" x2="12" y2="12" />
+    <polyline points="3.27 6.96 12 12.01 20.73 6.96" />
+  </svg>
+);
+
 const ProductsGeneralSettings = () => {
-  const { canReplaceSettings, canRoundUpSettings } = useSettings(); // useSettings
+  const { canReplaceSettings, canRoundUpSettings } = useSettings();
   const {
     changeCanReplaceSettings,
     changeCanRoundUpSettings,
@@ -14,92 +61,82 @@ const ProductsGeneralSettings = () => {
     changeCanRoundUpAll,
   } = useSettingsOperations();
 
-  console.log("canReplaceSettings:", canReplaceSettings);
-  console.log("canRoundUpSettings:", canRoundUpSettings);
-
-  const onClickCanReplaceAll = () => {
-    changeCanReplaceAll(true);
-    changeCanReplaceSettings("all");
+  const handleReplace = (value) => {
+    changeCanReplaceSettings(value);
+    if (value === "all") changeCanReplaceAll(true);
+    if (value === "none") changeCanReplaceAll(false);
   };
 
-  const onClickCanReplaceNone = () => {
-    changeCanReplaceAll(false);
-    changeCanReplaceSettings("none");
-  };
-
-  const onClickCanRoundUpAll = () => {
-    changeCanRoundUpAll(true);
-    changeCanRoundUpSettings("all");
-  };
-
-  const onClickCanRoundUpNone = () => {
-    changeCanRoundUpAll(false);
-    changeCanRoundUpSettings("none");
-  };
-
-  const onClickCanReplaceBySelect = () => {
-    changeCanReplaceSettings("bySelect");
-  };
-
-  const onClickCanRoundUpBySelect = () => {
-    changeCanRoundUpSettings("bySelect");
+  const handleRoundUp = (value) => {
+    changeCanRoundUpSettings(value);
+    if (value === "all") changeCanRoundUpAll(true);
+    if (value === "none") changeCanRoundUpAll(false);
   };
 
   return (
-    <div className="products-general-settings">
-      <div className="can-replace-general-settings">
-        <div
-          className={`all-products ${
-            canReplaceSettings === "all" ? "active" : ""
-          }`}
-          onClick={onClickCanReplaceAll}
-        >
-          עם החלפה אוטומטית של מוצרים
+    <>
+      <section className="optx-rule-card">
+        <header className="optx-rule-header">
+          <div className="optx-rule-icon optx-rule-icon--green">
+            <ReplaceIcon />
+          </div>
+          <div className="optx-rule-text">
+            <h3 className="optx-rule-title">החלפת מוצרים</h3>
+            <p className="optx-rule-hint">
+              החלף מוצרים שאינם זמינים בסופר חלופי משתלם
+            </p>
+          </div>
+        </header>
+        <div className="optx-segmented" role="tablist" aria-label="החלפת מוצרים">
+          {REPLACE_OPTIONS.map((opt) => {
+            const active = canReplaceSettings === opt.value;
+            return (
+              <button
+                key={opt.value}
+                type="button"
+                className={`optx-seg ${active ? "is-active" : ""}`}
+                onClick={() => handleReplace(opt.value)}
+                role="tab"
+                aria-selected={active}
+              >
+                {opt.label}
+              </button>
+            );
+          })}
         </div>
-        <div
-          className={`some-products ${
-            canReplaceSettings === "bySelect" ? "active" : ""
-          }`}
-          onClick={onClickCanReplaceBySelect}
-        >
-          עם החלפה אוטומטית של מוצרים שנבחרו
+      </section>
+
+      <section className="optx-rule-card">
+        <header className="optx-rule-header">
+          <div className="optx-rule-icon optx-rule-icon--amber">
+            <PackageIcon />
+          </div>
+          <div className="optx-rule-text">
+            <h3 className="optx-rule-title">עיגול כמות במבצע</h3>
+            <p className="optx-rule-hint">
+              הוסף יחידות אם המבצע משתלם יותר (למשל "3 ב-25 ₪")
+            </p>
+          </div>
+        </header>
+        <div className="optx-segmented" role="tablist" aria-label="עיגול כמות במבצע">
+          {ROUND_UP_OPTIONS.map((opt) => {
+            const active = canRoundUpSettings === opt.value;
+            return (
+              <button
+                key={opt.value}
+                type="button"
+                className={`optx-seg ${active ? "is-active" : ""}`}
+                onClick={() => handleRoundUp(opt.value)}
+                role="tab"
+                aria-selected={active}
+              >
+                {opt.label}
+              </button>
+            );
+          })}
         </div>
-        <div
-          className={`no-products ${
-            canReplaceSettings === "none" ? "active" : ""
-          }`}
-          onClick={onClickCanReplaceNone}
-        >
-          ללא החלפה אוטומטית של מוצרים
-        </div>
-      </div>
-      <div className="can-round-up-general-settings">
-        <div
-          className={`all-products ${
-            canRoundUpSettings === "all" ? "active" : ""
-          }`}
-          onClick={onClickCanRoundUpAll}
-        >
-          עם העגלת כמות של כל מוצר שבמבצע
-        </div>
-        <div
-          className={`some-products ${
-            canRoundUpSettings === "bySelect" ? "active" : ""
-          }`}
-          onClick={onClickCanRoundUpBySelect}
-        >
-          עם העגלת כמות של מוצרים שנבחרו
-        </div>
-        <div
-          className={`no-products ${
-            canRoundUpSettings === "none" ? "active" : ""
-          }`}
-          onClick={onClickCanRoundUpNone}
-        >
-          ללא העגלת כמות של מוצרים
-        </div>
-      </div>
-    </div>
+      </section>
+    </>
   );
 };
 

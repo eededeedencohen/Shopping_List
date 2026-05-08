@@ -1,0 +1,90 @@
+.dawn-bg {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  background: linear-gradient(180deg, #ffe5b4 0%, #ffd1a3 28%, #ffb5a7 60%, #ffd6e7 90%, #fff5e1 100%);
+}
+
+.dawn-sun {
+  position: absolute;
+  top: 16%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 280px;
+  height: 280px;
+  background: radial-gradient(
+    circle,
+    rgba(255, 245, 200, 1) 0%,
+    rgba(255, 210, 140, 0.7) 35%,
+    transparent 72%
+  );
+  border-radius: 50%;
+  filter: blur(18px);
+  animation: dawn-pulse 8s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes dawn-pulse {
+  0%,
+  100% { opacity: 0.85; transform: translateX(-50%) scale(1); }
+  50%  { opacity: 1;    transform: translateX(-50%) scale(1.05); }
+}
+
+.dawn-rays {
+  position: absolute;
+  top: 16%;
+  left: 50%;
+  width: 700px;
+  height: 700px;
+  margin-left: -350px;
+  background: conic-gradient(
+    from 0deg,
+    transparent 0deg, rgba(255, 220, 150, 0.18) 5deg, transparent 12deg,
+    transparent 35deg, rgba(255, 220, 150, 0.18) 40deg, transparent 47deg,
+    transparent 70deg, rgba(255, 220, 150, 0.18) 75deg, transparent 82deg,
+    transparent 105deg, rgba(255, 220, 150, 0.18) 110deg, transparent 117deg,
+    transparent 140deg, rgba(255, 220, 150, 0.18) 145deg, transparent 152deg,
+    transparent 175deg, rgba(255, 220, 150, 0.18) 180deg, transparent 187deg,
+    transparent 210deg, rgba(255, 220, 150, 0.18) 215deg, transparent 222deg,
+    transparent 245deg, rgba(255, 220, 150, 0.18) 250deg, transparent 257deg,
+    transparent 280deg, rgba(255, 220, 150, 0.18) 285deg, transparent 292deg,
+    transparent 315deg, rgba(255, 220, 150, 0.18) 320deg, transparent 327deg,
+    transparent 350deg, rgba(255, 220, 150, 0.18) 355deg, transparent 360deg
+  );
+  border-radius: 50%;
+  animation: dawn-rotate 36s linear infinite;
+  opacity: 0.65;
+  pointer-events: none;
+  filter: blur(2px);
+}
+
+@keyframes dawn-rotate {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+.dawn-spark {
+  position: absolute;
+  width: 7px;
+  height: 7px;
+  background: radial-gradient(circle, rgba(255, 250, 220, 1) 0%, rgba(255, 220, 160, 0.5) 50%, transparent 75%);
+  border-radius: 50%;
+  pointer-events: none;
+  animation: dawn-rise 14s linear infinite;
+}
+.dawn-spark-0 { left: 8%;  bottom: -10px; animation-delay: 0s;  }
+.dawn-spark-1 { left: 22%; bottom: -10px; animation-delay: -2s; }
+.dawn-spark-2 { left: 36%; bottom: -10px; animation-delay: -4s; animation-duration: 16s; }
+.dawn-spark-3 { left: 50%; bottom: -10px; animation-delay: -6s; }
+.dawn-spark-4 { left: 64%; bottom: -10px; animation-delay: -8s; animation-duration: 18s; }
+.dawn-spark-5 { left: 78%; bottom: -10px; animation-delay: -10s; }
+.dawn-spark-6 { left: 92%; bottom: -10px; animation-delay: -1s; }
+.dawn-spark-7 { left: 14%; bottom: -10px; animation-delay: -7s; animation-duration: 17s; }
+
+@keyframes dawn-rise {
+  0%   { transform: translateY(0) translateX(0); opacity: 0; }
+  10%  { opacity: 1; }
+  90%  { opacity: 1; }
+  100% { transform: translateY(-110vh) translateX(40px); opacity: 0; }
+}

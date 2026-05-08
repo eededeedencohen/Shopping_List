@@ -1,76 +1,126 @@
-/* מעטפת כללית */
+/* ═══════════════════════════════════════════════
+   Slide-to-confirm — visual refresh
+   (behavior is in CalculationOptimalCarts.js — untouched)
+   ═══════════════════════════════════════════════ */
+
 .slide-wrapper {
   width: 100%;
   display: flex;
   justify-content: center;
-  padding: 40px 16px;
+  padding: 16px 4px 8px;
+  margin-top: auto;
 }
 
-/* המסילה (pill) */
+/* The track — premium pill */
 .slide-track {
   position: relative;
   width: 100%;
-  max-width: 380px; /* אפשר לשנות */
-  height: 68px;
-  padding: 6px; /* חייב להתאים ל-padding ב-JS */
+  max-width: 480px;
+  height: 64px;
+  padding: 6px;
   border-radius: 999px;
-  background: linear-gradient(
-    145deg,
-    rgba(255, 255, 255, 0.35),
-    rgba(0, 0, 0, 0.2)
-  );
-  box-shadow: inset 0 4px 6px rgba(0, 0, 0, 0.15),
-    inset 0 2px 4px rgba(255, 255, 255, 0.25), 0 8px 14px rgba(0, 0, 0, 0.18);
-  backdrop-filter: blur(14px);
+
+  background:
+    linear-gradient(135deg, #1e3a8a 0%, #1d4ed8 45%, #2563eb 100%);
+
+  box-shadow:
+    inset 0 2px 4px rgba(0, 0, 0, 0.22),
+    inset 0 -1px 2px rgba(255, 255, 255, 0.18),
+    0 12px 28px rgba(37, 99, 235, 0.28),
+    0 2px 4px rgba(15, 23, 42, 0.18);
+
   overflow: hidden;
+  cursor: grab;
 }
 
-/* הכיתוב במרכז */
+/* Subtle moving sheen — animated highlight on the track */
+.slide-track::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 60%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.18) 50%,
+    transparent 100%
+  );
+  animation: slide-sheen 3.5s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes slide-sheen {
+  0%   { transform: translateX(0%); }
+  100% { transform: translateX(300%); }
+}
+
+/* Centered label */
 .slide-label {
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  font-family: "SF Pro", "Heebo", sans-serif;
-  font-size: 1rem;
-  font-weight: 600;
+  font-family: "Heebo", "Open Sans", sans-serif;
+  font-size: 0.95rem;
+  font-weight: 700;
   color: #ffffff;
   white-space: nowrap;
   pointer-events: none;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+  letter-spacing: 0.2px;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+  z-index: 2;
 }
 
-/* הכדור – “זכוכית” */
+/* The knob */
 .slide-knob {
+  position: relative;
   width: 56px;
   height: 56px;
   border-radius: 50%;
-  background: radial-gradient(
-    circle at 30% 30%,
-    #2d8cff 20%,
-    #00337e 70%,
-    #001b4b 100%
-  );
-  box-shadow: 0 0 6px 2px rgba(45, 140, 255, 0.6),
-    0 8px 16px rgba(0, 0, 0, 0.25), inset 0 2px 4px rgba(255, 255, 255, 0.45),
-    inset 0 -2px 4px rgba(0, 0, 0, 0.4);
+
+  background:
+    radial-gradient(circle at 30% 30%, #ffffff 0%, #e0e7ff 38%, #c7d2fe 100%);
+
+  box-shadow:
+    0 6px 14px rgba(15, 23, 42, 0.32),
+    0 0 0 1px rgba(255, 255, 255, 0.45) inset,
+    0 -2px 4px rgba(15, 23, 42, 0.18) inset;
+
   cursor: grab;
   touch-action: none;
-}
-.slide-knob:active {
-  cursor: grabbing;
+  z-index: 3;
 }
 
+.slide-knob:active { cursor: grabbing; }
+
+/* Chevron arrow inside the knob, pointing in the slide direction (left in RTL) */
+.slide-knob::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 12px;
+  height: 12px;
+  border-left: 2.6px solid #1d4ed8;
+  border-bottom: 2.6px solid #1d4ed8;
+  transform: translate(-50%, -50%) rotate(45deg);
+  transform-origin: center;
+  border-radius: 1px;
+}
+
+/* Trailing fill — already JS-bound to width via x */
 .slide-shadow {
   position: absolute;
   top: 0;
   left: 0;
   height: 100%;
   pointer-events: none;
-  z-index: 1; /* 🆕 יושב מתחת לכדור */
+  z-index: 1;
   background: linear-gradient(
     to right,
-    rgba(0, 0, 0, 0.35) 0%,
-    rgba(0, 0, 0, 0) 100%
+    rgba(255, 255, 255, 0.28) 0%,
+    rgba(255, 255, 255, 0) 100%
   );
 }
