@@ -1,0 +1,101 @@
+.settings-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.55);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  z-index: 10000;
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  animation: settings-modal-fade 0.22s ease;
+}
+
+@keyframes settings-modal-fade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.settings-modal-window {
+  position: relative;
+  width: 100%;
+  max-width: 720px;
+  max-height: 100vh;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  background: linear-gradient(35deg, rgb(201 240 255) 0%, rgb(255 255 255) 95%);
+  animation: settings-modal-slide 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+  direction: rtl;
+}
+
+@keyframes settings-modal-slide {
+  from { transform: translateY(16px); opacity: 0; }
+  to   { transform: translateY(0); opacity: 1; }
+}
+
+/* Settings.css forces 78px top padding for the global toolbar.
+   In modal mode there's no toolbar above, so reclaim that space. */
+.settings-modal-window .settings-page {
+  min-height: 100%;
+  padding-top: 64px;
+}
+
+/* Close button — sits inside the modal window, top-left in RTL */
+.settings-modal-close {
+  position: sticky;
+  top: 12px;
+  margin: 12px 12px 0 auto;
+  width: 40px;
+  height: 40px;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  color: #475569;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: inherit;
+  z-index: 5;
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.12);
+  transition: transform 0.16s ease, color 0.16s ease,
+    background 0.16s ease, box-shadow 0.16s ease;
+  float: left;
+}
+
+.settings-modal-close svg {
+  width: 18px;
+  height: 18px;
+}
+
+.settings-modal-close:hover {
+  color: #b91c1c;
+  background: #ffffff;
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.16);
+}
+
+.settings-modal-close:active {
+  transform: scale(0.94);
+}
+
+/* Pull the page content up so it starts under the close button row */
+.settings-modal-window .settings-page__header {
+  margin-top: -32px;
+}
+
+/* Desktop: present as a floating card with rounded corners */
+@media (min-width: 720px) {
+  .settings-modal-overlay {
+    align-items: center;
+    padding: 24px;
+  }
+
+  .settings-modal-window {
+    border-radius: 22px;
+    max-height: calc(100vh - 48px);
+    box-shadow: 0 28px 70px rgba(15, 23, 42, 0.32);
+    border: 1px solid rgba(255, 255, 255, 0.6);
+  }
+}
