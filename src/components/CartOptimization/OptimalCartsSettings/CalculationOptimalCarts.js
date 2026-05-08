@@ -83,7 +83,18 @@ export default function CalculationOptimalCarts() {
         <motion.div className="slide-shadow" style={{ width: shadowWidth }} />
 
         <motion.span className="slide-label" style={{ opacity: labelOpacity }}>
-          החלק לחישוב העגלות
+          <span className="slide-label-text">החלק לחישוב העגלות</span>
+          <span className="slide-label-hint" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="9 18 15 12 9 6" />
+            </svg>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="9 18 15 12 9 6" />
+            </svg>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="9 18 15 12 9 6" />
+            </svg>
+          </span>
         </motion.span>
 
         <motion.div
