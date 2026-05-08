@@ -49,6 +49,7 @@ export default function ProductComparison({ barcode }) {
   const [rawScrapedPrices, setRawScrapedPrices] = useState([]);
   const [source, setSource] = useState("loading"); // "loading" | "db" | "scraper" | "empty"
   const [addModalOpen, setAddModalOpen] = useState(false);
+  const [priceMode, setPriceMode] = useState("regular"); // "regular" | "unit"
 
   useEffect(() => {
     if (!barcode) return;
@@ -121,16 +122,29 @@ export default function ProductComparison({ barcode }) {
     };
   }, [barcode, getPriceList]);
 
+  const hasAnyDiscount = useMemo(
+    () =>
+      Array.isArray(priceList) &&
+      priceList.some(
+        (p) => p.discount && typeof p.discount.priceForUnit === "number"
+      ),
+    [priceList]
+  );
+
   const sortedPrices = useMemo(() => {
     if (!Array.isArray(priceList)) return [];
-    return [...priceList].sort((a, b) => {
-      const aPrice = typeof a.price === "number" ? a.price : Number.POSITIVE_INFINITY;
-      const bPrice = typeof b.price === "number" ? b.price : Number.POSITIVE_INFINITY;
-      return aPrice - bPrice;
-    });
-  }, [priceList]);
+    const effective = (p) => {
+      if (priceMode === "unit" && p.discount && typeof p.discount.priceForUnit === "number") {
+        return p.discount.priceForUnit;
+      }
+      return typeof p.price === "number" ? p.price : Number.POSITIVE_INFINITY;
+    };
+    return [...priceList]
+      .map((p) => ({ ...p, _effective: effective(p) }))
+      .sort((a, b) => a._effective - b._effective);
+  }, [priceList, priceMode]);
 
-  const cheapestPrice = sortedPrices[0]?.price;
+  const cheapestEffective = sortedPrices[0]?._effective;
   const hasMultiplePrices = sortedPrices.length > 1;
 
   const handleSaved = async () => {
@@ -163,10 +177,9 @@ export default function ProductComparison({ barcode }) {
   return (
     <>
     <div className="compareM-prices-container">
-      {/* ── Hero card ───────────────────────────── */}
-      <section className="compareM__hero">
+      {/* ── Hero (minimal) ──────────────────────── */}
+      <header className="compareM__hero">
         <div className="compareM__hero-image">
-          <div className="compareM__hero-image-glow" />
           {scrapedImage ? (
             <img
               src={scrapedImage}
@@ -183,32 +196,13 @@ export default function ProductComparison({ barcode }) {
 
         <h2 className="compareM__hero-title">{product.name}</h2>
 
-        <div className="compareM__chips">
+        <p className="compareM__hero-meta">
           {product.weight !== "" && product.weight !== undefined && product.weight !== 0 && (
-            <span className="compareM__chip">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
-                <path d="M3.27 6.96 12 12.01l8.73-5.05M12 22.08V12" />
-              </svg>
-              <span>{product.weight} {unitWeightFormat(product.unitWeight)}</span>
-            </span>
+            <span>{product.weight} {unitWeightFormat(product.unitWeight)}</span>
           )}
-          {product.brand && (
-            <span className="compareM__chip">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z" />
-                <circle cx="7" cy="7" r="1" />
-              </svg>
-              <span>{product.brand}</span>
-            </span>
-          )}
-          <span className="compareM__chip compareM__chip--mono">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M3 5h2v14H3zM7 5h1v14H7zM11 5h2v14h-2zM15 5h1v14h-1zM19 5h2v14h-2z" />
-            </svg>
-            <span>{product.barcode}</span>
-          </span>
-        </div>
+          {product.brand && <span>{product.brand}</span>}
+          <span className="compareM__hero-meta-barcode">ברקוד {product.barcode}</span>
+        </p>
 
         {source === "scraper" && (
           <div className="compareM__scraper-notice">
@@ -235,88 +229,104 @@ export default function ProductComparison({ barcode }) {
             </button>
           </div>
         )}
-      </section>
+      </header>
 
       {/* ── Prices section ───────────────────────── */}
       {sortedPrices.length === 0 ? (
         <div className="compareM__empty-prices">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-            <circle cx="12" cy="12" r="10" />
-            <path d="M8 14s1.5 2 4 2 4-2 4-2M9 9h.01M15 9h.01" />
-          </svg>
           <p>לא נמצאו מחירים עבור הברקוד הזה</p>
         </div>
       ) : (
         <section className="compareM__prices-section">
-          <header className="compareM__prices-header">
-            <h3>מחירים בסופרים</h3>
-            <span className="compareM__prices-count">{sortedPrices.length}</span>
-          </header>
+          <div className="compareM__prices-header">
+            <h3>
+              מחירים בסופרים <span className="compareM__prices-count">{sortedPrices.length}</span>
+            </h3>
 
-          <div className="compareM__prices-list">
+            {hasAnyDiscount && (
+              <div className="compareM__price-mode" role="tablist" aria-label="מצב הצגת מחיר">
+                <button
+                  type="button"
+                  className={priceMode === "regular" ? "active" : ""}
+                  onClick={() => setPriceMode("regular")}
+                  role="tab"
+                  aria-selected={priceMode === "regular"}
+                >
+                  מחיר רגיל
+                </button>
+                <button
+                  type="button"
+                  className={priceMode === "unit" ? "active" : ""}
+                  onClick={() => setPriceMode("unit")}
+                  role="tab"
+                  aria-selected={priceMode === "unit"}
+                >
+                  מחיר ליחידה במבצע
+                </button>
+              </div>
+            )}
+          </div>
+
+          <ul className="compareM__prices-list">
             {Children.toArray(
               sortedPrices.map((priceObject) => {
-                const isCheapest =
+                const isBest =
                   hasMultiplePrices &&
-                  typeof priceObject.price === "number" &&
-                  priceObject.price === cheapestPrice;
+                  typeof priceObject._effective === "number" &&
+                  priceObject._effective === cheapestEffective;
                 const addressIsLink =
                   priceObject.supermarket.address?.includes("https");
 
+                const showingUnitPrice =
+                  priceMode === "unit" &&
+                  priceObject.discount &&
+                  typeof priceObject.discount.priceForUnit === "number";
+
+                const displayedPrice = showingUnitPrice
+                  ? priceObject.discount.priceForUnit
+                  : priceObject.price;
+
                 return (
-                  <article
-                    className={`compareM__price-card${isCheapest ? " compareM__price-card--best" : ""}`}
-                  >
-                    {isCheapest && (
-                      <span className="compareM__best-badge">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                          <path d="M12 2l2.39 4.84L20 7.5l-3.95 3.85L17 17l-5-2.62L7 17l.95-5.65L4 7.5l5.61-.66L12 2z" />
-                        </svg>
-                        הזול ביותר
-                      </span>
-                    )}
-
-                    <div className="compareM__price-card-body">
-                      <div className="compareM__price-card-logo">
-                        <SupermarketImage supermarketName={priceObject.supermarket.name} />
-                      </div>
-
-                      <div className="compareM__price-card-info">
-                        {addressIsLink ? (
-                          <p className="compareM__price-card-name">{priceObject.supermarket.name}</p>
-                        ) : (
-                          <>
-                            <p className="compareM__price-card-name">{priceObject.supermarket.name}</p>
-                            <p className="compareM__price-card-address">
-                              {priceObject.supermarket.address}
-                              {priceObject.supermarket.city ? `, ${priceObject.supermarket.city}` : ""}
-                            </p>
-                          </>
-                        )}
-                      </div>
-
-                      <div className="compareM__price-card-price">
-                        <span className="compareM__price-currency">₪</span>
-                        <span className="compareM__price-value">{priceFormat(priceObject.price)}</span>
-                      </div>
+                  <li className={`compareM__price-row${isBest ? " best" : ""}`}>
+                    <div className="compareM__price-row-logo">
+                      <SupermarketImage supermarketName={priceObject.supermarket.name} />
                     </div>
 
-                    {priceObject.discount && (
-                      <div className="compareM__price-discount">
-                        <span className="compareM__price-discount-tag">מבצע</span>
-                        <span className="compareM__price-discount-text">
-                          {priceObject.discount.units} יח׳ ב-{priceFormat(priceObject.discount.totalPrice)} ₪
+                    <div className="compareM__price-row-info">
+                      <p className="compareM__price-row-name">{priceObject.supermarket.name}</p>
+                      {!addressIsLink && (priceObject.supermarket.address || priceObject.supermarket.city) && (
+                        <p className="compareM__price-row-address">
+                          {priceObject.supermarket.address}
+                          {priceObject.supermarket.city ? `, ${priceObject.supermarket.city}` : ""}
+                        </p>
+                      )}
+                      {priceObject.discount && (
+                        <p className="compareM__price-row-discount">
+                          מבצע: {priceObject.discount.units} ב-{priceFormat(priceObject.discount.totalPrice)} ₪
+                          {!showingUnitPrice && (
+                            <> · {priceFormat(priceObject.discount.priceForUnit)} ₪ ליח׳</>
+                          )}
+                        </p>
+                      )}
+                    </div>
+
+                    <div className="compareM__price-row-price">
+                      {isBest && <span className="compareM__price-row-best-tag">הזול ביותר</span>}
+                      <span className="compareM__price-row-amount">
+                        <span className="compareM__price-row-currency">₪</span>
+                        {priceFormat(displayedPrice)}
+                      </span>
+                      {showingUnitPrice && (
+                        <span className="compareM__price-row-strike">
+                          ₪{priceFormat(priceObject.price)}
                         </span>
-                        <span className="compareM__price-discount-unit">
-                          ({priceFormat(priceObject.discount.priceForUnit)} ₪ ליחידה)
-                        </span>
-                      </div>
-                    )}
-                  </article>
+                      )}
+                    </div>
+                  </li>
                 );
               })
             )}
-          </div>
+          </ul>
         </section>
       )}
     </div>
