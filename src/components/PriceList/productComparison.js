@@ -167,23 +167,6 @@ export default function ProductComparison({ barcode }) {
   const cheapestEffective = sortedPrices[0]?._effective;
   const hasMultiplePrices = sortedPrices.length > 1;
 
-  const mostExpensiveEffective = useMemo(() => {
-    let max = -Infinity;
-    for (const p of sortedPrices) {
-      if (typeof p._effective === "number" && p._effective > max && Number.isFinite(p._effective)) {
-        max = p._effective;
-      }
-    }
-    return Number.isFinite(max) ? max : null;
-  }, [sortedPrices]);
-
-  const maxSavings =
-    typeof mostExpensiveEffective === "number" &&
-    typeof cheapestEffective === "number" &&
-    mostExpensiveEffective > cheapestEffective
-      ? mostExpensiveEffective - cheapestEffective
-      : 0;
-
   // Group adjacent same-chain entries that share price + discount.
   // Because sortedPrices is already sorted by effective price, branches with
   // identical effective price land next to each other; identical (chain + raw
@@ -379,11 +362,6 @@ export default function ProductComparison({ barcode }) {
                   ? priceObject.discount.priceForUnit
                   : priceObject.price;
 
-                const savingsForBest =
-                  isBest && maxSavings > 0
-                    ? maxSavings.toFixed(2)
-                    : null;
-
                 return (
                   <li
                     className={`compareM__price-row${isBest ? " best" : ""}${branchCount > 1 ? " is-group" : ""}${isExpanded ? " is-expanded" : ""}`}
@@ -452,11 +430,6 @@ export default function ProductComparison({ barcode }) {
                         {isBest && (
                           <span className="compareM__price-row-best-tag">
                             הזול ביותר
-                          </span>
-                        )}
-                        {savingsForBest && (
-                          <span className="compareM__price-row-savings">
-                            חוסכים ₪{savingsForBest}
                           </span>
                         )}
                         <span className="compareM__price-row-amount">
