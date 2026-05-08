@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import "./Settings.css";
 import { useProductsLayout } from "../../context/ProductsLayoutContext";
 import { useCartCardLayout } from "../../context/CartCardLayoutContext";
+import { usePriceCompareLayout } from "../../context/PriceCompareLayoutContext";
 import { useAvailabilityMeta } from "../../hooks/useProductAvailability";
 import { rebuildAvailabilityIndex } from "../../services/productAvailabilityService";
 
@@ -15,6 +16,19 @@ const PRODUCTS_LAYOUT_OPTIONS = [
     value: "grid",
     label: "רשת",
     description: "שני מוצרים בכל שורה — תצוגה קומפקטית",
+  },
+];
+
+const PRICE_COMPARE_LAYOUT_OPTIONS = [
+  {
+    value: "expanded",
+    label: "כל הסניפים",
+    description: "כל סניף מוצג כשורה נפרדת — תמיד",
+  },
+  {
+    value: "grouped",
+    label: "מקובצים לפי רשת",
+    description: "סניפים זהים באותה רשת מתאחדים לשורה אחת",
   },
 ];
 
@@ -42,6 +56,40 @@ function ProductsLayoutPreview({ value }) {
   return (
     <div className="layout-preview layout-preview--grid">
       <span /><span /><span /><span />
+    </div>
+  );
+}
+
+function PriceComparePreview({ value }) {
+  if (value === "expanded") {
+    return (
+      <div className="price-compare-preview">
+        <div className="price-compare-preview__row">
+          <span className="price-compare-preview__logo" />
+          <span className="price-compare-preview__line" />
+          <span className="price-compare-preview__price" />
+        </div>
+        <div className="price-compare-preview__row">
+          <span className="price-compare-preview__logo" />
+          <span className="price-compare-preview__line" />
+          <span className="price-compare-preview__price" />
+        </div>
+        <div className="price-compare-preview__row">
+          <span className="price-compare-preview__logo" />
+          <span className="price-compare-preview__line" />
+          <span className="price-compare-preview__price" />
+        </div>
+      </div>
+    );
+  }
+  return (
+    <div className="price-compare-preview price-compare-preview--grouped">
+      <div className="price-compare-preview__row">
+        <span className="price-compare-preview__logo" />
+        <span className="price-compare-preview__line" />
+        <span className="price-compare-preview__badge">3</span>
+        <span className="price-compare-preview__price" />
+      </div>
     </div>
   );
 }
@@ -97,6 +145,8 @@ export default function Settings() {
     useProductsLayout();
   const { layout: cartCardLayout, setLayout: setCartCardLayout } =
     useCartCardLayout();
+  const { layout: priceCompareLayout, setLayout: setPriceCompareLayout } =
+    usePriceCompareLayout();
 
   const { meta, isLoading: isMetaLoading, refetch: refetchMeta } =
     useAvailabilityMeta();
@@ -185,6 +235,37 @@ export default function Settings() {
                     aria-pressed={active}
                   >
                     <CartCardPreview value={opt.value} />
+                    <span className="layout-option__label">{opt.label}</span>
+                    <span className="layout-option__desc">
+                      {opt.description}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+
+        <section className="settings-card">
+          <header className="settings-card__header">
+            <span className="settings-card__title">תצוגת השוואת מחירים</span>
+          </header>
+          <div className="settings-card__body">
+            <p className="settings-card__hint">
+              בחר כיצד יוצגו מחירים של אותה רשת באותו מוצר
+            </p>
+            <div className="layout-options">
+              {PRICE_COMPARE_LAYOUT_OPTIONS.map((opt) => {
+                const active = priceCompareLayout === opt.value;
+                return (
+                  <button
+                    key={opt.value}
+                    type="button"
+                    className={`layout-option ${active ? "is-active" : ""}`}
+                    onClick={() => setPriceCompareLayout(opt.value)}
+                    aria-pressed={active}
+                  >
+                    <PriceComparePreview value={opt.value} />
                     <span className="layout-option__label">{opt.label}</span>
                     <span className="layout-option__desc">
                       {opt.description}

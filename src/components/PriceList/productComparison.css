@@ -259,15 +259,41 @@
 
 .compareM__price-row {
   position: relative;
+  display: flex;
+  flex-direction: column;
+  background: #ffffff;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  overflow: hidden;
+}
+
+.compareM__price-row-main {
   display: grid;
   grid-template-columns: 48px 1fr auto;
   align-items: center;
   gap: 12px;
   padding: 12px 14px;
-  background: #ffffff;
-  border-radius: 12px;
-  border: 1px solid #e5e7eb;
-  overflow: hidden;
+  background: transparent;
+  border: 0;
+  width: 100%;
+  text-align: inherit;
+  font: inherit;
+  color: inherit;
+  cursor: default;
+}
+
+.compareM__price-row.is-group .compareM__price-row-main {
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: background 0.15s ease;
+}
+
+.compareM__price-row.is-group .compareM__price-row-main:hover {
+  background: rgba(0, 0, 0, 0.015);
+}
+
+.compareM__price-row.is-group.best .compareM__price-row-main:hover {
+  background: rgba(16, 185, 129, 0.06);
 }
 
 .compareM__price-row.best {
@@ -280,8 +306,8 @@
   position: absolute;
   inset-inline-start: 0;
   top: 10px;
-  bottom: 10px;
   width: 3px;
+  height: 56px;
   background: #10b981;
   border-radius: 0 3px 3px 0;
 }
@@ -326,6 +352,41 @@
   text-overflow: ellipsis;
   white-space: nowrap;
   unicode-bidi: plaintext;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.compareM__branch-count-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: #eef2ff;
+  border: 1px solid #c7d2fe;
+  color: #4338ca;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: -0.1px;
+  white-space: nowrap;
+  line-height: 1.6;
+}
+
+.compareM__price-row.best .compareM__branch-count-pill {
+  background: #d1fae5;
+  border-color: #a7f3d0;
+  color: #047857;
+}
+
+.compareM__price-row-grouphint {
+  color: #94a3b8 !important;
+  font-weight: 500 !important;
+  font-size: 0.74rem !important;
+  font-style: italic;
+}
+
+.compareM__price-row.is-expanded .compareM__price-row-grouphint {
+  color: #6b7280 !important;
 }
 
 .compareM__price-row-address {
@@ -369,6 +430,18 @@
   line-height: 1.5;
 }
 
+.compareM__price-row-savings {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #047857;
+  background: linear-gradient(135deg, #10b981 0%, #047857 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  white-space: nowrap;
+  letter-spacing: -0.1px;
+}
+
 .compareM__price-row-amount {
   display: inline-flex;
   align-items: baseline;
@@ -402,6 +475,87 @@
   text-decoration: line-through;
   font-variant-numeric: tabular-nums;
   letter-spacing: -0.1px;
+}
+
+/* ── Group chevron + expand area ─────────────── */
+.compareM__group-chevron {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  margin-top: 2px;
+  border-radius: 50%;
+  background: #f3f4f6;
+  color: #6b7280;
+  transition: transform 0.25s ease, background 0.2s ease;
+}
+
+.compareM__price-row.best .compareM__group-chevron {
+  background: #d1fae5;
+  color: #047857;
+}
+
+.compareM__group-chevron svg {
+  width: 14px;
+  height: 14px;
+  transition: transform 0.25s ease;
+}
+
+.compareM__price-row.is-expanded .compareM__group-chevron svg {
+  transform: rotate(180deg);
+}
+
+.compareM__group-branches {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.28s ease;
+}
+
+.compareM__price-row.is-expanded .compareM__group-branches {
+  max-height: 600px;
+}
+
+.compareM__group-branches-inner {
+  border-top: 1px dashed #e5e7eb;
+  padding: 8px 14px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  background: rgba(0, 0, 0, 0.012);
+}
+
+.compareM__price-row.best .compareM__group-branches-inner {
+  border-top-color: #bbf7d0;
+  background: rgba(16, 185, 129, 0.04);
+}
+
+.compareM__group-branch {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.78rem;
+  color: #4b5563;
+  unicode-bidi: plaintext;
+}
+
+.compareM__group-branch-dot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #cbd5e1;
+  flex-shrink: 0;
+}
+
+.compareM__price-row.best .compareM__group-branch-dot {
+  background: #34d399;
+}
+
+.compareM__group-branch-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 1;
 }
 
 /* ── Empty state ─────────────────────────────── */
