@@ -189,59 +189,45 @@ const OptimalProductItem = ({
       </header>
 
       {isExistsInOptimalCart ? (
-        <div className="opi-comparison">
-          <div className="opi-side opi-side--optimal">
-            <span className="opi-side-header">בסופר זה</span>
-            <div className="opi-side-rows">
-              <div className="opi-row">
-                <span className="opi-row-label">כמות</span>
-                <span className="opi-row-value">
-                  {DetailsOptimalProduct.quantity}
-                </span>
-              </div>
-              <div className="opi-row">
-                <span className="opi-row-label">סה"כ</span>
-                <span className="opi-row-value">
-                  ₪{DetailsOptimalProduct.totalPrice.toFixed(2)}
-                </span>
-              </div>
-              <div className="opi-row">
-                <span className="opi-row-label">ל-100 {unitLabel}</span>
-                <span className="opi-row-value opi-row-value--small">
-                  ₪{optimalUnitPrice}
-                </span>
-              </div>
+        <div className="opi-stats">
+          <div className="opi-stat-row opi-stat-row--optimal">
+            <span className="opi-stat-row-label">בסופר זה</span>
+            <div className="opi-stat-row-cells">
+              <span className="opi-rp-stat">
+                {DetailsOptimalProduct.quantity}
+                <span className="opi-rp-stat-unit">יח׳</span>
+              </span>
+              <span className="opi-rp-stat opi-rp-stat--money">
+                ₪{DetailsOptimalProduct.totalPrice.toFixed(2)}
+              </span>
+              <span className="opi-rp-stat opi-rp-stat--small">
+                ₪{optimalUnitPrice}
+                <span className="opi-rp-stat-unit">/100{unitLabel}</span>
+              </span>
             </div>
           </div>
 
           {originalProductExists ? (
-            <div className="opi-side opi-side--original">
-              <span className="opi-side-header">בעגלה המקורית</span>
-              <div className="opi-side-rows">
-                <div className="opi-row">
-                  <span className="opi-row-label">כמות</span>
-                  <span className="opi-row-value">
-                    {detailsOriginProduct.amount}
-                  </span>
-                </div>
-                <div className="opi-row">
-                  <span className="opi-row-label">סה"כ</span>
-                  <span className="opi-row-value">
-                    ₪{detailsOriginProduct.totalPrice.toFixed(2)}
-                  </span>
-                </div>
-                <div className="opi-row">
-                  <span className="opi-row-label">ל-100 {unitLabel}</span>
-                  <span className="opi-row-value opi-row-value--small">
-                    ₪{originalUnitPrice}
-                  </span>
-                </div>
+            <div className="opi-stat-row opi-stat-row--original">
+              <span className="opi-stat-row-label">בעגלה המקורית</span>
+              <div className="opi-stat-row-cells">
+                <span className="opi-rp-stat">
+                  {detailsOriginProduct.amount}
+                  <span className="opi-rp-stat-unit">יח׳</span>
+                </span>
+                <span className="opi-rp-stat opi-rp-stat--money">
+                  ₪{detailsOriginProduct.totalPrice.toFixed(2)}
+                </span>
+                <span className="opi-rp-stat opi-rp-stat--small">
+                  ₪{originalUnitPrice}
+                  <span className="opi-rp-stat-unit">/100{unitLabel}</span>
+                </span>
               </div>
             </div>
           ) : (
-            <div className="opi-side opi-side--inactive">
-              <span className="opi-side-header">בעגלה המקורית</span>
-              <span className="opi-side-empty">לא היה בעגלה</span>
+            <div className="opi-stat-row opi-stat-row--inactive">
+              <span className="opi-stat-row-label">בעגלה המקורית</span>
+              <span className="opi-stat-row-empty">לא היה בעגלה</span>
             </div>
           )}
         </div>

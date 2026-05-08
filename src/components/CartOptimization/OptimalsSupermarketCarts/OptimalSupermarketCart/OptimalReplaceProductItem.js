@@ -176,27 +176,47 @@ const OptimalReplaceProductItem = ({
           הוחלף ב
         </span>
 
-        {/* Alternative product */}
+        {/* Alternative product (image + name + stats inline) */}
         <div className="opi-rp-block opi-rp-block--alt">
-          <div className="opi-rp-img">
-            <ProductImageDisplay
-              barcode={productDetails.barcode}
-              className="opi-rp-img-el"
-            />
-          </div>
-          <div className="opi-rp-info">
-            <span className="opi-rp-tag opi-rp-tag--alt">המוצר החלופי</span>
-            <h3 className="opi-rp-name">{productDetails.name}</h3>
-            <p className="opi-rp-meta">
-              {productDetails.brand && <span>{productDetails.brand}</span>}
-              {productDetails.weight !== undefined &&
-                productDetails.weight !== "" &&
-                productDetails.weight !== 0 && (
-                  <span>
-                    {productDetails.weight} {replacementUnitLabel}
-                  </span>
-                )}
-            </p>
+          <span className="opi-rp-tag opi-rp-tag--alt">החלופי</span>
+          <div className="opi-rp-row">
+            <div className="opi-rp-img">
+              <ProductImageDisplay
+                barcode={productDetails.barcode}
+                className="opi-rp-img-el"
+              />
+            </div>
+            <div className="opi-rp-info">
+              <h3 className="opi-rp-name">{productDetails.name}</h3>
+              {(productDetails.brand ||
+                (productDetails.weight !== undefined &&
+                  productDetails.weight !== "" &&
+                  productDetails.weight !== 0)) && (
+                <p className="opi-rp-meta">
+                  {productDetails.brand && <span>{productDetails.brand}</span>}
+                  {productDetails.weight !== undefined &&
+                    productDetails.weight !== "" &&
+                    productDetails.weight !== 0 && (
+                      <span>
+                        {productDetails.weight} {replacementUnitLabel}
+                      </span>
+                    )}
+                </p>
+              )}
+              <div className="opi-rp-stats">
+                <span className="opi-rp-stat">
+                  {DetailsOptimalProduct.quantity}
+                  <span className="opi-rp-stat-unit">יח׳</span>
+                </span>
+                <span className="opi-rp-stat opi-rp-stat--money">
+                  ₪{DetailsOptimalProduct.totalPrice.toFixed(2)}
+                </span>
+                <span className="opi-rp-stat opi-rp-stat--small">
+                  ₪{optimalUnitPrice}
+                  <span className="opi-rp-stat-unit">/100{replacementUnitLabel}</span>
+                </span>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -209,88 +229,55 @@ const OptimalReplaceProductItem = ({
 
         {/* Original product */}
         <div className="opi-rp-block opi-rp-block--orig">
-          <div className="opi-rp-img">
-            <ProductImageDisplay
-              barcode={original.barcode}
-              className="opi-rp-img-el"
-            />
-          </div>
-          <div className="opi-rp-info">
-            <span className="opi-rp-tag opi-rp-tag--orig">המוצר המקורי</span>
-            <h3 className="opi-rp-name">{original.name}</h3>
-            <p className="opi-rp-meta">
-              {original.brand && <span>{original.brand}</span>}
-              {original.weight !== undefined &&
-                original.weight !== "" &&
-                original.weight !== 0 && (
-                  <span>
-                    {original.weight}{" "}
-                    {getConvertedUnitWeight(original.unitWeight)}
+          <span className="opi-rp-tag opi-rp-tag--orig">המקורי</span>
+          <div className="opi-rp-row">
+            <div className="opi-rp-img">
+              <ProductImageDisplay
+                barcode={original.barcode}
+                className="opi-rp-img-el"
+              />
+            </div>
+            <div className="opi-rp-info">
+              <h3 className="opi-rp-name">{original.name}</h3>
+              {(original.brand ||
+                (original.weight !== undefined &&
+                  original.weight !== "" &&
+                  original.weight !== 0)) && (
+                <p className="opi-rp-meta">
+                  {original.brand && <span>{original.brand}</span>}
+                  {original.weight !== undefined &&
+                    original.weight !== "" &&
+                    original.weight !== 0 && (
+                      <span>
+                        {original.weight}{" "}
+                        {getConvertedUnitWeight(original.unitWeight)}
+                      </span>
+                    )}
+                </p>
+              )}
+              {originalProductExists ? (
+                <div className="opi-rp-stats">
+                  <span className="opi-rp-stat">
+                    {detailsOriginProduct.amount}
+                    <span className="opi-rp-stat-unit">יח׳</span>
                   </span>
-                )}
-            </p>
+                  <span className="opi-rp-stat opi-rp-stat--money">
+                    ₪{detailsOriginProduct.totalPrice.toFixed(2)}
+                  </span>
+                  <span className="opi-rp-stat opi-rp-stat--small">
+                    ₪{originalUnitPrice}
+                    <span className="opi-rp-stat-unit">
+                      /100{getConvertedUnitWeight(original.unitWeight)}
+                    </span>
+                  </span>
+                </div>
+              ) : (
+                <p className="opi-rp-not-existed">לא היה בעגלה המקורית</p>
+              )}
+            </div>
           </div>
         </div>
       </header>
-
-      <div className="opi-comparison">
-        <div className="opi-side opi-side--optimal">
-          <span className="opi-side-header">המוצר החלופי</span>
-          <div className="opi-side-rows">
-            <div className="opi-row">
-              <span className="opi-row-label">כמות</span>
-              <span className="opi-row-value">
-                {DetailsOptimalProduct.quantity}
-              </span>
-            </div>
-            <div className="opi-row">
-              <span className="opi-row-label">סה"כ</span>
-              <span className="opi-row-value">
-                ₪{DetailsOptimalProduct.totalPrice.toFixed(2)}
-              </span>
-            </div>
-            <div className="opi-row">
-              <span className="opi-row-label">ל-100 {replacementUnitLabel}</span>
-              <span className="opi-row-value opi-row-value--small">
-                ₪{optimalUnitPrice}
-              </span>
-            </div>
-          </div>
-        </div>
-
-        {originalProductExists ? (
-          <div className="opi-side opi-side--original">
-            <span className="opi-side-header">המוצר המקורי</span>
-            <div className="opi-side-rows">
-              <div className="opi-row">
-                <span className="opi-row-label">כמות</span>
-                <span className="opi-row-value">
-                  {detailsOriginProduct.amount}
-                </span>
-              </div>
-              <div className="opi-row">
-                <span className="opi-row-label">סה"כ</span>
-                <span className="opi-row-value">
-                  ₪{detailsOriginProduct.totalPrice.toFixed(2)}
-                </span>
-              </div>
-              <div className="opi-row">
-                <span className="opi-row-label">
-                  ל-100 {getConvertedUnitWeight(original.unitWeight)}
-                </span>
-                <span className="opi-row-value opi-row-value--small">
-                  ₪{originalUnitPrice}
-                </span>
-              </div>
-            </div>
-          </div>
-        ) : (
-          <div className="opi-side opi-side--inactive">
-            <span className="opi-side-header">המוצר המקורי</span>
-            <span className="opi-side-empty">לא היה בעגלה</span>
-          </div>
-        )}
-      </div>
 
       {savings > 0 && (
         <div className="opi-savings-row">

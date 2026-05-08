@@ -166,13 +166,10 @@
   height: 11px;
 }
 
-/* Each product block */
+/* Product block — compact horizontal layout (image + info incl. inline stats) */
 .opi-rp-block {
-  display: grid;
-  grid-template-columns: 56px 1fr;
-  gap: 12px;
-  align-items: center;
-  padding: 9px 10px;
+  position: relative;
+  padding: 8px 10px 10px;
   border-radius: 12px;
   border: 1px solid transparent;
   unicode-bidi: plaintext;
@@ -181,7 +178,7 @@
 .opi-rp-block--alt {
   background: linear-gradient(180deg, #f5f3ff 0%, rgba(255, 255, 255, 0.6) 100%);
   border-color: rgba(124, 58, 237, 0.28);
-  box-shadow: 0 2px 8px rgba(124, 58, 237, 0.10);
+  box-shadow: 0 2px 8px rgba(124, 58, 237, 0.1);
 }
 
 .opi-rp-block--orig {
@@ -189,10 +186,47 @@
   border-color: rgba(15, 23, 42, 0.08);
 }
 
+/* Tag floats in the top-right corner (RTL) */
+.opi-rp-tag {
+  position: absolute;
+  top: 8px;
+  right: 10px;
+  z-index: 1;
+  display: inline-flex;
+  padding: 1px 8px;
+  border-radius: 999px;
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.2px;
+  text-transform: none;
+}
+
+.opi-rp-tag--alt {
+  background: rgba(124, 58, 237, 0.14);
+  color: #6d28d9;
+  border: 1px solid rgba(124, 58, 237, 0.22);
+}
+
+.opi-rp-tag--orig {
+  background: #f1f5f9;
+  color: #64748b;
+  border: 1px solid #e2e8f0;
+}
+
+/* Horizontal row inside the block */
+.opi-rp-row {
+  display: grid;
+  grid-template-columns: 52px 1fr;
+  gap: 10px;
+  align-items: center;
+  /* Push down so the floating tag has room above the content */
+  padding-top: 14px;
+}
+
 /* Image */
 .opi-rp-img {
-  width: 56px;
-  height: 56px;
+  width: 52px;
+  height: 52px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -217,7 +251,7 @@
   display: block;
 }
 
-/* Info */
+/* Info column */
 .opi-rp-info {
   display: flex;
   flex-direction: column;
@@ -226,36 +260,12 @@
   text-align: right;
 }
 
-.opi-rp-tag {
-  display: inline-flex;
-  align-self: flex-start;
-  padding: 1px 7px;
-  border-radius: 999px;
-  font-size: 0.62rem;
-  font-weight: 800;
-  letter-spacing: 0.2px;
-  text-transform: none;
-  margin-bottom: 1px;
-}
-
-.opi-rp-tag--alt {
-  background: rgba(124, 58, 237, 0.14);
-  color: #6d28d9;
-  border: 1px solid rgba(124, 58, 237, 0.22);
-}
-
-.opi-rp-tag--orig {
-  background: #f1f5f9;
-  color: #64748b;
-  border: 1px solid #e2e8f0;
-}
-
 .opi-rp-name {
   margin: 0;
-  font-size: 0.92rem;
+  font-size: 0.9rem;
   font-weight: 800;
   color: #0f172a;
-  line-height: 1.25;
+  line-height: 1.22;
   letter-spacing: -0.2px;
   word-break: break-word;
   unicode-bidi: plaintext;
@@ -272,7 +282,7 @@
   flex-wrap: wrap;
   align-items: center;
   gap: 3px 8px;
-  font-size: 0.76rem;
+  font-size: 0.74rem;
   color: #64748b;
   font-weight: 500;
   unicode-bidi: plaintext;
@@ -287,6 +297,63 @@
 
 .opi-rp-block--orig .opi-rp-meta {
   color: #94a3b8;
+}
+
+/* Inline stats — quantity / total / per-100 */
+.opi-rp-stats {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 3px 10px;
+  margin-top: 4px;
+  unicode-bidi: plaintext;
+}
+
+.opi-rp-stat {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 2px;
+  font-size: 0.82rem;
+  font-weight: 800;
+  color: #475569;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.1px;
+}
+
+.opi-rp-stat--money {
+  font-size: 0.95rem;
+  color: #0f172a;
+  font-weight: 800;
+  letter-spacing: -0.3px;
+}
+
+.opi-rp-block--alt .opi-rp-stat--money {
+  color: #6d28d9;
+}
+
+.opi-rp-block--orig .opi-rp-stat--money {
+  color: #475569;
+}
+
+.opi-rp-stat--small {
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: #64748b;
+}
+
+.opi-rp-stat-unit {
+  font-size: 0.66rem;
+  font-weight: 600;
+  color: #94a3b8;
+}
+
+.opi-rp-not-existed {
+  margin: 4px 0 0;
+  font-size: 0.78rem;
+  color: #94a3b8;
+  font-weight: 600;
+  font-style: italic;
+  unicode-bidi: plaintext;
 }
 
 /* "במקום" connector between the two product blocks */
@@ -391,97 +458,59 @@
   font-weight: 700;
 }
 
-/* ── Comparison ─────────────────────────────── */
-.opi-comparison {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px;
-}
-
-.opi-side {
+/* ── Stats (used by OptimalProductItem — compact two-line layout) ── */
+.opi-stats {
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  padding: 10px 12px;
+  gap: 4px;
+  padding: 9px 11px;
   background: #f8fafc;
   border: 1px solid #f1f5f9;
   border-radius: 12px;
 }
 
-.opi-side--optimal {
-  background: linear-gradient(180deg, #ecfdf5 0%, #f0fdf4 100%);
-  border-color: rgba(16, 185, 129, 0.25);
+.opi-stat-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 4px 0;
+  unicode-bidi: plaintext;
 }
 
-.opi-side--original {
-  background: linear-gradient(180deg, #f1f5f9 0%, #f8fafc 100%);
-  border-color: #e2e8f0;
+.opi-stat-row + .opi-stat-row {
+  border-top: 1px dashed rgba(15, 23, 42, 0.08);
+  padding-top: 7px;
+  margin-top: 1px;
 }
 
-.opi-side--inactive {
-  background: #f8fafc;
-  border-color: #e2e8f0;
-  border-style: dashed;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  min-height: 80px;
-}
-
-.opi-side-header {
+.opi-stat-row-label {
   font-size: 0.74rem;
   font-weight: 700;
   color: #64748b;
   letter-spacing: -0.1px;
-  padding-bottom: 4px;
-  border-bottom: 1px dashed rgba(15, 23, 42, 0.08);
+  flex-shrink: 0;
 }
 
-.opi-side--optimal .opi-side-header { color: #047857; }
-.opi-side--original .opi-side-header { color: #475569; }
+.opi-stat-row--optimal .opi-stat-row-label { color: #047857; }
 
-.opi-side-rows {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-}
-
-.opi-row {
-  display: flex;
+.opi-stat-row-cells {
+  display: inline-flex;
+  flex-wrap: wrap;
   align-items: baseline;
-  justify-content: space-between;
-  gap: 6px;
+  justify-content: flex-end;
+  gap: 3px 11px;
   font-size: 0.82rem;
-}
-
-.opi-row-label {
-  color: #64748b;
-  font-weight: 500;
   unicode-bidi: plaintext;
 }
 
-.opi-row-value {
-  color: #0f172a;
-  font-weight: 800;
-  font-variant-numeric: tabular-nums;
-  letter-spacing: -0.2px;
-  unicode-bidi: plaintext;
-}
+.opi-stat-row--optimal .opi-rp-stat--money { color: #047857; }
+.opi-stat-row--original .opi-rp-stat--money { color: #475569; }
 
-.opi-row-value--small {
+.opi-stat-row-empty {
   font-size: 0.78rem;
-  font-weight: 700;
-  color: #475569;
-}
-
-.opi-side--optimal .opi-row-value {
-  color: #047857;
-}
-
-.opi-side-empty {
-  font-size: 0.82rem;
-  color: #94a3b8;
   font-weight: 600;
+  color: #94a3b8;
   font-style: italic;
 }
 
@@ -600,12 +629,8 @@
 
 /* ── Responsive ────────────────────────────── */
 @media (max-width: 380px) {
-  .opi-comparison {
-    grid-template-columns: 1fr;
-  }
-  .opi-action span {
-    display: none;
-  }
+  .opi-action span { display: none; }
+  .opi-rp-stats { gap: 3px 7px; }
 }
 
 /* legacy classes — neutralized */
