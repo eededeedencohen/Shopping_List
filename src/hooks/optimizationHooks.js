@@ -106,6 +106,39 @@ export const useSettingsOperations = () => {
   const removeSupermarketID = (id) =>
     setSupermarketIDs((ids) => ids.filter((x) => x !== id));
 
+  /* Bulk: replace the entire selection with a list of IDs (deduped). */
+  const setSupermarketIDsBulk = (idList) =>
+    setSupermarketIDs(() => {
+      const seen = new Set();
+      const out = [];
+      for (const id of idList || []) {
+        if (id == null || seen.has(id)) continue;
+        seen.add(id);
+        out.push(id);
+      }
+      return out;
+    });
+
+  /* Bulk: add many IDs at once (idempotent). */
+  const insertSupermarketIDs = (idList) =>
+    setSupermarketIDs((ids) => {
+      const seen = new Set(ids);
+      const out = [...ids];
+      for (const id of idList || []) {
+        if (id != null && !seen.has(id)) {
+          seen.add(id);
+          out.push(id);
+        }
+      }
+      return out;
+    });
+
+  /* Bulk: remove many IDs at once. */
+  const removeSupermarketIDs = (idList) => {
+    const drop = new Set(idList || []);
+    setSupermarketIDs((ids) => ids.filter((x) => !drop.has(x)));
+  };
+
   const insertBrandToBlackList = (code, brand) =>
     setProductsSettings((arr) =>
       arr.map((p) =>
@@ -176,6 +209,9 @@ export const useSettingsOperations = () => {
 
     insertSupermarketID,
     removeSupermarketID,
+    insertSupermarketIDs,
+    removeSupermarketIDs,
+    setSupermarketIDsBulk,
     insertBrandToBlackList,
     removeBrandFromBlackList,
     changeMaxWeightGain,
