@@ -481,6 +481,9 @@
   display: inline-flex;
   align-items: baseline;
   gap: 2px;
+  /* Force ₪ to render on the LEFT of the number regardless of the
+     surrounding RTL context. */
+  direction: ltr;
   font-size: 1.4rem;
   font-weight: 800;
   color: #111827;
@@ -504,6 +507,10 @@
 }
 
 .compareM__price-row-strike {
+  display: inline-block;
+  /* Same — pin to LTR so the text "₪7.20" stays as ₪ + number visually. */
+  direction: ltr;
+  unicode-bidi: bidi-override;
   font-size: 0.72rem;
   font-weight: 600;
   color: #9ca3af;
