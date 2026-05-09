@@ -92,6 +92,16 @@ function Scraper() {
 
   const barcodeExists = barcode.length > 0 && barcodeSet.has(barcode);
 
+  /* Unique chains the product exists in (across all branches) */
+  const uniqueChains = useMemo(() => {
+    if (!prices?.prices) return 0;
+    const set = new Set();
+    for (const p of prices.prices) {
+      if (p.supermarketName) set.add(p.supermarketName.trim());
+    }
+    return set.size;
+  }, [prices]);
+
   const handleFetch = async () => {
     if (!barcode.trim()) return;
     setLoading(true);
@@ -233,6 +243,11 @@ function Scraper() {
         <div className="scraper-prices">
           <div className="scraper-stats">
             <span className="stat">{prices.results} תוצאות</span>
+            {uniqueChains > 0 && (
+              <span className="stat chains">
+                {uniqueChains} {uniqueChains === 1 ? "רשת" : "רשתות"}
+              </span>
+            )}
             <span className="stat matched">{prices.matched} מותאמים</span>
             {prices.unmatched > 0 && (
               <span className="stat unmatched">{prices.unmatched} לא מותאמים</span>

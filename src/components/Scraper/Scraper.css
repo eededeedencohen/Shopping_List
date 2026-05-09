@@ -278,6 +278,10 @@
   background: rgba(30, 209, 255, 0.1);
   color: #80d8ff;
 }
+.stat.chains {
+  background: rgba(168, 85, 247, 0.12);
+  color: #d8b4fe;
+}
 
 /* ── Price Cards ── */
 .price-list {
