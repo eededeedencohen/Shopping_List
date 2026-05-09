@@ -2,6 +2,7 @@ import {
   createContext,
   useContext,
   useEffect,
+  useRef,
   useState,
   useCallback,
 } from "react";
@@ -11,12 +12,37 @@ import {
   updateActiveCart as apiUpdateActiveCart,
   confirmCart,
 } from "../services/cartService";
+import { DOMAIN } from "../constants";
 
 const CartContext2 = createContext(null);
+
+/* How long to wait after the last cart change before sending the update
+   to the server. Resets on every new change. */
+const ACTIVE_CART_DEBOUNCE_MS = 2000;
+
+const buildPayload = (cart) => {
+  if (!cart) return null;
+  return {
+    supermarketID: cart.supermarketID,
+    products: (cart.products || []).map(({ barcode, amount }) => ({
+      barcode,
+      amount,
+    })),
+  };
+};
 
 export const CartContextProvider2 = ({ children }) => {
   const [cart, setCart] = useState(null);
   const [isLoadingCartData, setIsLoadingCartData] = useState(false);
+
+  /* Refs used by the debouncer */
+  const cartRef = useRef(cart);
+  const debounceTimerRef = useRef(null);
+  const pendingFlushRef = useRef(false);
+
+  useEffect(() => {
+    cartRef.current = cart;
+  }, [cart]);
 
   useEffect(() => {
     const loadCart = async () => {
@@ -52,22 +78,103 @@ export const CartContextProvider2 = ({ children }) => {
     }
   };
 
-  /** שולח עדכון מלא לעגלה הפעילה – בלי לעדכן את ה‑state */
-  const sendActiveCart = useCallback(async () => {
-    if (!cart) return;
+  /**
+   * Sends the LATEST cart snapshot to the server immediately. Called
+   * either by the debounce timer firing, or by an explicit flush
+   * (e.g. on tab close).
+   */
+  const flushActiveCart = useCallback(async () => {
+    if (debounceTimerRef.current) {
+      clearTimeout(debounceTimerRef.current);
+      debounceTimerRef.current = null;
+    }
+    if (!pendingFlushRef.current) return;
+    pendingFlushRef.current = false;
 
-    const supermarketID = cart.supermarketID;
-    const products = cart.products.map(({ barcode, amount }) => ({
-      barcode,
-      amount,
-    }));
+    const payload = buildPayload(cartRef.current);
+    if (!payload) return;
 
     try {
-      await apiUpdateActiveCart(supermarketID, products);
+      await apiUpdateActiveCart(payload.supermarketID, payload.products);
     } catch (err) {
       console.error("sendActiveCart failed:", err);
     }
-  }, [cart]);
+  }, []);
+
+  /**
+   * Public API: schedule (debounced) sending of the current active cart
+   * to the server. Each call resets the timer; only one request fires
+   * after ACTIVE_CART_DEBOUNCE_MS of quiet, with the latest cart snapshot.
+   */
+  const sendActiveCart = useCallback(() => {
+    if (!cartRef.current) return;
+
+    pendingFlushRef.current = true;
+
+    if (debounceTimerRef.current) {
+      clearTimeout(debounceTimerRef.current);
+    }
+    debounceTimerRef.current = setTimeout(() => {
+      debounceTimerRef.current = null;
+      flushActiveCart();
+    }, ACTIVE_CART_DEBOUNCE_MS);
+  }, [flushActiveCart]);
+
+  /* Flush any pending update when the tab is closed/refreshed/hidden,
+     using sendBeacon so the request actually leaves the browser. */
+  useEffect(() => {
+    const flushBeacon = () => {
+      if (!pendingFlushRef.current) return;
+      const payload = buildPayload(cartRef.current);
+      if (!payload) return;
+
+      const url = `${DOMAIN}/api/v1/carts/update-active-cart`;
+      try {
+        if (typeof navigator !== "undefined" && navigator.sendBeacon) {
+          const blob = new Blob([JSON.stringify(payload)], {
+            type: "application/json",
+          });
+          navigator.sendBeacon(url, blob);
+        } else {
+          // Fallback — fire-and-forget POST
+          apiUpdateActiveCart(payload.supermarketID, payload.products).catch(
+            () => {}
+          );
+        }
+      } catch {
+        /* ignore */
+      }
+
+      pendingFlushRef.current = false;
+      if (debounceTimerRef.current) {
+        clearTimeout(debounceTimerRef.current);
+        debounceTimerRef.current = null;
+      }
+    };
+
+    const onVisibilityChange = () => {
+      if (document.visibilityState === "hidden") flushBeacon();
+    };
+
+    window.addEventListener("beforeunload", flushBeacon);
+    window.addEventListener("pagehide", flushBeacon);
+    document.addEventListener("visibilitychange", onVisibilityChange);
+
+    return () => {
+      window.removeEventListener("beforeunload", flushBeacon);
+      window.removeEventListener("pagehide", flushBeacon);
+      document.removeEventListener("visibilitychange", onVisibilityChange);
+    };
+  }, []);
+
+  /* Cleanup: if the provider unmounts with a pending flush, send it. */
+  useEffect(() => {
+    return () => {
+      if (pendingFlushRef.current) {
+        flushActiveCart();
+      }
+    };
+  }, [flushActiveCart]);
 
   return (
     <CartContext2.Provider
@@ -78,6 +185,7 @@ export const CartContextProvider2 = ({ children }) => {
         supermarketID,
         syncCartToServer,
         sendActiveCart,
+        flushActiveCart,
         confirmCart,
       }}
     >
