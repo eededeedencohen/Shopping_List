@@ -120,6 +120,16 @@ function Toolbar() {
         onClose={() => setIsSettingsModalOpen(false)}
       />
 
+      {/* Barcodes Audit */}
+      <Link
+        to="/barcodes-audit"
+        className="barcodes-audit-link"
+        onClick={() => setSelectedPage("/barcodes-audit")}
+        aria-label="Barcodes Audit"
+      >
+        <BarcodeIcon className="barcodes-audit-icon" aria-hidden="true" />
+      </Link>
+
       {/* עגלה */}
       <Link to="/cart" onClick={handleCartClick}>
         <div className="cart-icon">
@@ -309,19 +319,6 @@ function Toolbar() {
                 <VibrationIcon className="svg-icon" />
               </div>
               <h1>Vibration Settings</h1>
-            </div>
-          </Link>
-
-          <Link to="/barcodes-audit" onClick={() => handleNavClick("/barcodes-audit")}>
-            <div
-              className={`nav-item ${
-                selectedPage === "/barcodes-audit" ? "selected-page" : ""
-              }`}
-            >
-              <div className="nav-icon">
-                <BarcodeIcon className="svg-icon" />
-              </div>
-              <h1>Barcodes Audit</h1>
             </div>
           </Link>
 
