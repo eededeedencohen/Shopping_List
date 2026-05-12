@@ -36,6 +36,7 @@ import ProductsListServer from "./components/ProductList/ProductListServer";
 import AddProduct from "./components/AddProduct/AddProduct";
 import Scraper from "./components/Scraper/Scraper";
 import Settings from "./components/Settings/Settings";
+import BarcodesAudit from "./components/BarcodesAudit/BarcodesAudit";
 
 function Routing() {
   return (
@@ -86,6 +87,7 @@ function Routing() {
       <Route path="/add-product" element={<AddProduct />} />
       <Route path="/scraper" element={<Scraper />} />
       <Route path="/settings" element={<Settings />} />
+      <Route path="/barcodes-audit" element={<BarcodesAudit />} />
     </Routes>
   );
 }

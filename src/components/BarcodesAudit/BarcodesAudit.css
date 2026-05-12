@@ -1,0 +1,379 @@
+/* ═══════════════════════════════════════════════
+   Barcodes Audit page
+   ═══════════════════════════════════════════════ */
+
+.ba-page {
+  position: fixed;
+  top: var(--toolbar-h, 40px);
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 0;
+
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  padding: 18px 14px 28px;
+  gap: 14px;
+
+  font-family: "Heebo", "Open Sans", Arial, sans-serif;
+  direction: rtl;
+  color: #0f172a;
+
+  background:
+    radial-gradient(circle at 18% -8%, rgba(37, 99, 235, 0.14) 0%, transparent 55%),
+    radial-gradient(circle at 92% 110%, rgba(16, 185, 129, 0.14) 0%, transparent 55%),
+    linear-gradient(180deg, #eef4fc 0%, #e3edf8 100%);
+}
+
+/* ── Header ─────────────────────────────────── */
+.ba-header {
+  padding: 4px;
+}
+
+.ba-title {
+  margin: 0 0 2px;
+  font-size: 1.4rem;
+  font-weight: 800;
+  letter-spacing: -0.3px;
+  color: #0f172a;
+}
+
+.ba-subtitle {
+  margin: 0;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #64748b;
+}
+
+.ba-subtitle code {
+  font-family: "Courier New", ui-monospace, monospace;
+  font-size: 0.82rem;
+  padding: 1px 6px;
+  background: rgba(15, 23, 42, 0.06);
+  border-radius: 6px;
+}
+
+/* ── Generic card ───────────────────────────── */
+.ba-card {
+  padding: 16px 18px;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(14px) saturate(140%);
+  -webkit-backdrop-filter: blur(14px) saturate(140%);
+  box-shadow:
+    0 4px 14px rgba(15, 23, 42, 0.06),
+    0 1px 0 rgba(255, 255, 255, 0.85) inset;
+}
+
+.ba-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 40px 20px;
+  color: #64748b;
+  font-weight: 500;
+}
+
+.ba-spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid rgba(37, 99, 235, 0.15);
+  border-top-color: #2563eb;
+  border-radius: 50%;
+  animation: ba-spin 0.85s linear infinite;
+}
+
+@keyframes ba-spin { to { transform: rotate(360deg); } }
+
+.ba-error {
+  background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+  border-color: #fecaca;
+  color: #b91c1c;
+  font-weight: 600;
+  text-align: center;
+}
+
+/* ── Summary stats (grid of 4 tiles) ────────── */
+.ba-stats {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+@media (min-width: 720px) {
+  .ba-stats { grid-template-columns: repeat(4, 1fr); }
+}
+
+.ba-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 14px 16px;
+  border-radius: 16px;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(12px) saturate(140%);
+  box-shadow:
+    0 4px 14px rgba(15, 23, 42, 0.05),
+    0 1px 0 rgba(255, 255, 255, 0.85) inset;
+}
+
+.ba-stat-label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #64748b;
+  letter-spacing: -0.1px;
+}
+
+.ba-stat-value {
+  font-size: 1.55rem;
+  font-weight: 800;
+  color: #0f172a;
+  letter-spacing: -0.5px;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.1;
+}
+
+.ba-stat-unit {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #64748b;
+  margin-inline-start: 2px;
+}
+
+.ba-stat--total .ba-stat-value { color: #1d4ed8; }
+.ba-stat--existing { background: linear-gradient(180deg, #ecfdf5 0%, #ffffff 75%); border-color: rgba(16, 185, 129, 0.32); }
+.ba-stat--existing .ba-stat-label { color: #065f46; }
+.ba-stat--existing .ba-stat-value { color: #047857; }
+.ba-stat--missing  { background: linear-gradient(180deg, #fff7ed 0%, #ffffff 75%); border-color: rgba(245, 158, 11, 0.32); }
+.ba-stat--missing  .ba-stat-label { color: #92400e; }
+.ba-stat--missing  .ba-stat-value { color: #b45309; }
+.ba-stat--percent  { background: linear-gradient(180deg, #eff6ff 0%, #ffffff 75%); border-color: rgba(37, 99, 235, 0.32); }
+.ba-stat--percent  .ba-stat-label { color: #1d4ed8; }
+.ba-stat--percent  .ba-stat-value { color: #1d4ed8; }
+
+/* ── Progress bar ───────────────────────────── */
+.ba-progress {
+  position: relative;
+  width: 100%;
+  height: 28px;
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 999px;
+  overflow: hidden;
+  box-shadow:
+    inset 0 1px 2px rgba(15, 23, 42, 0.06),
+    0 1px 0 rgba(255, 255, 255, 0.7) inset;
+}
+
+.ba-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #10b981 0%, #34d399 100%);
+  transition: width 0.5s ease;
+  box-shadow: 0 0 12px rgba(16, 185, 129, 0.45) inset;
+}
+
+.ba-progress-label {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 0.82rem;
+  font-weight: 800;
+  color: #0f172a;
+  letter-spacing: -0.1px;
+  font-variant-numeric: tabular-nums;
+  pointer-events: none;
+  direction: ltr;
+}
+
+/* ── List card ──────────────────────────────── */
+.ba-list-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px 14px 14px;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(14px) saturate(140%);
+  -webkit-backdrop-filter: blur(14px) saturate(140%);
+  box-shadow:
+    0 4px 14px rgba(15, 23, 42, 0.06),
+    0 1px 0 rgba(255, 255, 255, 0.85) inset;
+}
+
+/* Tabs */
+.ba-tabs {
+  display: flex;
+  padding: 3px;
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  border-radius: 11px;
+}
+
+.ba-tab {
+  flex: 1 1 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 10px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: #64748b;
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+  transition: background 0.15s, color 0.15s, box-shadow 0.15s;
+}
+
+.ba-tab:not(.is-active):hover { color: #0f172a; }
+
+.ba-tab.is-active {
+  background: #ffffff;
+  color: #0f172a;
+  box-shadow:
+    0 1px 3px rgba(0, 0, 0, 0.08),
+    0 0 0 1px rgba(0, 0, 0, 0.04);
+}
+
+.ba-tab-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 28px;
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.06);
+  color: #475569;
+  font-size: 0.72rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.ba-tab.is-active .ba-tab-count {
+  background: rgba(37, 99, 235, 0.12);
+  color: #1d4ed8;
+}
+
+/* Search */
+.ba-search {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.ba-search-input {
+  flex: 1;
+  padding: 9px 14px;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  background: #ffffff;
+  font-family: inherit;
+  font-size: 0.9rem;
+  color: #0f172a;
+  outline: none;
+  direction: ltr;
+  font-variant-numeric: tabular-nums;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.ba-search-input:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.18);
+}
+
+.ba-search-clear {
+  position: absolute;
+  left: 8px;
+  width: 22px;
+  height: 22px;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(15, 23, 42, 0.08);
+  color: #475569;
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.ba-search-clear:hover {
+  background: rgba(239, 68, 68, 0.15);
+  color: #b91c1c;
+}
+
+.ba-search-hint {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #64748b;
+  white-space: nowrap;
+}
+
+/* List */
+.ba-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 6px;
+  max-height: 60vh;
+  overflow-y: auto;
+}
+
+@media (min-width: 480px) {
+  .ba-list { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (min-width: 720px) {
+  .ba-list { grid-template-columns: repeat(3, 1fr); }
+}
+
+.ba-list-item {
+  display: flex;
+  align-items: center;
+  padding: 8px 12px;
+  background: #f8fafc;
+  border: 1px solid #f1f5f9;
+  border-radius: 8px;
+  font-family: "Courier New", ui-monospace, monospace;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #0f172a;
+  letter-spacing: 0.5px;
+  direction: ltr;
+}
+
+.ba-list-empty {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 28px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #94a3b8;
+  font-style: italic;
+}
+
+.ba-list-truncated {
+  margin: 6px 0 0;
+  text-align: center;
+  font-size: 0.78rem;
+  color: #64748b;
+  font-style: italic;
+}
