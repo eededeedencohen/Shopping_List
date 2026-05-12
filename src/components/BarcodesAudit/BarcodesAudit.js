@@ -13,6 +13,12 @@ const SCRAPE_TABS = [
   { value: "notScraped", label: "לא נסרק" },
 ];
 
+const IMAGE_TABS = [
+  { value: "with", label: "עם תמונה" },
+  { value: "without", label: "ללא תמונה" },
+  { value: "orphan", label: "תמונות עודפות" },
+];
+
 export default function BarcodesAudit() {
   /* ─────  DB summary (existing/missing in Mongo)  ───── */
   const [summary, setSummary] = useState(null);
@@ -20,6 +26,13 @@ export default function BarcodesAudit() {
   const [summaryError, setSummaryError] = useState("");
   const [sourceTab, setSourceTab] = useState("missing");
   const [query, setQuery] = useState("");
+
+  /* ─────  images coverage  ───── */
+  const [imagesData, setImagesData] = useState(null);
+  const [imagesError, setImagesError] = useState("");
+  const [imageTab, setImageTab] = useState("without");
+  const [imageQuery, setImageQuery] = useState("");
+  const [showThumbs, setShowThumbs] = useState(false);
 
   /* ─────  chp.co.il scrape  ───── */
   const [scrapeStatus, setScrapeStatus] = useState(null);
@@ -46,6 +59,22 @@ export default function BarcodesAudit() {
         if (!cancelled) setSummaryError(err.message);
       } finally {
         if (!cancelled) setSummaryLoading(false);
+      }
+    })();
+    (async () => {
+      try {
+        const res = await fetch(
+          `${DOMAIN}/api/v1/barcodes-audit/images-summary`
+        );
+        const json = await res.json();
+        if (cancelled) return;
+        if (json.status !== "success") {
+          setImagesError(json.message || "שגיאה בטעינת סיכום התמונות");
+          return;
+        }
+        setImagesData(json.data);
+      } catch (err) {
+        if (!cancelled) setImagesError(err.message);
       }
     })();
     return () => {
@@ -161,6 +190,16 @@ export default function BarcodesAudit() {
     }
     return [...src].sort((a, b) => b.priceCount - a.priceCount);
   }, [scrapeResults, scrapeTab, scrapeQuery]);
+
+  const imagesList = useMemo(() => {
+    if (!imagesData) return [];
+    let src;
+    if (imageTab === "with") src = imagesData.withImageBarcodes;
+    else if (imageTab === "without") src = imagesData.withoutImageBarcodes;
+    else src = imagesData.orphanBarcodes;
+    const q = imageQuery.trim();
+    return q ? src.filter((b) => b.includes(q)) : src;
+  }, [imagesData, imageTab, imageQuery]);
 
   const isRunning = scrapeStatus?.state === "running";
   const progressPct =
@@ -297,6 +336,173 @@ export default function BarcodesAudit() {
               <p className="ba-list-truncated">
                 מציג 500 ראשונים מתוך {sourceList.length.toLocaleString()} —
                 צמצם חיפוש לראות עוד
+              </p>
+            )}
+          </section>
+        </>
+      )}
+
+      {/* ───────── Images coverage ───────── */}
+      <section className="ba-section-title">
+        <h2>תמונות</h2>
+        <p className="ba-section-desc">
+          קיבולת התמונות מ-<code>images/</code> בשרת מול הברקודים שב-
+          <code>barcodes.json</code>
+        </p>
+      </section>
+
+      {imagesError && <div className="ba-card ba-error">{imagesError}</div>}
+
+      {imagesData && (
+        <>
+          <section className="ba-stats">
+            <div className="ba-stat ba-stat--total">
+              <span className="ba-stat-label">סך הכל בקובץ</span>
+              <span className="ba-stat-value">
+                {imagesData.total.toLocaleString()}
+              </span>
+            </div>
+            <div className="ba-stat ba-stat--existing">
+              <span className="ba-stat-label">עם תמונה</span>
+              <span className="ba-stat-value">
+                {imagesData.withImage.toLocaleString()}
+              </span>
+            </div>
+            <div className="ba-stat ba-stat--missing">
+              <span className="ba-stat-label">ללא תמונה</span>
+              <span className="ba-stat-value">
+                {imagesData.withoutImage.toLocaleString()}
+              </span>
+            </div>
+            <div className="ba-stat ba-stat--percent">
+              <span className="ba-stat-label">% כיסוי</span>
+              <span className="ba-stat-value">
+                {imagesData.percentage.toFixed(1)}
+                <span className="ba-stat-unit">%</span>
+              </span>
+            </div>
+          </section>
+
+          <div className="ba-progress">
+            <div
+              className="ba-progress-fill"
+              style={{ width: `${imagesData.percentage}%` }}
+            />
+            <span className="ba-progress-label">
+              {imagesData.withImage.toLocaleString()} /{" "}
+              {imagesData.total.toLocaleString()}
+            </span>
+          </div>
+
+          <div className="ba-images-meta">
+            <span>
+              סה"כ קבצים בתיקייה:{" "}
+              <strong>{imagesData.totalImageFiles.toLocaleString()}</strong>
+            </span>
+            {imagesData.orphanCount > 0 && (
+              <span className="ba-images-orphan-note">
+                {imagesData.orphanCount.toLocaleString()} תמונות עודפות (ברקוד
+                שלא קיים ב-<code>barcodes.json</code>)
+              </span>
+            )}
+          </div>
+
+          <section className="ba-list-card">
+            <div className="ba-tabs">
+              {IMAGE_TABS.map((t) => {
+                const active = imageTab === t.value;
+                let count = 0;
+                if (t.value === "with") count = imagesData.withImage;
+                else if (t.value === "without") count = imagesData.withoutImage;
+                else count = imagesData.orphanCount;
+                return (
+                  <button
+                    key={t.value}
+                    type="button"
+                    className={`ba-tab ${active ? "is-active" : ""}`}
+                    onClick={() => setImageTab(t.value)}
+                  >
+                    {t.label}
+                    <span className="ba-tab-count">
+                      {count.toLocaleString()}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+
+            <div className="ba-search">
+              <input
+                type="text"
+                inputMode="numeric"
+                className="ba-search-input"
+                placeholder="חיפוש ברקוד…"
+                value={imageQuery}
+                onChange={(e) => setImageQuery(e.target.value)}
+              />
+              {imageQuery && (
+                <button
+                  type="button"
+                  className="ba-search-clear"
+                  onClick={() => setImageQuery("")}
+                  aria-label="נקה חיפוש"
+                >
+                  ×
+                </button>
+              )}
+              <label className="ba-thumbs-toggle">
+                <input
+                  type="checkbox"
+                  checked={showThumbs}
+                  onChange={(e) => setShowThumbs(e.target.checked)}
+                />
+                הצג תמונות
+              </label>
+              <span className="ba-search-hint">
+                {imagesList.length.toLocaleString()} תוצאות
+              </span>
+            </div>
+
+            {showThumbs && imageTab !== "without" ? (
+              <div className="ba-thumbs-grid">
+                {imagesList.length === 0 ? (
+                  <div className="ba-list-empty">אין תוצאות</div>
+                ) : (
+                  imagesList.slice(0, 200).map((b) => (
+                    <div key={b} className="ba-thumb">
+                      <div className="ba-thumb-img-wrap">
+                        <img
+                          src={`${DOMAIN}/images/${b}.jpg`}
+                          alt={b}
+                          loading="lazy"
+                          onError={(e) => {
+                            e.target.style.opacity = 0.18;
+                          }}
+                        />
+                      </div>
+                      <span className="ba-thumb-barcode">{b}</span>
+                    </div>
+                  ))
+                )}
+              </div>
+            ) : (
+              <ul className="ba-list">
+                {imagesList.length === 0 ? (
+                  <li className="ba-list-empty">אין תוצאות</li>
+                ) : (
+                  imagesList.slice(0, 500).map((b) => (
+                    <li key={b} className="ba-list-item">
+                      <span className="ba-list-barcode">{b}</span>
+                    </li>
+                  ))
+                )}
+              </ul>
+            )}
+
+            {imagesList.length > (showThumbs ? 200 : 500) && (
+              <p className="ba-list-truncated">
+                מציג {showThumbs ? 200 : 500} ראשונים מתוך{" "}
+                {imagesList.length.toLocaleString()} — צמצם חיפוש לראות עוד
               </p>
             )}
           </section>
