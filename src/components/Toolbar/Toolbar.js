@@ -312,6 +312,19 @@ function Toolbar() {
             </div>
           </Link>
 
+          <Link to="/barcodes-audit" onClick={() => handleNavClick("/barcodes-audit")}>
+            <div
+              className={`nav-item ${
+                selectedPage === "/barcodes-audit" ? "selected-page" : ""
+              }`}
+            >
+              <div className="nav-icon">
+                <BarcodeIcon className="svg-icon" />
+              </div>
+              <h1>Barcodes Audit</h1>
+            </div>
+          </Link>
+
           <Link to="/architecture" onClick={() => handleNavClick("/architecture")}>
             <div
               className={`nav-item ${
