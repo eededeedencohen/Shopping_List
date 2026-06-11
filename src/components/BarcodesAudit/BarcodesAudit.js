@@ -41,6 +41,7 @@ export default function BarcodesAudit() {
   const [scrapeQuery, setScrapeQuery] = useState("");
   const [actionPending, setActionPending] = useState(false);
   const [actionMsg, setActionMsg] = useState("");
+  const [concurrency, setConcurrency] = useState(30);
   const pollRef = useRef(null);
 
   useEffect(() => {
@@ -140,12 +141,13 @@ export default function BarcodesAudit() {
     setActionPending(true);
     setActionMsg("");
     try {
+      const safeConc = Math.max(1, Math.min(100, Number(concurrency) || 30));
       const res = await fetch(
         `${DOMAIN}/api/v1/barcodes-audit/scrape-all`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ fresh: !!fresh }),
+          body: JSON.stringify({ fresh: !!fresh, concurrency: safeConc }),
         }
       );
       const json = await res.json();
@@ -520,6 +522,19 @@ export default function BarcodesAudit() {
 
       <section className="ba-card ba-scrape-controls">
         <div className="ba-scrape-actions">
+          <label className="ba-conc-input">
+            <span>במקביל</span>
+            <input
+              type="number"
+              min={1}
+              max={100}
+              step={1}
+              value={concurrency}
+              onChange={(e) => setConcurrency(e.target.value)}
+              disabled={isRunning || actionPending}
+            />
+          </label>
+
           <button
             type="button"
             className="ba-btn ba-btn--primary"
@@ -559,6 +574,11 @@ export default function BarcodesAudit() {
                 {scrapeStatus.state === "failed" && "× נכשל"}
                 {scrapeStatus.state === "idle" && "○ לא הופעל"}
               </span>
+              {scrapeStatus.concurrency && (
+                <span className="ba-stat-muted-inline">
+                  ×{scrapeStatus.concurrency} במקביל
+                </span>
+              )}
               {scrapeStatus.total > 0 && (
                 <span className="ba-scrape-counter">
                   {scrapeStatus.done.toLocaleString()} /{" "}
