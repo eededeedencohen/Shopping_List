@@ -1,11 +1,12 @@
 /* ═══════════════════════════════════════════════
-   Weight-accuracy sliders (alt product weight range)
+   Weight-accuracy dual-handle range slider
+   (alt product weight: min ↔ base ↔ max in one row)
    ═══════════════════════════════════════════════ */
 
 .wa-wrapper {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
   font-family: "Heebo", "Open Sans", Arial, sans-serif;
 }
 
@@ -17,107 +18,199 @@
   letter-spacing: -0.1px;
 }
 
-.wa-slider {
+/* ─── The whole range row (track + labels under it) ─── */
+.wa-rangerow {
+  /* Render the slider in physical LTR so "min on left, max on right"
+     is consistent regardless of the surrounding RTL flow. */
+  direction: ltr;
   display: flex;
   flex-direction: column;
   gap: 6px;
+  padding: 4px 10px;
 }
 
-.wa-row {
-  display: inline-flex;
+.wa-rangerow-track {
+  position: relative;
+  height: 28px;
+  width: 100%;
+}
+
+/* base unselected track */
+.wa-rangerow-bg {
+  position: absolute;
+  inset: 50% 0 auto 0;
+  height: 8px;
+  transform: translateY(-50%);
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  border-radius: 999px;
+  pointer-events: none;
+}
+
+/* the colored "selected range" fills — between thumbs and base */
+.wa-rangerow-fill {
+  position: absolute;
+  top: 50%;
+  height: 8px;
+  transform: translateY(-50%);
+  border-radius: 999px;
+  pointer-events: none;
+}
+.wa-rangerow-fill--min {
+  background: linear-gradient(90deg, #fca5a5 0%, #fecaca 100%);
+}
+.wa-rangerow-fill--max {
+  background: linear-gradient(90deg, #6ee7b7 0%, #34d399 100%);
+}
+
+/* center anchor (= product base weight) */
+.wa-rangerow-anchor {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 2px;
+  height: 16px;
+  transform: translate(-50%, -50%);
+  background: #94a3b8;
+  border-radius: 1px;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* ─── the two native range inputs, overlaid ─── */
+.wa-rangerow-input {
+  position: absolute;
+  top: 0;
+  height: 28px;
+  background: transparent;
+  -webkit-appearance: none;
+  appearance: none;
+  outline: none;
+  margin: 0;
+  padding: 0;
+  z-index: 2;
+  /* each half captures clicks within its own bounds, so click-to-jump
+     still works and the user can grab the nearest thumb. */
+}
+
+/* When the user starts interacting with one input, raise it above the
+   other so the two thumbs don't fight when they overlap at the center. */
+.wa-rangerow-input:hover,
+.wa-rangerow-input:focus,
+.wa-rangerow-input:active {
+  z-index: 3;
+}
+
+.wa-rangerow-input--min {
+  left: 0;
+  width: 50%;
+}
+.wa-rangerow-input--max {
+  left: 50%;
+  width: 50%;
+}
+
+/* Webkit: invisible track, visible draggable thumb */
+.wa-rangerow-input::-webkit-slider-runnable-track {
+  background: transparent;
+  border: 0;
+  height: 28px;
+}
+.wa-rangerow-input::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 2px solid #ffffff;
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.25);
+  cursor: grab;
+  pointer-events: auto;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.wa-rangerow-input--min::-webkit-slider-thumb {
+  background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);
+}
+.wa-rangerow-input--max::-webkit-slider-thumb {
+  background: linear-gradient(135deg, #10b981 0%, #047857 100%);
+}
+.wa-rangerow-input::-webkit-slider-thumb:active {
+  transform: scale(1.18);
+  box-shadow: 0 3px 10px rgba(15, 23, 42, 0.32);
+  cursor: grabbing;
+}
+
+/* Firefox: same idea */
+.wa-rangerow-input::-moz-range-track {
+  background: transparent;
+  border: 0;
+  height: 28px;
+}
+.wa-rangerow-input::-moz-range-thumb {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 2px solid #ffffff;
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.25);
+  cursor: grab;
+  pointer-events: auto;
+}
+.wa-rangerow-input--min::-moz-range-thumb {
+  background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);
+}
+.wa-rangerow-input--max::-moz-range-thumb {
+  background: linear-gradient(135deg, #10b981 0%, #047857 100%);
+}
+
+/* ─── labels row (under the slider) ─── */
+.wa-rangerow-labels {
+  display: flex;
   align-items: baseline;
-  gap: 5px;
-  font-size: 0.82rem;
-  color: #64748b;
-  font-weight: 600;
-}
-
-.wa-cap::after {
-  content: ":";
-  margin-inline-start: 1px;
-  color: #cbd5e1;
-}
-
-.wa-val {
-  font-size: 1rem;
-  font-weight: 800;
-  font-variant-numeric: tabular-nums;
-  letter-spacing: -0.2px;
-}
-
-.wa-unit {
+  justify-content: space-between;
+  gap: 8px;
   font-size: 0.78rem;
   color: #64748b;
   font-weight: 600;
 }
 
-.wa-slider--up   .wa-val { color: #047857; }
-.wa-slider--down .wa-val { color: #b91c1c; }
-
-/* The range track */
-.wa-range {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 100%;
-  height: 6px;
-  border-radius: 3px;
-  outline: none;
-  -webkit-tap-highlight-color: transparent;
+.wa-rangerow-label {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 4px;
+  /* Each label is a tiny Hebrew chunk — let bidi resolve naturally. */
+  unicode-bidi: plaintext;
 }
 
-.wa-range--up {
-  background: linear-gradient(90deg, #d1fae5 0%, #6ee7b7 100%);
+.wa-rangerow-cap {
+  color: #94a3b8;
+  font-weight: 700;
 }
 
-.wa-range--down {
-  background: linear-gradient(90deg, #fee2e2 0%, #fca5a5 100%);
+.wa-rangerow-value {
+  font-size: 0.95rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.2px;
 }
 
-/* Webkit thumb */
-.wa-range::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
-  cursor: grab;
-  border: 2px solid #ffffff;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.18);
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
+.wa-rangerow-unit {
+  color: #94a3b8;
+  font-weight: 600;
 }
 
-.wa-range--up::-webkit-slider-thumb {
-  background: linear-gradient(135deg, #10b981 0%, #047857 100%);
+.wa-rangerow-label--min .wa-rangerow-value { color: #b91c1c; }
+.wa-rangerow-label--max .wa-rangerow-value { color: #047857; }
+.wa-rangerow-label--base {
+  font-size: 0.74rem;
+  color: #64748b;
+}
+.wa-rangerow-label--base .wa-rangerow-value {
+  font-size: 0.85rem;
+  color: #475569;
+  font-weight: 700;
 }
 
-.wa-range--down::-webkit-slider-thumb {
-  background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);
-}
-
-.wa-range::-webkit-slider-thumb:active {
-  transform: scale(1.18);
-  cursor: grabbing;
-}
-
-/* Firefox thumb */
-.wa-range::-moz-range-thumb {
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
-  border: 2px solid #ffffff;
-  cursor: grab;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.18);
-}
-
-.wa-range--up::-moz-range-thumb {
-  background: linear-gradient(135deg, #10b981 0%, #047857 100%);
-}
-
-.wa-range--down::-moz-range-thumb {
-  background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);
-}
-
-/* Legacy classes — neutralized */
+/* Legacy classes from the old stacked-sliders design — neutralized */
 .product-settings__weight-accuracy,
 .weight-gain-value,
 .weight-loss-value,
@@ -126,6 +219,16 @@
 .weight-gain-display,
 .weight-loss-display,
 .unit-weight-gain,
-.unit-weight-loss {
+.unit-weight-loss,
+.wa-slider,
+.wa-slider--up,
+.wa-slider--down,
+.wa-row,
+.wa-cap,
+.wa-val,
+.wa-unit,
+.wa-range,
+.wa-range--up,
+.wa-range--down {
   all: revert;
 }
