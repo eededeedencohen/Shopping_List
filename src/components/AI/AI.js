@@ -13,6 +13,7 @@ import DawnBackground from "./DawnBackground";
 import CloudsBackground from "./CloudsBackground";
 import BloomBackground from "./BloomBackground";
 import { useAITheme } from "../../context/AIThemeContext";
+import useBodyScrollLock from "../../hooks/useBodyScrollLock";
 import Brobot from "../Brobot/Brobot";
 import TestModal from "./TestModal/TestModal";
 import { ReactComponent as VolumeIcon } from "./icons/volume.svg";
@@ -113,6 +114,7 @@ export default function AI() {
   const { settings: aiSettings, updateSetting } = useAiSettings();
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [testModalOpen, setTestModalOpen] = useState(false);
+  useBodyScrollLock(settingsOpen);
 
   const micThreshold = aiSettings.micThreshold;
   const setMicThreshold = (v) => updateSetting("micThreshold", typeof v === "function" ? v(micThreshold) : v);
@@ -612,6 +614,7 @@ export default function AI() {
                     <option value="TxGEqnHWrfWFTfGW9XjX">Josh (זכר)</option>
                     <option value="VR6AewLTigWG4xSOukaG">Arnold (זכר)</option>
                     <option value="29vD33N1CtxCmqQRPOHJ">Drew (זכר)</option>
+                    <option value="KzE5xImZVu70uQLdx5z5">Kitchri (נקבה)</option>
                   </>
                 ) : (
                   <>

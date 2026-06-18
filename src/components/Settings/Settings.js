@@ -687,7 +687,7 @@ export default function Settings() {
           <div className="settings-card__body">
             <div className="settings-row">
               <span className="settings-row__label">גרסה</span>
-              <span className="settings-row__value">1.0.0</span>
+              <span className="settings-row__value">1.1.0</span>
             </div>
           </div>
         </section>
