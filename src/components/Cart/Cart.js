@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import Modal from "./Modal";
 import ReplaceProducts from "./ReplaceProducts";
 import ReplaceSupermarket from "./ReplaceSupermarket/ReplaceSupermarket";
+import InvoiceBillAnimation from "./ConfirmAnimation/InvoiceBillAnimation";
 import styles from "./Cart.module.css";
 import {
   getProductImage,
@@ -165,6 +166,8 @@ export default function Cart() {
   const [isModalOpen, setModalOpen] = useState(false);
   const [isReplaceSupermarketOpen, setIsReplaceSupermarketOpen] =
     useState(false);
+  // Plays the invoice-bill "saved!" animation after the user confirms the cart.
+  const [isSavingAnimOpen, setIsSavingAnimOpen] = useState(false);
 
   const [currentBarcode, setCurrentBarcode] = useState(null);
 
@@ -259,9 +262,11 @@ export default function Cart() {
 
   const handleConfirmCart = async () => {
     try {
+      setIsSavingAnimOpen(true);
       confirmAndClearCart();
     } catch (error) {
       console.error("Error confirming the cart:", error);
+      setIsSavingAnimOpen(false);
     }
   };
 
@@ -658,6 +663,11 @@ export default function Cart() {
           </button>
         </div>
       )}
+
+      <InvoiceBillAnimation
+        isOpen={isSavingAnimOpen}
+        onClose={() => setIsSavingAnimOpen(false)}
+      />
     </div>
   );
 }

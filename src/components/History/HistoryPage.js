@@ -17,7 +17,56 @@ const HistoryPage = () => {
   const [sortBy, setSortBy] = useState("date-desc");
   const [filterSupermarket, setFilterSupermarket] = useState("all");
 
+  /* selection mode for bulk-delete */
+  const [isSelectionMode, setIsSelectionMode] = useState(false);
+  const [selectedIds, setSelectedIds] = useState(() => new Set());
+  const [isDeleting, setIsDeleting] = useState(false);
+
   const { allSupermarkets, isAllSupermarketsUploaded } = useCartOptimizationCtx();
+
+  const exitSelection = () => {
+    setIsSelectionMode(false);
+    setSelectedIds(new Set());
+  };
+
+  const toggleSelected = (id) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  const handleDeleteSelected = async () => {
+    if (!selectedIds.size || isDeleting) return;
+    const count = selectedIds.size;
+    if (
+      !window.confirm(
+        count === 1
+          ? "למחוק את הקבלה שנבחרה?"
+          : `למחוק ${count} קבלות שנבחרו?`
+      )
+    ) {
+      return;
+    }
+    setIsDeleting(true);
+    const ids = [...selectedIds];
+    const results = await Promise.allSettled(
+      ids.map((id) => axios.delete(`${DOMAIN}/api/v1/history/${id}`))
+    );
+    const succeededIds = new Set(
+      ids.filter((_, i) => results[i].status === "fulfilled")
+    );
+    setHistory((prev) => prev.filter((c) => !succeededIds.has(c._id)));
+    const failed = results.filter((r) => r.status === "rejected").length;
+    if (failed > 0) {
+      console.error(`Failed to delete ${failed}/${count} receipts`);
+      alert(`${count - failed} מתוך ${count} נמחקו. ${failed} נכשלו — נסה שוב.`);
+    }
+    exitSelection();
+    setIsDeleting(false);
+  };
 
   useEffect(() => {
     const fetchHistory = async () => {
@@ -135,15 +184,27 @@ const HistoryPage = () => {
 
       {/* Filters */}
       <div className="history-filters">
-        <div className="history-search-wrapper">
-          <SearchIcon className="history-search-icon" />
-          <input
-            type="text"
-            className="history-search-input"
-            placeholder="חפש לפי סופר, כתובת או עיר..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
+        <div className="history-search-row">
+          <div className="history-search-wrapper">
+            <SearchIcon className="history-search-icon" />
+            <input
+              type="text"
+              className="history-search-input"
+              placeholder="חפש לפי סופר, כתובת או עיר..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
+          {history.length > 0 && (
+            <button
+              type="button"
+              className={`history-select-toggle ${isSelectionMode ? "active" : ""}`}
+              onClick={() => (isSelectionMode ? exitSelection() : setIsSelectionMode(true))}
+              aria-pressed={isSelectionMode}
+            >
+              {isSelectionMode ? "ביטול" : "בחר"}
+            </button>
+          )}
         </div>
 
         <div className="history-filter-buttons">
@@ -198,13 +259,30 @@ const HistoryPage = () => {
           </div>
         </div>
       ) : (
+        <>
         <div className="history-lists">
-          {filteredHistory.map((cart, index) => (
-            <Link to={`/history/${cart._id}`} key={cart._id}>
+          {filteredHistory.map((cart, index) => {
+            const isSelected = selectedIds.has(cart._id);
+            const cardInner = (
               <div
-                className="cart-details"
+                className={`cart-details ${isSelectionMode ? "is-selectable" : ""} ${
+                  isSelected ? "is-selected" : ""
+                }`}
                 style={{ animationDelay: `${0.1 + index * 0.08}s` }}
               >
+                {isSelectionMode && (
+                  <span
+                    className={`cart-details-checkbox ${isSelected ? "is-checked" : ""}`}
+                    aria-hidden="true"
+                  >
+                    {isSelected && (
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.4" strokeLinecap="round" strokeLinejoin="round">
+                        <polyline points="20 6 9 17 4 12" />
+                      </svg>
+                    )}
+                  </span>
+                )}
+
                 <div className="cart-details-supermarket">
                   <div className="cart-details-supermarket__image">
                     <SupermarketImage supermarketName={cart.supermarketName} />
@@ -246,9 +324,55 @@ const HistoryPage = () => {
                 {/* Mini barcode */}
                 <div className="cart-details-barcode"></div>
               </div>
-            </Link>
-          ))}
+            );
+
+            if (isSelectionMode) {
+              return (
+                <button
+                  key={cart._id}
+                  type="button"
+                  className="history-card-tap"
+                  onClick={() => toggleSelected(cart._id)}
+                  aria-pressed={isSelected}
+                >
+                  {cardInner}
+                </button>
+              );
+            }
+            return (
+              <Link to={`/history/${cart._id}`} key={cart._id}>
+                {cardInner}
+              </Link>
+            );
+          })}
         </div>
+
+        {isSelectionMode && (
+          <div className={`history-selection-bar ${selectedIds.size ? "has-selection" : ""}`}>
+            <span className="history-selection-count">
+              {selectedIds.size === 0
+                ? "סמן קבלות למחיקה"
+                : selectedIds.size === 1
+                ? "קבלה אחת נבחרה"
+                : `${selectedIds.size} קבלות נבחרו`}
+            </span>
+            <button
+              type="button"
+              className="history-selection-delete"
+              onClick={handleDeleteSelected}
+              disabled={!selectedIds.size || isDeleting}
+            >
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <polyline points="3 6 5 6 21 6" />
+                <path d="M19 6l-2 14a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2L5 6" />
+                <path d="M10 11v6M14 11v6" />
+                <path d="M9 6V4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2" />
+              </svg>
+              {isDeleting ? "מוחק…" : "מחק"}
+            </button>
+          </div>
+        )}
+        </>
       )}
     </div>
   );

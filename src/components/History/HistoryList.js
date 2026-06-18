@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
+import { useReceiptTheme } from "../../context/ReceiptThemeContext";
 import "./HistoryList.css";
 import { ProductImageDisplay } from "../Images/ProductImageService";
 import SupermarketImage from "../Images/SupermarketImage";
@@ -46,6 +47,7 @@ const generateBarcodeNumber = (id) => {
 const HistoryList = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { theme: receiptTheme } = useReceiptTheme();
   const [cart, setCart] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [isPrinting, setIsPrinting] = useState(false);
@@ -92,7 +94,7 @@ const HistoryList = () => {
   );
 
   return (
-    <div className="receipt-container">
+    <div className={`receipt-container receipt-theme--${receiptTheme}`}>
       {/* Back Button */}
       <button className="receipt-back-btn" onClick={handleBack}>
         ←
@@ -237,7 +239,6 @@ const HistoryList = () => {
 
         {/* Footer with barcode */}
         <div className="receipt-footer">
-          <div className="receipt-thank-you">תודה שקניתם אצלנו!</div>
           <div className="receipt-barcode"></div>
           <div className="receipt-barcode-number">
             {generateBarcodeNumber(id)}

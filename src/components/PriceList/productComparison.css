@@ -88,6 +88,19 @@
   overflow: hidden;
   padding: 4px;
   border: 1px solid #f3f4f6;
+  cursor: zoom-in;
+  font-family: inherit;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 0.15s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.compareM__hero-image:hover {
+  border-color: rgba(37, 99, 235, 0.32);
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.10);
+}
+
+.compareM__hero-image:active {
+  transform: scale(0.96);
 }
 
 .compareM__hero-image-img,
@@ -628,4 +641,79 @@
     font-size: 0.78rem;
     padding: 6px 8px;
   }
+}
+
+/* ── Full-size product image lightbox ─────────────── */
+.compareM__lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 11000;
+  background: rgba(15, 23, 42, 0.86);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 28px 20px;
+  animation: compareM-lb-fade 0.18s ease-out;
+}
+
+@keyframes compareM-lb-fade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.compareM__lightbox-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 0;
+  background: rgba(255, 255, 255, 0.95);
+  color: #0f172a;
+  font-size: 1.6rem;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.32);
+  -webkit-tap-highlight-color: transparent;
+  z-index: 1;
+  transition: transform 0.15s ease;
+}
+
+.compareM__lightbox-close:active {
+  transform: scale(0.92);
+}
+
+.compareM__lightbox-stage {
+  max-width: min(92vw, 720px);
+  max-height: 90vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 16px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.4);
+  animation: compareM-lb-pop 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes compareM-lb-pop {
+  from { opacity: 0; transform: scale(0.92); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+.compareM__lightbox-img {
+  display: block;
+  max-width: 100%;
+  max-height: calc(90vh - 32px);
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  border-radius: 6px;
 }

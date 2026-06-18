@@ -463,3 +463,27 @@
 }
 
 @keyframes snf-spin { to { transform: rotate(360deg); } }
+
+/* "By preferences" — distinct yellow/amber so it sits between the primary
+   "select all" (white) and the ghost "clear" (transparent) actions. */
+.snf-toolbar-btn--pref {
+  background: linear-gradient(135deg, #fde68a 0%, #fbbf24 100%);
+  color: #78350f;
+  border-color: rgba(217, 119, 6, 0.45);
+  box-shadow: 0 3px 10px rgba(217, 119, 6, 0.22);
+}
+.snf-toolbar-btn--pref svg {
+  width: 14px;
+  height: 14px;
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.15));
+}
+.snf-toolbar-btn--pref:hover:not(:disabled) {
+  filter: brightness(1.04);
+  box-shadow: 0 4px 12px rgba(217, 119, 6, 0.32);
+}
+.snf-toolbar-btn--pref:active:not(:disabled) { transform: scale(0.96); }
+.snf-toolbar-btn--pref:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  box-shadow: none;
+}

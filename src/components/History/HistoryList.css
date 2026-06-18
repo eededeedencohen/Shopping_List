@@ -1136,3 +1136,8 @@
     transform: rotate(360deg);
   }
 }
+
+/* ── Grayscale receipt theme ── */
+.receipt-theme--grayscale .receipt-paper {
+  filter: grayscale(100%) contrast(0.96);
+}

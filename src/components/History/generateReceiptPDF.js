@@ -245,11 +245,7 @@ const generateReceiptPDF = async (cart, receiptId) => {
         </div>
       </div>
 
-      <!-- THANK YOU -->
-      <div style="text-align:center;padding-top:14px;font-size:14px;font-weight:700;direction:rtl;">
-        תודה שקניתם אצלנו!
-      </div>
-      <div style="text-align:center;font-size:10px;color:#aaa;margin-top:4px;">
+      <div style="text-align:center;font-size:10px;color:#aaa;margin-top:14px;">
         www.shopping-list.app
       </div>
     </div>

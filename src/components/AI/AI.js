@@ -530,16 +530,6 @@ export default function AI() {
 
         {/* ── Settings Panel ── */}
         <div className={`settings-panel ${settingsOpen ? "open" : ""}`}>
-          <div className="settings-header">
-            <h3 className="settings-title">הגדרות</h3>
-            <button
-              className="settings-close-btn"
-              onClick={() => setSettingsOpen(false)}
-            >
-              {"\u2715"}
-            </button>
-          </div>
-
           <div className="settings-section">
             <div className="settings-section-header">
               <div className="settings-section-icon">
@@ -794,8 +784,17 @@ export default function AI() {
             <textarea
               value={textInput}
               onChange={(e) => setTextInput(e.target.value)}
-              placeholder="...הקלד הודעה"
-              dir="auto"
+              placeholder="הקלד הודעה..."
+              dir="rtl"
+              onKeyDown={(e) => {
+                /* Enter sends (Shift+Enter / Ctrl+Enter keeps newline). */
+                if (e.key === "Enter" && !e.shiftKey && !e.ctrlKey && !e.metaKey) {
+                  e.preventDefault();
+                  if (textInput.trim()) {
+                    handleOnSubmit(e);
+                  }
+                }
+              }}
               onFocus={() => brobotRef.current?.look("down")}
               onBlur={() => brobotRef.current?.look("center")}
             />

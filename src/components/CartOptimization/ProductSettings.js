@@ -1,10 +1,10 @@
-import React from "react";
+import React, { useState } from "react";
 import ProductDetails from "./ProductDetails";
 import WeightAccuracy from "./WeightAccuracy";
 import BrandsFilter from "./BrandsFilter/BrandsFilter";
+import AlternativeProductsModal from "./AlternativeProductsModal/AlternativeProductsModal";
 import "./ProductSettings.css";
 import { useSettingsOperations } from "../../hooks/optimizationHooks";
-import { useProductGroups } from "../../hooks/appHooks";
 
 function ToggleRow({ label, hint, checked, onChange }) {
   return (
@@ -28,7 +28,7 @@ function ToggleRow({ label, hint, checked, onChange }) {
 
 export default function ProductSettings({ product }) {
   const { changeCanRoundUp, changeCanReplace } = useSettingsOperations();
-  const { groups, isLoading } = useProductGroups(product.barcode);
+  const [isAltModalOpen, setIsAltModalOpen] = useState(false);
 
   return (
     <article className="ps-card">
@@ -65,19 +65,35 @@ export default function ProductSettings({ product }) {
             generalName={product.productDetails.generalName}
             barcode={product.barcode}
           />
-          <div className="ps-tags">
-            {isLoading ? (
-              <span className="ps-tags-state">טוען תגיות…</span>
-            ) : groups.length ? (
-              groups.map((g) => (
-                <span key={g.groupName} className="ps-tag">
-                  {g.groupName}
-                </span>
-              ))
-            ) : (
-              <span className="ps-tags-state">אין תגיות</span>
-            )}
-          </div>
+
+          <button
+            type="button"
+            className="ps-view-alts-btn"
+            onClick={() => setIsAltModalOpen(true)}
+          >
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
+              <circle cx="11" cy="11" r="7" />
+              <line x1="21" y1="21" x2="16.65" y2="16.65" />
+            </svg>
+            <span>הצג מוצרים תואמים</span>
+            <span className="ps-view-alts-btn__chevron" aria-hidden="true">‹</span>
+          </button>
+
+          <AlternativeProductsModal
+            isOpen={isAltModalOpen}
+            onClose={() => setIsAltModalOpen(false)}
+            barcode={product.barcode}
+            productDetails={product.productDetails}
+            productSettings={product.productSettings}
+          />
         </div>
       )}
     </article>

@@ -91,66 +91,127 @@
 /* ========================================= */
 .settings-panel {
   position: fixed;
-  top: 0;
-  right: -310px;
-  width: 290px;
-  height: 100%;
+  /* Sit BELOW the app toolbar so the header (X + title) isn't hidden. */
+  top: var(--toolbar-h, 40px);
+  right: -360px;
+  width: 320px;
+  height: calc(100% - var(--toolbar-h, 40px));
   z-index: 99;
+  /* Slightly warmer dark — less "cold spaceship", more "premium app". */
   background:
-    radial-gradient(1200px 600px at 100% 0%, rgba(30, 209, 255, 0.08), transparent 55%),
-    linear-gradient(180deg, #0b1426 0%, #060c1a 100%);
-  border-left: 1px solid rgba(30, 209, 255, 0.18);
-  padding: 0 18px 24px;
+    radial-gradient(900px 480px at 100% -10%, rgba(56, 189, 248, 0.10), transparent 60%),
+    radial-gradient(700px 480px at -20% 110%, rgba(168, 85, 247, 0.08), transparent 60%),
+    linear-gradient(180deg, #0f172a 0%, #0b1220 100%);
+  border-left: 1px solid rgba(148, 163, 184, 0.10);
+  padding: 18px 16px 22px;
   overflow-y: auto;
+  overscroll-behavior: contain;
   transition: right 0.35s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow:
-    -16px 0 48px rgba(0, 0, 0, 0.55),
+    -20px 0 56px rgba(0, 0, 0, 0.55),
     inset 1px 0 0 rgba(255, 255, 255, 0.04);
   direction: rtl;
+  font-family: "Heebo", "Open Sans", Arial, sans-serif;
 }
 .settings-panel.open {
   right: 0;
 }
 
+/* slim accent strip on the inner edge */
+.settings-panel::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  width: 2px;
+  background: linear-gradient(180deg, #38bdf8 0%, #6366f1 50%, #a855f7 100%);
+  opacity: 0.55;
+  pointer-events: none;
+}
+
 /* ── Header ── */
 .settings-header {
+  position: sticky;
+  top: 0;
+  z-index: 1;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 22px 4px 14px;
-  margin-bottom: 14px;
-  border-bottom: 1px solid rgba(30, 209, 255, 0.14);
-  position: sticky;
-  top: 0;
-  background: linear-gradient(180deg, #0b1426 80%, rgba(11, 20, 38, 0));
-  z-index: 1;
+  gap: 12px;
+  padding: 20px 4px 14px;
+  margin: 0 -16px 14px;
+  padding-left: 20px;
+  padding-right: 20px;
+  background: linear-gradient(180deg, rgba(15, 23, 42, 0.98) 70%, rgba(15, 23, 42, 0));
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+.settings-header::after {
+  /* Soft gradient divider line below the header — replaces the harsh
+     vertical accent bar that used to sit next to the title. */
+  content: "";
+  position: absolute;
+  right: 20px;
+  left: 20px;
+  bottom: 8px;
+  height: 1px;
+  background: linear-gradient(90deg,
+    transparent 0%,
+    rgba(99, 102, 241, 0.45) 20%,
+    rgba(56, 189, 248, 0.45) 80%,
+    transparent 100%);
+  opacity: 0.55;
+  pointer-events: none;
+}
+.settings-title-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
 }
 .settings-title {
-  font-size: 1.25rem;
-  font-weight: 700;
   margin: 0;
-  color: #f1f5f9;
-  letter-spacing: 0.1px;
-  font-family: "Heebo", "Open Sans", sans-serif;
+  font-family: inherit;
+  font-size: 1.45rem;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  line-height: 1.1;
+  background: linear-gradient(135deg, #f1f5f9 0%, #cbd5e1 80%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+.settings-subtitle {
+  margin: 0;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #64748b;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
 }
 .settings-close-btn {
-  width: 34px;
-  height: 34px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 10px;
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  border-radius: 12px;
   background: rgba(255, 255, 255, 0.04);
-  color: rgba(255, 255, 255, 0.7);
-  font-size: 15px;
+  color: rgba(248, 250, 252, 0.85);
+  font-size: 18px;
+  font-weight: 600;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
+  -webkit-tap-highlight-color: transparent;
   transition: background 0.2s, color 0.2s, border-color 0.2s, transform 0.15s;
 }
 .settings-close-btn:hover {
-  background: rgba(255, 80, 80, 0.16);
-  color: #ff8b8b;
-  border-color: rgba(255, 80, 80, 0.35);
+  background: rgba(244, 63, 94, 0.14);
+  color: #fda4af;
+  border-color: rgba(244, 63, 94, 0.35);
 }
 .settings-close-btn:active { transform: scale(0.92); }
 
@@ -185,21 +246,19 @@
   position: relative;
   margin-bottom: 12px;
   padding: 14px 14px 12px;
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.045) 0%, rgba(255, 255, 255, 0.015) 100%);
   border-radius: 16px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(148, 163, 184, 0.12);
   box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.04) inset,
-    0 8px 24px rgba(0, 0, 0, 0.25);
-  transition: border-color 0.2s, transform 0.2s, box-shadow 0.25s;
+    0 1px 0 rgba(255, 255, 255, 0.05) inset,
+    0 6px 22px rgba(0, 0, 0, 0.22);
+  transition: border-color 0.2s, box-shadow 0.25s, transform 0.18s;
 }
 .settings-section:hover {
-  border-color: rgba(30, 209, 255, 0.28);
+  border-color: rgba(148, 163, 184, 0.22);
   box-shadow:
     0 1px 0 rgba(255, 255, 255, 0.06) inset,
-    0 10px 28px rgba(0, 0, 0, 0.3),
-    0 0 0 1px rgba(30, 209, 255, 0.08);
+    0 8px 28px rgba(0, 0, 0, 0.28);
 }
 
 /* Section header — icon + title in a row */
@@ -209,7 +268,7 @@
   gap: 10px;
   margin-bottom: 12px;
   padding-bottom: 10px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  border-bottom: 1px solid rgba(148, 163, 184, 0.10);
 }
 
 .settings-section-icon {
@@ -219,72 +278,72 @@
   align-items: center;
   justify-content: center;
   border-radius: 10px;
-  background: linear-gradient(135deg, rgba(27, 110, 255, 0.22) 0%, rgba(30, 209, 255, 0.18) 100%);
-  border: 1px solid rgba(30, 209, 255, 0.28);
-  box-shadow:
-    0 4px 10px rgba(30, 209, 255, 0.15),
-    0 1px 0 rgba(255, 255, 255, 0.1) inset;
+  background: linear-gradient(180deg, rgba(56, 189, 248, 0.14), rgba(99, 102, 241, 0.10));
+  border: 1px solid rgba(99, 102, 241, 0.22);
   flex-shrink: 0;
   margin-bottom: 0;
+  box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.06) inset;
 }
 
 .settings-section-svg {
-  width: 17px;
-  height: 17px;
+  width: 16px;
+  height: 16px;
   display: block;
-  fill: #1ed1ff;
-  filter: drop-shadow(0 0 6px rgba(30, 209, 255, 0.45));
+  fill: #cbd5e1;
 }
 .settings-section-svg path,
 .settings-section-svg polygon,
 .settings-section-svg circle,
 .settings-section-svg g {
-  fill: #1ed1ff;
+  fill: #cbd5e1;
 }
 
 .settings-section-title {
   display: inline;
-  font-size: 0.95rem;
-  font-weight: 700;
+  font-size: 0.98rem;
+  font-weight: 800;
   color: #f1f5f9;
   text-transform: none;
-  letter-spacing: 0;
+  letter-spacing: -0.25px;
   margin-bottom: 0;
 }
 
-/* ── Language Select ── */
+/* ── Language Select — segmented pill control ── */
 .language-select-row {
   display: flex;
-  gap: 6px;
+  gap: 4px;
   margin-top: 4px;
+  padding: 3px;
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(148, 163, 184, 0.10);
+  border-radius: 12px;
 }
 .lang-btn {
   flex: 1;
   padding: 8px 4px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 10px;
-  background: rgba(255, 255, 255, 0.04);
-  color: #cbd5e1;
-  font-size: 0.8rem;
-  font-weight: 500;
-  font-family: "Heebo", sans-serif;
+  border: 1px solid transparent;
+  border-radius: 9px;
+  background: transparent;
+  color: #94a3b8;
+  font-size: 0.82rem;
+  font-weight: 600;
+  font-family: inherit;
   cursor: pointer;
-  transition: background 0.2s, border-color 0.2s, color 0.2s, transform 0.15s;
+  -webkit-tap-highlight-color: transparent;
+  transition: background 0.18s, color 0.18s, transform 0.15s, box-shadow 0.2s;
 }
 .lang-btn:hover {
-  background: rgba(30, 209, 255, 0.1);
-  border-color: rgba(30, 209, 255, 0.3);
-  color: #fff;
+  color: #e2e8f0;
+  background: rgba(255, 255, 255, 0.04);
 }
-.lang-btn:active { transform: scale(0.96); }
+.lang-btn:active { transform: scale(0.97); }
 .lang-btn.active {
-  background: linear-gradient(135deg, var(--grad-start), var(--grad-mid));
-  border-color: rgba(30, 209, 255, 0.5);
+  background: linear-gradient(135deg, #38bdf8 0%, #6366f1 100%);
   color: #fff;
   font-weight: 700;
   box-shadow:
-    0 4px 14px rgba(30, 209, 255, 0.32),
-    0 1px 0 rgba(255, 255, 255, 0.18) inset;
+    0 4px 12px rgba(56, 189, 248, 0.28),
+    0 1px 0 rgba(255, 255, 255, 0.22) inset;
 }
 
 /* ── Voice Select ── */
@@ -295,31 +354,34 @@
   margin-top: 10px;
 }
 .voice-label {
-  font-size: 0.85rem;
-  color: #ccc;
+  font-size: 0.82rem;
+  color: #94a3b8;
   white-space: nowrap;
+  font-weight: 600;
 }
 .voice-dropdown {
   flex: 1;
-  padding: 6px 8px;
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.08);
-  color: #eee;
-  font-size: 0.8rem;
-  font-family: "Heebo", sans-serif;
+  padding: 9px 12px;
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.30);
+  color: #e2e8f0;
+  font-size: 0.85rem;
+  font-family: inherit;
+  font-weight: 600;
   cursor: pointer;
   outline: none;
-  transition: border-color 0.2s;
+  transition: border-color 0.2s, box-shadow 0.2s;
   direction: rtl;
 }
 .voice-dropdown:hover,
 .voice-dropdown:focus {
-  border-color: rgba(30, 209, 255, 0.4);
+  border-color: rgba(56, 189, 248, 0.45);
+  box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.14);
 }
 .voice-dropdown option {
-  background: #1a1a2e;
-  color: #eee;
+  background: #1e293b;
+  color: #e2e8f0;
 }
 
 /* ── Disabled states ── */
@@ -344,30 +406,31 @@
   padding: 10px 2px;
   cursor: pointer;
   font-size: 0.9rem;
-  color: #e5e7eb;
+  color: #e2e8f0;
+  font-weight: 500;
 }
 .toggle-row + .toggle-row {
-  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  border-top: 1px solid rgba(148, 163, 184, 0.08);
 }
 
-/* ── Toggle Switch ── */
+/* ── Toggle Switch — iOS-style ── */
 .toggle-switch {
   position: relative;
   width: 46px;
   height: 26px;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: rgba(148, 163, 184, 0.20);
+  border: 1px solid rgba(148, 163, 184, 0.14);
   cursor: pointer;
   transition: background 0.25s, box-shadow 0.25s, border-color 0.25s;
   flex-shrink: 0;
 }
 .toggle-switch.on {
-  background: linear-gradient(135deg, var(--grad-start), var(--grad-mid));
-  border-color: rgba(30, 209, 255, 0.55);
+  background: linear-gradient(135deg, #10b981 0%, #34d399 100%);
+  border-color: rgba(16, 185, 129, 0.55);
   box-shadow:
-    0 0 12px rgba(30, 209, 255, 0.35),
-    0 1px 0 rgba(255, 255, 255, 0.18) inset;
+    0 4px 12px rgba(16, 185, 129, 0.28),
+    0 1px 0 rgba(255, 255, 255, 0.20) inset;
 }
 .toggle-knob {
   position: absolute;
@@ -382,7 +445,7 @@
 }
 .toggle-switch.on .toggle-knob {
   left: 22px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4), 0 0 6px rgba(30, 209, 255, 0.6);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
 }
 
 /* ── Threshold Slider ── */
@@ -508,11 +571,21 @@
 .ai-container .messages-container {
   flex: 1;
   overflow-y: auto;
-  padding: 0.25rem 0.5rem 0.75rem;
+  /* Top padding leaves room for the floating settings button (40px + 10px
+     offset + breathing) so the first message isn't hidden under it. */
+  padding: 56px 0.5rem 0.75rem;
+  scroll-padding-top: 56px;
   display: flex;
   flex-direction: column;
   gap: 10px;
   overflow-x: hidden;
+}
+
+/* Soft gradient mask at the top of the scroll area — content that scrolls
+   under the settings button fades out instead of appearing through it. */
+.ai-container .messages-container {
+  mask-image: linear-gradient(180deg, transparent 0, #000 32px, #000 100%);
+  -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 32px, #000 100%);
 }
 
 /* ---------- USER INPUT BAR ---------- */
@@ -541,6 +614,7 @@
   min-height: 2.8rem;
   max-height: 6rem;
   padding: 0.55rem 0.75rem;
+  font-family: "Heebo", "Open Sans", Arial, sans-serif;
   font-size: 0.95rem;
   border: none;
   border-radius: 14px;
@@ -555,6 +629,8 @@
   color: #e0e0e0;
   text-align: right;
   direction: rtl;
+  font-family: "Heebo", "Open Sans", Arial, sans-serif;
+  font-weight: 500;
 }
 
 .ai-container .user-text-box button {

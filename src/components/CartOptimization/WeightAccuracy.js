@@ -77,37 +77,23 @@ export default function WeightAccuracy({
 
       <div className="wa-rangerow">
         <div className="wa-rangerow-track">
-          <div className="wa-rangerow-bg" />
-
-          {/* selected range fills (red on the left of base, green on the right) */}
-          <div
-            className="wa-rangerow-fill wa-rangerow-fill--min"
-            style={{ left: `${minPct}%`, width: `${50 - minPct}%` }}
-          />
-          <div
-            className="wa-rangerow-fill wa-rangerow-fill--max"
-            style={{ left: "50%", width: `${maxPct - 50}%` }}
-          />
+          {/* Pill-shaped base track that also clips the colored fills inside it,
+             so they share its rounded ends instead of drawing their own. */}
+          <div className="wa-rangerow-bg">
+            <div
+              className="wa-rangerow-fill wa-rangerow-fill--max"
+              style={{ left: `${100 - maxPct}%`, width: `${maxPct - 50}%` }}
+            />
+            <div
+              className="wa-rangerow-fill wa-rangerow-fill--min"
+              style={{ left: "50%", width: `${50 - minPct}%` }}
+            />
+          </div>
 
           {/* center anchor (base weight) */}
           <div className="wa-rangerow-anchor" />
 
-          {/* min handle — left half of track */}
-          <input
-            type="range"
-            min={0}
-            max={baseWeight}
-            step={5}
-            value={tempWeightLoss}
-            onChange={handleWeightLossChange}
-            onMouseUp={handleWeightLossCommit}
-            onTouchEnd={handleWeightLossCommit}
-            onKeyUp={handleWeightLossCommit}
-            className="wa-rangerow-input wa-rangerow-input--min"
-            aria-label="משקל מינימלי"
-          />
-
-          {/* max handle — right half of track */}
+          {/* max handle — LEFT half of track (reversed: high values to the left) */}
           <input
             type="range"
             min={baseWeight}
@@ -121,22 +107,44 @@ export default function WeightAccuracy({
             className="wa-rangerow-input wa-rangerow-input--max"
             aria-label="משקל מקסימלי"
           />
+
+          {/* min handle — RIGHT half of track (reversed: low values to the right) */}
+          <input
+            type="range"
+            min={0}
+            max={baseWeight}
+            step={5}
+            value={tempWeightLoss}
+            onChange={handleWeightLossChange}
+            onMouseUp={handleWeightLossCommit}
+            onTouchEnd={handleWeightLossCommit}
+            onKeyUp={handleWeightLossCommit}
+            className="wa-rangerow-input wa-rangerow-input--min"
+            aria-label="משקל מינימלי"
+          />
         </div>
 
         <div className="wa-rangerow-labels">
-          <span className="wa-rangerow-label wa-rangerow-label--min">
-            <span className="wa-rangerow-cap">מינ׳</span>
-            <span className="wa-rangerow-value">{tempWeightLoss}</span>
-            <span className="wa-rangerow-unit">{unit}</span>
-          </span>
-          <span className="wa-rangerow-label wa-rangerow-label--base">
-            <span className="wa-rangerow-value">{baseWeight}</span>
-            <span className="wa-rangerow-unit">{unit}</span>
-          </span>
           <span className="wa-rangerow-label wa-rangerow-label--max">
             <span className="wa-rangerow-cap">עד</span>
-            <span className="wa-rangerow-value">{tempWeightGain}</span>
-            <span className="wa-rangerow-unit">{unit}</span>
+            <span className="wa-rangerow-value-row">
+              <span className="wa-rangerow-value">{tempWeightGain}</span>
+              <span className="wa-rangerow-unit">{unit}</span>
+            </span>
+          </span>
+          <span className="wa-rangerow-label wa-rangerow-label--base">
+            <span className="wa-rangerow-cap">בסיס</span>
+            <span className="wa-rangerow-value-row">
+              <span className="wa-rangerow-value">{baseWeight}</span>
+              <span className="wa-rangerow-unit">{unit}</span>
+            </span>
+          </span>
+          <span className="wa-rangerow-label wa-rangerow-label--min">
+            <span className="wa-rangerow-cap">מינ׳</span>
+            <span className="wa-rangerow-value-row">
+              <span className="wa-rangerow-value">{tempWeightLoss}</span>
+              <span className="wa-rangerow-unit">{unit}</span>
+            </span>
           </span>
         </div>
       </div>

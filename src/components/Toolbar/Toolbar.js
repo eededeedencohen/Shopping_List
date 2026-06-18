@@ -15,11 +15,7 @@ import { ReactComponent as PieChartIcon } from "./pie-chart.svg";
 import { ReactComponent as TransactionHistoryIcon } from "./transaction-history.svg";
 import { ReactComponent as Voice2Icon } from "./voice-bot.svg";
 import { ReactComponent as WishlistIcon } from "./wishlist.svg";
-import { ReactComponent as EditIcon } from "./editing.svg";
-import { ReactComponent as DataClassificationIcon } from "./data-classification.svg";
 import { ReactComponent as BarcodeIcon} from "./barcode.svg";
-import { ReactComponent as VibrationIcon } from "./waves.svg";
-import { ReactComponent as ArchitectureIcon } from "./architecture.svg";
 import { ReactComponent as HomeIcon } from "./home.svg";
 function Toolbar() {
   const { totalAmount } = useCartTotals(); // ← כמות בעגלה
@@ -120,16 +116,6 @@ function Toolbar() {
         onClose={() => setIsSettingsModalOpen(false)}
       />
 
-      {/* Barcodes Audit */}
-      <Link
-        to="/barcodes-audit"
-        className="barcodes-audit-link"
-        onClick={() => setSelectedPage("/barcodes-audit")}
-        aria-label="Barcodes Audit"
-      >
-        <BarcodeIcon className="barcodes-audit-icon" aria-hidden="true" />
-      </Link>
-
       {/* עגלה */}
       <Link to="/cart" onClick={handleCartClick}>
         <div className="cart-icon">
@@ -159,7 +145,7 @@ function Toolbar() {
               <div className="nav-icon">
                 <HomeIcon className="svg-icon" />
               </div>
-              <h1>Home</h1>
+              <h1>בית</h1>
             </div>
           </Link>
 
@@ -173,7 +159,7 @@ function Toolbar() {
               <div className="nav-icon">
                 <GroceryIcon2 className="svg-icon" />
               </div>
-              <h1>Products</h1>
+              <h1>מוצרים</h1>
             </div>
           </Link>
 
@@ -187,39 +173,7 @@ function Toolbar() {
               <div className="nav-icon">
                 <GroceryIcon2 className="svg-icon" />
               </div>
-              <h1>Products (Server)</h1>
-            </div>
-          </Link>
-
-          <Link
-            to="/products-list-groups"
-            onClick={() => handleNavClick("/products-list-groups")}
-          >
-            <div
-              className={`nav-item ${
-                selectedPage === "/products-list-groups" ? "selected-page" : ""
-              }`}
-            >
-              <div className="nav-icon">
-                <DataClassificationIcon className="svg-icon" />
-              </div>
-              <h1>Edit Groups</h1>
-            </div>
-          </Link>
-
-          <Link
-            to="/edit-products"
-            onClick={() => handleNavClick("/edit-products")}
-          >
-            <div
-              className={`nav-item ${
-                selectedPage === "/edit-products" ? "selected-page" : ""
-              }`}
-            >
-              <div className="nav-icon">
-                <EditIcon className="svg-icon" />
-              </div>
-              <h1>Edit</h1>
+              <h1>מוצרים (שרת)</h1>
             </div>
           </Link>
 
@@ -235,7 +189,7 @@ function Toolbar() {
               <div className="nav-icon">
                 <WishlistIcon className="svg-icon" />
               </div>
-              <h1>Receipt To History</h1>
+              <h1>סריקת קבלות</h1>
             </div>
           </Link>
 
@@ -251,7 +205,7 @@ function Toolbar() {
               <div className="nav-icon">
                 <PieChartIcon className="svg-icon" />
               </div>
-              <h1>Statistics</h1>
+              <h1>סטטיסטיקות</h1>
             </div>
           </Link>
 
@@ -267,7 +221,7 @@ function Toolbar() {
               <div className="nav-icon">
                 <Voice2Icon className="svg-icon" />
               </div>
-              <h1>Voice Assistant</h1>
+              <h1>עוזר קולי</h1>
             </div>
           </Link>
 
@@ -280,7 +234,7 @@ function Toolbar() {
               <div className="nav-icon">
                 <TransactionHistoryIcon className="svg-icon" />
               </div>
-              <h1>Shopping History</h1>
+              <h1>היסטוריית קניות</h1>
             </div>
           </Link>
 
@@ -293,7 +247,7 @@ function Toolbar() {
               <div className="nav-icon">
                 <AiIcon2 className="svg-icon" />
               </div>
-              <h1>AI</h1>
+              <h1>עוזר AI</h1>
             </div>
           </Link>
 
@@ -306,32 +260,7 @@ function Toolbar() {
               <div className="nav-icon">
                 <BarcodeIcon className="svg-icon" />
               </div>
-              <h1>Barcode Scanner</h1>
-            </div>
-          </Link>
-          <Link to="/vibration-settings" onClick={() => handleNavClick("/vibration-settings")}>
-            <div
-              className={`nav-item ${
-                selectedPage === "/vibration-settings" ? "selected-page" : ""
-              }`}
-            >
-              <div className="nav-icon">
-                <VibrationIcon className="svg-icon" />
-              </div>
-              <h1>Vibration Settings</h1>
-            </div>
-          </Link>
-
-          <Link to="/architecture" onClick={() => handleNavClick("/architecture")}>
-            <div
-              className={`nav-item ${
-                selectedPage === "/architecture" ? "selected-page" : ""
-              }`}
-            >
-              <div className="nav-icon">
-                <ArchitectureIcon className="svg-icon" />
-              </div>
-              <h1>App Architecture</h1>
+              <h1>סורק ברקוד</h1>
             </div>
           </Link>
         </div>

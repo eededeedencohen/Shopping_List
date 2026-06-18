@@ -1,0 +1,284 @@
+/* ═══════════════════════════════════════════════
+   Loading animations gallery (display-only)
+   ═══════════════════════════════════════════════ */
+
+.la-page {
+  position: fixed;
+  top: var(--toolbar-h, 40px);
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 0;
+
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  padding: 18px 14px 28px;
+  gap: 18px;
+
+  font-family: "Heebo", "Open Sans", Arial, sans-serif;
+  direction: rtl;
+  color: #0f172a;
+
+  background:
+    radial-gradient(circle at 22% -10%, rgba(167, 139, 250, 0.16) 0%, transparent 55%),
+    radial-gradient(circle at 88% 110%, rgba(16, 185, 129, 0.14) 0%, transparent 55%),
+    linear-gradient(180deg, #eef4fc 0%, #e3edf8 100%);
+}
+
+/* ─── Header ─── */
+.la-header { padding: 6px 6px 0; }
+.la-page-title {
+  margin: 0 0 4px;
+  font-size: 1.4rem;
+  font-weight: 800;
+  letter-spacing: -0.3px;
+  color: #0f172a;
+}
+.la-page-subtitle {
+  margin: 0;
+  font-size: 0.88rem;
+  color: #64748b;
+  line-height: 1.4;
+}
+
+/* ─── Grid ─── */
+.la-grid {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: 1fr;
+}
+@media (min-width: 520px) { .la-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (min-width: 820px) { .la-grid { grid-template-columns: repeat(3, 1fr); } }
+
+.la-card {
+  display: flex;
+  flex-direction: column;
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(15, 23, 42, 0.06);
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow:
+    0 6px 20px rgba(15, 23, 42, 0.06),
+    0 1px 0 rgba(255, 255, 255, 0.9) inset;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.la-card:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    0 10px 28px rgba(15, 23, 42, 0.10),
+    0 1px 0 rgba(255, 255, 255, 0.9) inset;
+}
+
+.la-stage {
+  height: 220px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.la-info { padding: 14px 16px 16px; }
+.la-title {
+  margin: 0 0 4px;
+  font-size: 1rem;
+  font-weight: 800;
+  color: #0f172a;
+  letter-spacing: -0.2px;
+}
+.la-desc {
+  margin: 0;
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: #64748b;
+  line-height: 1.4;
+}
+
+/* ─── Mascot SVG (shared) ─── */
+.la-mascot {
+  width: 88%;
+  max-width: 240px;
+  height: auto;
+  overflow: visible;
+}
+
+.la-shadow {
+  fill: rgba(15, 23, 42, 0.16);
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: la-shadow 1.6s ease-in-out infinite;
+}
+@keyframes la-shadow {
+  0%, 100% { transform: scaleX(1);   opacity: 0.55; }
+  50%      { transform: scaleX(0.7); opacity: 0.30; }
+}
+
+/* Universal "character bob" — used by every loader. */
+.la-char {
+  transform-box: fill-box;
+  transform-origin: center bottom;
+  animation: la-bob 1.6s ease-in-out infinite;
+}
+@keyframes la-bob {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-5px); }
+}
+
+/* ─── 1. Cart pusher — cart + character bob together, wheels spin ─── */
+.la-anim-cart .la-cart {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: la-bob 1.6s ease-in-out infinite, la-cart-roll 1.6s ease-in-out infinite;
+}
+@keyframes la-cart-roll {
+  0%, 100% { transform: translate(0, 0); }
+  50%      { transform: translate(2px, -5px); }
+}
+.la-anim-cart .la-wheel {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: la-wheel-spin 0.7s linear infinite;
+}
+@keyframes la-wheel-spin {
+  to { transform: rotate(360deg); }
+}
+.la-anim-cart .la-arm-push {
+  transform-box: fill-box;
+  transform-origin: 104px 116px;
+  animation: la-arm-push 1.6s ease-in-out infinite;
+}
+@keyframes la-arm-push {
+  0%, 100% { transform: rotate(0); }
+  50%      { transform: rotate(-3deg); }
+}
+
+/* ─── 2. Scanner — phone hand wiggle, red beam glides ─── */
+.la-anim-scan .la-phone-group {
+  transform-box: fill-box;
+  transform-origin: 98px 148px;
+  animation: la-bob 1.6s ease-in-out infinite, la-phone-tilt 2.6s ease-in-out infinite;
+}
+@keyframes la-phone-tilt {
+  0%, 100% { transform: rotate(-2deg); }
+  50%      { transform: rotate( 2deg); }
+}
+.la-anim-scan .la-scan-beam {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: la-scan 1.4s ease-in-out infinite;
+}
+@keyframes la-scan {
+  0%, 100% { transform: translateY(-13px); opacity: 0.85; }
+  50%      { transform: translateY(13px);  opacity: 1; }
+}
+
+/* ─── 3. List — clipboard bobs, checks pop in ─── */
+.la-anim-list .la-clipboard {
+  transform-box: fill-box;
+  transform-origin: 88px 148px;
+  animation: la-bob 1.6s ease-in-out infinite;
+}
+.la-anim-list .la-check {
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: la-check 3.6s cubic-bezier(0.4, 1.6, 0.5, 1) infinite;
+}
+.la-anim-list .la-check-1 { animation-delay: 0s; }
+.la-anim-list .la-check-2 { animation-delay: 0.45s; }
+.la-anim-list .la-check-3 { animation-delay: 0.9s; }
+.la-anim-list .la-check-4 { animation-delay: 1.35s; }
+@keyframes la-check {
+  0%   { opacity: 0; transform: scale(0.3) rotate(-12deg); }
+  6%   { opacity: 1; transform: scale(1.2) rotate(0deg); }
+  12%  { opacity: 1; transform: scale(1) rotate(0deg); }
+  55%  { opacity: 1; transform: scale(1) rotate(0deg); }
+  65%  { opacity: 0; transform: scale(1) rotate(0deg); }
+  100% { opacity: 0; transform: scale(1) rotate(0deg); }
+}
+
+/* ─── 4. Chef — pot stays put, spoon stirs, steam rises ─── */
+.la-anim-cook .la-pot-group { /* pot does NOT bob — it's on the counter */
+  transform-box: fill-box;
+  transform-origin: 184px 134px;
+}
+.la-anim-cook .la-spoon {
+  transform-box: fill-box;
+  transform-origin: 184px 108px;
+  animation: la-stir 1.2s linear infinite;
+}
+@keyframes la-stir {
+  0%   { transform: rotate(-18deg); }
+  50%  { transform: rotate( 18deg); }
+  100% { transform: rotate(-18deg); }
+}
+.la-anim-cook .la-arm-spoon {
+  transform-box: fill-box;
+  transform-origin: 126px 124px;
+  animation: la-stir-arm 1.2s linear infinite;
+}
+@keyframes la-stir-arm {
+  0%, 100% { transform: rotate(-4deg); }
+  50%      { transform: rotate( 4deg); }
+}
+.la-anim-cook .la-steam path {
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: center bottom;
+  animation: la-steam 2.4s ease-in-out infinite;
+}
+.la-anim-cook .la-steam-1 { animation-delay: 0s;   }
+.la-anim-cook .la-steam-2 { animation-delay: 0.6s; }
+.la-anim-cook .la-steam-3 { animation-delay: 1.2s; }
+@keyframes la-steam {
+  0%   { opacity: 0;   transform: translateY(0)    scale(1);   }
+  30%  { opacity: 0.9; }
+  100% { opacity: 0;   transform: translateY(-22px) scale(0.6); }
+}
+
+/* ─── 5. Detective — magnifier sweeps in front of her ─── */
+.la-anim-search .la-magnifier {
+  transform-box: fill-box;
+  transform-origin: 180px 120px;
+  animation: la-bob 1.6s ease-in-out infinite, la-search-sweep 2.4s ease-in-out infinite;
+}
+@keyframes la-search-sweep {
+  0%, 100% { transform: translate(0,  0)   rotate(-8deg); }
+  25%      { transform: translate(-14px, 8px) rotate(-16deg); }
+  75%      { transform: translate(12px,-4px) rotate(  6deg); }
+}
+.la-anim-search .la-arm-mag {
+  transform-box: fill-box;
+  transform-origin: 132px 124px;
+  animation: la-search-arm 2.4s ease-in-out infinite;
+}
+@keyframes la-search-arm {
+  0%, 100% { transform: rotate(0); }
+  25%      { transform: rotate(-6deg); }
+  75%      { transform: rotate( 4deg); }
+}
+
+/* ─── 6. Scale — character bobs subtly, number flickers ─── */
+.la-anim-scale .la-char {
+  /* very subtle — the character is "weighing himself", not really walking */
+  animation: la-bob 2s ease-in-out infinite;
+}
+.la-anim-scale .la-scale-num {
+  animation: la-scale-flicker 1.8s ease-in-out infinite;
+}
+@keyframes la-scale-flicker {
+  0%, 100% { opacity: 1; }
+  20%      { opacity: 0.3; }
+  40%      { opacity: 1; }
+  60%      { opacity: 0.3; }
+  80%      { opacity: 1; }
+}
+
+/* ─── Reduced motion ─── */
+@media (prefers-reduced-motion: reduce) {
+  .la-mascot *,
+  .la-mascot {
+    animation: none !important;
+  }
+}

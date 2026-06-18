@@ -5,6 +5,7 @@ import {
   useSupermarkets,
   useSettingsOperations,
 } from "../../../hooks/optimizationHooks";
+import { useSupermarketPreferences } from "../../../context/SupermarketPreferencesContext";
 import SupermarketImage from "../../Images/SupermarketImage";
 
 const CheckIcon = (props) => (
@@ -69,11 +70,23 @@ const ClearIcon = (props) => (
   </svg>
 );
 
+const StarIcon = (props) => (
+  <svg
+    viewBox="0 0 24 24"
+    fill="currentColor"
+    aria-hidden="true"
+    {...props}
+  >
+    <path d="M12 2l2.9 6.55 7.1.85-5.3 4.85 1.5 7.1L12 17.77 5.8 21.35l1.5-7.1L2 9.4l7.1-.85L12 2z" />
+  </svg>
+);
+
 const SupermarketsNamesFillter = ({ onSelect }) => {
   const { allSupermarkets = [], isAllSupermarketsUploaded } = useSupermarkets();
   const { supermarketIDs = [] } = useSettings();
   const { insertSupermarketIDs, removeSupermarketIDs, setSupermarketIDsBulk } =
     useSettingsOperations();
+  const { preferredSupermarketIDs } = useSupermarketPreferences();
 
   const chains = useMemo(() => {
     const map = new Map();
@@ -99,6 +112,27 @@ const SupermarketsNamesFillter = ({ onSelect }) => {
 
   const handleClearAll = () => {
     setSupermarketIDsBulk([]);
+  };
+
+  /* "by preferences" — select exactly the branches (supermarketIDs) the
+     user marked as preferred in Settings. We intersect with the currently
+     known supermarkets so stale IDs aren't kept around. */
+  const preferredSet = useMemo(
+    () => new Set((preferredSupermarketIDs || []).map(String)),
+    [preferredSupermarketIDs]
+  );
+  const idsByPreference = useMemo(
+    () =>
+      preferredSet.size
+        ? allSupermarkets
+            .filter((s) => preferredSet.has(String(s.supermarketID)))
+            .map((s) => s.supermarketID)
+        : [],
+    [allSupermarkets, preferredSet]
+  );
+  const handleSelectByPreferences = () => {
+    if (!idsByPreference.length) return;
+    setSupermarketIDsBulk(idsByPreference);
   };
 
   const handleToggleChain = (chain) => {
@@ -144,6 +178,20 @@ const SupermarketsNamesFillter = ({ onSelect }) => {
           >
             <CheckIcon />
             סמן הכל
+          </button>
+          <button
+            type="button"
+            className="snf-toolbar-btn snf-toolbar-btn--pref"
+            onClick={handleSelectByPreferences}
+            disabled={idsByPreference.length === 0}
+            title={
+              preferredSet.size === 0
+                ? "להגדיר העדפות בעמוד ההגדרות"
+                : `יסמן ${idsByPreference.length} סניפים מועדפים`
+            }
+          >
+            <StarIcon />
+            לפי העדפות
           </button>
           <button
             type="button"

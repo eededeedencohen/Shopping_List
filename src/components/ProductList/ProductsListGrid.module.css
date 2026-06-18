@@ -8,9 +8,11 @@
 .list__products-container {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-auto-rows: max-content;
   gap: 8px;
   padding: 8px;
   align-items: stretch;
+  align-content: start;
   overflow-x: hidden;
   overflow-y: auto;
 }
@@ -118,6 +120,12 @@
 
 .list__product-info p {
   margin: 0;
+}
+
+/* Restore a small visible gap between the weight number and its unit
+   ("70 גרם"), which the `margin: 0` rule above otherwise clobbers. */
+.list__product-weight {
+  gap: 3px;
 }
 
 .list__separator {

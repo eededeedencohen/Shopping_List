@@ -41,6 +41,27 @@ export const getSupermarketsForBarcodes = async (barcodes) => {
 };
 
 /**
+ * Per-barcode availability. Returns a map keyed by barcode with the
+ * full list of supermarket IDs that carry each one — caller can
+ * intersect with the user's selected supermarkets to get per-product
+ * "available in N of your stores" counts.
+ *
+ * @param {string[]} barcodes
+ * @returns {Promise<{ availability: Record<string, string[]> }>}
+ */
+export const getAvailabilityPerBarcode = async (barcodes) => {
+  const res = await httpClient.post(
+    "/product-availability/per-barcode",
+    JSON.stringify({ barcodes: Array.isArray(barcodes) ? barcodes : [] }),
+    { headers: { "Content-Type": "application/json" } }
+  );
+  const payload = normalize(res.data);
+  return {
+    availability: payload?.data?.availability || {},
+  };
+};
+
+/**
  * Summary metadata for the Settings rebuild card —
  * how many barcodes are indexed, when it was last rebuilt.
  *

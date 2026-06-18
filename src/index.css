@@ -1,3 +1,9 @@
+:root {
+  /* Height of the fixed app toolbar — referenced by other pages to
+     position content below it (var(--toolbar-h, …)). */
+  --toolbar-h: 52px;
+}
+
 body {
   overflow-x: hidden;
   margin: 0;

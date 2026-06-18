@@ -4,7 +4,7 @@ import { useCartTotals } from "../../hooks/appHooks";
 import "./HomePage.css";
 
 import { ReactComponent as GroceryIcon } from "../Toolbar/grocery2.svg";
-import { ReactComponent as CartIcon } from "../Toolbar/cart.svg";
+import { ReactComponent as CartIcon } from "../Cart/Icons/shopping-cart.svg";
 import { ReactComponent as WishlistIcon } from "../Toolbar/wishlist.svg";
 import { ReactComponent as HistoryIcon } from "../Toolbar/transaction-history.svg";
 import { ReactComponent as PieChartIcon } from "../Toolbar/pie-chart.svg";
@@ -57,7 +57,7 @@ const FEATURES = [
     key: "stats",
     title: "סטטיסטיקות",
     desc: "גרפים וניתוח הוצאות",
-    path: "/expense-overview",
+    path: "/advanced-stats",
     Icon: PieChartIcon,
     className: "homepage__card--stats",
   },

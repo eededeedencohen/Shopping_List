@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState, Children } from "react";
+import ReactDOM from "react-dom";
 import { Spin } from "antd";
 import { usePriceList } from "../../context/PriceContext";
 import { usePriceCompareLayout } from "../../context/PriceCompareLayoutContext";
@@ -62,6 +63,7 @@ export default function ProductComparison({ barcode }) {
   const [addModalOpen, setAddModalOpen] = useState(false);
   const [priceMode, setPriceMode] = useState("regular"); // "regular" | "unit"
   const [expandedGroups, setExpandedGroups] = useState(() => new Set());
+  const [imageLightboxOpen, setImageLightboxOpen] = useState(false);
 
   const toggleGroup = (key) =>
     setExpandedGroups((prev) => {
@@ -235,7 +237,12 @@ export default function ProductComparison({ barcode }) {
       {/* ── Hero (compact product card) ─────────── */}
       <header className="compareM__hero">
         <div className="compareM__hero-card">
-          <div className="compareM__hero-image">
+          <button
+            type="button"
+            className="compareM__hero-image"
+            onClick={() => setImageLightboxOpen(true)}
+            aria-label="הצג תמונה בגודל מלא"
+          >
             {scrapedImage ? (
               <img
                 src={scrapedImage}
@@ -248,7 +255,7 @@ export default function ProductComparison({ barcode }) {
                 className="compareM__hero-image-img"
               />
             )}
-          </div>
+          </button>
 
           <div className="compareM__hero-info">
             <h2 className="compareM__hero-title">{product.name}</h2>
@@ -483,6 +490,43 @@ export default function ProductComparison({ barcode }) {
         onSaved={handleSaved}
       />
     )}
+
+    {imageLightboxOpen &&
+      ReactDOM.createPortal(
+        <div
+          className="compareM__lightbox"
+          role="dialog"
+          aria-label="תמונת מוצר מוגדלת"
+          onClick={() => setImageLightboxOpen(false)}
+        >
+          <button
+            type="button"
+            className="compareM__lightbox-close"
+            onClick={() => setImageLightboxOpen(false)}
+            aria-label="סגור"
+          >
+            ×
+          </button>
+          <div
+            className="compareM__lightbox-stage"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {scrapedImage ? (
+              <img
+                src={scrapedImage}
+                alt={product.name}
+                className="compareM__lightbox-img"
+              />
+            ) : (
+              <ProductImageDisplay
+                barcode={barcode}
+                className="compareM__lightbox-img"
+              />
+            )}
+          </div>
+        </div>,
+        document.getElementById("modal-root") || document.body
+      )}
     </>
   );
 }

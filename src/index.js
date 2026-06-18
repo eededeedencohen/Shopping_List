@@ -9,7 +9,6 @@ import { CartOptimizationContextProvider } from "./context/cart-optimizationCont
 import { CartContextProvider2 } from "./context/CartContext2";
 import { PriceContextProvider2 } from "./context/PriceContext2";
 import { ProductContextProvider2 } from "./context/ProductContext2";
-import { GroupContextProvider } from "./context/GroupsContext"; // Importing GroupsContext if needed
 import { CartOptimizationProvider } from "./context/CartOptimizationContext";
 import { AiSettingsProvider } from "./context/AiSettingsContext";
 import { AddProductDefaultsProvider } from "./context/AddProductDefaultsContext";
@@ -17,6 +16,8 @@ import { ProductsLayoutProvider } from "./context/ProductsLayoutContext";
 import { CartCardLayoutProvider } from "./context/CartCardLayoutContext";
 import { PriceCompareLayoutProvider } from "./context/PriceCompareLayoutContext";
 import { AIThemeProvider } from "./context/AIThemeContext";
+import { ReceiptThemeProvider } from "./context/ReceiptThemeContext";
+import { SupermarketPreferencesProvider } from "./context/SupermarketPreferencesContext";
 
 const root = createRoot(document.getElementById("root"));
 
@@ -27,7 +28,6 @@ root.render(
         <CartContextProvider>
           <CartContextProvider2>
             <PriceContextProvider2>
-              <GroupContextProvider>
                 <ProductContextProvider2>
                   <CartOptimizationContextProvider>
                     <CartOptimizationProvider>
@@ -37,7 +37,11 @@ root.render(
                             <CartCardLayoutProvider>
                               <PriceCompareLayoutProvider>
                                 <AIThemeProvider>
-                                  <App />
+                                  <ReceiptThemeProvider>
+                                    <SupermarketPreferencesProvider>
+                                      <App />
+                                    </SupermarketPreferencesProvider>
+                                  </ReceiptThemeProvider>
                                 </AIThemeProvider>
                               </PriceCompareLayoutProvider>
                             </CartCardLayoutProvider>
@@ -47,7 +51,6 @@ root.render(
                     </CartOptimizationProvider>
                   </CartOptimizationContextProvider>
                 </ProductContextProvider2>
-              </GroupContextProvider>
             </PriceContextProvider2>
           </CartContextProvider2>
         </CartContextProvider>

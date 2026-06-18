@@ -1,120 +1,142 @@
 /* ═══════════════════════════════════════════════
    Weight-accuracy dual-handle range slider
-   (alt product weight: min ↔ base ↔ max in one row)
+   (alt product weight: max ↔ base ↔ min in one row)
    ═══════════════════════════════════════════════ */
 
 .wa-wrapper {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 14px;
+  padding: 14px 14px 12px;
+  border-radius: 16px;
+  background: linear-gradient(180deg, #fafbfd 0%, #f3f6fb 100%);
+  border: 1px solid rgba(15, 23, 42, 0.06);
   font-family: "Heebo", "Open Sans", Arial, sans-serif;
 }
 
 .wa-title {
   margin: 0;
-  font-size: 0.88rem;
-  font-weight: 700;
+  font-size: 0.92rem;
+  font-weight: 800;
   color: #0f172a;
-  letter-spacing: -0.1px;
+  letter-spacing: -0.2px;
+  text-align: center;
 }
 
-/* ─── The whole range row (track + labels under it) ─── */
+/* ─── The whole range row (track + labels) ─── */
 .wa-rangerow {
-  /* Render the slider in physical LTR so "min on left, max on right"
-     is consistent regardless of the surrounding RTL flow. */
+  /* Force LTR coordinate system inside the RTL parent so positions are
+     predictable. RTL direction is re-applied to each individual slider. */
   direction: ltr;
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  padding: 4px 10px;
+  gap: 14px;
+  padding: 0 6px;
 }
 
+/* ─── The slider track ─── */
 .wa-rangerow-track {
   position: relative;
-  height: 28px;
+  height: 32px;
   width: 100%;
 }
 
-/* base unselected track */
+/* base unselected track — a soft pill with depth. Acts as the clipping
+   container for the colored fills so their edges share its rounded shape. */
 .wa-rangerow-bg {
   position: absolute;
-  inset: 50% 0 auto 0;
-  height: 8px;
-  transform: translateY(-50%);
-  background: #f1f5f9;
-  border: 1px solid #e2e8f0;
+  left: 0;
+  right: 0;
+  top: calc(50% - 7px);
+  height: 14px;
+  background: linear-gradient(180deg, #e6ebf3 0%, #eef2f8 100%);
   border-radius: 999px;
+  overflow: hidden;
   pointer-events: none;
+  box-shadow:
+    inset 0 1px 2px rgba(15, 23, 42, 0.12),
+    0 1px 0 rgba(255, 255, 255, 0.85);
 }
 
-/* the colored "selected range" fills — between thumbs and base */
+/* the colored "selected range" fills — plain rectangles, the pill shape
+   comes from the parent's border-radius + overflow:hidden. */
 .wa-rangerow-fill {
   position: absolute;
-  top: 50%;
-  height: 8px;
-  transform: translateY(-50%);
-  border-radius: 999px;
+  top: 0;
+  bottom: 0;
   pointer-events: none;
 }
 .wa-rangerow-fill--min {
-  background: linear-gradient(90deg, #fca5a5 0%, #fecaca 100%);
+  background: linear-gradient(270deg, #fda4af 0%, #fb7185 100%);
 }
 .wa-rangerow-fill--max {
-  background: linear-gradient(90deg, #6ee7b7 0%, #34d399 100%);
+  background: linear-gradient(90deg, #6ee7b7 0%, #10b981 100%);
 }
 
-/* center anchor (= product base weight) */
+/* center anchor (= product base weight) — a tiny dot at the midpoint */
 .wa-rangerow-anchor {
   position: absolute;
   left: 50%;
   top: 50%;
-  width: 2px;
-  height: 16px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
   transform: translate(-50%, -50%);
-  background: #94a3b8;
-  border-radius: 1px;
+  background: #ffffff;
+  border: 2px solid #94a3b8;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.2);
   pointer-events: none;
   z-index: 1;
 }
 
 /* ─── the two native range inputs, overlaid ─── */
+/* The input, the WebKit runnable-track, and the thumb are all 22px tall.
+   When everything matches the thumb height, browsers don't need any
+   auto-centering math, so the thumb sits exactly on the track line.
+   The input is then absolutely centered in the 32px parent. */
 .wa-rangerow-input {
   position: absolute;
-  top: 0;
-  height: 28px;
+  top: calc(50% - 11px);
+  height: 22px;
   background: transparent;
   -webkit-appearance: none;
   appearance: none;
   outline: none;
   margin: 0;
   padding: 0;
+  border: 0;
+  box-sizing: border-box;
   z-index: 2;
-  /* each half captures clicks within its own bounds, so click-to-jump
-     still works and the user can grab the nearest thumb. */
 }
 
-/* When the user starts interacting with one input, raise it above the
-   other so the two thumbs don't fight when they overlap at the center. */
 .wa-rangerow-input:hover,
 .wa-rangerow-input:focus,
 .wa-rangerow-input:active {
   z-index: 3;
 }
 
-.wa-rangerow-input--min {
+/* Each input occupies its physical half. `direction: rtl` reverses the
+   slider so values grow OUTWARD from the centered anchor:
+     max input (left half)  → baseWeight on the right edge of its half,
+                              2× baseWeight on the far left.
+     min input (right half) → baseWeight on the left edge of its half,
+                              0 on the far right. */
+.wa-rangerow-input--max {
   left: 0;
   width: 50%;
+  direction: rtl;
 }
-.wa-rangerow-input--max {
+.wa-rangerow-input--min {
   left: 50%;
   width: 50%;
+  direction: rtl;
 }
 
-/* Webkit: invisible track, visible draggable thumb */
+/* Webkit: invisible track, refined draggable thumb */
 .wa-rangerow-input::-webkit-slider-runnable-track {
   background: transparent;
   border: 0;
-  height: 28px;
+  height: 22px;
 }
 .wa-rangerow-input::-webkit-slider-thumb {
   -webkit-appearance: none;
@@ -122,21 +144,27 @@
   width: 22px;
   height: 22px;
   border-radius: 50%;
-  border: 2px solid #ffffff;
-  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.25);
+  background: #ffffff;
+  border: 0;
+  margin-top: 0;
   cursor: grab;
-  pointer-events: auto;
+  box-shadow:
+    0 0 0 4px var(--wa-thumb-color, #475569),
+    0 2px 6px rgba(15, 23, 42, 0.18),
+    0 6px 14px rgba(15, 23, 42, 0.10);
   transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
-.wa-rangerow-input--min::-webkit-slider-thumb {
-  background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);
-}
-.wa-rangerow-input--max::-webkit-slider-thumb {
-  background: linear-gradient(135deg, #10b981 0%, #047857 100%);
+.wa-rangerow-input--max { --wa-thumb-color: #10b981; }
+.wa-rangerow-input--min { --wa-thumb-color: #f43f5e; }
+
+.wa-rangerow-input::-webkit-slider-thumb:hover {
+  box-shadow:
+    0 0 0 4px var(--wa-thumb-color),
+    0 0 0 8px color-mix(in oklab, var(--wa-thumb-color) 22%, transparent),
+    0 3px 8px rgba(15, 23, 42, 0.22);
 }
 .wa-rangerow-input::-webkit-slider-thumb:active {
-  transform: scale(1.18);
-  box-shadow: 0 3px 10px rgba(15, 23, 42, 0.32);
+  transform: scale(1.12);
   cursor: grabbing;
 }
 
@@ -144,71 +172,100 @@
 .wa-rangerow-input::-moz-range-track {
   background: transparent;
   border: 0;
-  height: 28px;
+  height: 22px;
 }
 .wa-rangerow-input::-moz-range-thumb {
   width: 22px;
   height: 22px;
   border-radius: 50%;
-  border: 2px solid #ffffff;
-  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.25);
+  background: #ffffff;
+  border: 0;
   cursor: grab;
-  pointer-events: auto;
-}
-.wa-rangerow-input--min::-moz-range-thumb {
-  background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);
-}
-.wa-rangerow-input--max::-moz-range-thumb {
-  background: linear-gradient(135deg, #10b981 0%, #047857 100%);
+  box-shadow:
+    0 0 0 4px var(--wa-thumb-color, #475569),
+    0 2px 6px rgba(15, 23, 42, 0.18);
 }
 
-/* ─── labels row (under the slider) ─── */
+/* ─── labels row (chips under the slider) ─── */
 .wa-rangerow-labels {
   display: flex;
-  align-items: baseline;
+  align-items: stretch;
   justify-content: space-between;
   gap: 8px;
-  font-size: 0.78rem;
-  color: #64748b;
-  font-weight: 600;
 }
 
 .wa-rangerow-label {
+  flex: 1 1 0;
   display: inline-flex;
-  align-items: baseline;
-  gap: 4px;
-  /* Each label is a tiny Hebrew chunk — let bidi resolve naturally. */
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  padding: 6px 8px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(15, 23, 42, 0.06);
+  text-align: center;
   unicode-bidi: plaintext;
+  transition: transform 0.15s ease;
 }
 
 .wa-rangerow-cap {
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.4px;
   color: #94a3b8;
-  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.wa-rangerow-value-row {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 3px;
 }
 
 .wa-rangerow-value {
-  font-size: 0.95rem;
+  font-size: 1.05rem;
   font-weight: 800;
   font-variant-numeric: tabular-nums;
-  letter-spacing: -0.2px;
+  letter-spacing: -0.3px;
+  line-height: 1.1;
 }
 
 .wa-rangerow-unit {
+  font-size: 0.72rem;
   color: #94a3b8;
-  font-weight: 600;
+  font-weight: 700;
 }
 
-.wa-rangerow-label--min .wa-rangerow-value { color: #b91c1c; }
-.wa-rangerow-label--max .wa-rangerow-value { color: #047857; }
-.wa-rangerow-label--base {
-  font-size: 0.74rem;
-  color: #64748b;
+/* End-label color tinting — matches the corresponding thumb */
+.wa-rangerow-label--max {
+  background: linear-gradient(180deg, #ecfdf5 0%, #ffffff 100%);
+  border-color: rgba(16, 185, 129, 0.22);
 }
+.wa-rangerow-label--max .wa-rangerow-cap { color: #047857; }
+.wa-rangerow-label--max .wa-rangerow-value { color: #047857; }
+
+.wa-rangerow-label--min {
+  background: linear-gradient(180deg, #fff1f2 0%, #ffffff 100%);
+  border-color: rgba(244, 63, 94, 0.22);
+}
+.wa-rangerow-label--min .wa-rangerow-cap { color: #be123c; }
+.wa-rangerow-label--min .wa-rangerow-value { color: #be123c; }
+
+/* Base (middle) — quieter, smaller */
+.wa-rangerow-label--base {
+  flex: 0 1 auto;
+  padding: 6px 12px;
+  background: rgba(248, 250, 252, 0.85);
+  border-color: rgba(15, 23, 42, 0.08);
+}
+.wa-rangerow-label--base .wa-rangerow-cap { color: #94a3b8; }
 .wa-rangerow-label--base .wa-rangerow-value {
-  font-size: 0.85rem;
+  font-size: 0.9rem;
   color: #475569;
   font-weight: 700;
 }
+.wa-rangerow-label--base .wa-rangerow-unit { font-size: 0.68rem; }
 
 /* Legacy classes from the old stacked-sliders design — neutralized */
 .product-settings__weight-accuracy,

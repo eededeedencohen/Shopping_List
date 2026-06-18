@@ -3,7 +3,8 @@
  * במקום להשתמש ב-import עצום, משתמש בטעינה דינמית
  */
 
-import React from "react";
+import React, { useState } from "react";
+import { DOMAIN } from "../../constants";
 
 // Cache לשמירת תמונות שכבר טענו
 const imageCache = {};
@@ -53,8 +54,11 @@ function ProductImageDisplay({
   style = {},
 }) {
   const imagePath = getProductImage(barcode);
+  /* When the local bundled image is missing, fall back to the backend's
+     Mongo-backed image endpoint. If that 404s too, render the placeholder. */
+  const [serverFailed, setServerFailed] = useState(false);
 
-  if (!imagePath) {
+  if (!imagePath && (serverFailed || !barcode)) {
     return (
       <div
         className={className}
@@ -73,15 +77,23 @@ function ProductImageDisplay({
     );
   }
 
+  const src = imagePath || `${DOMAIN}/api/v1/product-images/${barcode}`;
+
   return (
     <img
-      src={imagePath}
+      src={src}
       alt={alt || `Product ${barcode}`}
       className={className}
       style={style}
       loading="lazy"
       onError={(e) => {
-        e.target.style.display = "none";
+        if (imagePath) {
+          /* Local image asset is broken — hide and move on. */
+          e.target.style.display = "none";
+        } else {
+          /* Server fetch failed — switch to the placeholder. */
+          setServerFailed(true);
+        }
       }}
     />
   );
