@@ -410,6 +410,12 @@ function ProductsList() {
     return true;
   });
 
+  // Push products without a price in the current supermarket to the bottom.
+  // Array.prototype.sort is stable so available items keep their original order.
+  const orderedProducts = [...filteredProducts].sort(
+    (a, b) => (a.unitPrice == null) - (b.unitPrice == null)
+  );
+
   if (isLoadingProducts) {
     return (
       <div className={styles['spinner-container']}>
@@ -470,8 +476,15 @@ function ProductsList() {
             onTouchMove={handleTouchMove}
             onTouchEnd={handleTouchEnd}
           >
-            {filteredProducts.map((product) => (
-              <div className={styles['list__product-card']} key={product.barcode}>
+            {orderedProducts.map((product) => {
+              const priceUnavailable = typeof product.unitPrice !== "number";
+              return (
+              <div
+                className={`${styles['list__product-card']} ${
+                  priceUnavailable ? styles['list__product-card--unavailable'] : ''
+                }`}
+                key={product.barcode}
+              >
                 {product.discount && (
                   <div className={styles['list__product-badge']}>מבצע</div>
                 )}
@@ -576,7 +589,8 @@ function ProductsList() {
                   <div></div>
                 </div>
               </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </div>
