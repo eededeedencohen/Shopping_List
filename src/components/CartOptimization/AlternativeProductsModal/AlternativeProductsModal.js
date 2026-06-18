@@ -9,6 +9,7 @@ import { DOMAIN } from "../../../constants";
 import {
   formatProductWeight,
 } from "../WeightAccuracyHelpers";
+import useBodyScrollLock from "../../../hooks/useBodyScrollLock";
 import "./AlternativeProductsModal.css";
 
 /**
@@ -30,6 +31,7 @@ export default function AlternativeProductsModal({
   productDetails,
   productSettings,
 }) {
+  useBodyScrollLock(isOpen);
   const { products } = useProductList();
   const { pricesMap } = usePriceMap();
   const { supermarketIDs: selectedSupermarketIDs } = useSettings();

@@ -1,9 +1,11 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import { ALL_TESTS } from "./testData";
+import useBodyScrollLock from "../../../hooks/useBodyScrollLock";
 import "./TestModal.css";
 
 const TestModal = ({ isOpen, onClose, onRunTest }) => {
+  useBodyScrollLock(isOpen);
   if (!isOpen) return null;
 
   const handleTest = (test) => {

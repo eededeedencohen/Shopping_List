@@ -1,8 +1,10 @@
 // import React, { useEffect } from "react";
 import ReactDOM from "react-dom";
 import "./productComparisonModal.css";
+import useBodyScrollLock from "../../hooks/useBodyScrollLock";
 
 const ProductComparisonModal = ({ isOpen, children, onClose }) => {
+  useBodyScrollLock(isOpen);
   if (!isOpen) {
     return null;
   }

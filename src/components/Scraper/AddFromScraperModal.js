@@ -4,6 +4,7 @@ import { DOMAIN } from "../../constants";
 import { useProductList } from "../../hooks/appHooks";
 import { useAddProductDefaults } from "../../context/AddProductDefaultsContext";
 import ImageCropModal from "../AddProduct/ImageCropModal";
+import useBodyScrollLock from "../../hooks/useBodyScrollLock";
 import "./AddFromScraperModal.css";
 
 const UNIT_OPTIONS = [
@@ -16,6 +17,7 @@ const UNIT_OPTIONS = [
 ];
 
 function AddFromScraperModal({ isOpen, onClose, barcode, scrapedPrices, onSaved, initialName = "", initialImageDataUri = null }) {
+  useBodyScrollLock(isOpen);
   const { allCategories, all_sub_categories } = useProductList();
   const { defaults, updateDefault, loaded } = useAddProductDefaults();
 

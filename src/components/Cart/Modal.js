@@ -1,8 +1,10 @@
 // import React, { useEffect } from "react";
 import ReactDOM from "react-dom";
 import styles from "./Modal.module.css";
+import useBodyScrollLock from "../../hooks/useBodyScrollLock";
 
 const Modal = ({ isOpen, children, onClose }) => {
+  useBodyScrollLock(isOpen);
   if (!isOpen) {
     return null;
   }

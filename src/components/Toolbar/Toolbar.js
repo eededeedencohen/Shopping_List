@@ -5,6 +5,7 @@ import SearchModal from "../SearchBar/SearchModal";
 import SettingsModal from "../Settings/SettingsModal";
 import { useCartTotals } from "../../hooks/appHooks";
 import useVibrate from "../../hooks/useVibrate";
+import useBodyScrollLock from "../../hooks/useBodyScrollLock";
 import "./Toolbar.css";
 
 import SearchIcon from "./search.svg";
@@ -23,6 +24,7 @@ function Toolbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
+  useBodyScrollLock(isOpen);
 
   const vibrate = useVibrate();
 

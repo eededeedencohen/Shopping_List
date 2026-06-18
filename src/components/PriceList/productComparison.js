@@ -7,6 +7,7 @@ import { ProductImageDisplay } from "../Images/ProductImageService";
 import SupermarketImage from "../Images/SupermarketImage";
 import AddFromScraperModal from "../Scraper/AddFromScraperModal";
 import { DOMAIN } from "../../constants";
+import useBodyScrollLock from "../../hooks/useBodyScrollLock";
 import "./productComparison.css";
 
 const priceFormat = (price) =>
@@ -64,6 +65,7 @@ export default function ProductComparison({ barcode }) {
   const [priceMode, setPriceMode] = useState("regular"); // "regular" | "unit"
   const [expandedGroups, setExpandedGroups] = useState(() => new Set());
   const [imageLightboxOpen, setImageLightboxOpen] = useState(false);
+  useBodyScrollLock(imageLightboxOpen);
 
   const toggleGroup = (key) =>
     setExpandedGroups((prev) => {

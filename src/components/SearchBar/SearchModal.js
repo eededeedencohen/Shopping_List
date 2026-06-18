@@ -1,8 +1,10 @@
 // import React, { useEffect } from "react";
 import ReactDOM from "react-dom";
 import "./SearchModal.css";
+import useBodyScrollLock from "../../hooks/useBodyScrollLock";
 
 const SearchModal = ({ isOpen, children, onClose }) => {
+  useBodyScrollLock(isOpen);
   if (!isOpen) {
     return null;
   }

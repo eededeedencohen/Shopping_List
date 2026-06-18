@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 import ReactDOM from "react-dom";
 import "./InvoiceBillAnimation.css";
+import useBodyScrollLock from "../../../hooks/useBodyScrollLock";
 
 /**
  * Full-screen "invoice-bill" save animation:
@@ -16,6 +17,7 @@ export default function InvoiceBillAnimation({
   onClose,
   duration = 4500,
 }) {
+  useBodyScrollLock(isOpen);
   useEffect(() => {
     if (!isOpen) return undefined;
     const t = setTimeout(() => onClose && onClose(), duration);

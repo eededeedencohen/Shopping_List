@@ -1,5 +1,6 @@
 import React, { useState, useRef, useCallback, useEffect } from "react";
 import ReactDOM from "react-dom";
+import useBodyScrollLock from "../../hooks/useBodyScrollLock";
 
 const MIN_SIZE = 30;
 const HANDLE_RADIUS = 14; // hit area for touch
@@ -40,6 +41,7 @@ function getCursor(handle) {
 }
 
 function ImageCropModal({ imageSrc, onDone, onClose }) {
+  useBodyScrollLock(true);
   const canvasRef = useRef(null);
   const imgRef = useRef(null);
 

@@ -3,6 +3,7 @@ import ReactDOM from "react-dom";
 import SupermarketsNamesFillter from "./SupermarketsNamesFillter";
 import SupermarketsBranches from "./SupermarketsBranches";
 import "./SupermarketsFilterModal.css";
+import useBodyScrollLock from "../../../hooks/useBodyScrollLock";
 
 const ChevronIcon = (props) => (
   <svg
@@ -37,6 +38,7 @@ const CloseIcon = (props) => (
 
 const SupermarketsFilterModal = ({ isOpen, onClose }) => {
   const [activeChain, setActiveChain] = useState(null);
+  useBodyScrollLock(isOpen);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -47,11 +49,8 @@ const SupermarketsFilterModal = ({ isOpen, onClose }) => {
       }
     };
     document.addEventListener("keydown", onKey);
-    const prevOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
     return () => {
       document.removeEventListener("keydown", onKey);
-      document.body.style.overflow = prevOverflow;
     };
   }, [isOpen, onClose, activeChain]);
 

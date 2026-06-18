@@ -1,8 +1,10 @@
 // import React, { useEffect } from "react";
 import ReactDOM from "react-dom";
 import "./EditOptimalProductModal.css";
+import useBodyScrollLock from "../../../../../hooks/useBodyScrollLock";
 
 const EditOptimalProductModal = ({ isOpen, children, onClose }) => {
+  useBodyScrollLock(isOpen);
   if (!isOpen) {
     return null;
   }

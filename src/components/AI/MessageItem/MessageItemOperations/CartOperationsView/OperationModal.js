@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from "react";
 import ReactDOM from "react-dom";
 import "./OperationModal.css";
+import useBodyScrollLock from "../../../../../hooks/useBodyScrollLock";
 
 const OperationModal = ({ isOpen, children, onClose }) => {
   const [isRendered, setIsRendered] = useState(false);
+  useBodyScrollLock(isOpen);
 
   useEffect(() => {
     if (isOpen) {

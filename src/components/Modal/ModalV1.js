@@ -28,10 +28,12 @@
 import React, { useState, useEffect } from "react";
 import ReactDOM from "react-dom";
 import "./ModalV1.css";
+import useBodyScrollLock from "../../hooks/useBodyScrollLock";
 
 const ModalV1 = ({ isOpen, children, onClose }) => {
   const [isRendered, setIsRendered] = useState(false);
   const [modalStyle, setModalStyle] = useState("slide-left 0.5s ease");
+  useBodyScrollLock(isOpen);
 
   useEffect(() => {
     if (isOpen) {

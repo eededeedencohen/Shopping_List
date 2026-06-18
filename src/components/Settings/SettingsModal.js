@@ -3,10 +3,12 @@ import ReactDOM from "react-dom";
 import { useLocation } from "react-router-dom";
 import Settings from "./Settings";
 import "./SettingsModal.css";
+import useBodyScrollLock from "../../hooks/useBodyScrollLock";
 
 export default function SettingsModal({ isOpen, onClose }) {
   const location = useLocation();
   const openedAtPath = useRef(null);
+  useBodyScrollLock(isOpen);
 
   useEffect(() => {
     if (!isOpen) {
@@ -26,11 +28,8 @@ export default function SettingsModal({ isOpen, onClose }) {
       if (e.key === "Escape") onClose();
     };
     document.addEventListener("keydown", onKey);
-    const prevOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
     return () => {
       document.removeEventListener("keydown", onKey);
-      document.body.style.overflow = prevOverflow;
     };
   }, [isOpen, onClose]);
 
