@@ -17,7 +17,6 @@ import OptimalCartsSettings from "./components/CartOptimization/OptimalCartsSett
 import OptimalsSupermarketCarts from "./components/CartOptimization/OptimalsSupermarketCarts/OptimalsSupermarketCarts";
 import OptimalCart from "./components/CartOptimization/OptimalsSupermarketCarts/OptimalSupermarketCart/OptimalCart";
 import ExpenseOverview from "./components/Stats/ExpenseOverview";
-import EditProducts from "./components/ProductList/EditProducts";
 import AI from "./components/AI/AI";
 import ProductsListTest from "./components/HooksTest/ProductsListTest";
 import CartTest from "./components/HooksTest/CartTest";
@@ -27,16 +26,15 @@ import AnimationMove from "./components/AAAnimationTests/AnimationMove";
 import AnimationTouchMove from "./components/AAAnimationTests/AnimationTouchMove";
 import Chatbot from "./components/Design/Chatbot/Chatbot";
 import StatsDashboard from "./components/Design/Charts/StatsDashboard";
-import ProductsListGroups from "./components/ProductList/ProductListGroups";
 import BarcodeScanner from "./components/AAAnimationTests/BarcodeScanner";
-import VibrationSettings from "./components/Test/vibrate";
-import AppArchitecture from "./components/AppArchitecture/AppArchitecture";
 import AdvancedStatsDashboard from "./components/Stats/AdvancedStatsDashboard";
 import ProductsListServer from "./components/ProductList/ProductListServer";
 import AddProduct from "./components/AddProduct/AddProduct";
 import Scraper from "./components/Scraper/Scraper";
 import Settings from "./components/Settings/Settings";
 import BarcodesAudit from "./components/BarcodesAudit/BarcodesAudit";
+import LoadingAnimations from "./components/LoadingAnimations/LoadingAnimations";
+import RefreshAllPrices from "./components/RefreshAllPrices/RefreshAllPrices";
 
 function Routing() {
   return (
@@ -68,7 +66,6 @@ function Routing() {
         element={<OptimalCart />}
       />
       <Route path="/expense-overview" element={<ExpenseOverview />} />
-      <Route path="/edit-products" element={<EditProducts />} />
       <Route path="/ai" element={<AI />} />
       <Route path="/products-list-test" element={<ProductsListTest />} />
       <Route path="/cart-test" element={<CartTest />} />
@@ -78,16 +75,15 @@ function Routing() {
       <Route path="/animation-touch-move" element={<AnimationTouchMove />} />
       <Route path="/chatbot" element={<Chatbot />} />
       <Route path="/stats-dashboard" element={<StatsDashboard />} />
-      <Route path="/products-list-groups" element={<ProductsListGroups />} />
       <Route path="/barcode-scanner" element={<BarcodeScanner />} />
-      <Route path="/vibration-settings" element={<VibrationSettings />} />
-      <Route path="/architecture" element={<AppArchitecture />} />
       <Route path="/advanced-stats" element={<AdvancedStatsDashboard />} />
       <Route path="/products-server" element={<ProductsListServer />} />
       <Route path="/add-product" element={<AddProduct />} />
       <Route path="/scraper" element={<Scraper />} />
       <Route path="/settings" element={<Settings />} />
       <Route path="/barcodes-audit" element={<BarcodesAudit />} />
+      <Route path="/loading-animations" element={<LoadingAnimations />} />
+      <Route path="/refresh-all-prices" element={<RefreshAllPrices />} />
     </Routes>
   );
 }

@@ -1,9 +1,25 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import ReactDOM from "react-dom";
+import { useLocation } from "react-router-dom";
 import Settings from "./Settings";
 import "./SettingsModal.css";
 
 export default function SettingsModal({ isOpen, onClose }) {
+  const location = useLocation();
+  const openedAtPath = useRef(null);
+
+  useEffect(() => {
+    if (!isOpen) {
+      openedAtPath.current = null;
+      return;
+    }
+    if (openedAtPath.current === null) {
+      openedAtPath.current = location.pathname;
+    } else if (location.pathname !== openedAtPath.current) {
+      onClose();
+    }
+  }, [isOpen, location.pathname, onClose]);
+
   useEffect(() => {
     if (!isOpen) return;
     const onKey = (e) => {

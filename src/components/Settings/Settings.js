@@ -1,10 +1,15 @@
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import "./Settings.css";
 import { useProductsLayout } from "../../context/ProductsLayoutContext";
 import { useCartCardLayout } from "../../context/CartCardLayoutContext";
 import { usePriceCompareLayout } from "../../context/PriceCompareLayoutContext";
 import { useAITheme } from "../../context/AIThemeContext";
+import { useReceiptTheme } from "../../context/ReceiptThemeContext";
+import { useSupermarketPreferences } from "../../context/SupermarketPreferencesContext";
+import { useSupermarkets } from "../../hooks/optimizationHooks";
 import { useAvailabilityMeta } from "../../hooks/useProductAvailability";
+import SupermarketImage from "../Images/SupermarketImage";
 import { rebuildAvailabilityIndex } from "../../services/productAvailabilityService";
 
 const PRODUCTS_LAYOUT_OPTIONS = [
@@ -53,6 +58,19 @@ const PRICE_COMPARE_LAYOUT_OPTIONS = [
     value: "grouped",
     label: "מקובצים לפי רשת",
     description: "סניפים זהים באותה רשת מתאחדים לשורה אחת",
+  },
+];
+
+const RECEIPT_THEME_OPTIONS = [
+  {
+    value: "color",
+    label: "צבעוני",
+    description: "תצוגה מקורית עם איקונים ותמונות בצבע מלא",
+  },
+  {
+    value: "grayscale",
+    label: "גווני אפור",
+    description: "הקבלה כולה בגוונים של שחור-לבן",
   },
 ];
 
@@ -157,6 +175,27 @@ function PriceComparePreview({ value }) {
   );
 }
 
+function ReceiptThemePreview({ value }) {
+  return (
+    <div className={`receipt-theme-preview receipt-theme-preview--${value}`}>
+      <span className="receipt-theme-preview__line receipt-theme-preview__line--header" />
+      <span className="receipt-theme-preview__row">
+        <span className="receipt-theme-preview__tag" />
+        <span className="receipt-theme-preview__line" />
+      </span>
+      <span className="receipt-theme-preview__row">
+        <span className="receipt-theme-preview__tag" />
+        <span className="receipt-theme-preview__line" />
+      </span>
+      <span className="receipt-theme-preview__row">
+        <span className="receipt-theme-preview__tag" />
+        <span className="receipt-theme-preview__line" />
+      </span>
+      <span className="receipt-theme-preview__total" />
+    </div>
+  );
+}
+
 function CartCardPreview({ value }) {
   if (value === "default") {
     return (
@@ -211,6 +250,23 @@ export default function Settings() {
   const { layout: priceCompareLayout, setLayout: setPriceCompareLayout } =
     usePriceCompareLayout();
   const { theme: aiTheme, setTheme: setAITheme } = useAITheme();
+  const { theme: receiptTheme, setTheme: setReceiptTheme } = useReceiptTheme();
+  const {
+    preferredSupermarketIDs,
+    toggleSupermarket,
+    clearPreferences,
+  } = useSupermarketPreferences();
+  const { allSupermarkets } = useSupermarkets();
+  const [isBranchPickerOpen, setIsBranchPickerOpen] = useState(false);
+
+  /* lookup: id → { name, address, city } — used by the chip list */
+  const supermarketLookup = React.useMemo(() => {
+    const map = new Map();
+    (allSupermarkets || []).forEach((s) => {
+      map.set(String(s.supermarketID), s);
+    });
+    return map;
+  }, [allSupermarkets]);
 
   const { meta, isLoading: isMetaLoading, refetch: refetchMeta } =
     useAvailabilityMeta();
@@ -374,6 +430,37 @@ export default function Settings() {
 
         <section className="settings-card">
           <header className="settings-card__header">
+            <span className="settings-card__title">תצוגת קבלה</span>
+          </header>
+          <div className="settings-card__body">
+            <p className="settings-card__hint">
+              בחר כיצד תוצג קבלה בהיסטוריית הקניות
+            </p>
+            <div className="layout-options">
+              {RECEIPT_THEME_OPTIONS.map((opt) => {
+                const active = receiptTheme === opt.value;
+                return (
+                  <button
+                    key={opt.value}
+                    type="button"
+                    className={`layout-option ${active ? "is-active" : ""}`}
+                    onClick={() => setReceiptTheme(opt.value)}
+                    aria-pressed={active}
+                  >
+                    <ReceiptThemePreview value={opt.value} />
+                    <span className="layout-option__label">{opt.label}</span>
+                    <span className="layout-option__desc">
+                      {opt.description}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+
+        <section className="settings-card">
+          <header className="settings-card__header">
             <span className="settings-card__title">עדכון נתונים</span>
           </header>
           <div className="settings-card__body">
@@ -438,6 +525,163 @@ export default function Settings() {
 
         <section className="settings-card">
           <header className="settings-card__header">
+            <span className="settings-card__title">רענון כל המחירים</span>
+          </header>
+          <div className="settings-card__body">
+            <p className="settings-card__hint">
+              טעינה מחדש של מחירי כל המוצרים מ-chp.co.il והחלפת כל אובייקטי
+              המחירים במסד הנתונים. התהליך רץ בשלושה שלבים מקבילים עם פידבק חי.
+            </p>
+
+            <Link to="/refresh-all-prices" className="settings-link-btn">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.4"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
+                <polyline points="23 4 23 10 17 10" />
+                <polyline points="1 20 1 14 7 14" />
+                <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15" />
+              </svg>
+              רענן את כל המחירים
+              <svg
+                className="settings-link-btn__chevron"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.4"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
+                <polyline points="15 18 9 12 15 6" />
+              </svg>
+            </Link>
+          </div>
+        </section>
+
+        <section className="settings-card">
+          <header className="settings-card__header">
+            <span className="settings-card__title">סניפים מועדפים</span>
+          </header>
+          <div className="settings-card__body">
+            <p className="settings-card__hint">
+              בחר את הסניפים שאתה מעדיף לקנות בהם. הכפתור "לפי העדפות"
+              באופטימיזציית עגלות יסמן בדיוק את הסניפים האלה.
+            </p>
+
+            <div className="settings-row">
+              <span className="settings-row__label">סניפים מועדפים</span>
+              <span className="settings-row__value">
+                {preferredSupermarketIDs.length === 0
+                  ? "לא נבחרו"
+                  : preferredSupermarketIDs.length}
+              </span>
+            </div>
+
+            {preferredSupermarketIDs.length > 0 && (
+              <div className="settings-preferred-chips">
+                {preferredSupermarketIDs.slice(0, 24).map((id) => {
+                  const s = supermarketLookup.get(String(id));
+                  const label = s
+                    ? `${s.name}${s.address ? ` · ${s.address}` : ""}`
+                    : `סניף #${id}`;
+                  return (
+                    <span key={id} className="settings-preferred-chip">
+                      <span className="settings-preferred-chip__text">{label}</span>
+                      <button
+                        type="button"
+                        className="settings-preferred-chip__x"
+                        onClick={() => toggleSupermarket(id)}
+                        aria-label="הסר"
+                      >
+                        ×
+                      </button>
+                    </span>
+                  );
+                })}
+                {preferredSupermarketIDs.length > 24 && (
+                  <span className="settings-preferred-chip-more">
+                    + עוד {preferredSupermarketIDs.length - 24}
+                  </span>
+                )}
+              </div>
+            )}
+
+            <button
+              type="button"
+              className="settings-link-btn"
+              onClick={() => setIsBranchPickerOpen(true)}
+            >
+              <svg
+                viewBox="0 0 24 24"
+                fill="currentColor"
+                aria-hidden="true"
+              >
+                <path d="M12 2l2.9 6.55 7.1.85-5.3 4.85 1.5 7.1L12 17.77 5.8 21.35l1.5-7.1L2 9.4l7.1-.85L12 2z" />
+              </svg>
+              {preferredSupermarketIDs.length === 0 ? "בחר סניפים" : "ערוך סניפים"}
+              <svg
+                className="settings-link-btn__chevron"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.4"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
+                <polyline points="15 18 9 12 15 6" />
+              </svg>
+            </button>
+          </div>
+        </section>
+
+        <section className="settings-card">
+          <header className="settings-card__header">
+            <span className="settings-card__title">אנימציות טעינה</span>
+          </header>
+          <div className="settings-card__body">
+            <p className="settings-card__hint">
+              גלריית אנימציות בסגנון דואלינגו — דמויות שעושות פעולה
+              שמתאימה למצב הטעינה. לתצוגה בלבד.
+            </p>
+            <Link to="/loading-animations" className="settings-link-btn">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.4"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
+                <circle cx="12" cy="12" r="3" />
+                <path d="M12 1v6m0 10v6M4.22 4.22l4.24 4.24m7.08 7.08l4.24 4.24M1 12h6m10 0h6M4.22 19.78l4.24-4.24m7.08-7.08l4.24-4.24" />
+              </svg>
+              פתח את הגלריה
+              <svg
+                className="settings-link-btn__chevron"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.4"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
+                <polyline points="15 18 9 12 15 6" />
+              </svg>
+            </Link>
+          </div>
+        </section>
+
+        <section className="settings-card">
+          <header className="settings-card__header">
             <span className="settings-card__title">אודות</span>
           </header>
           <div className="settings-card__body">
@@ -447,6 +691,407 @@ export default function Settings() {
             </div>
           </div>
         </section>
+      </div>
+
+      {isBranchPickerOpen && (
+        <BranchPickerModal
+          allSupermarkets={allSupermarkets}
+          preferredSupermarketIDs={preferredSupermarketIDs}
+          onToggleSupermarket={toggleSupermarket}
+          onClearAll={clearPreferences}
+          onClose={() => setIsBranchPickerOpen(false)}
+        />
+      )}
+    </div>
+  );
+}
+
+/* ─────────────  Modal — pick preferred branches (individual supermarkets)  ───────────── */
+
+function BranchPickerModal({
+  allSupermarkets,
+  preferredSupermarketIDs,
+  onToggleSupermarket,
+  onClearAll,
+  onClose,
+}) {
+  /* selected chain — null means "showing the chain grid", a string means
+     "drilled into this chain's branches". */
+  const [selectedChain, setSelectedChain] = useState(null);
+
+  const selectedSet = React.useMemo(
+    () => new Set((preferredSupermarketIDs || []).map(String)),
+    [preferredSupermarketIDs]
+  );
+
+  const chains = React.useMemo(() => {
+    const map = new Map();
+    (allSupermarkets || []).forEach((s) => {
+      if (!s || !s.name) return;
+      if (!map.has(s.name)) map.set(s.name, []);
+      map.get(s.name).push(s);
+    });
+    return Array.from(map.entries())
+      .map(([name, branches]) => ({
+        name,
+        branches: branches.sort((a, b) =>
+          (a.address || "").localeCompare(b.address || "", "he")
+        ),
+        selectedCount: branches.filter((b) =>
+          selectedSet.has(String(b.supermarketID))
+        ).length,
+      }))
+      .sort(
+        (a, b) =>
+          b.branches.length - a.branches.length ||
+          a.name.localeCompare(b.name, "he")
+      );
+  }, [allSupermarkets, selectedSet]);
+
+  const activeChain = selectedChain
+    ? chains.find((c) => c.name === selectedChain)
+    : null;
+
+  const handleOverlay = (e) => {
+    if (e.target.classList.contains("chain-picker-overlay")) onClose();
+  };
+
+  const handleSelectAllInChain = () => {
+    if (!activeChain) return;
+    const allSel = activeChain.selectedCount === activeChain.branches.length;
+    activeChain.branches.forEach((b) => {
+      const isSel = selectedSet.has(String(b.supermarketID));
+      if (allSel && isSel) onToggleSupermarket(b.supermarketID);
+      if (!allSel && !isSel) onToggleSupermarket(b.supermarketID);
+    });
+  };
+
+  return (
+    <div
+      className="chain-picker-overlay"
+      role="dialog"
+      aria-label="בחירת סניפים מועדפים"
+      onClick={handleOverlay}
+    >
+      <div className="chain-picker-window">
+        <header className="chain-picker-header">
+          <div>
+            <h3 className="chain-picker-title">
+              {activeChain ? activeChain.name : "סניפים מועדפים"}
+            </h3>
+            <p className="chain-picker-subtitle">
+              {activeChain
+                ? `${activeChain.selectedCount} מתוך ${activeChain.branches.length} סניפים נבחרו`
+                : "בחר רשת כדי לראות את הסניפים שלה"}
+            </p>
+          </div>
+          <button
+            type="button"
+            className="chain-picker-close"
+            onClick={onClose}
+            aria-label="סגור"
+          >
+            ×
+          </button>
+        </header>
+
+        {!activeChain ? (
+          <ChainGrid chains={chains} onPickChain={setSelectedChain} />
+        ) : (
+          <ChainBranches
+            chain={activeChain}
+            selectedSet={selectedSet}
+            onToggleSupermarket={onToggleSupermarket}
+            onSelectAllInChain={handleSelectAllInChain}
+            onBack={() => setSelectedChain(null)}
+          />
+        )}
+
+        <footer className="chain-picker-footer">
+          <span className="chain-picker-selected-count">
+            {preferredSupermarketIDs.length === 0
+              ? "אף סניף לא נבחר"
+              : preferredSupermarketIDs.length === 1
+              ? "סניף אחד נבחר"
+              : `סה"כ ${preferredSupermarketIDs.length} סניפים נבחרו`}
+          </span>
+          <button
+            type="button"
+            className="chain-picker-clear"
+            onClick={onClearAll}
+            disabled={preferredSupermarketIDs.length === 0}
+          >
+            נקה הכל
+          </button>
+        </footer>
+      </div>
+    </div>
+  );
+}
+
+/* ─── Step 1 — grid of chain cards (logo + count of selected) ─── */
+function ChainGrid({ chains, onPickChain }) {
+  const [query, setQuery] = useState("");
+  const filtered = React.useMemo(() => {
+    const q = query.trim().toLowerCase();
+    if (!q) return chains;
+    return chains.filter((c) => c.name.toLowerCase().includes(q));
+  }, [chains, query]);
+
+  return (
+    <div className="chain-picker-body">
+      <div className="chain-picker-search">
+        <input
+          type="text"
+          className="chain-picker-search-input"
+          placeholder="חפש רשת..."
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+        />
+        {query && (
+          <button
+            type="button"
+            className="chain-picker-search-clear"
+            onClick={() => setQuery("")}
+            aria-label="נקה"
+          >
+            ×
+          </button>
+        )}
+      </div>
+
+      {filtered.length === 0 ? (
+        <div className="chain-picker-empty">אין תוצאות</div>
+      ) : (
+        <div className="chain-picker-grid">
+          {filtered.map((c) => {
+            const allSelected = c.selectedCount === c.branches.length;
+            const someSelected = c.selectedCount > 0 && !allSelected;
+            return (
+              <button
+                type="button"
+                key={c.name}
+                className={`chain-picker-card ${
+                  allSelected ? "is-all" : someSelected ? "is-partial" : ""
+                }`}
+                onClick={() => onPickChain(c.name)}
+              >
+                <div className="chain-picker-card-logo">
+                  <SupermarketImage supermarketName={c.name} />
+                </div>
+                <div className="chain-picker-card-info">
+                  <span className="chain-picker-card-name">{c.name}</span>
+                  <span className="chain-picker-card-meta">
+                    {c.selectedCount > 0 ? (
+                      <span className="chain-picker-card-meta-sel">
+                        ✓ {c.selectedCount} / {c.branches.length}
+                      </span>
+                    ) : (
+                      <span>{c.branches.length} סניפים</span>
+                    )}
+                  </span>
+                </div>
+                <svg
+                  className="chain-picker-card-arrow"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.4"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden="true"
+                >
+                  <polyline points="15 18 9 12 15 6" />
+                </svg>
+              </button>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ─── Step 2 — branches of a chain, grouped by city ─── */
+function ChainBranches({
+  chain,
+  selectedSet,
+  onToggleSupermarket,
+  onSelectAllInChain,
+  onBack,
+}) {
+  const [query, setQuery] = useState("");
+  const [activeCity, setActiveCity] = useState(null);
+
+  const byCity = React.useMemo(() => {
+    const map = new Map();
+    chain.branches.forEach((b) => {
+      const city = b.city || "—";
+      if (!map.has(city)) map.set(city, []);
+      map.get(city).push(b);
+    });
+    return Array.from(map.entries())
+      .map(([city, branches]) => ({ city, branches }))
+      .sort((a, b) => b.branches.length - a.branches.length);
+  }, [chain]);
+
+  const filtered = React.useMemo(() => {
+    const q = query.trim().toLowerCase();
+    let groups = byCity;
+    if (activeCity) groups = groups.filter((g) => g.city === activeCity);
+    if (q) {
+      groups = groups
+        .map(({ city, branches }) => ({
+          city,
+          branches: branches.filter(
+            (b) =>
+              (b.address || "").toLowerCase().includes(q) ||
+              (b.city || "").toLowerCase().includes(q)
+          ),
+        }))
+        .filter((g) => g.branches.length > 0);
+    }
+    return groups;
+  }, [byCity, query, activeCity]);
+
+  const allSelected = chain.selectedCount === chain.branches.length;
+
+  return (
+    <div className="chain-picker-body">
+      <div className="chain-picker-branches-toolbar">
+        <button
+          type="button"
+          className="chain-picker-back"
+          onClick={onBack}
+        >
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.4"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+          >
+            <polyline points="9 18 15 12 9 6" />
+          </svg>
+          חזרה לרשתות
+        </button>
+        <button
+          type="button"
+          className={`chain-picker-select-all ${allSelected ? "is-on" : ""}`}
+          onClick={onSelectAllInChain}
+        >
+          {allSelected ? "בטל סימון של הכל" : "סמן הכל"}
+        </button>
+      </div>
+
+      {chain.branches.length > 6 && (
+        <div className="chain-picker-search">
+          <input
+            type="text"
+            className="chain-picker-search-input"
+            placeholder="חפש עיר או כתובת..."
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+          />
+          {query && (
+            <button
+              type="button"
+              className="chain-picker-search-clear"
+              onClick={() => setQuery("")}
+              aria-label="נקה"
+            >
+              ×
+            </button>
+          )}
+        </div>
+      )}
+
+      {byCity.length > 1 && (
+        <div className="chain-picker-city-chips">
+          <button
+            type="button"
+            className={`chain-picker-city-chip ${
+              activeCity === null ? "is-active" : ""
+            }`}
+            onClick={() => setActiveCity(null)}
+          >
+            הכל
+            <span className="chain-picker-city-count">
+              {chain.branches.length}
+            </span>
+          </button>
+          {byCity.map((g) => (
+            <button
+              key={g.city}
+              type="button"
+              className={`chain-picker-city-chip ${
+                activeCity === g.city ? "is-active" : ""
+              }`}
+              onClick={() =>
+                setActiveCity(activeCity === g.city ? null : g.city)
+              }
+            >
+              {g.city}
+              <span className="chain-picker-city-count">
+                {g.branches.length}
+              </span>
+            </button>
+          ))}
+        </div>
+      )}
+
+      <div className="chain-picker-branches-list">
+        {filtered.length === 0 ? (
+          <div className="chain-picker-empty">לא נמצאו סניפים</div>
+        ) : (
+          filtered.map(({ city, branches }) => (
+            <section key={city} className="chain-picker-city-group">
+              {byCity.length > 1 && (
+                <header className="chain-picker-city-header">
+                  <span className="chain-picker-city-name">{city}</span>
+                  <span className="chain-picker-city-count chain-picker-city-count--header">
+                    {branches.length}
+                  </span>
+                </header>
+              )}
+              <ul className="chain-picker-branches-ul">
+                {branches.map((b) => {
+                  const checked = selectedSet.has(String(b.supermarketID));
+                  return (
+                    <li key={b.supermarketID}>
+                      <label
+                        className={`chain-picker-branch ${
+                          checked ? "is-checked" : ""
+                        }`}
+                      >
+                        <input
+                          type="checkbox"
+                          className="chain-picker-checkbox"
+                          checked={checked}
+                          onChange={() =>
+                            onToggleSupermarket(b.supermarketID)
+                          }
+                        />
+                        <span className="chain-picker-branch-text">
+                          <span className="chain-picker-branch-addr">
+                            {b.address || "כתובת לא זמינה"}
+                          </span>
+                          {b.city && (
+                            <span className="chain-picker-branch-city">
+                              {b.city}
+                            </span>
+                          )}
+                        </span>
+                      </label>
+                    </li>
+                  );
+                })}
+              </ul>
+            </section>
+          ))
+        )}
       </div>
     </div>
   );
