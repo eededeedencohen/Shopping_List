@@ -1,24 +1,24 @@
 .category-navigation-container {
-  --default-icon-color: #d6fcff;
-  --color-משקאות-קלים: #ff0000;
+  --default-icon-color: #828282;
+  --color-משקאות-קלים: #c7def8;
   --color-המקפיא: #00fbff;
   --color-יינות: #dd1eff;
   --color-תבלינים-אבקות-ומרקי-אינסטנט: #ff9800;
-  --color-פארם-ותינוקות: #795548;
-  --color-שימורים: #607d8b;
+  --color-פארם-ותינוקות: #ff00ee;
+  --color-שימורים: #f8df8a;
   --color-חטיפים-ודגנים: #ffc107;
-  --color-חלב-ביצים-ומעדנים: #3f51b5;
+  --color-חלב-ביצים-ומעדנים: #ffffff;
   --color-אפייה-ביתית: #f06292;
   --color-בירות: #ffd000;
-  --color-מתוקים-ושוקולד: #8d6e63;
-  --color-מוצרי-בסיס-לבישול: #009688;
+  --color-מתוקים-ושוקולד: #c03300;
+  --color-מוצרי-בסיס-לבישול: #6cffac;
   --color-אלכוהול-וקוקטיילים: #c2185b;
-  --color-חד-פעמי: #9e9e9e;
-  --color-ניקיון-וטואלטיקה: #607d8b;
+  --color-חד-פעמי: #ffffff;
+  --color-ניקיון-וטואלטיקה: #aae3ff;
   --color-שמנים: #ffe100;
   --color-רטבים: #ff2a2a;
   --color-גבינות: #fbc02d;
-  --color-משקאות-חמים: #6d4c41;
+  --color-משקאות-חמים: #ff0000;
   --color-מוצרי-תינוקות: #ba68c8;
 }
 
