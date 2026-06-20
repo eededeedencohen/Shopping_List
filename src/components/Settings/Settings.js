@@ -11,6 +11,7 @@ import { useSupermarkets } from "../../hooks/optimizationHooks";
 import { useAvailabilityMeta } from "../../hooks/useProductAvailability";
 import SupermarketImage from "../Images/SupermarketImage";
 import { rebuildAvailabilityIndex } from "../../services/productAvailabilityService";
+import { BUILD_VERSION } from "../../buildInfo";
 
 const PRODUCTS_LAYOUT_OPTIONS = [
   {
@@ -687,7 +688,7 @@ export default function Settings() {
           <div className="settings-card__body">
             <div className="settings-row">
               <span className="settings-row__label">גרסה</span>
-              <span className="settings-row__value">1.1.0</span>
+              <span className="settings-row__value">{BUILD_VERSION}</span>
             </div>
           </div>
         </section>
