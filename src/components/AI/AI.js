@@ -615,6 +615,7 @@ export default function AI() {
                     <option value="VR6AewLTigWG4xSOukaG">Arnold (זכר)</option>
                     <option value="29vD33N1CtxCmqQRPOHJ">Drew (זכר)</option>
                     <option value="KzE5xImZVu70uQLdx5z5">Kitchri (נקבה)</option>
+                    <option value="WTELPzK6rbJ0aj54ivAR">Kitchri - IL (נקבה)</option>
                   </>
                 ) : (
                   <>

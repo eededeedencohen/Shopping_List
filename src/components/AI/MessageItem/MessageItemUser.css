@@ -8,20 +8,42 @@
   word-wrap: break-word; /* שבירת טקסט ארוך */
 }
 
-/* הודעת המשתמש – מיושרת לימין, רקע כחול */
+/* הודעת המשתמש — מיושרת לימין, עיצוב תואם לבועת ה-AI
+ * (גרדיינט כחול, בורדר רך, פינה אסימטרית פונה לכיוון המשתמש,
+ *  צל רב-שכבתי לעומק וזוהר עדין, הדגשה פנימית עליונה לתחושת זכוכית) */
 .message-item.user {
-  background-color: #007bff;
-  color: #fff;
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 55%, #1d4ed8 100%);
+  border: 1px solid rgba(147, 197, 253, 0.38);
+  border-radius: 18px 18px 4px 18px;
+  box-shadow:
+    0 2px 8px rgba(15, 23, 42, 0.22),
+    0 6px 18px rgba(37, 99, 235, 0.32),
+    inset 0 1px 0 rgba(255, 255, 255, 0.28),
+    inset 0 -1px 0 rgba(15, 23, 42, 0.18);
+  color: #ffffff;
+  text-shadow: 0 1px 2px rgba(15, 23, 42, 0.18);
   align-self: flex-end;
+  transition: transform 0.18s ease, box-shadow 0.22s ease;
+}
+
+.message-item.user:hover {
+  transform: translateY(-1px);
+  box-shadow:
+    0 4px 12px rgba(15, 23, 42, 0.28),
+    0 8px 22px rgba(37, 99, 235, 0.40),
+    inset 0 1px 0 rgba(255, 255, 255, 0.32),
+    inset 0 -1px 0 rgba(15, 23, 42, 0.20);
 }
 
 /* הגדרת טקסט */
 .message-item p {
   margin: 0;
-  font-size: 1rem;
+  font-size: 0.95rem;
+  line-height: 1.5;
 }
 
-/* יישור טקסט להודעת משתמש */
+/* יישור טקסט להודעת משתמש — RTL כמו ה-AI */
 .message-item.user p {
   text-align: right;
+  direction: rtl;
 }
