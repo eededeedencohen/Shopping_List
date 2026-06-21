@@ -1,110 +1,131 @@
-/* ─────────────────────────────────────────────
-   Bottom navigation — flush to bottom edge
-   ───────────────────────────────────────────── */
+/* ───────────────────────────────────────────────────────────
+   Bottom navigation — slim blue bar + peeking robot "coin".
+
+   Grid row 3 of the .App shell. The blue bar is SHORT; the robot coin
+   peeks above it and nests in a transparent circular notch (cradle) cut
+   into the bar's top edge.
+
+   STABILITY RULES (the earlier FAB broke the app — do not regress):
+   - The coin peeks above the BLUE bar but stays WITHIN the nav row's height
+     (--nav-bar-h), so it never overflows into page content.
+   - No infinite animations (no breathing halo / rotating aurora).
+   - The bar and coin are SIBLINGS so the bar's notch mask never clips the coin.
+
+   --nav-bar-h must stay in sync with --bottom-nav-h in index.css.
+   ─────────────────────────────────────────────────────────── */
+
 .bottom-nav {
-  position: fixed;
+  --nav-blue-1: #4f9bff; /* bright top of the coin */
+  --nav-blue-2: #2563eb;
+  --nav-blue-3: #1d4ed8;
+
+  --nav-bar-h: 54px; /* the nav ROW height (reserved space — unchanged) */
+  --blue-h: 30px; /* the SHORT blue bar height */
+  --fab: 46px; /* coin diameter */
+  --notch-gap: 4px; /* transparent ring thickness around the coin */
+
+  position: relative;
+  flex: 0 0 auto;
+  width: 100%;
+  z-index: 50;
+  direction: ltr;
+  height: calc(var(--nav-bar-h) + env(safe-area-inset-bottom, 0px));
+}
+
+/* The slim blue bar, anchored to the bottom, with a circular notch cut into
+   its top-center (the transparent cradle the coin nests in). */
+.bottom-nav__bar {
+  position: absolute;
   left: 0;
   right: 0;
   bottom: 0;
-  z-index: 100;
-  pointer-events: auto;
-  direction: ltr;
-  background: rgba(255, 255, 255, 0.92);
-  backdrop-filter: blur(20px) saturate(160%);
-  -webkit-backdrop-filter: blur(20px) saturate(160%);
-  border-top: 1px solid rgba(15, 23, 42, 0.08);
-  box-shadow:
-    0 -4px 18px rgba(15, 23, 42, 0.08),
-    0 -1px 0 rgba(255, 255, 255, 0.7) inset;
-  padding-bottom: env(safe-area-inset-bottom, 0px);
+  height: calc(var(--blue-h) + env(safe-area-inset-bottom, 0px));
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.16) 0%, rgba(255, 255, 255, 0) 60%),
+    linear-gradient(180deg, var(--nav-blue-2) 0%, var(--nav-blue-3) 100%);
+  /* Notch: transparent within (coin radius + gap) at the bar's top-center. */
+  -webkit-mask: radial-gradient(
+    circle calc(var(--fab) / 2 + var(--notch-gap)) at 50% 0%,
+    transparent calc(var(--fab) / 2 + var(--notch-gap) - 1px),
+    #000 calc(var(--fab) / 2 + var(--notch-gap))
+  );
+  mask: radial-gradient(
+    circle calc(var(--fab) / 2 + var(--notch-gap)) at 50% 0%,
+    transparent calc(var(--fab) / 2 + var(--notch-gap) - 1px),
+    #000 calc(var(--fab) / 2 + var(--notch-gap))
+  );
+  /* Soft lift shadow that follows the notched silhouette. */
+  filter: drop-shadow(0 -1px 4px rgba(15, 23, 42, 0.16));
 }
 
-.bottom-nav__list {
-  display: flex;
-  align-items: center;
-  justify-content: space-around;
+/* The robot coin — glossy raised circle that peeks above the bar and sits in
+   the notch with a transparent ring around it. */
+.bottom-nav__btn {
+  position: absolute;
+  left: 50%;
+  /* Center of the coin sits on the blue bar's top edge → upper half peeks. */
+  bottom: calc(var(--blue-h) - var(--fab) / 2 + env(safe-area-inset-bottom, 0px));
+  transform: translateX(-50%);
+  display: grid;
+  place-items: center;
+  width: var(--fab);
+  height: var(--fab);
   margin: 0;
-  padding: 2px 4px;
-  list-style: none;
-}
-
-.bottom-nav__item {
-  flex: 1;
-  display: flex;
-  justify-content: center;
-}
-
-.bottom-nav__link {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 44px;
-  height: 36px;
-  border-radius: 10px;
-  color: #64748b;
-  text-decoration: none;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  cursor: pointer;
+  color: inherit;
+  font: inherit;
+  -webkit-appearance: none;
+  appearance: none;
   -webkit-tap-highlight-color: transparent;
-  transition:
-    color 0.25s cubic-bezier(0.22, 1, 0.36, 1),
-    background 0.25s cubic-bezier(0.22, 1, 0.36, 1),
-    transform 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+  background:
+    radial-gradient(125% 95% at 50% 6%, rgba(255, 255, 255, 0.55) 0%, rgba(255, 255, 255, 0) 52%),
+    linear-gradient(180deg, var(--nav-blue-1) 0%, var(--nav-blue-2) 58%, var(--nav-blue-3) 100%);
+  box-shadow:
+    0 2px 7px rgba(13, 42, 99, 0.42),
+    inset 0 1px 1px rgba(255, 255, 255, 0.6),
+    inset 0 -5px 9px rgba(13, 42, 99, 0.3);
+  transition: transform 0.18s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.2s ease;
 }
 
-.bottom-nav__link:hover {
-  color: #1e293b;
-  background: rgba(15, 23, 42, 0.05);
+.bottom-nav__btn:hover {
+  transform: translateX(-50%) translateY(-1px);
+  box-shadow:
+    0 5px 12px rgba(13, 42, 99, 0.5),
+    inset 0 1px 1px rgba(255, 255, 255, 0.6),
+    inset 0 -5px 9px rgba(13, 42, 99, 0.3);
 }
 
-.bottom-nav__link:active {
-  transform: scale(0.92);
+.bottom-nav__btn:active {
+  transform: translateX(-50%) scale(0.93);
+}
+
+.bottom-nav__btn:focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 3px #ffffff,
+    0 0 0 5px rgba(0, 116, 207, 0.6),
+    0 2px 7px rgba(13, 42, 99, 0.42);
 }
 
 .bottom-nav__icon {
-  width: 20px;
-  height: 20px;
+  width: 24px;
+  height: 24px;
   display: block;
-  transition:
-    transform 0.25s cubic-bezier(0.22, 1, 0.36, 1),
-    filter 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+  color: #ffffff;
+  fill: currentColor;
+  filter: drop-shadow(0 1px 1.5px rgba(13, 42, 99, 0.45));
 }
 
-.bottom-nav__icon path,
-.bottom-nav__icon circle,
-.bottom-nav__icon polygon,
-.bottom-nav__icon rect,
-.bottom-nav__icon g {
+.bottom-nav__icon path {
   fill: currentColor;
 }
 
-/* Active item — blue tinted background + colored icon + top indicator bar */
-.bottom-nav__item.is-active .bottom-nav__link {
-  color: #2563eb;
-  background: linear-gradient(180deg, rgba(37, 99, 235, 0.12) 0%, rgba(37, 99, 235, 0.04) 100%);
-}
-
-.bottom-nav__item.is-active .bottom-nav__icon {
-  transform: scale(1.08);
-  filter: drop-shadow(0 1px 2px rgba(37, 99, 235, 0.25));
-}
-
-/* Top indicator strip on active item */
-.bottom-nav__item.is-active .bottom-nav__link::before {
-  content: "";
-  position: absolute;
-  top: -2px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 22px;
-  height: 2.5px;
-  border-radius: 0 0 3px 3px;
-  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 55%, #1d4ed8 100%);
-  box-shadow: 0 2px 6px rgba(37, 99, 235, 0.4);
-}
-
 @media (prefers-reduced-motion: reduce) {
-  .bottom-nav__link,
-  .bottom-nav__icon {
+  .bottom-nav__btn {
     transition: none;
   }
 }

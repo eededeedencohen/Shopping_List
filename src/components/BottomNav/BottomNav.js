@@ -1,49 +1,24 @@
 import React from "react";
-import { Link, useLocation } from "react-router-dom";
 import "./BottomNav.css";
-import { ReactComponent as HomeIcon } from "../Toolbar/home.svg";
-import { ReactComponent as ProductsIcon } from "../Toolbar/grocery2.svg";
-import { ReactComponent as BarcodeIcon } from "../Toolbar/barcode.svg";
 import { ReactComponent as RobotIcon } from "../Toolbar/robot.svg";
-import { ReactComponent as ReceiptIcon } from "../Toolbar/wishlist.svg";
 
-const ALLOWED_PATHS = ["/", "/products", "/barcode-scanner", "/image-parser"];
-
-const NAV_ITEMS = [
-  { to: "/", Icon: HomeIcon, label: "בית" },
-  { to: "/products", Icon: ProductsIcon, label: "מוצרים" },
-  { to: "/barcode-scanner", Icon: BarcodeIcon, label: "סריקת ברקוד" },
-  { to: "/image-parser", Icon: ReceiptIcon, label: "קבלה להיסטוריה" },
-  { to: "/ai", Icon: RobotIcon, label: "AI" },
-];
-
+/**
+ * BottomNav — a slim blue bar (grid row 3 of the .App shell) with a robot
+ * "coin" that peeks above the bar, nested in a transparent circular notch.
+ *
+ * Stable by design: the coin peeks above the BLUE bar but stays WITHIN the
+ * nav row's reserved height (it never overflows into page content), and there
+ * are NO infinite animations — those two things are what broke earlier.
+ * The bar and the coin are SIBLINGS so the bar's notch mask doesn't clip it.
+ */
 export default function BottomNav() {
-  const { pathname } = useLocation();
-
-  if (!ALLOWED_PATHS.includes(pathname)) return null;
-
   return (
-    <nav className="bottom-nav" aria-label="ניווט ראשי">
-      <ul className="bottom-nav__list">
-        {NAV_ITEMS.map(({ to, Icon, label }) => {
-          const active = pathname === to;
-          return (
-            <li
-              key={to}
-              className={`bottom-nav__item ${active ? "is-active" : ""}`}
-            >
-              <Link
-                to={to}
-                className="bottom-nav__link"
-                aria-label={label}
-                aria-current={active ? "page" : undefined}
-              >
-                <Icon className="bottom-nav__icon" />
-              </Link>
-            </li>
-          );
-        })}
-      </ul>
+    <nav className="bottom-nav" aria-label="סרגל תחתון">
+      <div className="bottom-nav__bar" aria-hidden="true" />
+      {/* Decorative only — no navigation yet. */}
+      <button type="button" className="bottom-nav__btn" aria-label="רובוט">
+        <RobotIcon className="bottom-nav__icon" aria-hidden="true" />
+      </button>
     </nav>
   );
 }

@@ -18,6 +18,9 @@
   background: transparent;
   color: var(--txt-light);
   padding: 6px;
+  /* No bottom gap: the input bar sits flush on the bottom nav, so no dark
+     page-background "groove" appears between them. */
+  padding-bottom: 0;
   box-sizing: border-box;
   font-family: "Heebo", sans-serif;
 }
@@ -594,11 +597,14 @@
   bottom: 0;
   padding: 10px 14px;
   border-radius: 24px;
-  margin-top: 6px;
+  /* Pin the input to the very bottom of the chat area so it sits flush on the
+     bottom nav — no transparent strip (dark "groove") between them. */
+  margin-top: auto;
   background: var(--glass-bg);
   backdrop-filter: blur(14px) saturate(180%);
   border: 1px solid var(--glass-bd);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25),
+  /* Softer, upward-only shadow so it doesn't pool a dark band onto the nav. */
+  box-shadow: 0 -1px 10px rgba(0, 0, 0, 0.14),
     0 0 8px rgba(255, 255, 255, 0.4) inset;
 }
 
