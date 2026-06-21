@@ -3,12 +3,7 @@
    ═══════════════════════════════════════════════ */
 
 .lc-page {
-  position: fixed;
-  top: var(--toolbar-h, 40px);
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 0;
+  height: 100%;
 
   display: flex;
   flex-direction: column;

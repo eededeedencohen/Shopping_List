@@ -6,11 +6,8 @@
    ═══════════════════════════════════════════════ */
 
 .optx-page {
-  position: fixed;
-  top: var(--toolbar-h, 40px);
-  left: 0;
-  right: 0;
-  bottom: 0;
+  position: relative;
+  height: 100%;
   z-index: 0;
 
   display: flex;

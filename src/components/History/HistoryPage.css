@@ -25,7 +25,7 @@
 /* Page container - counter/desk background */
 .history-page-container {
   width: 100%;
-  min-height: 100vh;
+  min-height: 100%;
   background: linear-gradient(135deg, #c9c9c9 0%, #e0e0e0 50%, #d0d0d0 100%);
   padding: 15px 10px 30px;
   display: flex;
@@ -700,7 +700,7 @@
 /* floating bottom action bar */
 .history-selection-bar {
   position: fixed;
-  bottom: 16px;
+  bottom: calc(16px + var(--bottom-nav-h));
   left: 50%;
   transform: translateX(-50%);
   z-index: 50;

@@ -1,7 +1,8 @@
 /* ───────────── HomePage Container ───────────── */
 .homepage {
-  /* Lock to exactly one viewport — no scrolling, everything fits. */
-  height: calc(100dvh - var(--toolbar-h, 40px));
+  /* Fill the app-shell scroll area exactly — no scrolling, everything fits
+     between the toolbar and the bottom nav. */
+  height: 100%;
   padding: 1rem 0.85rem 0.85rem;
   position: relative;
   overflow: hidden;

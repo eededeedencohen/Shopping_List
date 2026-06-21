@@ -92,7 +92,8 @@
   position: relative;
   overflow-x: hidden;
   overflow-y: auto;
-  min-height: calc(100vh - var(--offset-top, 100px));
+  /* Fill the app-shell scroll row (grid row 2) instead of the full viewport. */
+  min-height: 100%;
 }
 
 /* כרטיס מוצר - תצוגה בשורה */

@@ -24,7 +24,7 @@
 /* ── Main Container ── */
 .scanner-container {
   width: 100%;
-  min-height: calc(100vh - var(--toolbar-h, 40px));
+  min-height: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;

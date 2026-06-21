@@ -1,9 +1,9 @@
 .scraper-page {
   direction: rtl;
-  min-height: 100vh;
+  min-height: 100%;
   background: linear-gradient(135deg, #0a0e1a 0%, #121830 50%, #0d1224 100%);
   color: #fff;
-  padding: 60px 16px 40px;
+  padding: 16px 16px 40px;
 }
 
 .scraper-header h1 {

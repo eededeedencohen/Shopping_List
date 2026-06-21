@@ -16,7 +16,7 @@
   position: relative;
   overflow-x: hidden;
   overflow-y: auto;
-  min-height: calc(100vh - var(--offset-top));
+  min-height: 100%;
 }
 
 
@@ -441,7 +441,8 @@
 /* ── FAB Add Product ── */
 .fab-add-product {
   position: fixed;
-  bottom: 24px;
+  /* Lift above the in-grid bottom nav. */
+  bottom: calc(24px + var(--bottom-nav-h));
   right: 24px;
   width: 56px;
   height: 56px;
@@ -469,7 +470,8 @@
 
 .fab-scraper {
   position: fixed;
-  bottom: 90px;
+  /* Lift above the in-grid bottom nav (stacked over the add-product FAB). */
+  bottom: calc(90px + var(--bottom-nav-h));
   right: 24px;
   width: 46px;
   height: 46px;

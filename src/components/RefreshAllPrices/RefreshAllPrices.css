@@ -3,9 +3,9 @@
  */
 
 .rfp-page {
-  min-height: 100vh;
-  min-height: 100dvh;
-  padding: 78px 16px 48px;
+  /* Fill the app-shell scroll row; the 78px top was a stale fixed-toolbar offset. */
+  min-height: 100%;
+  padding: 20px 16px 48px;
   background: linear-gradient(35deg, rgb(201 240 255) 0%, rgb(255 255 255) 95%);
   font-family: "Heebo", "Open Sans", -apple-system, BlinkMacSystemFont,
     "Segoe UI", Roboto, sans-serif;
@@ -503,7 +503,7 @@
 .rfp-err-msg { color: #64748b; }
 
 @media (max-width: 520px) {
-  .rfp-page { padding: 70px 12px 40px; }
+  .rfp-page { padding: 16px 12px 40px; }
   .rfp-page-content { padding: 18px 16px; }
   .rfp-summary-grid { grid-template-columns: 1fr; }
 }

@@ -5,7 +5,7 @@
 
 /* ── Base ────────────────────────────────────────────────────── */
 .page {
-  min-height: 100vh;
+  min-height: 100%;
   background: linear-gradient(35deg, rgb(201 240 255) 0%, rgb(255 255 255) 95%);
   font-family: 'Heebo', 'Open Sans', -apple-system, BlinkMacSystemFont, sans-serif;
   color: #1e3a5f;
@@ -1940,7 +1940,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-height: 80vh;
+  min-height: 100%;
   background: linear-gradient(35deg, rgb(201 240 255) 0%, rgb(255 255 255) 95%);
   gap: 20px;
   position: relative;
@@ -1996,7 +1996,7 @@
   text-align: center;
   padding: 80px 24px;
   background: linear-gradient(35deg, rgb(201 240 255) 0%, rgb(255 255 255) 95%);
-  min-height: 100vh;
+  min-height: 100%;
 }
 
 .emptyIcon {
@@ -2033,7 +2033,7 @@
 /* ── Back Button ─────────────────────────────────────────────── */
 .backBtn {
   position: fixed;
-  bottom: 24px;
+  bottom: calc(24px + var(--bottom-nav-h));
   left: 50%;
   transform: translateX(-50%);
   background: linear-gradient(145deg, #6366f1 0%, #4f46e5 100%);

@@ -338,8 +338,12 @@
   flex-direction: column;
   width: 100%;
   max-width: 100vw;
-  height: calc(100vh - 40px);
-  height: calc(100dvh - 40px);
+  /* Grid shell: row 2 (.app-scroll) is already 100dvh − toolbar − bottomNav.
+     Fill that row exactly (height:100%) instead of the old 100dvh−40px, which
+     was ~toolbar-height too tall and caused a second/spurious scroll on the row.
+     .cart stays its own scroll container (overflow-y:auto) so the sticky-top
+     hide/reveal JS and position:sticky top:0 keep working unchanged. */
+  height: 100%;
   overflow-x: hidden;
   overflow-y: auto;
   background: linear-gradient(35deg, rgb(201 240 255) 0%, rgb(255 255 255) 95%);
@@ -1438,12 +1442,12 @@
    ═══════════════════════════════════════════════════════════════ */
 .confirm-footer {
   position: fixed;
-  bottom: 0;
+  /* Sit ABOVE the in-flow bottom nav (which owns the bottom strip + safe area). */
+  bottom: var(--bottom-nav-h);
   left: 0;
   right: 0;
   z-index: 2;
   padding: 12px 14px;
-  padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px));
   background: transparent;
   backdrop-filter: none;
   -webkit-backdrop-filter: none;

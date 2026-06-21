@@ -1,8 +1,7 @@
 .settings-page {
   position: relative;
-  min-height: 100vh;
-  min-height: 100dvh;
-  padding: 78px 16px 48px;
+  min-height: 100%;
+  padding: 20px 16px 48px;
   background: linear-gradient(35deg, rgb(201 240 255) 0%, rgb(255 255 255) 95%);
   font-family: "Heebo", "Open Sans", -apple-system, BlinkMacSystemFont,
     "Segoe UI", Roboto, sans-serif;
