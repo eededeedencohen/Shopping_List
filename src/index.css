@@ -2,10 +2,22 @@
   /* Height of the fixed app toolbar — referenced by other pages to
      position content below it (var(--toolbar-h, …)). */
   --toolbar-h: 52px;
+
+  /* Bottom navigation bar height (the bar now occupies REAL layout space at
+     the bottom of the app-shell flex column — it is NOT fixed/floating — so
+     page content can never slide under it). Keep in sync with BottomNav.css
+     --nav-bar-h. Used to lift any page-level fixed elements above the bar. */
+  --bottom-nav-h: 54px;
+  /* The robot circle peeks ~14px above the bar. The single scroll area
+     (.app-scroll) reserves this much at its bottom edge so the last content
+     clears the peeking circle. */
+  --bottom-nav-space: 18px;
 }
 
 body {
-  overflow-x: hidden;
+  /* The app shell (.App) owns its height (100dvh) and the single scroll area
+     is .app-scroll. The document/body must never scroll. */
+  overflow: hidden;
   margin: 0;
   padding: 0;
   font-family: "Heebo", "Rubik", "Assistant", "Arial Hebrew", Arial,

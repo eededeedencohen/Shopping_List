@@ -1,7 +1,9 @@
 /* ───────────────── Toolbar ───────────────── */
 .toolbar {
-  position: fixed;
-  top: 0;
+  /* Row 1 of the .App grid (in-flow, no longer position:fixed). position:
+     relative keeps it the anchor for its absolutely-positioned icons and,
+     together with z-index, gives it a stacking context. */
+  position: relative;
   width: 100%;
   display: flex;
   justify-content: flex-end;
