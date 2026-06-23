@@ -19,10 +19,9 @@
   --nav-blue-2: #2563eb;
   --nav-blue-3: #1d4ed8;
 
-  --nav-bar-h: 54px; /* the nav ROW height (reserved space — unchanged) */
-  --blue-h: 30px; /* the SHORT blue bar height */
-  --fab: 46px; /* coin diameter */
-  --notch-gap: 4px; /* transparent ring thickness around the coin */
+  --nav-bar-h: 54px; /* the nav ROW height = the full blue bar height */
+  --fab: 60px; /* coin diameter */
+  --gap: 5px; /* transparent hole thickness around the coin */
 
   position: relative;
   flex: 0 0 auto;
@@ -32,39 +31,35 @@
   height: calc(var(--nav-bar-h) + env(safe-area-inset-bottom, 0px));
 }
 
-/* The slim blue bar, anchored to the bottom, with a circular notch cut into
-   its top-center (the transparent cradle the coin nests in). */
+/* The blue bar fills the WHOLE grid row, with a clean transparent circular
+   HOLE around the coin (no box-shadow here — it would darken the hole). */
 .bottom-nav__bar {
   position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: calc(var(--blue-h) + env(safe-area-inset-bottom, 0px));
+  inset: 0;
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.16) 0%, rgba(255, 255, 255, 0) 60%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.16) 0%, rgba(255, 255, 255, 0) 50%),
     linear-gradient(180deg, var(--nav-blue-2) 0%, var(--nav-blue-3) 100%);
-  /* Notch: transparent within (coin radius + gap) at the bar's top-center. */
   -webkit-mask: radial-gradient(
-    circle calc(var(--fab) / 2 + var(--notch-gap)) at 50% 0%,
-    transparent calc(var(--fab) / 2 + var(--notch-gap) - 1px),
-    #000 calc(var(--fab) / 2 + var(--notch-gap))
+    circle calc(var(--fab) / 2 + var(--gap))
+      at 50% calc(var(--nav-bar-h) - 2px - var(--fab) / 2),
+    transparent calc(var(--fab) / 2 + var(--gap) - 1px),
+    #000 calc(var(--fab) / 2 + var(--gap))
   );
   mask: radial-gradient(
-    circle calc(var(--fab) / 2 + var(--notch-gap)) at 50% 0%,
-    transparent calc(var(--fab) / 2 + var(--notch-gap) - 1px),
-    #000 calc(var(--fab) / 2 + var(--notch-gap))
+    circle calc(var(--fab) / 2 + var(--gap))
+      at 50% calc(var(--nav-bar-h) - 2px - var(--fab) / 2),
+    transparent calc(var(--fab) / 2 + var(--gap) - 1px),
+    #000 calc(var(--fab) / 2 + var(--gap))
   );
-  /* Soft lift shadow that follows the notched silhouette. */
-  filter: drop-shadow(0 -1px 4px rgba(15, 23, 42, 0.16));
 }
 
-/* The robot coin — glossy raised circle that peeks above the bar and sits in
-   the notch with a transparent ring around it. */
+/* The robot coin — glossy raised circle centered in the bar, ringed in cream. */
 .bottom-nav__btn {
   position: absolute;
   left: 50%;
-  /* Center of the coin sits on the blue bar's top edge → upper half peeks. */
-  bottom: calc(var(--blue-h) - var(--fab) / 2 + env(safe-area-inset-bottom, 0px));
+  /* The coin (60px) is larger than the 54px bar, so it sits at the bottom and
+     peeks a little above it (bar height / grid unchanged). */
+  bottom: calc(2px + env(safe-area-inset-bottom, 0px));
   transform: translateX(-50%);
   display: grid;
   place-items: center;
@@ -83,20 +78,16 @@
   background:
     radial-gradient(125% 95% at 50% 6%, rgba(255, 255, 255, 0.55) 0%, rgba(255, 255, 255, 0) 52%),
     linear-gradient(180deg, var(--nav-blue-1) 0%, var(--nav-blue-2) 58%, var(--nav-blue-3) 100%);
+  /* Inset gloss only — NO outward shadow/ring (it would fall into the
+     transparent hole and darken it). */
   box-shadow:
-    0 2px 7px rgba(13, 42, 99, 0.42),
     inset 0 1px 1px rgba(255, 255, 255, 0.6),
-    inset 0 -5px 9px rgba(13, 42, 99, 0.3);
-  transition: transform 0.18s cubic-bezier(0.22, 1, 0.36, 1),
-    box-shadow 0.2s ease;
+    inset 0 -6px 10px rgba(13, 42, 99, 0.32);
+  transition: transform 0.18s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .bottom-nav__btn:hover {
   transform: translateX(-50%) translateY(-1px);
-  box-shadow:
-    0 5px 12px rgba(13, 42, 99, 0.5),
-    inset 0 1px 1px rgba(255, 255, 255, 0.6),
-    inset 0 -5px 9px rgba(13, 42, 99, 0.3);
 }
 
 .bottom-nav__btn:active {
@@ -112,8 +103,8 @@
 }
 
 .bottom-nav__icon {
-  width: 24px;
-  height: 24px;
+  width: 38px;
+  height: 38px;
   display: block;
   color: #ffffff;
   fill: currentColor;
