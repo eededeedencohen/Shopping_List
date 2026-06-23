@@ -120,3 +120,214 @@
     transition: none;
   }
 }
+
+/* ───────────────────────────────────────────────────────────
+   AI action sheet (opens from the bottom when the coin is tapped)
+   ─────────────────────────────────────────────────────────── */
+.ai-sheet__overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  background: rgba(10, 20, 35, 0.5);
+  -webkit-backdrop-filter: blur(3px);
+  backdrop-filter: blur(3px);
+  animation: ai-sheet-fade 0.2s ease;
+}
+
+.ai-sheet {
+  width: 100%;
+  max-width: 520px;
+  max-height: 80vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  background: rgba(255, 255, 255, 0.97);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+  backdrop-filter: blur(20px) saturate(160%);
+  border-radius: 22px 22px 0 0;
+  box-shadow: 0 -12px 40px rgba(10, 20, 35, 0.28);
+  padding: 8px 14px calc(16px + env(safe-area-inset-bottom, 0px));
+  font-family: "Heebo", "Open Sans", Arial, sans-serif;
+  animation: ai-sheet-up 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.ai-sheet__grip {
+  width: 40px;
+  height: 4px;
+  margin: 6px auto 10px;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.18);
+}
+
+.ai-sheet__header {
+  display: grid;
+  grid-template-columns: 36px 1fr 36px;
+  align-items: center;
+  gap: 6px;
+  min-height: 34px;
+  padding: 0 10px 12px;
+}
+
+.ai-sheet__title {
+  max-width: 100%;
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #0f172a;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ai-sheet__close,
+.ai-sheet__back {
+  justify-self: center;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(15, 23, 42, 0.06);
+  color: #334155;
+  font-size: 1.1rem;
+  line-height: 1;
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+  -webkit-tap-highlight-color: transparent;
+  transition: background 0.15s ease, transform 0.12s ease;
+}
+
+.ai-sheet__close:hover,
+.ai-sheet__back:hover {
+  background: rgba(15, 23, 42, 0.12);
+}
+
+.ai-sheet__close:active,
+.ai-sheet__back:active {
+  transform: scale(0.92);
+}
+
+.ai-sheet__back {
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.ai-sheet__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ai-sheet__item {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  margin: 0;
+  border: 1px solid rgba(15, 23, 42, 0.06);
+  border-radius: 14px;
+  background: rgba(248, 250, 252, 0.9);
+  color: #0f172a;
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 600;
+  text-align: right;
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+  -webkit-tap-highlight-color: transparent;
+  transition: background 0.15s ease, transform 0.12s ease, border-color 0.15s ease;
+}
+
+.ai-sheet__item:hover {
+  background: rgba(37, 99, 235, 0.08);
+  border-color: rgba(37, 99, 235, 0.25);
+}
+
+.ai-sheet__item:active {
+  transform: scale(0.985);
+}
+
+.ai-sheet__item-label {
+  flex: 1;
+}
+
+.ai-sheet__chevron {
+  color: #64748b;
+  font-size: 1.4rem;
+  line-height: 1;
+}
+
+/* Products view: sub-categories grouped under their category heading. */
+.ai-sheet__groups {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.ai-sheet__group-title {
+  padding: 2px 6px 6px;
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: #1d4ed8;
+}
+
+/* Navigation sub-category rows: leading round icon badge. */
+.ai-sheet__item--nav {
+  font-weight: 700;
+}
+
+.ai-sheet__item-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  background: linear-gradient(180deg, #3b82f6 0%, #1d4ed8 100%);
+  color: #ffffff;
+}
+
+.ai-sheet__item-icon svg {
+  width: 20px;
+  height: 20px;
+  fill: currentColor;
+}
+
+.ai-sheet__item-icon svg path,
+.ai-sheet__item-icon svg circle,
+.ai-sheet__item-icon svg rect,
+.ai-sheet__item-icon svg g {
+  fill: currentColor;
+}
+
+@keyframes ai-sheet-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes ai-sheet-up {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ai-sheet__overlay,
+  .ai-sheet {
+    animation: none;
+  }
+}

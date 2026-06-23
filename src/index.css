@@ -14,6 +14,13 @@
   --bottom-nav-space: 18px;
 }
 
+html {
+  /* Clamp the root so stray wide content (e.g. decorative squares positioned
+     by %) can't expand the layout viewport — which would make fixed overlays
+     (modals) render wider than the screen. */
+  overflow-x: hidden;
+}
+
 body {
   /* The app shell (.App) owns its height (100dvh) and the single scroll area
      is .app-scroll. The document/body must never scroll. */

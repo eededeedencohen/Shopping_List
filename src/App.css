@@ -33,7 +33,7 @@
   position: fixed; /* קבוע למסך, לא לתוכן */
   top: 0;
   left: 0;
-  width: 100vw;
+  right: 0;
   /* Track the SAME viewport unit as the .App grid (100dvh) so the fixed
      background doesn't desync from the layout when the mobile keyboard
      opens/closes — that desync is what made the bottom region "jump". */
