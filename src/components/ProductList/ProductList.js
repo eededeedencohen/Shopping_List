@@ -150,6 +150,8 @@ function ProductsList() {
   /* refs לזיהוי כיוון Swipe */
   const startTouch = useRef({ x: 0, y: 0 });
   const swipeDirection = useRef(null);
+  /* קונטיינר כרטיסי המוצרים — לאיפוס הגלילה אחרי מעבר תת-קטגוריה */
+  const productsContainerRef = useRef(null);
 
   const [selectedBarcode, setSelectedBarcode] = useState(null);
   const [isComparisonModalOpen, setIsComparisonModalOpen] = useState(false);
@@ -223,6 +225,18 @@ function ProductsList() {
     }, 201);
   };
 
+  /* גלילת אזור התוכן חזרה למעלה אחרי מעבר תת-קטגוריה. בארכיטקטורת ה-grid של
+     ה-app-shell ה-window/body אינם נגללים — רק .app-scroll — לכן יש לגלול אותו
+     ישירות כדי שהקטגוריה ותת-הקטגוריה יחזרו להיראות בראש העמוד. */
+  const scrollToTop = () => {
+    // אזור הגלילה של ה-app-shell (זה שנגלל בפועל בעמוד המוצרים)
+    const scroller = document.querySelector(".app-scroll");
+    if (scroller) scroller.scrollTop = 0;
+    // ליתר ביטחון גם את קונטיינר הכרטיסים (overflow-y: auto משלו)
+    if (productsContainerRef.current) productsContainerRef.current.scrollTop = 0;
+    window.scrollTo(0, 0); // fallback ללייאאוטים שבהם החלון כן נגלל
+  };
+
   /* -------------------------------- */
   /* כשמשחררים האצבע -> מעבר תתי־קטגוריה/קטגוריה */
   /* -------------------------------- */
@@ -251,7 +265,7 @@ function ProductsList() {
         // אנימציה משולשת
         animateRight();
       }
-      window.scrollTo(0, 0);
+      scrollToTop();
     } else if (swipeDirection.current === "left") {
       // החלקה שמאלה
       if (activeSubCategoryIndex < totalSubCats - 1) {
@@ -268,7 +282,7 @@ function ProductsList() {
         // אנימציה
         animateLeft();
       }
-      window.scrollTo(0, 0);
+      scrollToTop();
     } else {
       // לא הייתה החלקה
       setContainerStyle({});
@@ -470,6 +484,7 @@ function ProductsList() {
             <ProductComparison barcode={selectedBarcode} />
           </ProductComparisonModal>
           <div
+            ref={productsContainerRef}
             className={styles['list__products-container']}
             style={containerStyle}
             onTouchStart={handleTouchStart}
