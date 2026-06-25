@@ -1,9 +1,11 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import ReactDOM from "react-dom";
 import { useNavigate } from "react-router-dom";
 import "./BottomNav.css";
 import useBodyScrollLock from "../../hooks/useBodyScrollLock";
+import useVoiceCommand from "../../hooks/useVoiceCommand";
 import { useProductList } from "../../hooks/appHooks";
+import { useAiSettings } from "../../context/AiSettingsContext";
 
 import { ReactComponent as RobotIcon } from "../Toolbar/robot.svg";
 import { ReactComponent as HomeIcon } from "../Toolbar/home.svg";
@@ -85,6 +87,110 @@ export default function BottomNav() {
     close();
     navigate("/products");
   };
+
+  /* ── Voice command (long-press the coin) ──────────────────────────────
+     Long-press starts recording; a subsequent tap stops + sends it. The
+     reply language/voice are the shared AI settings (chosen in Settings). */
+  const aiSettings = useAiSettings();
+  const ttsLanguage = (aiSettings && aiSettings.settings.ttsLanguage) || "he";
+  const ttsVoice = (aiSettings && aiSettings.settings.ttsVoice) || "";
+
+  /* Perform the action the server resolved from the voice command. */
+  const performCommand = (cmd) => {
+    if (!cmd) return;
+    if (cmd.actionType === "navigate" && cmd.route) {
+      goTo(cmd.route);
+    } else if (
+      cmd.actionType === "open_subcategory" &&
+      Number.isInteger(cmd.categoryIndex) &&
+      Number.isInteger(cmd.subIndex)
+    ) {
+      goToSubCategory(cmd.categoryIndex, cmd.subIndex);
+    }
+    /* "none" → nothing to do; the spoken reply already played. */
+  };
+
+  const navPages = NAV_ITEMS.map((n, index) => ({
+    index,
+    label: n.label,
+    route: n.to,
+  }));
+
+  const {
+    state: voiceState,
+    error: voiceError,
+    startRecording,
+    stopRecording,
+  } = useVoiceCommand({
+    pages: navPages,
+    categories: allCategories,
+    subCategories: all_sub_categories,
+    ttsLanguage,
+    ttsVoice,
+    onCommand: performCommand,
+  });
+
+  const LONG_PRESS_MS = 450;
+  const longPressTimer = useRef(null);
+  const longPressFired = useRef(false);
+  const downWhileRecording = useRef(false);
+
+  const onCoinPointerDown = (e) => {
+    if (voiceState === "recording") {
+      // a second press while recording → the next pointerup stops it
+      downWhileRecording.current = true;
+      return;
+    }
+    if (voiceState !== "idle") return; // "starting" / "processing" → ignore
+    downWhileRecording.current = false;
+    longPressFired.current = false;
+    try {
+      if (e.currentTarget.setPointerCapture)
+        e.currentTarget.setPointerCapture(e.pointerId);
+    } catch (err) {
+      /* ignore */
+    }
+    clearTimeout(longPressTimer.current);
+    longPressTimer.current = setTimeout(() => {
+      longPressFired.current = true;
+      startRecording();
+    }, LONG_PRESS_MS);
+  };
+
+  const onCoinPointerUp = () => {
+    clearTimeout(longPressTimer.current);
+    if (downWhileRecording.current) {
+      downWhileRecording.current = false;
+      stopRecording();
+      return;
+    }
+    if (longPressFired.current) {
+      // released the initiating long-press → keep recording until next tap
+      longPressFired.current = false;
+      return;
+    }
+    if (voiceState === "idle") openSheet(); // short tap → open the action sheet
+  };
+
+  const onCoinPointerCancel = () => {
+    clearTimeout(longPressTimer.current);
+  };
+
+  // clear any pending long-press timer on unmount
+  useEffect(() => () => clearTimeout(longPressTimer.current), []);
+
+  const recording = voiceState === "recording" || voiceState === "starting";
+  const voiceHint = recording
+    ? "🎙️ מקליט… הקש לסיום"
+    : voiceState === "processing"
+    ? "מעבד…"
+    : voiceError === "mic-denied"
+    ? "אין הרשאת מיקרופון"
+    : voiceError === "unsupported"
+    ? "הדפדפן לא תומך בהקלטה"
+    : voiceError === "network"
+    ? "תקלת רשת, נסה שוב"
+    : "";
 
   const TITLES = {
     main: "מה תרצה לעשות?",
@@ -212,13 +318,24 @@ export default function BottomNav() {
     <>
       <nav className="bottom-nav" aria-label="סרגל תחתון">
         <div className="bottom-nav__bar" aria-hidden="true" />
+        {voiceHint && (
+          <div className="voice-hint" dir="rtl" role="status">
+            {voiceHint}
+          </div>
+        )}
         <button
           type="button"
-          className="bottom-nav__btn"
-          aria-label="פעולות"
+          className={`bottom-nav__btn${
+            recording ? " bottom-nav__btn--recording" : ""
+          }${voiceState === "processing" ? " bottom-nav__btn--processing" : ""}`}
+          aria-label="פעולות — לחיצה ארוכה להקלטה קולית"
           aria-haspopup="dialog"
           aria-expanded={open}
-          onClick={openSheet}
+          aria-pressed={recording}
+          onPointerDown={onCoinPointerDown}
+          onPointerUp={onCoinPointerUp}
+          onPointerCancel={onCoinPointerCancel}
+          onContextMenu={(e) => e.preventDefault()}
         >
           <RobotIcon className="bottom-nav__icon" aria-hidden="true" />
         </button>

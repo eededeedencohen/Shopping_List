@@ -1316,3 +1316,62 @@
   flex-direction: column;
   gap: 4px;
 }
+
+/* ───── Voice-reply settings card (language + voice) ───── */
+.voice-reply-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 0;
+  direction: rtl;
+}
+.voice-reply-row + .voice-reply-row {
+  border-top: 1px solid rgba(15, 23, 42, 0.06);
+}
+.voice-reply-row__label {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+.voice-reply-langs {
+  display: inline-flex;
+  gap: 6px;
+  background: rgba(15, 23, 42, 0.05);
+  border-radius: 999px;
+  padding: 3px;
+}
+.voice-reply-lang-btn {
+  border: 0;
+  background: transparent;
+  color: #475569;
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 700;
+  padding: 6px 16px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.voice-reply-lang-btn.is-active {
+  background: #2563eb;
+  color: #fff;
+  box-shadow: 0 2px 6px rgba(37, 99, 235, 0.35);
+}
+.voice-reply-select {
+  flex: 1;
+  max-width: 62%;
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #0f172a;
+  background: #fff;
+  border: 1px solid rgba(15, 23, 42, 0.15);
+  border-radius: 12px;
+  padding: 9px 12px;
+  cursor: pointer;
+}
+.voice-reply-select:focus-visible {
+  outline: 2px solid rgba(37, 99, 235, 0.5);
+  outline-offset: 1px;
+}

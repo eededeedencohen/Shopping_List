@@ -7,6 +7,7 @@ import { usePriceCompareLayout } from "../../context/PriceCompareLayoutContext";
 import { useAITheme } from "../../context/AIThemeContext";
 import { useReceiptTheme } from "../../context/ReceiptThemeContext";
 import { useSupermarketPreferences } from "../../context/SupermarketPreferencesContext";
+import { useAiSettings } from "../../context/AiSettingsContext";
 import { useSupermarkets } from "../../hooks/optimizationHooks";
 import { useAvailabilityMeta } from "../../hooks/useProductAvailability";
 import SupermarketImage from "../Images/SupermarketImage";
@@ -48,6 +49,40 @@ const AI_THEME_OPTIONS = [
     description: "סינתווייב — שמש ניאון וגריד פרספקטיבה",
   },
 ];
+
+/* Voice-reply language + voices — mirrors the picker on the AI page so the
+   voice command (long-press the bottom-nav coin) and the AI page share the
+   same spoken-reply preference (stored in AiSettingsContext). */
+const TTS_LANGUAGE_OPTIONS = [
+  { value: "he", label: "עברית" },
+  { value: "en", label: "English" },
+];
+
+const TTS_VOICES = {
+  en: [
+    { value: "", label: "Robot (ברירת מחדל)" },
+    { value: "21m00Tcm4TlvDq8ikWAM", label: "Rachel (נקבה)" },
+    { value: "EXAVITQu4vr4xnSDxMaL", label: "Bella (נקבה)" },
+    { value: "pNInz6obpgDQGcFmaJgB", label: "Adam (זכר)" },
+    { value: "ErXwobaYiN019PkySvjV", label: "Antoni (זכר)" },
+    { value: "TxGEqnHWrfWFTfGW9XjX", label: "Josh (זכר)" },
+    { value: "VR6AewLTigWG4xSOukaG", label: "Arnold (זכר)" },
+    { value: "29vD33N1CtxCmqQRPOHJ", label: "Drew (זכר)" },
+    { value: "KzE5xImZVu70uQLdx5z5", label: "Kitchri (נקבה)" },
+    { value: "WTELPzK6rbJ0aj54ivAR", label: "Kitchri - IL (נקבה)" },
+  ],
+  he: [
+    { value: "", label: "Alnilam - זכר (ברירת מחדל)" },
+    { value: "he-IL-Chirp3-HD-Puck", label: "Puck (זכר)" },
+    { value: "he-IL-Chirp3-HD-Charon", label: "Charon (זכר)" },
+    { value: "he-IL-Chirp3-HD-Fenrir", label: "Fenrir (זכר)" },
+    { value: "he-IL-Chirp3-HD-Orus", label: "Orus (זכר)" },
+    { value: "he-IL-Chirp3-HD-Aoede", label: "Aoede (נקבה)" },
+    { value: "he-IL-Chirp3-HD-Kore", label: "Kore (נקבה)" },
+    { value: "he-IL-Chirp3-HD-Leda", label: "Leda (נקבה)" },
+    { value: "he-IL-Chirp3-HD-Zephyr", label: "Zephyr (נקבה)" },
+  ],
+};
 
 const PRICE_COMPARE_LAYOUT_OPTIONS = [
   {
@@ -252,6 +287,11 @@ export default function Settings() {
     usePriceCompareLayout();
   const { theme: aiTheme, setTheme: setAITheme } = useAITheme();
   const { theme: receiptTheme, setTheme: setReceiptTheme } = useReceiptTheme();
+  const aiSettings = useAiSettings();
+  const ttsLanguage =
+    (aiSettings && aiSettings.settings.ttsLanguage) || "he";
+  const ttsVoice = (aiSettings && aiSettings.settings.ttsVoice) || "";
+  const updateAiSetting = aiSettings && aiSettings.updateSetting;
   const {
     preferredSupermarketIDs,
     toggleSupermarket,
@@ -394,6 +434,61 @@ export default function Settings() {
                   </button>
                 );
               })}
+            </div>
+          </div>
+        </section>
+
+        <section className="settings-card">
+          <header className="settings-card__header">
+            <span className="settings-card__title">תשובה קולית</span>
+          </header>
+          <div className="settings-card__body">
+            <p className="settings-card__hint">
+              בחר את שפת התשובה הקולית והקול לפקודות קוליות — לחיצה ארוכה על
+              כפתור ה-AI בסרגל התחתון מקליטה פקודה, והעוזר משיב בקול.
+            </p>
+
+            <div className="voice-reply-row">
+              <span className="voice-reply-row__label">שפת תשובה</span>
+              <div className="voice-reply-langs">
+                {TTS_LANGUAGE_OPTIONS.map((opt) => {
+                  const active = ttsLanguage === opt.value;
+                  return (
+                    <button
+                      key={opt.value}
+                      type="button"
+                      className={`voice-reply-lang-btn ${
+                        active ? "is-active" : ""
+                      }`}
+                      aria-pressed={active}
+                      onClick={() => {
+                        if (!updateAiSetting) return;
+                        updateAiSetting("ttsLanguage", opt.value);
+                        updateAiSetting("ttsVoice", "");
+                      }}
+                    >
+                      {opt.label}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div className="voice-reply-row">
+              <span className="voice-reply-row__label">קול</span>
+              <select
+                className="voice-reply-select"
+                value={ttsVoice}
+                onChange={(e) =>
+                  updateAiSetting && updateAiSetting("ttsVoice", e.target.value)
+                }
+              >
+                {(TTS_VOICES[ttsLanguage] || TTS_VOICES.he).map((v) => (
+                  <option key={v.value || "default"} value={v.value}>
+                    {v.label}
+                  </option>
+                ))}
+              </select>
             </div>
           </div>
         </section>
