@@ -10,6 +10,7 @@ import { useNavigate } from "react-router-dom";
 import "./BottomNav.css";
 import useBodyScrollLock from "../../hooks/useBodyScrollLock";
 import useVoiceCommand from "../../hooks/useVoiceCommand";
+import VoiceWaves from "./VoiceWaves";
 import { useProductList, useCartActions } from "../../hooks/appHooks";
 import { useAiSettings } from "../../context/AiSettingsContext";
 import { useCart } from "../../context/CartContext2";
@@ -234,6 +235,8 @@ export default function BottomNav() {
   const aiSettings = useAiSettings();
   const ttsLanguage = (aiSettings && aiSettings.settings.ttsLanguage) || "he";
   const ttsVoice = (aiSettings && aiSettings.settings.ttsVoice) || "";
+  const micThreshold =
+    (aiSettings && aiSettings.settings.micThreshold) || 15;
 
   /* Perform the action the server resolved from the voice command. Returns a
      directive telling the hook what to do with the conversation-history JSON:
@@ -364,26 +367,41 @@ export default function BottomNav() {
   const {
     state: voiceState,
     error: voiceError,
+    mode: voiceMode,
+    level: voiceLevel,
+    handsFree,
     startRecording,
     stopRecording,
+    startHandsFree,
+    stopHandsFree,
   } = useVoiceCommand({
     pages: navPages,
     categories: allCategories,
     subCategories: all_sub_categories,
     ttsLanguage,
     ttsVoice,
+    micThreshold,
     onCommand: performCommand,
   });
 
+  /* ── Coin gestures ───────────────────────────────────────────────────
+     • long-press            → single-shot recording (tap again to stop & send)
+     • double-tap            → enter hands-free continuous mode
+     • single tap (idle)     → open the action sheet
+     • single tap (hands-free / recording) → exit / stop
+     Pointer events only ARM the long-press; taps resolve in onClick (the
+     click-through-safe path that opens the modal). A single tap waits one
+     double-tap window before opening the sheet, so a 2nd tap can promote it. */
   const LONG_PRESS_MS = 450;
+  const DOUBLE_TAP_MS = 260;
   const longPressTimer = useRef(null);
   const longPressFired = useRef(false);
+  const tapCount = useRef(0);
+  const tapTimer = useRef(null);
 
-  /* Pointer events only ARM the long-press; the actual actions run in onClick
-     (the original, click-through-safe mechanism that opens the modal). */
   const onCoinPointerDown = () => {
     longPressFired.current = false; // reset every press (covers a prior long-press)
-    if (voiceState !== "idle") return; // only arm a long-press from idle
+    if (voiceState !== "idle" || handsFree) return; // arm long-press only from idle
     clearTimeout(longPressTimer.current);
     longPressTimer.current = setTimeout(() => {
       longPressFired.current = true;
@@ -399,29 +417,60 @@ export default function BottomNav() {
       longPressFired.current = false;
       return;
     }
+    if (handsFree) {
+      stopHandsFree(); // a single tap exits hands-free mode
+      return;
+    }
     if (voiceState === "recording" || voiceState === "starting") {
       stopRecording(); // tap while recording → stop & send
       return;
     }
-    if (voiceState === "idle") openSheet(); // short tap → open the action sheet
-    /* "processing" → ignore */
+    if (voiceState !== "idle") return; // "processing" → ignore
+
+    // idle: distinguish a single tap (open sheet) from a double tap (hands-free)
+    tapCount.current += 1;
+    if (tapCount.current === 1) {
+      tapTimer.current = setTimeout(() => {
+        tapCount.current = 0;
+        openSheet();
+      }, DOUBLE_TAP_MS);
+    } else {
+      clearTimeout(tapTimer.current);
+      tapCount.current = 0;
+      startHandsFree();
+    }
   };
 
-  // clear any pending long-press timer on unmount
-  useEffect(() => () => clearTimeout(longPressTimer.current), []);
+  // clear any pending timers on unmount
+  useEffect(
+    () => () => {
+      clearTimeout(longPressTimer.current);
+      clearTimeout(tapTimer.current);
+    },
+    []
+  );
 
-  const recording = voiceState === "recording" || voiceState === "starting";
-  const voiceHint = recording
-    ? "🎙️ מקליט… הקש לסיום"
-    : voiceState === "processing"
-    ? "מעבד…"
-    : voiceError === "mic-denied"
-    ? "אין הרשאת מיקרופון"
-    : voiceError === "unsupported"
-    ? "הדפדפן לא תומך בהקלטה"
-    : voiceError === "network"
-    ? "תקלת רשת, נסה שוב"
-    : "";
+  const recording = voiceMode === "recording";
+  const voiceHint =
+    voiceState === "starting"
+      ? "🎙️ פותח מיקרופון…"
+      : voiceMode === "recording"
+      ? handsFree
+        ? "🎧 מקשיב… דבר"
+        : "🎙️ מקליט… הקש לסיום"
+      : voiceMode === "speaking"
+      ? "🔊 משיב…"
+      : voiceMode === "processing"
+      ? "מעבד…"
+      : voiceMode === "listening"
+      ? "🎧 מצב דיבור רציף — הקש לסיום"
+      : voiceError === "mic-denied"
+      ? "אין הרשאת מיקרופון"
+      : voiceError === "unsupported"
+      ? "הדפדפן לא תומך בהקלטה"
+      : voiceError === "network"
+      ? "תקלת רשת, נסה שוב"
+      : "";
 
   const TITLES = {
     main: "מה תרצה לעשות?",
@@ -741,15 +790,20 @@ export default function BottomNav() {
             {voiceHint}
           </div>
         )}
+        <VoiceWaves
+          levelRef={voiceLevel}
+          mode={voiceMode}
+          active={voiceMode !== "idle"}
+        />
         <button
           type="button"
           className={`bottom-nav__btn${
-            recording ? " bottom-nav__btn--recording" : ""
-          }${voiceState === "processing" ? " bottom-nav__btn--processing" : ""}`}
-          aria-label="פעולות — לחיצה ארוכה להקלטה קולית"
+            voiceMode !== "idle" ? ` bottom-nav__btn--${voiceMode}` : ""
+          }`}
+          aria-label="פעולות — הקשה לתפריט, הקשה כפולה לדיבור רציף, לחיצה ארוכה להקלטה"
           aria-haspopup="dialog"
           aria-expanded={open}
-          aria-pressed={recording}
+          aria-pressed={handsFree || recording}
           onPointerDown={onCoinPointerDown}
           onPointerUp={cancelLongPress}
           onPointerCancel={cancelLongPress}

@@ -1,0 +1,178 @@
+/* ───────────────────────────────────────────────────────────
+   Audio-reactive voice waves around the bottom-nav robot coin.
+
+   Positioned as a sibling of the coin inside .bottom-nav (which is
+   position:relative; z-index:50). It mirrors the coin's footprint and fans
+   reactive bars out to the LEFT and RIGHT of the coin, plus a soft glow behind
+   it. Everything scales off --vlevel (0..1), written each frame by VoiceWaves.js.
+   pointer-events:none so the coin underneath stays tappable.
+   ─────────────────────────────────────────────────────────── */
+.voice-waves {
+  position: absolute;
+  left: 50%;
+  bottom: calc(2px + env(safe-area-inset-bottom, 0px));
+  transform: translateX(-50%);
+  width: min(440px, 96vw); /* fan the bars across (nearly) the full width */
+  height: var(--fab, 60px);
+  pointer-events: none;
+  z-index: 45; /* above the bar, below the coin (coin is later in the DOM) */
+
+  --vlevel: 0;
+  --wave-rgb: 56, 189, 248; /* listening (sky) — overridden per mode */
+}
+
+.voice-waves--listening {
+  --wave-rgb: 56, 189, 248;
+} /* sky */
+.voice-waves--recording {
+  --wave-rgb: 244, 63, 94;
+} /* rose */
+.voice-waves--speaking {
+  --wave-rgb: 139, 92, 246;
+} /* violet */
+.voice-waves--processing {
+  --wave-rgb: 148, 163, 184;
+} /* slate */
+
+/* Concentric ripples radiating from the coin (drops in a puddle). The whole
+   layer brightens AND scales up with the live amplitude, so it "breathes" with
+   the voice; each ring expands + fades on a staggered loop. */
+.voice-waves__ripples {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: var(--fab, 60px);
+  height: var(--fab, 60px);
+  transform: translate(-50%, -50%) scale(calc(1 + var(--vlevel) * 0.5));
+  opacity: calc(0.3 + var(--vlevel) * 0.7);
+  transition:
+    opacity 0.09s linear,
+    transform 0.09s linear;
+}
+
+.voice-waves__ripple {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  border: 2px solid rgba(var(--wave-rgb), 0.55);
+  transform: translate(-50%, -50%) scale(0.9);
+  opacity: 0; /* silent = no ripple at all */
+  animation: none;
+}
+/* Ripples run ONLY while there is sound (the .is-loud class, set by JS from the
+   live amplitude). In silence there is no circular animation. */
+.voice-waves.is-loud .voice-waves__ripple {
+  animation: vw-ripple 2.1s ease-out infinite;
+}
+.voice-waves.is-loud .voice-waves__ripple:nth-child(2) {
+  animation-delay: 0.7s;
+}
+.voice-waves.is-loud .voice-waves__ripple:nth-child(3) {
+  animation-delay: 1.4s;
+}
+
+@keyframes vw-ripple {
+  0% {
+    transform: translate(-50%, -50%) scale(0.85);
+    opacity: 0.7;
+    border-width: 2.5px;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(2.8);
+    opacity: 0;
+    border-width: 1px;
+  }
+}
+
+/* Soft colored halo behind the coin — grows/brightens with the amplitude. */
+.voice-waves__glow {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: var(--fab, 60px);
+  height: var(--fab, 60px);
+  border-radius: 50%;
+  transform: translate(-50%, -50%) scale(calc(1 + var(--vlevel) * 0.85));
+  background: radial-gradient(
+    circle,
+    rgba(var(--wave-rgb), calc(0.25 + var(--vlevel) * 0.5)) 0%,
+    rgba(var(--wave-rgb), 0) 68%
+  );
+  filter: blur(4px);
+  transition: transform 0.09s linear;
+}
+
+/* The two fans of bars: many thin bars packed tightly, radiating from the coin
+   outward to the sides (dense waveform, small uniform gaps). */
+.voice-waves__side {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  /* The coin peeks ABOVE the blue bar, so its center is ~5px above the bar's
+     middle. Drop the bars to sit on the toolbar's vertical middle (ripples and
+     glow stay centered on the coin). */
+  transform: translateY(5px);
+}
+.voice-waves__side--right {
+  left: calc(50% + var(--fab, 60px) / 2 + 8px);
+  flex-direction: row; /* index 0 (tallest) nearest the coin */
+}
+.voice-waves__side--left {
+  right: calc(50% + var(--fab, 60px) / 2 + 8px);
+  flex-direction: row-reverse; /* index 0 (tallest) nearest the coin */
+}
+
+.voice-waves__bar {
+  flex: 0 0 auto;
+  width: 3px;
+  border-radius: 999px;
+  background: linear-gradient(
+    to top,
+    rgba(var(--wave-rgb), 0.5),
+    rgb(var(--wave-rgb))
+  );
+  box-shadow:
+    0 0 6px rgba(var(--wave-rgb), 0.6),
+    0 0 12px rgba(var(--wave-rgb), 0.3);
+  /* baseline + amplitude, weighted per bar; capped to the coin height */
+  height: calc(
+    6px + (var(--fab, 60px) - 16px) * var(--w, 1) * (0.16 + var(--vlevel) * 0.95)
+  );
+  max-height: calc(var(--fab, 60px) - 6px);
+  transition: height 0.07s linear;
+  transform-origin: center;
+  opacity: calc(0.55 + var(--vlevel) * 0.45);
+  animation: vw-shimmer 0.9s ease-in-out infinite alternate;
+  animation-delay: calc(var(--d, 0) * -1s);
+}
+
+@keyframes vw-shimmer {
+  0% {
+    transform: scaleY(0.8);
+  }
+  100% {
+    transform: scaleY(1.06);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .voice-waves__bar,
+  .voice-waves__ripple {
+    animation: none;
+  }
+  .voice-waves__ripple:nth-child(2),
+  .voice-waves__ripple:nth-child(3) {
+    display: none;
+  }
+  .voice-waves__glow,
+  .voice-waves__ripples,
+  .voice-waves__bar {
+    transition: none;
+  }
+}
