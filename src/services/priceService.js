@@ -42,3 +42,21 @@ export const getCheapestSupermarketIDsByCart = async (products) => {
   );
   return normalize(res.data);
 };
+
+/**
+ * דירוג סופרמרקטים לפי מחיר העגלה (אותה עגלה, ממוין מהזול ליקר)
+ * מקבל: [{ barcode, amount }], וגבול אופציונלי
+ * מחזיר: { status, length, data: { supermarkets: [{ supermarketID, price }] } }
+ */
+export const getRankedSupermarketsByCart = async (products, limit = 10) => {
+  const res = await httpClient.post(
+    "/prices/ranked-supermarkets-by-cart/",
+    JSON.stringify({ products, limit }),
+    {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }
+  );
+  return normalize(res.data);
+};

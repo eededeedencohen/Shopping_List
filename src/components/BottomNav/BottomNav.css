@@ -155,6 +155,31 @@
   animation: ai-sheet-up 0.28s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
+/* ── Cheapest results: a NON-modal floating card that sits ABOVE the bottom
+   nav so it never hides or blocks the robot coin (the user can long-press the
+   coin again for a follow-up voice command). The overlay becomes transparent
+   and click-through; only the card itself is interactive. ── */
+.ai-sheet__overlay--bare {
+  background: transparent;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  pointer-events: none; /* clicks pass through to the coin / page */
+}
+
+.ai-sheet--floating {
+  pointer-events: auto; /* the card stays interactive */
+  width: calc(100% - 24px);
+  max-width: 460px;
+  /* lift the card above the bottom nav + the peeking coin */
+  margin-bottom: calc(var(--bottom-nav-h, 54px) + 30px + env(safe-area-inset-bottom, 0px));
+  max-height: 58vh;
+  border-radius: 22px;
+  box-shadow:
+    0 14px 44px rgba(10, 20, 35, 0.34),
+    0 0 0 1px rgba(15, 23, 42, 0.05);
+  padding: 8px 14px 14px;
+}
+
 .ai-sheet__grip {
   width: 40px;
   height: 4px;
@@ -330,6 +355,291 @@
   .ai-sheet {
     animation: none;
   }
+}
+
+/* ───────────────────────────────────────────────────────────
+   Cheapest-supermarket result (action #3 in the sheet)
+   ─────────────────────────────────────────────────────────── */
+.ai-sheet__cheapest {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 4px 2px 2px;
+}
+
+.ai-sheet__cheapest-msg {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  text-align: center;
+  color: #475569;
+  font-size: 0.98rem;
+  font-weight: 600;
+  padding: 24px 12px;
+}
+
+.ai-sheet__cheapest-spinner {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 2.5px solid rgba(37, 99, 235, 0.25);
+  border-top-color: #2563eb;
+  animation: vc-spin 0.7s linear infinite;
+}
+
+@keyframes vc-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.ai-sheet__cheapest-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 16px;
+  background: linear-gradient(
+    180deg,
+    rgba(34, 197, 94, 0.1) 0%,
+    rgba(248, 250, 252, 0.92) 100%
+  );
+}
+
+.ai-sheet__cheapest-logo {
+  width: 56px;
+  height: 56px;
+  flex: 0 0 auto;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.12);
+}
+
+.ai-sheet__cheapest-logo img,
+.ai-sheet__cheapest-logo svg {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.ai-sheet__cheapest-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.ai-sheet__cheapest-name {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #0f172a;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ai-sheet__cheapest-addr {
+  font-size: 0.85rem;
+  color: #64748b;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ai-sheet__cheapest-price {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  flex: 0 0 auto;
+}
+
+.ai-sheet__cheapest-price-label {
+  font-size: 0.72rem;
+  color: #64748b;
+  font-weight: 600;
+}
+
+.ai-sheet__cheapest-price-value {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #16a34a;
+  white-space: nowrap;
+}
+
+.ai-sheet__cheapest-note {
+  text-align: center;
+  font-size: 0.82rem;
+  color: #64748b;
+}
+
+.ai-sheet__cheapest-cta {
+  align-self: stretch;
+  border: 0;
+  border-radius: 14px;
+  padding: 13px;
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #fff;
+  background: linear-gradient(180deg, #3b82f6 0%, #2563eb 100%);
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 0.12s ease;
+}
+
+.ai-sheet__cheapest-cta:active {
+  transform: scale(0.985);
+}
+
+/* Mode toggle (immediate replace / display & choose) */
+.ai-sheet__mode {
+  display: flex;
+  gap: 4px;
+  background: rgba(15, 23, 42, 0.06);
+  border-radius: 999px;
+  padding: 4px;
+}
+
+.ai-sheet__mode-btn {
+  flex: 1;
+  border: 0;
+  background: transparent;
+  color: #475569;
+  font-family: inherit;
+  font-size: 0.92rem;
+  font-weight: 700;
+  padding: 9px 10px;
+  border-radius: 999px;
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+  -webkit-tap-highlight-color: transparent;
+  transition: background 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.ai-sheet__mode-btn.is-active {
+  background: #fff;
+  color: #1d4ed8;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.15);
+}
+
+/* Ranked supermarkets list (display mode) */
+.ai-sheet__ranked {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ai-sheet__ranked-row {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 14px;
+  background: rgba(248, 250, 252, 0.9);
+  cursor: pointer;
+  font-family: inherit;
+  text-align: right;
+  -webkit-appearance: none;
+  appearance: none;
+  -webkit-tap-highlight-color: transparent;
+  transition: background 0.15s ease, border-color 0.15s ease, transform 0.12s ease;
+}
+
+.ai-sheet__ranked-row:hover {
+  background: rgba(37, 99, 235, 0.08);
+  border-color: rgba(37, 99, 235, 0.25);
+}
+
+.ai-sheet__ranked-row:active {
+  transform: scale(0.985);
+}
+
+.ai-sheet__ranked-rank {
+  flex: 0 0 auto;
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: #e2e8f0;
+  color: #475569;
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+/* cheapest row (first) gets a green rank badge */
+.ai-sheet__ranked li:first-child .ai-sheet__ranked-rank {
+  background: #16a34a;
+  color: #fff;
+}
+
+.ai-sheet__ranked-logo {
+  width: 40px;
+  height: 40px;
+  flex: 0 0 auto;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.12);
+}
+
+.ai-sheet__ranked-logo img,
+.ai-sheet__ranked-logo svg {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.ai-sheet__ranked-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.ai-sheet__ranked-name {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #0f172a;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ai-sheet__ranked-addr {
+  font-size: 0.78rem;
+  color: #64748b;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ai-sheet__ranked-price {
+  flex: 0 0 auto;
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #16a34a;
+  white-space: nowrap;
 }
 
 /* ───────────────────────────────────────────────────────────

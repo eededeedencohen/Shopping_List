@@ -1,6 +1,14 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { DOMAIN } from "../constants";
 
+/* Conversation history is OWNED BY THE SERVER (a single JSON file). This hook
+   only DRIVES it: after a command resolves it tells the server to clear the file
+   (command succeeded → performCommand returns { history: "clear" }) or append
+   the turn (show_cheapest → { history: "append", summary }). A failed/not-
+   understood command ({ history: "keep" }) leaves the file untouched so the
+   context survives a retry. The server reads that file for GPT context and
+   applies its own inactivity (staleness) reset. */
+
 /**
  * Voice-command recorder for the bottom-nav robot coin (long-press to record).
  *
@@ -42,6 +50,7 @@ export default function useVoiceCommand({
   const chunksRef = useRef([]);
   const streamRef = useRef(null);
   const audioRef = useRef(null);
+  const pendingStopRef = useRef(false); // a stop requested during "starting"
 
   // latest config/handler (avoid stale closures inside async callbacks)
   const cfgRef = useRef({});
@@ -60,6 +69,21 @@ export default function useVoiceCommand({
       streamRef.current = null;
     }
   }, []);
+
+  /* Persist the conversation outcome to the server-owned history file. */
+  const persistHistory = useCallback((body) => {
+    return fetch(`${DOMAIN}/api/v1/general-ai/history`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    }).catch(() => {});
+  }, []);
+
+  /* Explicit "reset the conversation" action (also exposed to the caller). */
+  const clearHistory = useCallback(
+    () => persistHistory({ action: "clear" }),
+    [persistHistory]
+  );
 
   const sendBlob = useCallback(async () => {
     const recorder = mediaRecorderRef.current;
@@ -91,6 +115,7 @@ export default function useVoiceCommand({
     );
     fd.append("ttsLanguage", cfg.ttsLanguage || "he");
     if (cfg.ttsVoice) fd.append("ttsVoice", cfg.ttsVoice);
+    // History is NOT sent — the server reads it from its own JSON file.
 
     try {
       const res = await fetch(`${DOMAIN}/api/v1/general-ai/command`, {
@@ -102,25 +127,61 @@ export default function useVoiceCommand({
 
       if (json.audioUrl) {
         try {
+          // stop any reply still playing from a previous turn (no overlap)
+          if (audioRef.current) {
+            try {
+              audioRef.current.pause();
+            } catch (e) {
+              /* ignore */
+            }
+          }
           audioRef.current = new Audio(`${DOMAIN}/${json.audioUrl}`);
           audioRef.current.play().catch(() => {});
         } catch (e) {
           /* autoplay blocked — ignore */
         }
       }
+
+      // Execute the action. performCommand returns a directive for the history
+      // JSON: "clear" (command succeeded), "append" (show_cheapest → record the
+      // list), or "keep" (failed / not understood → leave context for a retry).
+      let directive = { history: "keep" };
       if (json.command && typeof cfg.onCommand === "function") {
-        cfg.onCommand(json.command);
+        try {
+          const r = await cfg.onCommand(json.command, json.transcript);
+          if (r && r.history) directive = r;
+        } catch (e) {
+          /* ignore handler errors */
+        }
       }
+
+      // Persist the outcome to the server-owned history file.
+      const transcript = (json.transcript || "").trim();
+      if (directive.history === "clear") {
+        await persistHistory({ action: "clear" });
+      } else if (directive.history === "append" && transcript) {
+        const assistantContent =
+          (directive.summary && String(directive.summary)) ||
+          (json.command && json.command.speech) ||
+          "";
+        await persistHistory({
+          action: "append",
+          user: transcript,
+          assistant: assistantContent,
+        });
+      }
+      // "keep" → leave the file unchanged
     } catch (e) {
       setError("network");
     } finally {
       setPhase("idle");
     }
-  }, [setPhase]);
+  }, [setPhase, persistHistory]);
 
   const startRecording = useCallback(async () => {
     if (stateRef.current !== "idle") return;
     setError(null);
+    pendingStopRef.current = false;
 
     if (!navigator.mediaDevices || !window.MediaRecorder) {
       setError("unsupported");
@@ -179,9 +240,28 @@ export default function useVoiceCommand({
     };
     recorder.start();
     setPhase("recording");
+
+    // If the user already tapped to stop while mic permission was resolving,
+    // honor it now (the UI promised tap-to-stop during "starting").
+    if (pendingStopRef.current) {
+      pendingStopRef.current = false;
+      setPhase("processing");
+      try {
+        recorder.stop();
+      } catch (e) {
+        releaseStream();
+        setPhase("idle");
+      }
+    }
   }, [setPhase, releaseStream, sendBlob]);
 
   const stopRecording = useCallback(() => {
+    // Tap during "starting" (mic spin-up): remember it; startRecording stops
+    // the recorder the moment it actually starts.
+    if (stateRef.current === "starting") {
+      pendingStopRef.current = true;
+      return;
+    }
     if (stateRef.current !== "recording") return;
     setPhase("processing");
     try {
@@ -212,10 +292,15 @@ export default function useVoiceCommand({
       } catch (e) {
         /* ignore */
       }
+      try {
+        if (audioRef.current) audioRef.current.pause();
+      } catch (e) {
+        /* ignore */
+      }
       releaseStream();
     },
     [releaseStream]
   );
 
-  return { state, error, startRecording, stopRecording };
+  return { state, error, startRecording, stopRecording, clearHistory };
 }
