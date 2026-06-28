@@ -28,7 +28,7 @@ const categoryIcons = {
     icons: [WineBottle],
     transforms: ["rotate(30deg) scale(1.3) translateY(-2px)"],
   },
-  "תבלינים, אבקות ומרקי אינסטנט": { icons: [Spices] },
+  "תבלינים, אבקות מרק ומרקי אינסטנט": { icons: [Spices] },
   "פארם ותינוקות": { icons: [BabyBottle] },
   שימורים: { icons: [CannedFood] },
   "חטיפים ודגנים": { icons: [Crisps] },
