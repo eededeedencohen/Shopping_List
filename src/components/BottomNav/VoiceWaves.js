@@ -22,17 +22,20 @@ export default function VoiceWaves({ levelRef, mode = "idle", active = false }) 
 
   useEffect(() => {
     if (!active) return undefined;
+    const el = rootRef.current;
+    // Write the level on the NAV (the shared parent) so both the waves AND the
+    // coin (siblings) can react to it via inheritance.
+    const host = (el && el.parentElement) || el;
     let stopped = false;
     loudRef.current = false;
     const tick = () => {
       if (stopped) return;
-      const el = rootRef.current;
+      const lvl =
+        levelRef && typeof levelRef.current === "number"
+          ? levelRef.current
+          : 0;
+      if (host) host.style.setProperty("--vlevel", lvl.toFixed(3));
       if (el) {
-        const lvl =
-          levelRef && typeof levelRef.current === "number"
-            ? levelRef.current
-            : 0;
-        el.style.setProperty("--vlevel", lvl.toFixed(3));
         // The concentric ripples fire ONLY on actual sound (your voice / the
         // AI) — never in silence. Hysteresis avoids on/off flicker at the edge.
         const loud = loudRef.current ? lvl > 0.05 : lvl > 0.14;
@@ -48,6 +51,7 @@ export default function VoiceWaves({ levelRef, mode = "idle", active = false }) 
       stopped = true;
       loudRef.current = false;
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
+      if (host) host.style.setProperty("--vlevel", "0");
     };
   }, [active, levelRef]);
 

@@ -22,6 +22,7 @@
   --nav-bar-h: 54px; /* the nav ROW height = the full blue bar height */
   --fab: 60px; /* coin diameter */
   --gap: 5px; /* transparent hole thickness around the coin */
+  --vlevel: 0; /* live voice amplitude 0..1 (set by VoiceWaves) — coin + waves */
 
   position: relative;
   flex: 0 0 auto;
@@ -51,6 +52,64 @@
     transparent calc(var(--fab) / 2 + var(--gap) - 1px),
     #000 calc(var(--fab) / 2 + var(--gap))
   );
+}
+
+/* ── Voice-active backdrop ──────────────────────────────────────────
+   While the voice engine is active, the bright blue bar washed out the neon
+   waves. We crossfade a DARK backdrop (with a mode-colored glow rising from the
+   coin) over the bar so the waves + coin pop and it reads as a premium
+   "assistant active" state. It's a SEPARATE sibling (not the bar's ::after —
+   the bar's notch mask was clipping the pseudo-element), painted over the blue
+   bar and under the waves/coin. Opacity crossfade → smooth in/out. */
+.bottom-nav__voicebg {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(
+      circle calc(var(--fab) * 1.7) at 50% 100%,
+      rgba(var(--bar-accent, 56, 189, 248), 0.55) 0%,
+      rgba(var(--bar-accent, 56, 189, 248), 0) 62%
+    ),
+    linear-gradient(180deg, #1b2b5e 0%, #0a1126 100%);
+  /* keep the SAME transparent notch (hole) as the blue bar, so the coin's
+     floating hole is preserved in voice mode (a masked sibling clips fine; an
+     ::after did not). */
+  -webkit-mask: radial-gradient(
+    circle calc(var(--fab) / 2 + var(--gap))
+      at 50% calc(var(--nav-bar-h) - 2px - var(--fab) / 2),
+    transparent calc(var(--fab) / 2 + var(--gap) - 1px),
+    #000 calc(var(--fab) / 2 + var(--gap))
+  );
+  mask: radial-gradient(
+    circle calc(var(--fab) / 2 + var(--gap))
+      at 50% calc(var(--nav-bar-h) - 2px - var(--fab) / 2),
+    transparent calc(var(--fab) / 2 + var(--gap) - 1px),
+    #000 calc(var(--fab) / 2 + var(--gap))
+  );
+  opacity: 0;
+  transition: opacity 0.35s ease;
+  pointer-events: none;
+}
+.bottom-nav--voice .bottom-nav__voicebg {
+  opacity: 1;
+}
+.bottom-nav--voice-listening {
+  --bar-accent: 56, 189, 248;
+}
+.bottom-nav--voice-recording {
+  --bar-accent: 244, 63, 94;
+}
+.bottom-nav--voice-speaking {
+  --bar-accent: 139, 92, 246;
+}
+.bottom-nav--voice-processing {
+  --bar-accent: 148, 163, 184;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bottom-nav__voicebg {
+    transition: none;
+  }
 }
 
 /* The robot coin — glossy raised circle centered in the bar, ringed in cream. */
@@ -685,9 +744,15 @@
   }
 }
 
-/* Processing: gentle breathing while waiting for the server. */
+/* Processing: gentle breathing while waiting for the server, plus a soft glow so
+   the floating hole reads as a glowing coin (not a bare white frame) on the dark
+   bar — matching the other voice modes. */
 .bottom-nav__btn--processing {
   animation: vc-breathe 1s ease-in-out infinite;
+  box-shadow:
+    inset 0 1px 1px rgba(255, 255, 255, 0.6),
+    inset 0 -6px 10px rgba(13, 42, 99, 0.32),
+    0 0 14px 2px rgba(79, 155, 255, 0.55);
 }
 
 @keyframes vc-breathe {
@@ -724,12 +789,25 @@
   }
 }
 
-/* AI speaking: violet-tinted coin with a soft glow. */
-.bottom-nav__btn--speaking {
+/* AI speaking: violet-tinted coin with a soft glow, and the coin PULSES in size
+   with the AI's voice (TTS amplitude via the shared --vlevel). The doubled-class
+   selector raises specificity so the pulse wins over :hover/:active transforms. */
+.bottom-nav__btn.bottom-nav__btn--speaking {
   background:
     radial-gradient(125% 95% at 50% 6%, rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0) 52%),
     linear-gradient(180deg, #a78bfa 0%, #8b5cf6 58%, #7c3aed 100%);
   animation: vc-glow-violet 1.2s ease-in-out infinite;
+  /* Bigger pulse, but clamped so the coin only grows up to the hole edge
+     (coin r=fab/2=30px; hole r=fab/2+gap≈35px → max scale ≈ 1.13) — it reaches
+     the gap but never crosses into the bar. */
+  transform: translateX(-50%) scale(min(calc(1 + var(--vlevel, 0) * 0.32), 1.13));
+  transition: transform 0.06s linear;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bottom-nav__btn.bottom-nav__btn--speaking {
+    transform: translateX(-50%);
+  }
 }
 
 @keyframes vc-glow-violet {

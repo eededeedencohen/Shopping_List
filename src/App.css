@@ -13,8 +13,13 @@
   grid-template-rows: auto minmax(0, 1fr) auto;
   height: 100vh;
   height: 100dvh;
-  /* Hard clamp: the app shell itself must never scroll. */
+  /* Hard clamp: the app shell itself must never scroll. `overflow: hidden` is
+     still a SCROLL CONTAINER, so a focus / scrollIntoView can scroll it a few px
+     when something (e.g. the voice waves) overflows past the bottom — that
+     desynced the grid and left a gap under the bottom nav. `overflow: clip` is
+     NOT a scroll container, so the shell can never be scrolled. hidden = fallback. */
   overflow: hidden;
+  overflow: clip;
 }
 
 /* Row 2 — the single scroll area. min-height:0 lets the 1fr row shrink and

@@ -463,7 +463,7 @@ export default function BottomNav() {
       : voiceMode === "processing"
       ? "מעבד…"
       : voiceMode === "listening"
-      ? "🎧 מצב דיבור רציף — הקש לסיום"
+      ? "" /* static listening: no chip (it covered the app); the waves show it */
       : voiceError === "mic-denied"
       ? "אין הרשאת מיקרופון"
       : voiceError === "unsupported"
@@ -783,8 +783,16 @@ export default function BottomNav() {
 
   return (
     <>
-      <nav className="bottom-nav" aria-label="סרגל תחתון">
+      <nav
+        className={`bottom-nav${
+          voiceMode !== "idle"
+            ? ` bottom-nav--voice bottom-nav--voice-${voiceMode}`
+            : ""
+        }`}
+        aria-label="סרגל תחתון"
+      >
         <div className="bottom-nav__bar" aria-hidden="true" />
+        <div className="bottom-nav__voicebg" aria-hidden="true" />
         {voiceHint && (
           <div className="voice-hint" dir="rtl" role="status">
             {voiceHint}

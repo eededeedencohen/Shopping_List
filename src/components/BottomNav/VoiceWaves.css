@@ -17,7 +17,7 @@
   pointer-events: none;
   z-index: 45; /* above the bar, below the coin (coin is later in the DOM) */
 
-  --vlevel: 0;
+  /* --vlevel is inherited from .bottom-nav (set by the rAF) so the coin shares it */
   --wave-rgb: 56, 189, 248; /* listening (sky) — overridden per mode */
 }
 
@@ -43,11 +43,15 @@
   top: 50%;
   width: var(--fab, 60px);
   height: var(--fab, 60px);
-  transform: translate(-50%, -50%) scale(calc(1 + var(--vlevel) * 0.5));
-  opacity: calc(0.3 + var(--vlevel) * 0.7);
+  /* Volume is read DIRECTLY from the size + brightness of the ring field, with a
+     WIDE dynamic range so a change in loudness is unmistakable even with no
+     sound: quiet = small/dim rings hugging the coin; loud = large/bright rings
+     sweeping far out. Snappy transition so it tracks the voice in real time. */
+  transform: translate(-50%, -50%) scale(calc(0.8 + var(--vlevel) * 1.7));
+  opacity: calc(0.35 + var(--vlevel) * 0.65);
   transition:
-    opacity 0.09s linear,
-    transform 0.09s linear;
+    opacity 0.05s linear,
+    transform 0.05s linear;
 }
 
 .voice-waves__ripple {
@@ -57,8 +61,11 @@
   width: 100%;
   height: 100%;
   border-radius: 50%;
-  border: 2px solid rgba(var(--wave-rgb), 0.55);
-  transform: translate(-50%, -50%) scale(0.9);
+  border-style: solid;
+  /* thickness + brightness also grow with volume (extra cue) */
+  border-color: rgba(var(--wave-rgb), calc(0.45 + var(--vlevel) * 0.55));
+  border-width: calc(1px + var(--vlevel) * 2.5px);
+  transform: translate(-50%, -50%) scale(0.85);
   opacity: 0; /* silent = no ripple at all */
   animation: none;
 }
@@ -76,14 +83,12 @@
 
 @keyframes vw-ripple {
   0% {
-    transform: translate(-50%, -50%) scale(0.85);
-    opacity: 0.7;
-    border-width: 2.5px;
+    transform: translate(-50%, -50%) scale(0.7);
+    opacity: 0.9;
   }
   100% {
-    transform: translate(-50%, -50%) scale(2.8);
+    transform: translate(-50%, -50%) scale(2.4);
     opacity: 0;
-    border-width: 1px;
   }
 }
 
