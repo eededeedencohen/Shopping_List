@@ -33,59 +33,93 @@
   to   { transform: translateY(0); opacity: 1; }
 }
 
-/* Settings.css forces 78px top padding for the global toolbar.
-   In modal mode there's no toolbar above, so reclaim that space. */
+/* In modal mode there's no global toolbar above; the sticky bar holds the
+   close/back control, so the page needs only a little top breathing room. */
 .settings-modal-window .settings-page {
   min-height: 100%;
-  padding-top: 64px;
+  padding-top: 6px;
 }
 
-/* Close button — sits inside the modal window, top-left in RTL */
-.settings-modal-close {
+/* Sticky top bar holding ONE control (see JS). A soft fade masks content that
+   scrolls underneath; pointer-events pass through except on the button. */
+.settings-modal-bar {
   position: sticky;
-  top: 12px;
-  margin: 12px 12px 0 auto;
-  width: 40px;
-  height: 40px;
-  border: 1px solid rgba(15, 23, 42, 0.08);
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.92);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  color: #475569;
-  cursor: pointer;
+  top: 0;
+  z-index: 6;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start; /* RTL start = right → back button (mobile) */
+  min-height: 52px;
+  padding: 12px 14px 8px;
+  background: linear-gradient(
+    to bottom,
+    rgb(219 244 255) 45%,
+    rgba(219, 244, 255, 0) 100%
+  );
+  pointer-events: none;
+}
+.settings-modal-bar > button {
+  pointer-events: auto;
+}
+
+/* Back button — shown when the modal is FULL-PAGE (mobile). */
+.settings-modal-back {
   display: inline-flex;
   align-items: center;
-  justify-content: center;
+  gap: 5px;
+  height: 42px;
+  padding: 0 18px 0 12px;
+  border: none;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.96);
+  color: #0f172a;
   font-family: inherit;
-  z-index: 5;
-  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.12);
-  transition: transform 0.16s ease, color 0.16s ease,
-    background 0.16s ease, box-shadow 0.16s ease;
-  float: left;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 6px 16px rgba(15, 23, 42, 0.14);
+  transition: transform 0.16s ease, box-shadow 0.16s ease, background 0.16s ease;
+}
+.settings-modal-back svg {
+  width: 22px;
+  height: 22px;
+}
+.settings-modal-back:hover {
+  background: #ffffff;
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.18);
+}
+.settings-modal-back:active {
+  transform: scale(0.95);
 }
 
+/* Close ✕ — shown when the modal is a WINDOWED card (desktop). Hidden on mobile. */
+.settings-modal-close {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(15, 23, 42, 0.06);
+  color: #334155;
+  cursor: pointer;
+  font-family: inherit;
+  transition: transform 0.16s ease, background 0.16s ease, color 0.16s ease;
+}
 .settings-modal-close svg {
   width: 18px;
   height: 18px;
 }
-
 .settings-modal-close:hover {
-  color: #b91c1c;
-  background: #ffffff;
-  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.16);
+  background: rgba(239, 68, 68, 0.12);
+  color: #dc2626;
 }
-
 .settings-modal-close:active {
-  transform: scale(0.94);
+  transform: scale(0.92);
 }
 
-/* Pull the page content up so it starts under the close button row */
-.settings-modal-window .settings-page__header {
-  margin-top: -32px;
-}
-
-/* Desktop: present as a floating card with rounded corners */
+/* Desktop: a floating card — swap the back button for the ✕ (top-left in RTL). */
 @media (min-width: 720px) {
   .settings-modal-overlay {
     align-items: center;
@@ -97,5 +131,18 @@
     max-height: calc(100vh - 48px);
     box-shadow: 0 28px 70px rgba(15, 23, 42, 0.32);
     border: 1px solid rgba(255, 255, 255, 0.6);
+  }
+
+  .settings-modal-bar {
+    justify-content: flex-end; /* RTL end = left → close ✕ */
+    background: none;
+    padding-top: 14px;
+  }
+
+  .settings-modal-back {
+    display: none;
+  }
+  .settings-modal-close {
+    display: inline-flex;
   }
 }
