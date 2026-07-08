@@ -1,6 +1,7 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import "./Settings.css";
+import { useCart } from "../../context/CartContext2";
 import { useProductsLayout } from "../../context/ProductsLayoutContext";
 import { useCartCardLayout } from "../../context/CartCardLayoutContext";
 import { usePriceCompareLayout } from "../../context/PriceCompareLayoutContext";
@@ -13,6 +14,21 @@ import { useAvailabilityMeta } from "../../hooks/useProductAvailability";
 import SupermarketImage from "../Images/SupermarketImage";
 import { rebuildAvailabilityIndex } from "../../services/productAvailabilityService";
 import { BUILD_VERSION } from "../../buildInfo";
+
+/* A fixed "demo" cart — one button fills the active cart with these and switches
+   to the chosen supermarket (for presentations). */
+const DEMO_SUPERMARKET_ID = 146;
+const DEMO_CART_PRODUCTS = [
+  { barcode: "7290004122195", amount: 2 },
+  { barcode: "7290107932080", amount: 2 },
+  { barcode: "7290017065236", amount: 2 },
+  { barcode: "7290011194246", amount: 2 },
+  { barcode: "7290003643387", amount: 1 },
+  { barcode: "7290000060903", amount: 2 },
+  { barcode: "7290100700396", amount: 2 },
+  { barcode: "7290107871990", amount: 2 },
+  { barcode: "7290100703007", amount: 2 },
+];
 
 const PRODUCTS_LAYOUT_OPTIONS = [
   {
@@ -296,9 +312,26 @@ export default function Settings() {
     preferredSupermarketIDs,
     toggleSupermarket,
     clearPreferences,
+    availableInAllMode,
+    setAvailableInAllMode,
   } = useSupermarketPreferences();
   const { allSupermarkets } = useSupermarkets();
   const [isBranchPickerOpen, setIsBranchPickerOpen] = useState(false);
+
+  const navigate = useNavigate();
+  const { cart, setCart, sendActiveCart } = useCart();
+
+  /* Demo button: empty the cart, fill it with the fixed demo products, switch to
+     the demo supermarket, persist, and open the cart to show the result. */
+  const fillDemoCart = () => {
+    setCart({
+      ...(cart || {}),
+      supermarketID: DEMO_SUPERMARKET_ID,
+      products: DEMO_CART_PRODUCTS.map((p) => ({ ...p })),
+    });
+    sendActiveCart();
+    navigate("/cart");
+  };
 
   /* lookup: id → { name, address, city } — used by the chip list */
   const supermarketLookup = React.useMemo(() => {
@@ -345,6 +378,29 @@ export default function Settings() {
       </div>
 
       <div className="settings-page__content">
+        <section className="settings-card">
+          <header className="settings-card__header">
+            <span className="settings-card__title">הדגמה</span>
+          </header>
+          <div className="settings-card__body">
+            <p className="settings-card__hint">
+              מילוי מהיר של העגלה בעגלת הדגמה קבועה (לצורך מצגת): מרוקן את העגלה
+              הנוכחית, מוסיף את מוצרי ההדגמה, ומחליף לסופרמרקט המוגדר, ופותח את
+              העגלה.
+            </p>
+            <button
+              type="button"
+              className="settings-link-btn"
+              onClick={fillDemoCart}
+            >
+              <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <path d="M7 18a2 2 0 1 0 .001 4.001A2 2 0 0 0 7 18zm10 0a2 2 0 1 0 .001 4.001A2 2 0 0 0 17 18zM7.16 14l.94-2h7.45a2 2 0 0 0 1.8-1.11l3.02-6.1A1 1 0 0 0 20.48 3H5.21l-.94-2H1v2h2l3.6 7.59-1.35 2.44A2 2 0 0 0 7 16h12v-2H7.16z" />
+              </svg>
+              מלא עגלת הדגמה
+            </button>
+          </div>
+        </section>
+
         <section className="settings-card">
           <header className="settings-card__header">
             <span className="settings-card__title">תצוגת רשימת המוצרים</span>
@@ -669,6 +725,28 @@ export default function Settings() {
               בחר את הסניפים שאתה מעדיף לקנות בהם. הכפתור "לפי העדפות"
               באופטימיזציית עגלות יסמן בדיוק את הסניפים האלה.
             </p>
+
+            <div className="settings-toggle-row">
+              <span className="settings-toggle-row__text">
+                <span className="settings-toggle-row__title">
+                  הצג רק מוצרים הקיימים בכל הסניפים
+                </span>
+                <span className="settings-toggle-row__hint">
+                  בעמוד המוצרים יוצגו רק מוצרים שנמכרים בכל הסניפים המועדפים
+                  שברשימה
+                </span>
+              </span>
+              <button
+                type="button"
+                role="switch"
+                aria-checked={availableInAllMode}
+                aria-label="הצג רק מוצרים הקיימים בכל הסניפים המועדפים"
+                className={`settings-switch${availableInAllMode ? " on" : ""}`}
+                onClick={() => setAvailableInAllMode((v) => !v)}
+              >
+                <span className="settings-switch__knob" />
+              </button>
+            </div>
 
             <div className="settings-row">
               <span className="settings-row__label">סניפים מועדפים</span>

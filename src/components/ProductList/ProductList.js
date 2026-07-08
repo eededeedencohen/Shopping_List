@@ -9,6 +9,7 @@ import {
 } from "../../hooks/appHooks";
 import { useProductsLayout } from "../../context/ProductsLayoutContext";
 import useVibrate from "../../hooks/useVibrate";
+import useAvailableInFavorites from "../../hooks/useAvailableInFavorites";
 
 import listStyles from "./ProductsList.module.css";
 import gridStyles from "./ProductsListGrid.module.css";
@@ -424,9 +425,18 @@ function ProductsList() {
     return true;
   });
 
+  /* "הצג רק מוצרים הקיימים בכל הסניפים המועדפים" mode (toggled in Settings):
+     when on + favorites chosen, keep only products carried by EVERY favorite
+     supermarket. No-op (pass-through) otherwise. */
+  const {
+    products: availableProducts,
+    isLoading: availabilityLoading,
+    active: availabilityModeActive,
+  } = useAvailableInFavorites(filteredProducts);
+
   // Push products without a price in the current supermarket to the bottom.
   // Array.prototype.sort is stable so available items keep their original order.
-  const orderedProducts = [...filteredProducts].sort(
+  const orderedProducts = [...availableProducts].sort(
     (a, b) => (a.unitPrice == null) - (b.unitPrice == null)
   );
 
@@ -491,6 +501,22 @@ function ProductsList() {
             onTouchMove={handleTouchMove}
             onTouchEnd={handleTouchEnd}
           >
+            {availabilityModeActive && orderedProducts.length === 0 && (
+              <div
+                style={{
+                  gridColumn: "1 / -1",
+                  padding: "52px 22px",
+                  textAlign: "center",
+                  color: "#64748b",
+                  fontSize: "0.95rem",
+                  lineHeight: 1.6,
+                }}
+              >
+                {availabilityLoading
+                  ? "בודק זמינות בסניפים המועדפים…"
+                  : "אין מוצרים הקיימים בכל הסניפים המועדפים שברשימה"}
+              </div>
+            )}
             {orderedProducts.map((product) => {
               const priceUnavailable = typeof product.unitPrice !== "number";
               return (

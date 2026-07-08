@@ -85,6 +85,72 @@
   padding-top: 12px;
 }
 
+/* ── Mode toggle row (preferred-supermarkets card) ───────────────── */
+.settings-toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 4px 0 12px;
+  margin-bottom: 10px;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.06);
+}
+.settings-toggle-row__text {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+.settings-toggle-row__title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+.settings-toggle-row__hint {
+  font-size: 0.82rem;
+  color: #64748b;
+  line-height: 1.45;
+}
+
+/* iOS-style switch — light theme, namespaced so it can't clash with AI.css */
+.settings-switch {
+  position: relative;
+  flex-shrink: 0;
+  width: 46px;
+  height: 26px;
+  margin: 0;
+  padding: 0;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.16);
+  border: 1px solid rgba(15, 23, 42, 0.1);
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+  transition: background 0.25s, border-color 0.25s, box-shadow 0.25s;
+}
+.settings-switch.on {
+  background: linear-gradient(135deg, #10b981 0%, #34d399 100%);
+  border-color: rgba(16, 185, 129, 0.55);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.28);
+}
+.settings-switch__knob {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #fff;
+  transition: left 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.25);
+}
+.settings-switch.on .settings-switch__knob {
+  left: 22px;
+}
+.settings-switch:active .settings-switch__knob {
+  transform: scale(0.94);
+}
+
 .settings-row__label {
   font-weight: 600;
   color: #334155;

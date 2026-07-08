@@ -1,12 +1,15 @@
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 
 const STORAGE_KEY = "supermarketPreferences.preferredSupermarketIDs";
+const STORAGE_KEY_MODE = "supermarketPreferences.availableInAllMode";
 
 const SupermarketPreferencesContext = createContext({
   preferredSupermarketIDs: [],
   setPreferredSupermarketIDs: () => {},
   toggleSupermarket: () => {},
   clearPreferences: () => {},
+  availableInAllMode: false,
+  setAvailableInAllMode: () => {},
 });
 
 function readInitial() {
@@ -23,8 +26,19 @@ function readInitial() {
   }
 }
 
+function readInitialMode() {
+  try {
+    return JSON.parse(localStorage.getItem(STORAGE_KEY_MODE)) === true;
+  } catch {
+    return false;
+  }
+}
+
 export function SupermarketPreferencesProvider({ children }) {
   const [preferredSupermarketIDs, setStateInternal] = useState(readInitial);
+  /* "הצג רק מוצרים הקיימים בכל הסניפים המועדפים" — filters the products page to
+     products carried by EVERY preferred supermarket. Persisted like the list. */
+  const [availableInAllMode, setModeInternal] = useState(readInitialMode);
 
   useEffect(() => {
     try {
@@ -36,6 +50,14 @@ export function SupermarketPreferencesProvider({ children }) {
       /* storage unavailable — ignore */
     }
   }, [preferredSupermarketIDs]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(STORAGE_KEY_MODE, JSON.stringify(availableInAllMode));
+    } catch {
+      /* storage unavailable — ignore */
+    }
+  }, [availableInAllMode]);
 
   const value = useMemo(
     () => ({
@@ -51,8 +73,13 @@ export function SupermarketPreferencesProvider({ children }) {
         );
       },
       clearPreferences: () => setStateInternal([]),
+      availableInAllMode,
+      setAvailableInAllMode: (v) =>
+        setModeInternal((prev) =>
+          typeof v === "function" ? Boolean(v(prev)) : Boolean(v)
+        ),
     }),
-    [preferredSupermarketIDs]
+    [preferredSupermarketIDs, availableInAllMode]
   );
 
   return (

@@ -17,6 +17,9 @@
   overflow-x: hidden;
   overflow-y: auto;
   min-height: 100%;
+  /* Vertical scroll + our own JS swipe only — the browser must not treat a
+     horizontal swipe here as back/forward navigation. */
+  touch-action: pan-y;
 }
 
 

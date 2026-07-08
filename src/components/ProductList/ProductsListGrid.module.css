@@ -15,6 +15,9 @@
   align-content: start;
   overflow-x: hidden;
   overflow-y: auto;
+  /* Vertical scroll + our own JS swipe only — the browser must not treat a
+     horizontal swipe here as back/forward navigation. */
+  touch-action: pan-y;
 }
 
 /* card — image area + text rows */

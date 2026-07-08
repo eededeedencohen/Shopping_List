@@ -19,12 +19,17 @@ html {
      by %) can't expand the layout viewport — which would make fixed overlays
      (modals) render wider than the screen. */
   overflow-x: hidden;
+  /* Kill the browser's horizontal swipe navigation (swipe = back/forward) so the
+     app's own horizontal swipes (e.g. switching product sub-categories) never
+     trigger a page back/forward — on mobile and trackpads alike. */
+  overscroll-behavior-x: none;
 }
 
 body {
   /* The app shell (.App) owns its height (100dvh) and the single scroll area
      is .app-scroll. The document/body must never scroll. */
   overflow: hidden;
+  overscroll-behavior-x: none;
   margin: 0;
   padding: 0;
   font-family: "Heebo", "Rubik", "Assistant", "Arial Hebrew", Arial,

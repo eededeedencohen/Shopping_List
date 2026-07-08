@@ -30,6 +30,8 @@
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   overscroll-behavior: contain;
+  /* No horizontal overscroll → no browser swipe back/forward from the scroller. */
+  overscroll-behavior-x: none;
   /* padding-bottom: var(--bottom-nav-space); */
 }
 
