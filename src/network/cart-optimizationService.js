@@ -14,6 +14,22 @@ const getOptimalSupermarketCarts = async (supermarketIDs, products) => {
   }
 };
 
+/* Same as getOptimalSupermarketCarts, but the V2 endpoint additionally returns
+   `productsDetails` (the full Product docs for every barcode in the result), so
+   the caller can show the chosen alternatives' names without extra lookups. */
+const getOptimalSupermarketCartsV2 = async (supermarketIDs, products) => {
+  try {
+    const response = await axios.post(
+      `${DOMAIN}/api/v1/cart-optimization/optimalsSupermarketCartsV2`,
+      { supermarketIDs, products }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error in fetching optimal supermarkets (v2): ", error);
+    throw error;
+  }
+};
+
 const getFullActiveCart = async (userID) => {
   try {
     const response = await axios.get(
@@ -96,6 +112,7 @@ const getListReplecementProductsByGeneralNameAndSupermarketID = async (
 
 export {
   getOptimalSupermarketCarts,
+  getOptimalSupermarketCartsV2,
   getFullActiveCart,
   getAllBrands,
   getAllBrandsByGeneralName, // no use yet

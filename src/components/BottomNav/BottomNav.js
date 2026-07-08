@@ -11,6 +11,7 @@ import "./BottomNav.css";
 import useBodyScrollLock from "../../hooks/useBodyScrollLock";
 import useVoiceCommand from "../../hooks/useVoiceCommand";
 import VoiceWaves from "./VoiceWaves";
+import CartOptimizeOverlay from "../CartOptimizeOverlay/CartOptimizeOverlay";
 import { useProductList, useCartActions } from "../../hooks/appHooks";
 import { useAiSettings } from "../../context/AiSettingsContext";
 import { useCart } from "../../context/CartContext2";
@@ -39,7 +40,7 @@ const ACTIONS = [
   { key: "nav", label: "ניווט", view: "nav" },
   { key: "products", label: "פעולה מספר 2", view: "products" },
   { key: "cheapest", label: "הסופר הזול ביותר לעגלה", view: "cheapest" },
-  { key: "a4", label: "פעולה מספר 4" },
+  { key: "a4", label: "ייעל את העגלה לסופר הנוכחי" },
   { key: "a5", label: "פעולה מספר 5" },
 ];
 
@@ -54,6 +55,57 @@ const NAV_ITEMS = [
   { to: "/barcode-scanner", label: "סורק ברקוד", Icon: BarcodeIcon },
   { to: "/ai", label: "עוזר AI", Icon: RobotIcon },
 ];
+
+/* A short, controlled spoken summary of a cart-optimization result — a status
+   snapshot ("what was worthwhile"), not a free-form ramble. Spoken after a
+   voice-triggered optimize, in the reply language (`lang`) so the TTS voice
+   matches the text (a Hebrew summary sent to the English voice = gibberish). */
+function buildOptimizeSummary(result, lang) {
+  const en = lang === "en";
+  if (!result || result.empty) {
+    return en
+      ? "I couldn't optimize the cart right now."
+      : "לא הצלחתי לייעל את העגלה כרגע.";
+  }
+  const saved = result.changedCount > 0 && result.savings > 0.005;
+  if (!saved) {
+    return en
+      ? "I went over every product in your cart — they're all already at the best price, nothing to optimize."
+      : "עברתי על כל המוצרים בעגלה, וכולם כבר במחיר הטוב ביותר — אין מה לייעל.";
+  }
+  const shekels = Math.round(result.savings);
+  const pct = Math.round(result.savingsPct);
+  const changed = result.changedCount;
+  const kept = (result.items || []).filter((i) => !i.changed).length;
+
+  if (en) {
+    const swap =
+      changed === 1
+        ? "one product was swapped for a better-value alternative"
+        : `${changed} products were swapped for better-value alternatives`;
+    let s = `I optimized your cart. I saved you about ${shekels} shekels, around ${pct} percent. ${swap}`;
+    if (kept > 0) {
+      s +=
+        kept === 1
+          ? ", and one product was already at its best price"
+          : `, and ${kept} products were already at their best price`;
+    }
+    return `${s}.`;
+  }
+
+  const swapPhrase =
+    changed === 1
+      ? "מוצר אחד הוחלף לחלופה משתלמת יותר"
+      : `${changed} מוצרים הוחלפו לחלופות משתלמות יותר`;
+  let s = `ייעלתי את העגלה. חסכתי לך בערך ${shekels} שקלים, כ-${pct} אחוז. ${swapPhrase}`;
+  if (kept > 0) {
+    s +=
+      kept === 1
+        ? ", ומוצר אחד כבר היה במחיר הטוב ביותר"
+        : `, ו-${kept} מוצרים כבר היו במחיר הטוב ביותר`;
+  }
+  return `${s}.`;
+}
 
 /**
  * BottomNav — slim blue bar with the robot "coin". Tapping the coin opens a
@@ -70,11 +122,12 @@ export default function BottomNav() {
     setActiveCategoryIndex,
     setActiveSubCategoryIndex,
   } = useProductList();
-  const { cart } = useCart();
+  const { cart, setCart } = useCart();
   const { allSupermarkets } = useSupermarkets();
   const { replaceSupermarket } = useCartActions();
 
   const [open, setOpen] = useState(false);
+  const [optimizing, setOptimizing] = useState(false); // action #4 overlay
   const [view, setView] = useState("main"); // "main" | "nav" | "products" | "cheapest"
   /* action #3 (cheapest) state — declared here so openSheet can reset it */
   const [cheapestMode, setCheapestMode] = useState("immediate"); // "immediate" | "display"
@@ -94,6 +147,27 @@ export default function BottomNav() {
     setCheapest({ status: "idle" });
     setRanked({ status: "idle" });
     setOpen(true);
+  };
+
+  /* Action #4 — optimize the whole cart for the current supermarket. Close the
+     sheet and open the full-screen optimize experience; it runs the same
+     cart-optimization algorithm (fixed settings) and calls back here to apply. */
+  const optimizeViaVoiceRef = useRef(false);
+  const startOptimize = (viaVoice = false) => {
+    optimizeViaVoiceRef.current = !!viaVoice;
+    close();
+    setOptimizing(true);
+  };
+
+  /* Called by the overlay's CTA. `optimizedProducts` is null when there was
+     nothing to improve (keep the cart untouched); otherwise replace the cart's
+     products in one shot. Then continue to the cart page. */
+  const applyOptimized = (optimizedProducts) => {
+    if (optimizedProducts && optimizedProducts.length && cart) {
+      setCart({ ...cart, products: optimizedProducts });
+    }
+    setOptimizing(false);
+    navigate("/cart");
   };
 
   /* Close on Escape. */
@@ -245,7 +319,21 @@ export default function BottomNav() {
                                           the list so the follow-up can resolve.
        • { history: "keep" }            — failed / not understood → leave as-is
                                           (so the user can retry with context). */
-  const performCommand = async (cmd) => {
+  const performCommand = async (cmd, transcript) => {
+    // Voice → optimize the cart ("תחליף לי את המוצרים למשתלמים יותר", "תהפוך את
+    // העגלה לאופטימלית", "תייעל את העגלה"). Primary path is the server intent
+    // (optimize_cart); the transcript keyword-match is a safety net that covers a
+    // mis-classification or a not-yet-redeployed NLU. Kept narrow so it never
+    // collides with the cheapest-SUPERMARKET intents (which don't mention מוצר).
+    const t = (transcript || "").replace(/["'.,!?]/g, "");
+    const optimizeIntent =
+      (cmd && cmd.actionType === "optimize_cart") ||
+      /אופטימ|ייעל|משתלמ|תחליף.*מוצר|מוצר.*(משתלמ|זול)/.test(t);
+    if (optimizeIntent) {
+      startOptimize(true);
+      return { history: "clear" };
+    }
+
     if (!cmd) return { history: "keep" };
 
     switch (cmd.actionType) {
@@ -374,6 +462,7 @@ export default function BottomNav() {
     stopRecording,
     startHandsFree,
     stopHandsFree,
+    speak,
   } = useVoiceCommand({
     pages: navPages,
     categories: allCategories,
@@ -383,6 +472,15 @@ export default function BottomNav() {
     micThreshold,
     onCommand: performCommand,
   });
+
+  /* Voice-triggered optimize: once the overlay reveals its result, speak a
+     short, controlled summary of what was worthwhile. The button path stays
+     silent — its on-screen summary is enough. */
+  const handleOptimizeResult = (result) => {
+    if (!optimizeViaVoiceRef.current) return;
+    optimizeViaVoiceRef.current = false;
+    speak(buildOptimizeSummary(result, ttsLanguage));
+  };
 
   /* ── Coin gestures ───────────────────────────────────────────────────
      • long-press            → single-shot recording (tap again to stop & send)
@@ -533,7 +631,10 @@ export default function BottomNav() {
                   <button
                     type="button"
                     className="ai-sheet__item"
-                    onClick={() => a.view && setView(a.view)}
+                    onClick={() => {
+                      if (a.key === "a4") startOptimize();
+                      else if (a.view) setView(a.view);
+                    }}
                   >
                     <span className="ai-sheet__item-label">{a.label}</span>
                     {a.view && (
@@ -822,6 +923,12 @@ export default function BottomNav() {
         </button>
       </nav>
       {sheet}
+      <CartOptimizeOverlay
+        open={optimizing}
+        onClose={() => setOptimizing(false)}
+        onApply={applyOptimized}
+        onResult={handleOptimizeResult}
+      />
     </>
   );
 }

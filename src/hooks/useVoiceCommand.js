@@ -639,6 +639,30 @@ export default function useVoiceCommand({
     [persistHistory]
   );
 
+  /* Speak an arbitrary line in the reply voice (server TTS), routed through the
+     same analyser so the waves react. Used to voice a result summary the app
+     composes AFTER an action runs (e.g. the cart-optimization outcome). */
+  const speak = useCallback(
+    async (text) => {
+      const msg = (text || "").trim();
+      if (!msg) return;
+      try {
+        const res = await fetch(`${DOMAIN}/api/v1/general-ai/speak`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ text: msg, ttsLanguage, ttsVoice }),
+        });
+        const json = await res.json();
+        if (json && json.audioUrl) {
+          await playReply(`${DOMAIN}/${json.audioUrl}`);
+        }
+      } catch (e) {
+        /* a missing summary voice shouldn't break the flow */
+      }
+    },
+    [playReply, ttsLanguage, ttsVoice]
+  );
+
   // auto-clear transient errors so the hint chip doesn't linger
   useEffect(() => {
     if (!error) return undefined;
@@ -691,5 +715,6 @@ export default function useVoiceCommand({
     startHandsFree,
     stopHandsFree,
     clearHistory,
+    speak,
   };
 }
