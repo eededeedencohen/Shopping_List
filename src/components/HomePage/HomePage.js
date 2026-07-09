@@ -1,6 +1,7 @@
 import { useRef, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { useCartTotals } from "../../hooks/appHooks";
+import BudgetTracker from "./BudgetTracker";
 import "./HomePage.css";
 
 import { ReactComponent as GroceryIcon } from "../Toolbar/grocery2.svg";
@@ -113,6 +114,9 @@ function HomePage() {
         <h1 className="homepage__greeting-text">{greeting.text}</h1>
         <p className="homepage__greeting-sub">מה נעשה היום?</p>
       </div>
+
+      {/* מעקב הוצאות חודשי — מסונכרן עם עמוד הסטטיסטיקות */}
+      <BudgetTracker />
 
       {/* כרטיסי פיצ'רים */}
       <div className="homepage__grid">
