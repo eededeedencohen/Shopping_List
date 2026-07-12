@@ -18,6 +18,7 @@ import { PriceCompareLayoutProvider } from "./context/PriceCompareLayoutContext"
 import { AIThemeProvider } from "./context/AIThemeContext";
 import { ReceiptThemeProvider } from "./context/ReceiptThemeContext";
 import { SupermarketPreferencesProvider } from "./context/SupermarketPreferencesContext";
+import { CompleteCartPreferencesProvider } from "./context/CompleteCartPreferencesContext";
 
 const root = createRoot(document.getElementById("root"));
 
@@ -39,7 +40,9 @@ root.render(
                                 <AIThemeProvider>
                                   <ReceiptThemeProvider>
                                     <SupermarketPreferencesProvider>
-                                      <App />
+                                      <CompleteCartPreferencesProvider>
+                                        <App />
+                                      </CompleteCartPreferencesProvider>
                                     </SupermarketPreferencesProvider>
                                   </ReceiptThemeProvider>
                                 </AIThemeProvider>

@@ -1,0 +1,328 @@
+/* ─────────────────────────────────────────────────────────────────────────
+   Supermarket picker — bottom sheet for action #5 "custom selection".
+   ───────────────────────────────────────────────────────────────────────── */
+
+.smpick {
+  position: fixed;
+  inset: 0;
+  z-index: 10050; /* above the action sheet (10000) so the picker stacks on top */
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  background: rgba(15, 23, 42, 0.42);
+  backdrop-filter: blur(2px);
+  animation: smpickFade 0.2s ease both;
+  font-family: "Heebo", "Open Sans", -apple-system, sans-serif;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.smpick__sheet {
+  width: 100%;
+  max-width: 520px;
+  max-height: 86vh;
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(180deg, #ffffff 0%, #f1f5fb 100%);
+  border-radius: 22px 22px 0 0;
+  box-shadow: 0 -14px 40px rgba(15, 23, 42, 0.28);
+  padding: 8px max(14px, env(safe-area-inset-left)) env(safe-area-inset-bottom);
+  color: #0f172a;
+  animation: smpickUp 0.28s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.smpick__grip {
+  width: 44px;
+  height: 5px;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.18);
+  margin: 4px auto 6px;
+}
+
+.smpick__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 2px 4px 8px;
+}
+.smpick__title {
+  font-size: 1.12rem;
+  font-weight: 800;
+}
+.smpick__x {
+  width: 34px;
+  height: 34px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(15, 23, 42, 0.06);
+  color: #475569;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.smpick__search {
+  flex: none;
+  width: 100%;
+  padding: 11px 14px;
+  margin-bottom: 8px;
+  border-radius: 12px;
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  background: #fff;
+  font-family: inherit;
+  font-size: 0.95rem;
+  color: #0f172a;
+  direction: rtl;
+}
+.smpick__search:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
+.smpick__list {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 2px 2px 8px;
+  overscroll-behavior: contain;
+}
+
+.smpick__chain {
+  flex: none; /* don't let flex shrink these below their content in the scroll list */
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid rgba(15, 23, 42, 0.07);
+  overflow: hidden;
+}
+.smpick__chain-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+}
+.smpick__chain-main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  padding: 0;
+  font-family: inherit;
+}
+.smpick__chain-logo {
+  flex: none;
+  width: 38px;
+  height: 38px;
+  border-radius: 9px;
+  background: #fff;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+.smpick__chain-logo img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+.smpick__chain-name {
+  flex: 1;
+  min-width: 0;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #1e293b;
+  text-align: start;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.smpick__chain-count {
+  flex: none;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: rgba(37, 99, 235, 0.1);
+  color: #2563eb;
+  font-size: 0.72rem;
+  font-weight: 800;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.smpick__chev {
+  flex: none;
+  color: #94a3b8;
+  font-size: 1.3rem;
+  line-height: 1;
+  transform: rotate(-90deg);
+  transition: transform 0.2s ease;
+}
+.smpick__chev.is-open {
+  transform: rotate(90deg);
+}
+
+.smpick__branches {
+  list-style: none;
+  margin: 0;
+  padding: 0 10px 8px 44px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.smpick__branch {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 8px 8px;
+  border: none;
+  border-radius: 10px;
+  background: none;
+  cursor: pointer;
+  font-family: inherit;
+  text-align: start;
+}
+.smpick__branch.is-on {
+  background: rgba(37, 99, 235, 0.08);
+}
+.smpick__branch-text {
+  flex: 1;
+  min-width: 0;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #475569;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* tri-state checkbox */
+.smpick__check {
+  flex: none;
+  width: 22px;
+  height: 22px;
+  border-radius: 7px;
+  border: 2px solid #cbd5e1;
+  background: #fff;
+  cursor: pointer;
+  position: relative;
+  padding: 0;
+}
+.smpick__check--all,
+.smpick__check--some {
+  background: linear-gradient(180deg, #3b82f6, #2563eb);
+  border-color: #2563eb;
+}
+.smpick__check--all::after {
+  content: "";
+  position: absolute;
+  left: 6px;
+  top: 2px;
+  width: 6px;
+  height: 11px;
+  border: solid #fff;
+  border-width: 0 2.5px 2.5px 0;
+  transform: rotate(45deg);
+}
+.smpick__check--some::after {
+  content: "";
+  position: absolute;
+  left: 4px;
+  top: 8px;
+  width: 10px;
+  height: 0;
+  border-top: 2.5px solid #fff;
+  border-radius: 2px;
+}
+
+/* flat single-select rows (reused by the complete-cart generalName picker) */
+.smpick__flat {
+  flex: none;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 11px 12px;
+  border: 1px solid rgba(15, 23, 42, 0.06);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.85);
+  cursor: pointer;
+  font-family: inherit;
+  text-align: start;
+}
+.smpick__flat.is-on {
+  background: rgba(37, 99, 235, 0.08);
+  border-color: rgba(37, 99, 235, 0.25);
+}
+.smpick__flat-text {
+  flex: 1;
+  min-width: 0;
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: #1e293b;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.smpick__empty {
+  padding: 24px 8px;
+  text-align: center;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #94a3b8;
+}
+
+.smpick__foot {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 4px max(10px, env(safe-area-inset-bottom));
+  border-top: 1px solid rgba(15, 23, 42, 0.08);
+}
+.smpick__count {
+  flex: 1;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #475569;
+}
+.smpick__confirm {
+  flex: none;
+  padding: 13px 26px;
+  border: none;
+  border-radius: 14px;
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 800;
+  color: #fff;
+  cursor: pointer;
+  background: linear-gradient(180deg, #10b981, #059669 65%, #047857);
+  box-shadow: 0 10px 22px rgba(5, 150, 105, 0.34);
+}
+.smpick__confirm:disabled {
+  background: #cbd5e1;
+  box-shadow: none;
+  cursor: default;
+}
+
+@keyframes smpickFade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes smpickUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .smpick,
+  .smpick__sheet {
+    animation: none;
+  }
+}

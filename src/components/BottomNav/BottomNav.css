@@ -426,6 +426,56 @@
   padding: 4px 2px 2px;
 }
 
+/* action #5 — compare mode picker */
+.ai-sheet__compare {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 4px 2px 2px;
+}
+.ai-sheet__compare-hint {
+  margin: 0 2px 2px;
+  font-size: 0.86rem;
+  font-weight: 600;
+  line-height: 1.4;
+  color: #64748b;
+}
+.ai-sheet__compare-opt {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 14px 14px;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.9);
+  cursor: pointer;
+  font-family: inherit;
+  text-align: start;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.05);
+}
+.ai-sheet__compare-opt:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+.ai-sheet__compare-opt-main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.ai-sheet__compare-opt-title {
+  font-size: 1rem;
+  font-weight: 800;
+  color: #0f172a;
+}
+.ai-sheet__compare-opt-sub {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #64748b;
+}
+
 .ai-sheet__cheapest-msg {
   display: flex;
   align-items: center;

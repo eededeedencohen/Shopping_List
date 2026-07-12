@@ -12,9 +12,15 @@ import useBodyScrollLock from "../../hooks/useBodyScrollLock";
 import useVoiceCommand from "../../hooks/useVoiceCommand";
 import VoiceWaves from "./VoiceWaves";
 import CartOptimizeOverlay from "../CartOptimizeOverlay/CartOptimizeOverlay";
-import { useProductList, useCartActions } from "../../hooks/appHooks";
+import SupermarketPickerSheet from "./SupermarketPickerSheet";
+import {
+  useProductList,
+  usePriceMap,
+  useCartActions,
+} from "../../hooks/appHooks";
 import { useAiSettings } from "../../context/AiSettingsContext";
 import { useCart } from "../../context/CartContext2";
+import { useCompleteCartPreferences } from "../../context/CompleteCartPreferencesContext";
 import { useSupermarkets } from "../../hooks/optimizationHooks";
 import {
   getCheapestSupermarketIDsByCart,
@@ -41,8 +47,18 @@ const ACTIONS = [
   { key: "products", label: "פעולה מספר 2", view: "products" },
   { key: "cheapest", label: "הסופר הזול ביותר לעגלה", view: "cheapest" },
   { key: "a4", label: "ייעל את העגלה לסופר הנוכחי" },
-  { key: "a5", label: "פעולה מספר 5" },
+  { key: "a5", label: "השווה מחירים בין סופרים", view: "compare" },
+  { key: "a6", label: "השלם את העגלה", view: "complete" },
+  { key: "a7", label: "השלם ועבור לסופר הזול", view: "complete7" },
 ];
+
+/* Curated Talpiot-area supermarket IDs (industrial/commercial zone + very close).
+   The data has no neighborhood field, so this is a hand-picked allowlist from the
+   store addresses: האומן / יד חרוצים / פייר קניג / עולי הגרדום / הרכבים / היצירה /
+   המרפא / דרך חברון (קטע תלפיות) / כתובות עם "תלפיות". Refine freely. */
+const TALPIOT_SUPERMARKET_IDS = new Set([
+  7, 8, 16, 18, 19, 23, 26, 30, 43, 111, 120, 121, 122, 133, 139, 198, 213,
+]);
 
 /* Navigation sub-categories → routes. */
 const NAV_ITEMS = [
@@ -121,14 +137,26 @@ export default function BottomNav() {
     all_sub_categories,
     setActiveCategoryIndex,
     setActiveSubCategoryIndex,
+    products,
   } = useProductList();
+  const { pricesMap } = usePriceMap();
   const { cart, setCart } = useCart();
   const { allSupermarkets } = useSupermarkets();
   const { replaceSupermarket } = useCartActions();
+  const { completeCartNames } = useCompleteCartPreferences();
 
   const [open, setOpen] = useState(false);
   const [optimizing, setOptimizing] = useState(false); // action #4 overlay
-  const [view, setView] = useState("main"); // "main" | "nav" | "products" | "cheapest"
+  const [comparing, setComparing] = useState(false); // action #5 overlay
+  const [compareCandidates, setCompareCandidates] = useState([]);
+  const [pickerOpen, setPickerOpen] = useState(false); // action #5 custom picker
+  const [completing, setCompleting] = useState(false); // action #6 overlay
+  const [completeStrategy, setCompleteStrategy] = useState("cheapest");
+  const [completeComparing, setCompleteComparing] = useState(false); // action #7
+  const [cc7Strategy, setCc7Strategy] = useState("cheapest");
+  const [cc7Candidates, setCc7Candidates] = useState([]);
+  const [compareWithComplete, setCompareWithComplete] = useState(false);
+  const [view, setView] = useState("main"); // "main" | "nav" | "products" | "cheapest" | "compare"
   /* action #3 (cheapest) state — declared here so openSheet can reset it */
   const [cheapestMode, setCheapestMode] = useState("immediate"); // "immediate" | "display"
   const [cheapest, setCheapest] = useState({ status: "idle" }); // single cheapest
@@ -146,6 +174,7 @@ export default function BottomNav() {
     setCheapestMode("immediate");
     setCheapest({ status: "idle" });
     setRanked({ status: "idle" });
+    setCompareWithComplete(false);
     setOpen(true);
   };
 
@@ -167,6 +196,92 @@ export default function BottomNav() {
       setCart({ ...cart, products: optimizedProducts });
     }
     setOptimizing(false);
+    navigate("/cart");
+  };
+
+  /* Action #5 — compare the cart across a chosen SET of supermarkets and build
+     the cart for the cheapest among them (same reveal as #4), then switch the
+     cart to that store. `supers` is the resolved supermarket objects. */
+  const startCompare = (supers) => {
+    if (!supers || !supers.length) return;
+    close();
+    setPickerOpen(false);
+    setCompareCandidates(supers);
+    setComparing(true);
+  };
+
+  /* Overlay CTA / auto-finish for compare: switch the cart to the chosen store
+     AND apply its optimized products in one shot, then open the cart. */
+  const applyCompare = (optimizedProducts, result) => {
+    const targetId =
+      result &&
+      result.targetSupermarket &&
+      result.targetSupermarket.supermarketID;
+    if (
+      optimizedProducts &&
+      optimizedProducts.length &&
+      cart &&
+      targetId != null
+    ) {
+      setCart({ ...cart, supermarketID: targetId, products: optimizedProducts });
+    }
+    setComparing(false);
+    navigate("/cart");
+  };
+
+  /* Action #6 — complete the cart: fill in any generalName from the user's
+     "complete cart" list that's missing, by the chosen strategy. */
+  const startComplete = (strategy) => {
+    setCompleteStrategy(strategy);
+    close();
+    setCompleting(true);
+  };
+
+  /* Overlay CTA / auto-finish for complete: ADD the picked products to the cart
+     (merge amounts), then open the cart. */
+  const applyComplete = (addedProducts) => {
+    if (addedProducts && addedProducts.length && cart) {
+      const merged = [...cart.products];
+      addedProducts.forEach((ap) => {
+        const ex = merged.find((p) => p.barcode === ap.barcode);
+        if (ex) ex.amount += ap.amount;
+        else merged.push({ ...ap });
+      });
+      setCart({ ...cart, products: merged });
+    }
+    setCompleting(false);
+    navigate("/cart");
+  };
+
+  /* Action #7 — complete the cart, then switch to the cheapest supermarket among
+     a chosen set (complete → compare, one overlay). */
+  const startCompleteCompare = (supers) => {
+    if (!supers || !supers.length) return;
+    close();
+    setPickerOpen(false);
+    setCc7Candidates(supers);
+    setCompleteComparing(true);
+  };
+
+  /* Overlay finish for action #7: the result says exactly what to apply —
+     switch to the cheapest store with its optimized products, OR (no cheaper
+     store) just apply the completion at the current store. */
+  const applyCompleteCompare = (_payload, result) => {
+    if (result && !result.empty && cart) {
+      const products = result.applyProducts;
+      if (products && products.length) {
+        if (result.applySupermarketID != null) {
+          setCart({
+            ...cart,
+            supermarketID: result.applySupermarketID,
+            products,
+          });
+        } else {
+          setCart({ ...cart, products });
+        }
+      }
+    }
+    setCompleteComparing(false);
     navigate("/cart");
   };
 
@@ -203,6 +318,25 @@ export default function BottomNav() {
   const supermarketLookup = useMemo(
     () =>
       new Map((allSupermarkets || []).map((s) => [String(s.supermarketID), s])),
+    [allSupermarkets]
+  );
+
+  /* Action #5 preset groups, resolved from the app-wide supermarket list. */
+  const talpiotSupermarkets = useMemo(
+    () =>
+      (allSupermarkets || []).filter((s) =>
+        TALPIOT_SUPERMARKET_IDS.has(Number(s.supermarketID))
+      ),
+    [allSupermarkets]
+  );
+  const onlineSupermarkets = useMemo(
+    () =>
+      (allSupermarkets || []).filter(
+        (s) =>
+          s &&
+          (s.city === "אינטרנט" ||
+            /^https?:\/\//.test(String(s.address || "")))
+      ),
     [allSupermarkets]
   );
 
@@ -575,6 +709,11 @@ export default function BottomNav() {
     nav: "ניווט",
     products: "תת-קטגוריות מוצרים",
     cheapest: "הסופר הזול ביותר לעגלה",
+    compare: compareWithComplete
+      ? "השלמה ומעבר לסופר הזול"
+      : "השוואת מחירים בין סופרים",
+    complete: "השלמת העגלה",
+    complete7: "השלמה ומעבר לסופר הזול",
   };
 
   const sheet =
@@ -633,7 +772,10 @@ export default function BottomNav() {
                     className="ai-sheet__item"
                     onClick={() => {
                       if (a.key === "a4") startOptimize();
-                      else if (a.view) setView(a.view);
+                      else if (a.key === "a5") {
+                        setCompareWithComplete(false);
+                        setView("compare");
+                      } else if (a.view) setView(a.view);
                     }}
                   >
                     <span className="ai-sheet__item-label">{a.label}</span>
@@ -877,6 +1019,231 @@ export default function BottomNav() {
               )}
             </div>
           )}
+
+          {/* ── Compare prices across a set of supermarkets (action #5 / #7) ── */}
+          {view === "compare" && (
+            <div className="ai-sheet__compare">
+              <p className="ai-sheet__compare-hint">
+                {compareWithComplete
+                  ? "בחר קבוצת סופרים — נשלים את העגלה ונמצא בה את הסופר הזול ביותר."
+                  : "בחר קבוצת סופרים — נמצא את העגלה הזולה ביותר ביניהם ונשווה מוצר-מול-מוצר, בדיוק כמו הייעול לסופר הנוכחי."}
+              </p>
+              <button
+                type="button"
+                className="ai-sheet__compare-opt"
+                disabled={!talpiotSupermarkets.length}
+                onClick={() =>
+                  compareWithComplete
+                    ? startCompleteCompare(talpiotSupermarkets)
+                    : startCompare(talpiotSupermarkets)
+                }
+              >
+                <span className="ai-sheet__compare-opt-main">
+                  <span className="ai-sheet__compare-opt-title">
+                    סופרי תלפיות
+                  </span>
+                  <span className="ai-sheet__compare-opt-sub">
+                    {talpiotSupermarkets.length} סופרים באזור תלפיות והסביבה
+                  </span>
+                </span>
+                <span className="ai-sheet__chevron" aria-hidden="true">
+                  ‹
+                </span>
+              </button>
+              <button
+                type="button"
+                className="ai-sheet__compare-opt"
+                disabled={!onlineSupermarkets.length}
+                onClick={() =>
+                  compareWithComplete
+                    ? startCompleteCompare(onlineSupermarkets)
+                    : startCompare(onlineSupermarkets)
+                }
+              >
+                <span className="ai-sheet__compare-opt-main">
+                  <span className="ai-sheet__compare-opt-title">
+                    סופרים אונליין
+                  </span>
+                  <span className="ai-sheet__compare-opt-sub">
+                    {onlineSupermarkets.length} סופרים עם משלוחים
+                  </span>
+                </span>
+                <span className="ai-sheet__chevron" aria-hidden="true">
+                  ‹
+                </span>
+              </button>
+              <button
+                type="button"
+                className="ai-sheet__compare-opt"
+                onClick={() => setPickerOpen(true)}
+              >
+                <span className="ai-sheet__compare-opt-main">
+                  <span className="ai-sheet__compare-opt-title">
+                    בחירה מותאמת
+                  </span>
+                  <span className="ai-sheet__compare-opt-sub">
+                    בחר רשתות וסניפים להשוואה
+                  </span>
+                </span>
+                <span className="ai-sheet__chevron" aria-hidden="true">
+                  ‹
+                </span>
+              </button>
+            </div>
+          )}
+
+          {/* ── Complete the cart (action #6) ── */}
+          {view === "complete" && (
+            <div className="ai-sheet__compare">
+              {completeCartNames.length === 0 ? (
+                <>
+                  <p className="ai-sheet__compare-hint">
+                    עדיין לא הגדרת "עגלה שלמה". בהגדרות בוחרים אילו מוצרים תמיד
+                    צריכים להיות בעגלה, וכאן משלימים את מה שחסר.
+                  </p>
+                  <button
+                    type="button"
+                    className="ai-sheet__compare-opt"
+                    onClick={() => goTo("/settings")}
+                  >
+                    <span className="ai-sheet__compare-opt-main">
+                      <span className="ai-sheet__compare-opt-title">
+                        להגדרת העגלה השלמה
+                      </span>
+                      <span className="ai-sheet__compare-opt-sub">
+                        פתח את ההגדרות ובחר מוצרים
+                      </span>
+                    </span>
+                    <span className="ai-sheet__chevron" aria-hidden="true">
+                      ‹
+                    </span>
+                  </button>
+                </>
+              ) : (
+                <>
+                  <p className="ai-sheet__compare-hint">
+                    {completeCartNames.length} מוצרים בעגלה השלמה. איך להשלים את
+                    מה שחסר?
+                  </p>
+                  <button
+                    type="button"
+                    className="ai-sheet__compare-opt"
+                    onClick={() => startComplete("cheapest")}
+                  >
+                    <span className="ai-sheet__compare-opt-main">
+                      <span className="ai-sheet__compare-opt-title">
+                        הזול ביותר ליחידת משקל
+                      </span>
+                      <span className="ai-sheet__compare-opt-sub">
+                        הבחירה המשתלמת ביותר בסופר הנוכחי
+                      </span>
+                    </span>
+                    <span className="ai-sheet__chevron" aria-hidden="true">
+                      ‹
+                    </span>
+                  </button>
+                  <button
+                    type="button"
+                    className="ai-sheet__compare-opt"
+                    onClick={() => startComplete("lastPurchased")}
+                  >
+                    <span className="ai-sheet__compare-opt-main">
+                      <span className="ai-sheet__compare-opt-title">
+                        האחרון שקנית
+                      </span>
+                      <span className="ai-sheet__compare-opt-sub">
+                        לפי היסטוריית הקניות (גיבוי: הזול ביותר)
+                      </span>
+                    </span>
+                    <span className="ai-sheet__chevron" aria-hidden="true">
+                      ‹
+                    </span>
+                  </button>
+                </>
+              )}
+            </div>
+          )}
+
+          {/* ── Complete the cart + switch to the cheapest (action #7) ── */}
+          {view === "complete7" && (
+            <div className="ai-sheet__compare">
+              {completeCartNames.length === 0 ? (
+                <>
+                  <p className="ai-sheet__compare-hint">
+                    עדיין לא הגדרת "עגלה שלמה". הפעולה משלימה את מה שחסר בעגלה ואז
+                    מוצאת עבורה את הסופר הזול ביותר — קודם צריך לבחור מוצרים
+                    בהגדרות.
+                  </p>
+                  <button
+                    type="button"
+                    className="ai-sheet__compare-opt"
+                    onClick={() => goTo("/settings")}
+                  >
+                    <span className="ai-sheet__compare-opt-main">
+                      <span className="ai-sheet__compare-opt-title">
+                        להגדרת העגלה השלמה
+                      </span>
+                      <span className="ai-sheet__compare-opt-sub">
+                        פתח את ההגדרות ובחר מוצרים
+                      </span>
+                    </span>
+                    <span className="ai-sheet__chevron" aria-hidden="true">
+                      ‹
+                    </span>
+                  </button>
+                </>
+              ) : (
+                <>
+                  <p className="ai-sheet__compare-hint">
+                    שלב 1 — איך להשלים את המוצרים החסרים? (אחר כך נבחר מול אילו
+                    סופרים להשוות)
+                  </p>
+                  <button
+                    type="button"
+                    className="ai-sheet__compare-opt"
+                    onClick={() => {
+                      setCc7Strategy("cheapest");
+                      setCompareWithComplete(true);
+                      setView("compare");
+                    }}
+                  >
+                    <span className="ai-sheet__compare-opt-main">
+                      <span className="ai-sheet__compare-opt-title">
+                        הזול ביותר ליחידת משקל
+                      </span>
+                      <span className="ai-sheet__compare-opt-sub">
+                        השלמה לפי המחיר המשתלם ביותר
+                      </span>
+                    </span>
+                    <span className="ai-sheet__chevron" aria-hidden="true">
+                      ‹
+                    </span>
+                  </button>
+                  <button
+                    type="button"
+                    className="ai-sheet__compare-opt"
+                    onClick={() => {
+                      setCc7Strategy("lastPurchased");
+                      setCompareWithComplete(true);
+                      setView("compare");
+                    }}
+                  >
+                    <span className="ai-sheet__compare-opt-main">
+                      <span className="ai-sheet__compare-opt-title">
+                        האחרון שקנית
+                      </span>
+                      <span className="ai-sheet__compare-opt-sub">
+                        השלמה לפי היסטוריית הקניות (גיבוי: הזול)
+                      </span>
+                    </span>
+                    <span className="ai-sheet__chevron" aria-hidden="true">
+                      ‹
+                    </span>
+                  </button>
+                </>
+              )}
+            </div>
+          )}
         </div>
       </div>,
       document.getElementById("modal-root")
@@ -928,6 +1295,40 @@ export default function BottomNav() {
         onClose={() => setOptimizing(false)}
         onApply={applyOptimized}
         onResult={handleOptimizeResult}
+      />
+      <CartOptimizeOverlay
+        open={comparing}
+        mode="compare"
+        candidateSupermarkets={compareCandidates}
+        onClose={() => setComparing(false)}
+        onApply={applyCompare}
+      />
+      <CartOptimizeOverlay
+        open={completing}
+        mode="complete"
+        completeNames={completeCartNames}
+        completeStrategy={completeStrategy}
+        onClose={() => setCompleting(false)}
+        onApply={applyComplete}
+      />
+      <CartOptimizeOverlay
+        open={completeComparing}
+        mode="completeCompare"
+        completeNames={completeCartNames}
+        completeStrategy={cc7Strategy}
+        candidateSupermarkets={cc7Candidates}
+        onClose={() => setCompleteComparing(false)}
+        onApply={applyCompleteCompare}
+      />
+      <SupermarketPickerSheet
+        open={pickerOpen}
+        supermarkets={allSupermarkets}
+        onClose={() => setPickerOpen(false)}
+        onConfirm={(supers) =>
+          compareWithComplete
+            ? startCompleteCompare(supers)
+            : startCompare(supers)
+        }
       />
     </>
   );

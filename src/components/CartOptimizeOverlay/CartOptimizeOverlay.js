@@ -1,8 +1,13 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import ReactDOM from "react-dom";
-import { useFullCart } from "../../hooks/appHooks";
+import { useFullCart, useProductList, usePriceMap } from "../../hooks/appHooks";
 import useBodyScrollLock from "../../hooks/useBodyScrollLock";
-import { runCartOptimization } from "../../utils/optimizeCart";
+import {
+  runCartOptimization,
+  runCompareOptimization,
+  runCompleteCart,
+  runCompleteAndCompare,
+} from "../../utils/optimizeCart";
 import ProductImageDisplay from "../Images/ProductImageService";
 import SupermarketImage from "../Images/SupermarketImage";
 import { ReactComponent as CartIcon } from "../Cart/Icons/shopping-cart.svg";
@@ -20,6 +25,22 @@ const SCAN_LINES = [
   "סורק חלופות זולות…",
   "משווה מחיר ל-100 גרם ומבצעים…",
   "בונה את העגלה המשתלמת…",
+];
+const COMPARE_SCAN_LINES = [
+  "בודק את הסופרים שבחרת…",
+  "מתמחר את העגלה בכל סופר…",
+  "מוצא את הסופר הזול ביותר…",
+];
+const COMPLETE_SCAN_LINES = [
+  "עובר על רשימת העגלה השלמה…",
+  "בודק מה חסר בעגלה…",
+  "בוחר את המוצרים המשתלמים…",
+];
+const COMPLETE_COMPARE_SCAN_LINES = [
+  "משלים את המוצרים החסרים…",
+  "בונה עגלה מלאה…",
+  "משווה מחירים בין הסופרים…",
+  "מוצא את הסופר הזול ביותר…",
 ];
 
 /* Clean vector icons (no text glyphs). */
@@ -67,6 +88,20 @@ const IconCheck = (props) => (
     <polyline points="20 6 9 17 4 12" />
   </svg>
 );
+const IconPlus = (props) => (
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2.6"
+    strokeLinecap="round"
+    aria-hidden="true"
+    {...props}
+  >
+    <line x1="12" y1="5" x2="12" y2="19" />
+    <line x1="5" y1="12" x2="19" y2="12" />
+  </svg>
+);
 
 /* Rising sparkle particles for the light result field. */
 function makeParticles(n) {
@@ -89,10 +124,43 @@ const unit = (n) => (Number(n) || 0).toFixed(2);
  * reveal of the savings (₪ and %) with a per-100g / per-unit before→after list
  * that auto-scrolls and then continues to the cart on its own.
  */
-export default function CartOptimizeOverlay({ open, onClose, onApply, onResult }) {
+export default function CartOptimizeOverlay({
+  open,
+  onClose,
+  onApply,
+  onResult,
+  mode = "current",
+  candidateSupermarkets,
+  completeNames,
+  completeStrategy = "cheapest",
+}) {
+  const completeCompare = mode === "completeCompare";
+  const compare = mode === "compare" || completeCompare;
+  const complete = mode === "complete";
   const { fullCart } = useFullCart();
+  const { products } = useProductList();
+  const { pricesMap } = usePriceMap();
   const fullCartRef = useRef(fullCart);
   fullCartRef.current = fullCart;
+  const modeRef = useRef(mode);
+  modeRef.current = mode;
+  const candidatesRef = useRef(candidateSupermarkets);
+  candidatesRef.current = candidateSupermarkets;
+  const completeRef = useRef(null);
+  completeRef.current = {
+    products,
+    pricesMap,
+    names: completeNames,
+    strategy: completeStrategy,
+    candidateSupermarkets,
+  };
+  const scanLines = complete
+    ? COMPLETE_SCAN_LINES
+    : completeCompare
+    ? COMPLETE_COMPARE_SCAN_LINES
+    : compare
+    ? COMPARE_SCAN_LINES
+    : SCAN_LINES;
 
   const [phase, setPhase] = useState("computing"); // computing | done | empty | error
   const [result, setResult] = useState(null);
@@ -112,7 +180,9 @@ export default function CartOptimizeOverlay({ open, onClose, onApply, onResult }
 
   const particles = useMemo(() => makeParticles(20), []);
   const smName =
-    (fullCartRef.current &&
+    (!compare &&
+      !complete &&
+      fullCartRef.current &&
       fullCartRef.current.supermarket &&
       fullCartRef.current.supermarket.name) ||
     "";
@@ -135,13 +205,26 @@ export default function CartOptimizeOverlay({ open, onClose, onApply, onResult }
     finishedRef.current = false;
     const fc = fullCartRef.current;
     const products = (fc && fc.productsWithPrices) || [];
-    if (!products.length) {
+    /* An EMPTY cart is a valid start for the complete flows (#6/#7) — they fill
+       the whole defined list from scratch. Only the optimize/compare flows need
+       existing products to work on. */
+    const emptyOk =
+      modeRef.current === "complete" || modeRef.current === "completeCompare";
+    if (!products.length && !emptyOk) {
       setPhase("empty");
       return undefined;
     }
     let cancelled = false;
     const started = Date.now();
-    runCartOptimization(fc)
+    const run =
+      modeRef.current === "completeCompare"
+        ? runCompleteAndCompare(fc, completeRef.current)
+        : modeRef.current === "complete"
+        ? runCompleteCart(fc, completeRef.current)
+        : modeRef.current === "compare"
+        ? runCompareOptimization(fc, candidatesRef.current)
+        : runCartOptimization(fc);
+    run
       .then((r) => {
         if (cancelled) return;
         const wait = Math.max(0, MIN_COMPUTE_MS - (Date.now() - started));
@@ -167,7 +250,7 @@ export default function CartOptimizeOverlay({ open, onClose, onApply, onResult }
   useEffect(() => {
     if (!open || phase !== "computing") return undefined;
     const t = setInterval(
-      () => setLine((l) => (l + 1) % SCAN_LINES.length),
+      () => setLine((l) => (l + 1) % scanLines.length),
       1100
     );
     return () => clearInterval(t);
@@ -205,8 +288,13 @@ export default function CartOptimizeOverlay({ open, onClose, onApply, onResult }
       if (finishedRef.current) return;
       finishedRef.current = true;
       const r = resultRef.current;
-      const saved = r && r.changedCount > 0 && r.savings > 0.005;
-      onApplyRef.current(saved ? r.optimizedProducts : null);
+      if (r && r.completeCompare) {
+        onApplyRef.current(null, r);
+        return;
+      }
+      const ok = r && r.complete ? r.addedCount > 0 : r && r.changedCount > 0 && r.savings > 0.005;
+      const payload = r && r.complete ? r.addedProducts : r && r.optimizedProducts;
+      onApplyRef.current(ok ? payload : null, r);
     };
 
     leadT = setTimeout(() => {
@@ -245,8 +333,9 @@ export default function CartOptimizeOverlay({ open, onClose, onApply, onResult }
 
   if (!open) return null;
 
-  const saved =
-    !!result && result.changedCount > 0 && result.savings > 0.005;
+  const saved = complete
+    ? !!result && result.addedCount > 0
+    : !!result && result.changedCount > 0 && result.savings > 0.005;
   const items = result ? result.items || [] : [];
   const keptCount = items.filter((i) => !i.changed).length;
   const totalMs =
@@ -260,7 +349,12 @@ export default function CartOptimizeOverlay({ open, onClose, onApply, onResult }
   const applyNow = () => {
     if (finishedRef.current) return;
     finishedRef.current = true;
-    onApply(saved ? result.optimizedProducts : null);
+    if (completeCompare) {
+      onApply(null, result);
+      return;
+    }
+    const payload = complete ? result.addedProducts : result.optimizedProducts;
+    onApply(saved ? payload : null, result);
   };
 
   const overlay = (
@@ -306,14 +400,20 @@ export default function CartOptimizeOverlay({ open, onClose, onApply, onResult }
           </div>
           <div className="copt__status">
             <span className="copt__status-title">
-              מייעל את העגלה שלך
+              {completeCompare
+                ? "משלים ומוצא את הזול ביותר"
+                : complete
+                ? "משלים את העגלה שלך"
+                : compare
+                ? "משווה מחירים בין הסופרים"
+                : "מייעל את העגלה שלך"}
               <span className="copt__dots">
                 <i />
                 <i />
                 <i />
               </span>
             </span>
-            <span className="copt__status-sub">{SCAN_LINES[line]}</span>
+            <span className="copt__status-sub">{scanLines[line]}</span>
           </div>
         </div>
       )}
@@ -339,8 +439,58 @@ export default function CartOptimizeOverlay({ open, onClose, onApply, onResult }
           </div>
 
           <div className="copt__head">
+            {completeCompare && result.completedCount > 0 && (
+              <div className="copt__ccbadge">
+                <IconPlus />
+                <span>
+                  השלמתי {result.completedCount}{" "}
+                  {result.completedCount === 1 ? "מוצר חסר" : "מוצרים חסרים"}
+                </span>
+              </div>
+            )}
+            {compare && saved && result.targetSupermarket && (
+              <div className="copt__target">
+                <span className="copt__target-logo">
+                  <SupermarketImage
+                    supermarketName={result.targetSupermarket.name}
+                  />
+                </span>
+                <span className="copt__target-text">
+                  <span className="copt__target-label">הסופר הזול ביותר</span>
+                  <span className="copt__target-name">
+                    {result.targetSupermarket.name ||
+                      `סופר #${result.targetSupermarket.supermarketID}`}
+                  </span>
+                </span>
+              </div>
+            )}
             <div className="copt__savings">
-              {saved ? (
+              {complete ? (
+                <>
+                  <span
+                    className={
+                      "copt__savings-check" +
+                      (saved ? " copt__savings-check--add" : "")
+                    }
+                  >
+                    {saved ? <IconPlus /> : <IconCheck />}
+                  </span>
+                  <span className="copt__savings-label copt__savings-label--ok">
+                    {!saved
+                      ? "העגלה כבר שלמה — כל מה שהגדרת בפנים"
+                      : result.addedCount === 1
+                      ? "השלמתי מוצר אחד לעגלה"
+                      : `השלמתי ${result.addedCount} מוצרים לעגלה`}
+                  </span>
+                  {saved && (
+                    <span className="copt__savings-sub">
+                      {completeStrategy === "lastPurchased"
+                        ? "לפי מה שקנית לאחרונה (בסופר הנוכחי)"
+                        : "הזול ביותר ליחידת משקל בסופר הנוכחי"}
+                    </span>
+                  )}
+                </>
+              ) : saved ? (
                 <>
                   <span className="copt__savings-label">חסכת</span>
                   <div className="copt__savings-row">
@@ -354,7 +504,11 @@ export default function CartOptimizeOverlay({ open, onClose, onApply, onResult }
                     )}
                   </div>
                   <span className="copt__savings-sub">
-                    {result.changedCount === 1
+                    {completeCompare
+                      ? "עגלה מלאה, במחיר הזול ביותר מבין הסופרים שבחרת"
+                      : compare
+                      ? "המחיר הזול ביותר מבין הסופרים שבחרת"
+                      : result.changedCount === 1
                       ? "מוצר אחד קיבל מחיר טוב יותר ליחידה"
                       : `${result.changedCount} מוצרים קיבלו מחיר טוב יותר ליחידה`}
                   </span>
@@ -365,13 +519,19 @@ export default function CartOptimizeOverlay({ open, onClose, onApply, onResult }
                     <IconCheck />
                   </span>
                   <span className="copt__savings-label copt__savings-label--ok">
-                    כל המוצרים כבר במחיר הטוב ביותר
+                    {completeCompare
+                      ? result.targetSupermarket
+                        ? "העגלה מושלמת, וכבר במחיר הטוב ביותר"
+                        : "השלמתי את העגלה, אך אף סופר לא מחזיק את כולה"
+                      : compare
+                      ? "העגלה שלך כבר זולה מכל הסופרים שבחרת"
+                      : "כל המוצרים כבר במחיר הטוב ביותר"}
                   </span>
                 </>
               )}
             </div>
 
-            {saved && (
+            {saved && !complete && (
               <div className="copt__totals">
                 <span className="copt__total copt__total--before">
                   {money(result.beforeTotal)}
@@ -389,13 +549,44 @@ export default function CartOptimizeOverlay({ open, onClose, onApply, onResult }
           <div className="copt__items" ref={itemsRef}>
             {items.map((it, idx) => (
               <div
-                key={it.original.barcode + "-" + idx}
+                key={(it.added ? it.barcode : it.original.barcode) + "-" + idx}
                 className={
-                  "copt__item" + (it.changed ? "" : " copt__item--kept")
+                  "copt__item" +
+                  (it.added || !it.changed ? " copt__item--kept" : "") +
+                  (it.completed ? " copt__item--completed" : "")
                 }
                 style={{ "--d": `${Math.min(idx, 16) * 0.045}s` }}
               >
-                {it.changed ? (
+                {it.completed && (
+                  <span className="copt__item-added-tag">
+                    <IconPlus />
+                    הושלם
+                  </span>
+                )}
+                {it.added ? (
+                  <div className="copt__kept-row">
+                    <span className="copt__imgwrap copt__imgwrap--kept">
+                      <ProductImageDisplay
+                        barcode={it.barcode}
+                        className="copt__img"
+                      />
+                    </span>
+                    <span className="copt__text">
+                      <span className="copt__name">{it.name}</span>
+                      <span className="copt__unit copt__unit--kept">
+                        <b className="copt__unit-num">{money(it.unitValue)}</b>
+                        <i className="copt__unit-label">{it.unitLabel}</i>
+                        {it.amount > 1 && (
+                          <i className="copt__unit-label">{` · ×${it.amount}`}</i>
+                        )}
+                      </span>
+                    </span>
+                    <span className="copt__kept-tag copt__kept-tag--add">
+                      <IconPlus />
+                      {it.via === "history" ? "כמו שקנית" : "נוסף"}
+                    </span>
+                  </div>
+                ) : it.changed ? (
                   <>
                     <div className="copt__side copt__side--old">
                       <span className="copt__imgwrap">
@@ -475,7 +666,23 @@ export default function CartOptimizeOverlay({ open, onClose, onApply, onResult }
               <div
                 className={"copt__summary" + (saved ? "" : " copt__summary--ok")}
               >
-                {saved ? (
+                {complete ? (
+                  <>
+                    <span className="copt__summary-check copt__summary-check--add">
+                      <IconPlus />
+                    </span>
+                    <span className="copt__summary-label">
+                      {result.addedCount === 1
+                        ? "מוצר אחד נוסף לעגלה"
+                        : `${result.addedCount} מוצרים נוספו לעגלה`}
+                    </span>
+                    <div className="copt__summary-note">
+                      {completeStrategy === "lastPurchased"
+                        ? "לפי הרכישות האחרונות שלך"
+                        : "הבחירה המשתלמת ביותר בסופר הנוכחי"}
+                    </div>
+                  </>
+                ) : saved ? (
                   <>
                     <div className="copt__summary-row">
                       <span className="copt__summary-label">בסך הכול חסכת</span>
@@ -500,8 +707,21 @@ export default function CartOptimizeOverlay({ open, onClose, onApply, onResult }
                       </span>
                     </div>
                     <div className="copt__summary-note">
-                      {result.changedCount} מוצרים שופרו
-                      {keptCount > 0 ? ` · ${keptCount} כבר אופטימליים` : ""}
+                      {completeCompare
+                        ? `בסופר ${
+                            result.targetSupermarket
+                              ? result.targetSupermarket.name || "הזול ביותר"
+                              : "הזול ביותר"
+                          }${
+                            result.completedCount > 0
+                              ? ` · ${result.completedCount} הושלמו`
+                              : ""
+                          }`
+                        : compare && result.targetSupermarket
+                        ? `בסופר ${result.targetSupermarket.name || "הזול ביותר"}`
+                        : `${result.changedCount} מוצרים שופרו${
+                            keptCount > 0 ? ` · ${keptCount} כבר אופטימליים` : ""
+                          }`}
                     </div>
                   </>
                 ) : (
@@ -510,7 +730,13 @@ export default function CartOptimizeOverlay({ open, onClose, onApply, onResult }
                       <IconCheck />
                     </span>
                     <span className="copt__summary-label">
-                      כל המוצרים כבר במחיר הטוב ביותר
+                      {completeCompare
+                        ? result.completedCount > 0
+                          ? `העגלה הושלמה (${result.completedCount})`
+                          : "העגלה כבר מלאה ובמחיר טוב"
+                        : compare
+                        ? "העגלה שלך כבר זולה מכל הסופרים שבחרת"
+                        : "כל המוצרים כבר במחיר הטוב ביותר"}
                     </span>
                     <div className="copt__summary-note">
                       סך העגלה {money(result.beforeTotal)}
@@ -523,7 +749,13 @@ export default function CartOptimizeOverlay({ open, onClose, onApply, onResult }
 
           <div className="copt__foot">
             <button type="button" className="copt__cta" onClick={applyNow}>
-              {saved ? "החל והמשך לעגלה" : "המשך לעגלה"}
+              {complete
+                ? "המשך לעגלה"
+                : saved
+                ? compare
+                  ? "החלף לסופר הזול והמשך"
+                  : "החל והמשך לעגלה"
+                : "המשך לעגלה"}
               <span className="copt__cta-arrow">
                 <IconArrow />
               </span>
@@ -542,9 +774,17 @@ export default function CartOptimizeOverlay({ open, onClose, onApply, onResult }
         <div className="copt__stage copt__stage--message">
           <CartIcon className="copt__msg-icon" />
           <span className="copt__msg">
-            {phase === "empty"
-              ? "העגלה ריקה — הוסף מוצרים כדי לייעל אותה"
-              : "אירעה שגיאה בייעול. נסה שוב."}
+            {phase === "error"
+              ? "אירעה שגיאה. נסה שוב."
+              : result && result.reason === "no-names"
+              ? 'לא הגדרת "עגלה שלמה" — בחר מוצרים בהגדרות תחילה.'
+              : result && result.reason === "no-carrier"
+              ? "אף אחד מהסופרים שבחרת לא מחזיק את כל מוצרי העגלה. נסה קבוצה אחרת."
+              : result && result.reason === "no-candidates"
+              ? "לא נבחרו סופרים להשוואה."
+              : compare
+              ? "העגלה ריקה — הוסף מוצרים כדי להשוות בין הסופרים"
+              : "העגלה ריקה — הוסף מוצרים כדי לייעל אותה"}
           </span>
           <button type="button" className="copt__cta" onClick={onClose}>
             סגור

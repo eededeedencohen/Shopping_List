@@ -8,10 +8,13 @@ import { usePriceCompareLayout } from "../../context/PriceCompareLayoutContext";
 import { useAITheme } from "../../context/AIThemeContext";
 import { useReceiptTheme } from "../../context/ReceiptThemeContext";
 import { useSupermarketPreferences } from "../../context/SupermarketPreferencesContext";
+import { useCompleteCartPreferences } from "../../context/CompleteCartPreferencesContext";
 import { useAiSettings } from "../../context/AiSettingsContext";
 import { useSupermarkets } from "../../hooks/optimizationHooks";
+import { useProductList } from "../../hooks/appHooks";
 import { useAvailabilityMeta } from "../../hooks/useProductAvailability";
 import SupermarketImage from "../Images/SupermarketImage";
+import CompleteCartPickerSheet from "./CompleteCartPickerSheet";
 import { rebuildAvailabilityIndex } from "../../services/productAvailabilityService";
 import { BUILD_VERSION } from "../../buildInfo";
 
@@ -317,6 +320,15 @@ export default function Settings() {
   } = useSupermarketPreferences();
   const { allSupermarkets } = useSupermarkets();
   const [isBranchPickerOpen, setIsBranchPickerOpen] = useState(false);
+  const { completeCartNames, toggleName, setCompleteCartNames } =
+    useCompleteCartPreferences();
+  const { products } = useProductList();
+  const [isCompleteCartPickerOpen, setIsCompleteCartPickerOpen] =
+    useState(false);
+  const allGeneralNames = React.useMemo(
+    () => [...new Set((products || []).map((p) => p.generalName).filter(Boolean))],
+    [products]
+  );
 
   const navigate = useNavigate();
   const { cart, setCart, sendActiveCart } = useCart();
@@ -331,6 +343,29 @@ export default function Settings() {
     });
     sendActiveCart();
     navigate("/cart");
+  };
+
+  /* "מלא מהעגלה הנוכחית" — add the generalNames of everything currently in the
+     cart to the complete-cart definition (merged, non-destructive). */
+  const cartGeneralNames = React.useMemo(() => {
+    const byBarcode = {};
+    (products || []).forEach((p) => {
+      if (p && p.barcode) byBarcode[p.barcode] = p.generalName;
+    });
+    return [
+      ...new Set(
+        ((cart && cart.products) || [])
+          .map((cp) => byBarcode[cp.barcode])
+          .filter(Boolean)
+      ),
+    ];
+  }, [products, cart]);
+
+  const fillCompleteFromCart = () => {
+    if (!cartGeneralNames.length) return;
+    setCompleteCartNames([
+      ...new Set([...completeCartNames, ...cartGeneralNames]),
+    ]);
   };
 
   /* lookup: id → { name, address, city } — used by the chip list */
@@ -817,6 +852,88 @@ export default function Settings() {
 
         <section className="settings-card">
           <header className="settings-card__header">
+            <span className="settings-card__title">עגלה שלמה</span>
+          </header>
+          <div className="settings-card__body">
+            <p className="settings-card__hint">
+              בחר מוצרים שתמיד צריכים להיות בעגלה. הפעולה "השלם את העגלה" (בכפתור
+              ה-AI) תוסיף כל מוצר כזה שחסר — לפי המחיר הזול ליחידת משקל, או לפי מה
+              שקנית לאחרונה.
+            </p>
+
+            <div className="settings-row">
+              <span className="settings-row__label">מוצרים בעגלה השלמה</span>
+              <span className="settings-row__value">
+                {completeCartNames.length === 0
+                  ? "לא נבחרו"
+                  : completeCartNames.length}
+              </span>
+            </div>
+
+            {completeCartNames.length > 0 && (
+              <div className="settings-preferred-chips">
+                {completeCartNames.slice(0, 30).map((name) => (
+                  <span key={name} className="settings-preferred-chip">
+                    <span className="settings-preferred-chip__text">{name}</span>
+                    <button
+                      type="button"
+                      className="settings-preferred-chip__x"
+                      onClick={() => toggleName(name)}
+                      aria-label="הסר"
+                    >
+                      ×
+                    </button>
+                  </span>
+                ))}
+                {completeCartNames.length > 30 && (
+                  <span className="settings-preferred-chip-more">
+                    + עוד {completeCartNames.length - 30}
+                  </span>
+                )}
+              </div>
+            )}
+
+            <button
+              type="button"
+              className="settings-link-btn"
+              onClick={fillCompleteFromCart}
+              disabled={!cartGeneralNames.length}
+            >
+              <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z" />
+              </svg>
+              {cartGeneralNames.length
+                ? `מלא מהעגלה הנוכחית (${cartGeneralNames.length})`
+                : "העגלה ריקה"}
+            </button>
+
+            <button
+              type="button"
+              className="settings-link-btn"
+              onClick={() => setIsCompleteCartPickerOpen(true)}
+            >
+              <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm1 9h4v2h-4v4h-2v-4H7v-2h4V7h2v4z" />
+              </svg>
+              {completeCartNames.length === 0 ? "בחר מוצרים" : "ערוך מוצרים"}
+              <svg
+                className="settings-link-btn__chevron"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.4"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
+                <polyline points="15 18 9 12 15 6" />
+              </svg>
+            </button>
+          </div>
+        </section>
+
+        <section className="settings-card">
+          <header className="settings-card__header">
             <span className="settings-card__title">אנימציות טעינה</span>
           </header>
           <div className="settings-card__body">
@@ -876,6 +993,14 @@ export default function Settings() {
           onClose={() => setIsBranchPickerOpen(false)}
         />
       )}
+
+      <CompleteCartPickerSheet
+        open={isCompleteCartPickerOpen}
+        allNames={allGeneralNames}
+        selected={completeCartNames}
+        onToggle={toggleName}
+        onClose={() => setIsCompleteCartPickerOpen(false)}
+      />
     </div>
   );
 }
