@@ -4,7 +4,6 @@ import HomePage from "./components/HomePage/HomePage";
 import PriceList from "./components/PriceList/PriceList";
 import Cart from "./components/Cart/Cart";
 import ImageParser from "./components/ImageParser/ImageParser";
-import AudioRecorder from "./components/UploadRecord/AudioRecorder";
 import HistoryPage from "./components/History/HistoryPage";
 import HistoryList from "./components/History/HistoryList";
 import CategoryList from "./components/Cart/Category/CategoryList";
@@ -45,7 +44,6 @@ function Routing() {
       <Route path="/cart" element={<Cart />} />
       <Route path="/stats" element={<Stats />} />
       <Route path="/image-parser" element={<ImageParser />} />
-      <Route path="/audio-recorder" element={<AudioRecorder />} />
       <Route path="/history" element={<HistoryPage />} />
       <Route path="/history/:id" element={<HistoryList />} />
       <Route path="/category" element={<CategoryList />} />

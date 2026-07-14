@@ -14,7 +14,6 @@ import { ReactComponent as GroceryIcon2 } from "./grocery2.svg";
 import { ReactComponent as AiIcon2 } from "./robot.svg";
 import { ReactComponent as PieChartIcon } from "./pie-chart.svg";
 import { ReactComponent as TransactionHistoryIcon } from "./transaction-history.svg";
-import { ReactComponent as Voice2Icon } from "./voice-bot.svg";
 import { ReactComponent as WishlistIcon } from "./wishlist.svg";
 import { ReactComponent as BarcodeIcon} from "./barcode.svg";
 import { ReactComponent as HomeIcon } from "./home.svg";
@@ -208,22 +207,6 @@ function Toolbar() {
                 <PieChartIcon className="svg-icon" />
               </div>
               <h1>סטטיסטיקות</h1>
-            </div>
-          </Link>
-
-          <Link
-            to="/audio-recorder"
-            onClick={() => handleNavClick("/audio-recorder")}
-          >
-            <div
-              className={`nav-item ${
-                selectedPage === "/audio-recorder" ? "selected-page" : ""
-              }`}
-            >
-              <div className="nav-icon">
-                <Voice2Icon className="svg-icon" />
-              </div>
-              <h1>עוזר קולי</h1>
             </div>
           </Link>
 
