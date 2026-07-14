@@ -1441,3 +1441,128 @@
   outline: 2px solid rgba(37, 99, 235, 0.5);
   outline-offset: 1px;
 }
+
+/* Synapse preview — deep navy, cyan/violet nodes, a traveling pulse */
+.ai-theme-preview--synapse {
+  background: linear-gradient(160deg, #0a0f22 0%, #101838 55%, #1b1040 100%);
+}
+.ai-theme-preview__syn-link {
+  position: absolute;
+  height: 1.5px;
+  background: linear-gradient(90deg, rgba(56, 189, 248, 0.7), rgba(167, 139, 250, 0.7));
+  border-radius: 2px;
+}
+.ai-theme-preview__syn-link-1 { top: 38%; left: 20%; width: 46%; transform: rotate(14deg); }
+.ai-theme-preview__syn-link-2 { top: 60%; left: 38%; width: 38%; transform: rotate(-18deg); }
+.ai-theme-preview__syn-node {
+  position: absolute;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #38bdf8;
+  box-shadow: 0 0 8px #38bdf8;
+}
+.ai-theme-preview__syn-node-1 { top: 32%; left: 18%; }
+.ai-theme-preview__syn-node-2 { top: 48%; left: 64%; background: #a78bfa; box-shadow: 0 0 8px #a78bfa; }
+.ai-theme-preview__syn-node-3 { top: 68%; left: 36%; width: 5px; height: 5px; }
+.ai-theme-preview__syn-pulse {
+  position: absolute;
+  top: 36%;
+  left: 22%;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #e0f8ff;
+  box-shadow: 0 0 10px 2px rgba(150, 240, 255, 0.9);
+  animation: aiThemeSynPulse 1.8s ease-in-out infinite;
+}
+@keyframes aiThemeSynPulse {
+  0% { transform: translate(0, 0); opacity: 0; }
+  15% { opacity: 1; }
+  85% { opacity: 1; }
+  100% { transform: translate(150px, 38px) scale(0.7); opacity: 0; }
+}
+
+/* Neon preview — cyberpunk horizon + rushing grid */
+.ai-theme-preview--neon {
+  background: linear-gradient(180deg, #06010f 0%, #2a0845 70%, #0d0121 100%);
+}
+.ai-theme-preview__neon-horizon {
+  position: absolute;
+  left: -6%;
+  right: -6%;
+  top: 52%;
+  height: 3px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, transparent, #00e5ff 30%, #fff 50%, #ff2bd6 70%, transparent);
+  box-shadow: 0 0 10px 2px rgba(0, 229, 255, 0.6), 0 0 20px 6px rgba(255, 43, 214, 0.4);
+}
+.ai-theme-preview__neon-grid {
+  position: absolute;
+  left: -20%;
+  right: -20%;
+  top: 54%;
+  bottom: 0;
+  background-image:
+    repeating-linear-gradient(90deg, rgba(255, 43, 214, 0.55) 0 1.5px, transparent 1.5px 22px),
+    repeating-linear-gradient(0deg, rgba(255, 43, 214, 0.45) 0 1.5px, transparent 1.5px 12px);
+  transform: perspective(60px) rotateX(55deg);
+  transform-origin: top center;
+}
+.ai-theme-preview__neon-spark {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+}
+.ai-theme-preview__neon-spark-1 {
+  top: 24%; left: 28%;
+  background: #7ff3ff;
+  box-shadow: 0 0 8px 2px rgba(0, 229, 255, 0.8);
+}
+.ai-theme-preview__neon-spark-2 {
+  top: 34%; left: 70%;
+  background: #ff8ae6;
+  box-shadow: 0 0 8px 2px rgba(255, 43, 214, 0.8);
+}
+
+/* Hacker preview — dark board with a lit circuit trace */
+.ai-theme-preview--hacker {
+  background: linear-gradient(165deg, #04110c 0%, #020b10 100%);
+}
+.ai-theme-preview__pcb {
+  position: absolute;
+  background: rgba(22, 255, 126, 0.35);
+  box-shadow: 0 0 5px rgba(22, 255, 126, 0.5);
+}
+.ai-theme-preview__pcb-1 { top: 34%; left: 12%; width: 44%; height: 2px; }
+.ai-theme-preview__pcb-2 { top: 34%; left: calc(12% + 44%); width: 2px; height: 34%; }
+.ai-theme-preview__pcb-pad {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  border: 2px solid rgba(22, 255, 126, 0.7);
+  background: rgba(2, 11, 8, 0.9);
+  box-shadow: 0 0 7px rgba(22, 255, 126, 0.6);
+}
+.ai-theme-preview__pcb-pad-1 { top: calc(34% - 3px); left: calc(12% - 4px); }
+.ai-theme-preview__pcb-pad-2 { top: calc(68% - 2px); left: calc(56% - 3px); }
+.ai-theme-preview__pcb-sig {
+  position: absolute;
+  top: calc(34% - 2px);
+  left: 12%;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #eafff0;
+  box-shadow: 0 0 9px 3px rgba(22, 255, 126, 0.9);
+  animation: aiThemePcbSig 2.2s linear infinite;
+}
+@keyframes aiThemePcbSig {
+  0% { transform: translate(0, 0); opacity: 0; }
+  10% { opacity: 1; }
+  60% { transform: translate(150px, 0); opacity: 1; }
+  95% { transform: translate(150px, 22px); opacity: 1; }
+  100% { transform: translate(150px, 24px); opacity: 0; }
+}

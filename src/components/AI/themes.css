@@ -225,3 +225,110 @@
               0 0 14px rgba(0, 230, 255, 0.45),
               inset 0 0 4px rgba(255, 255, 255, 0.7);
 }
+
+/* ── Synapse (רשת עצבית): electric cyan + violet accent ─────────── */
+.ai-container.theme-synapse {
+  --grad-start: #38bdf8;
+  --grad-mid:   #a78bfa;
+  --grad-end:   #0a0f22;
+}
+.ai-container.theme-synapse .settings-toggle-btn {
+  border-color: rgba(56, 189, 248, 0.4);
+  background: rgba(56, 189, 248, 0.12);
+}
+.ai-container.theme-synapse .lang-btn.active,
+.ai-container.theme-synapse .toggle-switch.on,
+.ai-container.theme-synapse .test-open-btn {
+  background: linear-gradient(135deg, #38bdf8, #a78bfa);
+  border-color: rgba(167, 139, 250, 0.55);
+  box-shadow: 0 5px 16px rgba(56, 189, 248, 0.35);
+}
+.ai-container.theme-synapse .message-item.user {
+  background: linear-gradient(135deg, #0ea5e9 0%, #8b5cf6 100%);
+  border: 1px solid rgba(167, 139, 250, 0.35);
+  box-shadow: 0 4px 14px rgba(56, 189, 248, 0.3),
+              0 0 20px rgba(139, 92, 246, 0.18);
+}
+.ai-container.theme-synapse .message-item.assistant,
+.ai-container.theme-synapse .op-message-bubble {
+  border-color: rgba(56, 189, 248, 0.3);
+  box-shadow: 0 2px 12px rgba(56, 189, 248, 0.14),
+              0 0 0 1px rgba(167, 139, 250, 0.12) inset;
+}
+.ai-container.theme-synapse .user-text-box {
+  border-color: rgba(56, 189, 248, 0.32);
+  box-shadow: 0 4px 14px rgba(56, 189, 248, 0.2),
+              0 0 0 1px rgba(167, 139, 250, 0.16) inset;
+}
+
+/* ── Neon (ניאון סיטי): hot magenta + electric cyan accent ─────────── */
+.ai-container.theme-neon {
+  --grad-start: #ff2bd6;
+  --grad-mid:   #00e5ff;
+  --grad-end:   #12042b;
+}
+.ai-container.theme-neon .settings-toggle-btn {
+  border-color: rgba(255, 43, 214, 0.42);
+  background: rgba(255, 43, 214, 0.12);
+}
+.ai-container.theme-neon .lang-btn.active,
+.ai-container.theme-neon .toggle-switch.on,
+.ai-container.theme-neon .test-open-btn {
+  background: linear-gradient(135deg, #ff2bd6, #00e5ff);
+  border-color: rgba(0, 229, 255, 0.55);
+  box-shadow: 0 5px 16px rgba(255, 43, 214, 0.4);
+}
+.ai-container.theme-neon .message-item.user {
+  background: linear-gradient(135deg, #e11dc0 0%, #06b6d4 100%);
+  border: 1px solid rgba(0, 229, 255, 0.35);
+  box-shadow: 0 4px 14px rgba(255, 43, 214, 0.35),
+              0 0 22px rgba(0, 229, 255, 0.18);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+.ai-container.theme-neon .message-item.assistant,
+.ai-container.theme-neon .op-message-bubble {
+  border-color: rgba(0, 229, 255, 0.32);
+  box-shadow: 0 2px 12px rgba(255, 43, 214, 0.16),
+              0 0 0 1px rgba(0, 229, 255, 0.12) inset;
+}
+.ai-container.theme-neon .user-text-box {
+  border-color: rgba(255, 43, 214, 0.32);
+  box-shadow: 0 4px 14px rgba(255, 43, 214, 0.22),
+              0 0 0 1px rgba(0, 229, 255, 0.18) inset;
+}
+
+/* ── Hacker (סייבר האקר): matrix green accent ─────────── */
+.ai-container.theme-hacker {
+  --grad-start: #16ff7e;
+  --grad-mid:   #00e5a8;
+  --grad-end:   #01100a;
+}
+.ai-container.theme-hacker .settings-toggle-btn {
+  border-color: rgba(22, 255, 126, 0.4);
+  background: rgba(22, 255, 126, 0.1);
+}
+.ai-container.theme-hacker .lang-btn.active,
+.ai-container.theme-hacker .toggle-switch.on,
+.ai-container.theme-hacker .test-open-btn {
+  background: linear-gradient(135deg, #10b981, #16ff7e);
+  border-color: rgba(22, 255, 126, 0.5);
+  box-shadow: 0 5px 16px rgba(22, 255, 126, 0.3);
+}
+.ai-container.theme-hacker .message-item.user {
+  background: linear-gradient(135deg, #047857 0%, #10d47e 100%);
+  border: 1px solid rgba(22, 255, 126, 0.35);
+  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.35),
+              0 0 20px rgba(22, 255, 126, 0.15);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+}
+.ai-container.theme-hacker .message-item.assistant,
+.ai-container.theme-hacker .op-message-bubble {
+  border-color: rgba(22, 255, 126, 0.28);
+  box-shadow: 0 2px 12px rgba(16, 185, 129, 0.14),
+              0 0 0 1px rgba(22, 255, 126, 0.1) inset;
+}
+.ai-container.theme-hacker .user-text-box {
+  border-color: rgba(22, 255, 126, 0.3);
+  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.2),
+              0 0 0 1px rgba(22, 255, 126, 0.14) inset;
+}

@@ -1,0 +1,378 @@
+/* "ניאון סיטי" — premium cyberpunk. Layer order (back→front):
+   sky → stars ×2 → nebula → sweeping beam → horizon glow → 3D grid →
+   rising sparks → scanlines → vignette. */
+
+.neon-bg {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  background: linear-gradient(
+    180deg,
+    #06010f 0%,
+    #12042b 40%,
+    #2a0845 62%,
+    #0d0121 100%
+  );
+}
+
+/* ── stars (two parallax twinkle layers) ── */
+.neon-stars {
+  position: absolute;
+  inset: 0 0 42% 0;
+  pointer-events: none;
+}
+.neon-stars--far {
+  background-image:
+    radial-gradient(1px 1px at 8% 22%, rgba(255, 255, 255, 0.8), transparent),
+    radial-gradient(1px 1px at 23% 64%, rgba(180, 240, 255, 0.7), transparent),
+    radial-gradient(1px 1px at 37% 15%, rgba(255, 255, 255, 0.6), transparent),
+    radial-gradient(1px 1px at 52% 48%, rgba(255, 200, 250, 0.7), transparent),
+    radial-gradient(1px 1px at 68% 27%, rgba(255, 255, 255, 0.65), transparent),
+    radial-gradient(1px 1px at 82% 60%, rgba(180, 240, 255, 0.6), transparent),
+    radial-gradient(1px 1px at 93% 18%, rgba(255, 255, 255, 0.75), transparent);
+  animation: neon-twinkle 5s ease-in-out infinite;
+}
+.neon-stars--near {
+  background-image:
+    radial-gradient(1.6px 1.6px at 15% 40%, #fff, transparent),
+    radial-gradient(2px 2px at 45% 12%, rgba(120, 235, 255, 0.95), transparent),
+    radial-gradient(1.6px 1.6px at 62% 55%, #fff, transparent),
+    radial-gradient(2px 2px at 78% 34%, rgba(255, 120, 230, 0.9), transparent),
+    radial-gradient(1.6px 1.6px at 90% 70%, #fff, transparent);
+  animation: neon-twinkle 3.6s ease-in-out 0.8s infinite;
+}
+
+/* ── nebula tints ── */
+.neon-nebula {
+  position: absolute;
+  inset: 0 0 35% 0;
+  background:
+    radial-gradient(60% 45% at 22% 30%, rgba(124, 58, 237, 0.28) 0%, transparent 70%),
+    radial-gradient(50% 40% at 80% 18%, rgba(6, 182, 212, 0.2) 0%, transparent 70%),
+    radial-gradient(70% 55% at 55% 60%, rgba(236, 72, 153, 0.16) 0%, transparent 72%);
+  filter: blur(4px);
+  animation: neon-nebula-drift 16s ease-in-out infinite alternate;
+  pointer-events: none;
+}
+
+/* ── slow sweeping light beam ── */
+.neon-beam {
+  position: absolute;
+  top: -10%;
+  bottom: 40%;
+  left: -30%;
+  width: 34%;
+  background: linear-gradient(
+    100deg,
+    transparent 0%,
+    rgba(120, 235, 255, 0.07) 42%,
+    rgba(255, 90, 220, 0.1) 55%,
+    transparent 100%
+  );
+  transform: skewX(-12deg);
+  filter: blur(6px);
+  animation: neon-beam-sweep 13s ease-in-out infinite;
+  pointer-events: none;
+}
+
+/* ── the synth sun — striped disc sinking into the horizon ── */
+.neon-sun-wrap {
+  position: absolute;
+  left: 50%;
+  top: calc(58% - 172px); /* the wrap ends AT the horizon */
+  transform: translateX(-50%);
+  width: 240px;
+  height: 172px; /* everything below the horizon is clipped */
+  overflow: hidden;
+  pointer-events: none;
+}
+.neon-sun {
+  position: absolute;
+  bottom: -52px; /* the disc's lower part sinks below the horizon */
+  left: 50%;
+  transform: translateX(-50%);
+  width: 210px;
+  height: 210px;
+  border-radius: 50%;
+  background: linear-gradient(
+    180deg,
+    #9df6ff 0%,
+    #58d4ff 24%,
+    #b06cff 52%,
+    #ff2bd6 78%,
+    #ff4fa3 100%
+  );
+  /* classic synthwave slats — thicker toward the bottom */
+  -webkit-mask-image: linear-gradient(
+    180deg,
+    #000 0 44%,
+    transparent 44% 47%,
+    #000 47% 55%,
+    transparent 55% 59%,
+    #000 59% 66%,
+    transparent 66% 71%,
+    #000 71% 77%,
+    transparent 77% 83%,
+    #000 83% 88%,
+    transparent 88% 100%
+  );
+  mask-image: linear-gradient(
+    180deg,
+    #000 0 44%,
+    transparent 44% 47%,
+    #000 47% 55%,
+    transparent 55% 59%,
+    #000 59% 66%,
+    transparent 66% 71%,
+    #000 71% 77%,
+    transparent 77% 83%,
+    #000 83% 88%,
+    transparent 88% 100%
+  );
+  filter: drop-shadow(0 0 26px rgba(255, 43, 214, 0.65))
+    drop-shadow(0 0 60px rgba(88, 212, 255, 0.35));
+  animation: neon-sun-rise 9s ease-in-out infinite alternate;
+}
+
+/* ── mountain silhouettes with glowing ridgelines ── */
+.neon-mtn {
+  position: absolute;
+  top: 42%;
+  height: 16.5%;
+  background: linear-gradient(180deg, #140628 0%, #0a0118 100%);
+  pointer-events: none;
+}
+.neon-mtn--back {
+  left: 0;
+  right: 0;
+  clip-path: polygon(
+    0 100%, 0 62%, 7% 38%, 14% 66%, 22% 30%, 30% 58%, 36% 70%, 44% 88%,
+    56% 88%, 64% 68%, 71% 26%, 80% 56%, 88% 40%, 100% 68%, 100% 100%
+  );
+  opacity: 0.55;
+  filter: drop-shadow(0 -2px 6px rgba(124, 58, 237, 0.5));
+}
+.neon-mtn--left {
+  left: 0;
+  width: 46%;
+  top: 45.5%;
+  height: 13%;
+  clip-path: polygon(
+    0 100%, 0 40%, 12% 62%, 25% 18%, 39% 66%, 52% 34%, 66% 74%, 82% 46%,
+    100% 100%
+  );
+  filter: drop-shadow(0 -2px 7px rgba(0, 229, 255, 0.55));
+}
+.neon-mtn--right {
+  right: 0;
+  width: 46%;
+  top: 45.5%;
+  height: 13%;
+  clip-path: polygon(
+    0 100%, 16% 50%, 30% 76%, 44% 26%, 58% 64%, 72% 14%, 86% 58%, 100% 36%,
+    100% 100%
+  );
+  filter: drop-shadow(0 -2px 7px rgba(255, 43, 214, 0.55));
+}
+
+/* ── horizon ── */
+.neon-horizon {
+  position: absolute;
+  left: -10%;
+  right: -10%;
+  top: 58%;
+  height: 5px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    #00e5ff 22%,
+    #ffffff 50%,
+    #ff2bd6 78%,
+    transparent 100%
+  );
+  border-radius: 999px;
+  box-shadow:
+    0 0 18px 4px rgba(0, 229, 255, 0.55),
+    0 0 46px 14px rgba(255, 43, 214, 0.4),
+    0 -30px 70px 18px rgba(124, 58, 237, 0.35);
+  animation: neon-horizon-pulse 4.5s ease-in-out infinite;
+}
+
+/* ── the endless grid ── */
+.neon-grid-wrap {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 58%;
+  bottom: 0;
+  overflow: hidden;
+  perspective: 220px;
+  perspective-origin: 50% 0%;
+}
+.neon-grid {
+  position: absolute;
+  left: -60%;
+  right: -60%;
+  top: 0;
+  height: 340%;
+  transform: rotateX(62deg);
+  transform-origin: top center;
+  background-image:
+    /* major magenta verticals */
+    repeating-linear-gradient(
+      90deg,
+      rgba(255, 43, 214, 0.55) 0 2px,
+      transparent 2px 90px
+    ),
+    /* minor cyan verticals */
+    repeating-linear-gradient(
+      90deg,
+      rgba(0, 229, 255, 0.16) 0 1px,
+      transparent 1px 30px
+    ),
+    /* horizontals rushing toward the viewer */
+    repeating-linear-gradient(
+      0deg,
+      rgba(255, 43, 214, 0.5) 0 2px,
+      rgba(0, 229, 255, 0.12) 2px 3px,
+      transparent 3px 70px
+    );
+  animation: neon-grid-rush 2.6s linear infinite;
+  box-shadow: 0 0 60px rgba(255, 43, 214, 0.25) inset;
+}
+/* energy wave racing across the grid toward the horizon */
+.neon-wave {
+  position: absolute;
+  left: -10%;
+  right: -10%;
+  height: 26%;
+  bottom: -30%;
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    rgba(0, 229, 255, 0.28) 40%,
+    rgba(255, 43, 214, 0.34) 60%,
+    transparent 100%
+  );
+  filter: blur(6px);
+  animation: neon-wave-race 3.4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  pointer-events: none;
+}
+
+/* fade the grid into the deep ── */
+.neon-grid-wrap::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(13, 1, 33, 0) 0%,
+    rgba(13, 1, 33, 0.25) 60%,
+    rgba(13, 1, 33, 0.85) 100%
+  );
+  pointer-events: none;
+}
+
+/* ── rising neon sparks ── */
+.neon-sparks {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.neon-sparks i {
+  --i: 0;
+  position: absolute;
+  bottom: -12px;
+  left: calc(6% + var(--i) * 10.5%);
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #7ff3ff;
+  box-shadow: 0 0 10px 2px rgba(0, 229, 255, 0.7);
+  opacity: 0;
+  animation: neon-spark-rise calc(6s + var(--i) * 1.3s) linear
+    calc(var(--i) * 0.9s) infinite;
+}
+.neon-sparks i:nth-child(even) {
+  background: #ff8ae6;
+  box-shadow: 0 0 10px 2px rgba(255, 43, 214, 0.7);
+  width: 3px;
+  height: 3px;
+}
+
+/* ── finish ── */
+.neon-scanlines {
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(255, 255, 255, 0.02) 0 1px,
+    transparent 1px 4px
+  );
+  mix-blend-mode: overlay;
+  pointer-events: none;
+}
+.neon-vignette {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    125% 105% at 50% 42%,
+    transparent 52%,
+    rgba(3, 0, 10, 0.6) 100%
+  );
+  pointer-events: none;
+}
+
+/* ── keyframes ── */
+@keyframes neon-twinkle {
+  0%, 100% { opacity: 0.55; }
+  50% { opacity: 1; }
+}
+@keyframes neon-nebula-drift {
+  0% { transform: translateX(-2%) scale(1); }
+  100% { transform: translateX(2%) scale(1.06); }
+}
+@keyframes neon-beam-sweep {
+  0%, 100% { left: -30%; opacity: 0; }
+  15% { opacity: 1; }
+  50% { left: 96%; opacity: 0.9; }
+  60% { opacity: 0; }
+}
+@keyframes neon-horizon-pulse {
+  0%, 100% { filter: brightness(1); }
+  50% { filter: brightness(1.35); }
+}
+@keyframes neon-grid-rush {
+  from { background-position: 0 0, 0 0, 0 0; }
+  to { background-position: 0 0, 0 0, 0 70px; }
+}
+@keyframes neon-sun-rise {
+  0% { transform: translateX(-50%) translateY(6px); }
+  100% { transform: translateX(-50%) translateY(-8px); }
+}
+@keyframes neon-wave-race {
+  0% { bottom: -30%; opacity: 0; }
+  12% { opacity: 1; }
+  85% { opacity: 0.8; }
+  100% { bottom: 96%; opacity: 0; }
+}
+@keyframes neon-spark-rise {
+  0% { opacity: 0; transform: translateY(0) scale(1); }
+  8% { opacity: 0.9; }
+  85% { opacity: 0.5; }
+  100% { opacity: 0; transform: translateY(-72vh) scale(0.5); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .neon-stars,
+  .neon-nebula,
+  .neon-beam,
+  .neon-horizon,
+  .neon-grid,
+  .neon-wave,
+  .neon-sun,
+  .neon-sparks i {
+    animation: none;
+  }
+}

@@ -1,0 +1,58 @@
+/* "רשת עצבית" — deep navy-violet space with a breathing core glow.
+   The canvas draws the living network on top; a vignette frames the scene. */
+
+.synapse-bg {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  background:
+    radial-gradient(110% 80% at 20% 8%, rgba(88, 60, 200, 0.22) 0%, transparent 55%),
+    radial-gradient(120% 90% at 85% 90%, rgba(14, 116, 144, 0.2) 0%, transparent 55%),
+    linear-gradient(168deg, #0a0f22 0%, #0c1230 45%, #070b1a 100%);
+}
+
+.synapse-glow {
+  position: absolute;
+  top: 32%;
+  left: 50%;
+  width: 130vw;
+  height: 70vh;
+  transform: translate(-50%, -50%);
+  background: radial-gradient(
+    ellipse at center,
+    rgba(56, 189, 248, 0.1) 0%,
+    rgba(139, 92, 246, 0.06) 40%,
+    transparent 70%
+  );
+  filter: blur(10px);
+  animation: synapse-breathe 7s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.synapse-canvas {
+  position: absolute;
+  inset: 0;
+}
+
+.synapse-vignette {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    130% 110% at 50% 45%,
+    transparent 55%,
+    rgba(4, 7, 16, 0.55) 100%
+  );
+  pointer-events: none;
+}
+
+@keyframes synapse-breathe {
+  0%, 100% { opacity: 0.65; transform: translate(-50%, -50%) scale(0.96); }
+  50% { opacity: 1; transform: translate(-50%, -50%) scale(1.05); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .synapse-glow {
+    animation: none;
+  }
+}

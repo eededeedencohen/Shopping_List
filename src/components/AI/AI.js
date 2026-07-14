@@ -6,6 +6,9 @@ import "./AI.css";
 import "./themes.css";
 import MessageItem from "./MessageItem/MessageItem";
 import NeuronBackground from "./NeuronBackground";
+import SynapseBackground from "./SynapseBackground";
+import NeonBackground from "./NeonBackground";
+import HackerBackground from "./HackerBackground";
 import AuroraBackground from "./AuroraBackground";
 import GalaxyBackground from "./GalaxyBackground";
 import CyberBackground from "./CyberBackground";
@@ -515,6 +518,9 @@ export default function AI() {
 
       <div className={`ai-container theme-${aiTheme}`}>
         {aiTheme === "neurons" && <NeuronBackground />}
+        {aiTheme === "synapse" && <SynapseBackground />}
+        {aiTheme === "neon" && <NeonBackground />}
+        {aiTheme === "hacker" && <HackerBackground />}
         {aiTheme === "aurora" && <AuroraBackground />}
         {aiTheme === "galaxy" && <GalaxyBackground />}
         {aiTheme === "cyber" && <CyberBackground />}

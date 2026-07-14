@@ -4,9 +4,12 @@ const STORAGE_KEY = "aiTheme";
 const DEFAULT_THEME = "neurons";
 const VALID_THEMES = [
   "neurons",
+  "synapse",
   "aurora",
   "galaxy",
   "cyber",
+  "neon",
+  "hacker",
   "dawn",
   "clouds",
   "bloom",

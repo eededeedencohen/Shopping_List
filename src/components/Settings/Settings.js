@@ -53,6 +53,21 @@ const AI_THEME_OPTIONS = [
     description: "חלקיקים זוהרים מחוברים — קלאסי וטכנולוגי",
   },
   {
+    value: "synapse",
+    label: "רשת נוירונים",
+    description: "הקלאסי בגרסה מלוטשת — חלקיקים חדים, חיבורים חיים ואותות",
+  },
+  {
+    value: "hacker",
+    label: "סייבר האקר",
+    description: "מעגל מודפס חי — אותות דוהרים במסלולים, גליץ' וסריקה",
+  },
+  {
+    value: "neon",
+    label: "ניאון סיטי",
+    description: "סייברפאנק עמוק — שמש ניאון, הרים וגריד אינסופי",
+  },
+  {
     value: "aurora",
     label: "זוהר צפוני",
     description: "ענני צבע נעים בתנועה איטית — חולמני",
@@ -190,6 +205,33 @@ function AIThemePreview({ value }) {
         <>
           <span className="ai-theme-preview__sun" />
           <span className="ai-theme-preview__grid" />
+        </>
+      )}
+      {value === "synapse" && (
+        <>
+          <span className="ai-theme-preview__syn-link ai-theme-preview__syn-link-1" />
+          <span className="ai-theme-preview__syn-link ai-theme-preview__syn-link-2" />
+          <span className="ai-theme-preview__syn-node ai-theme-preview__syn-node-1" />
+          <span className="ai-theme-preview__syn-node ai-theme-preview__syn-node-2" />
+          <span className="ai-theme-preview__syn-node ai-theme-preview__syn-node-3" />
+          <span className="ai-theme-preview__syn-pulse" />
+        </>
+      )}
+      {value === "neon" && (
+        <>
+          <span className="ai-theme-preview__neon-horizon" />
+          <span className="ai-theme-preview__neon-grid" />
+          <span className="ai-theme-preview__neon-spark ai-theme-preview__neon-spark-1" />
+          <span className="ai-theme-preview__neon-spark ai-theme-preview__neon-spark-2" />
+        </>
+      )}
+      {value === "hacker" && (
+        <>
+          <span className="ai-theme-preview__pcb ai-theme-preview__pcb-1" />
+          <span className="ai-theme-preview__pcb ai-theme-preview__pcb-2" />
+          <span className="ai-theme-preview__pcb-pad ai-theme-preview__pcb-pad-1" />
+          <span className="ai-theme-preview__pcb-pad ai-theme-preview__pcb-pad-2" />
+          <span className="ai-theme-preview__pcb-sig" />
         </>
       )}
     </div>
