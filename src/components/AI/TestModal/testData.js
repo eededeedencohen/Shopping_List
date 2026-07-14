@@ -1,6 +1,7 @@
 /* ──────────────────────────────────────────────
    Test data – fake AI responses for each type
    ────────────────────────────────────────────── */
+import { getPriceListByBarcode } from "../../../services/priceService";
 
 export const TEST_B1 = {
   messageToUser:
@@ -226,6 +227,70 @@ export const TEST_CART_BATCH_ADD = {
   data: null,
 };
 
+/* LIVE variant of the B1 test: keep the fixture's product docs, but fetch the
+   CURRENT prices of those barcodes across ALL branches from the server, and
+   assemble the exact production shape { chain: [{branchName, branchAddress,
+   products:[{product, price}]}] }. Returns null on failure → caller falls back
+   to the static fixture. */
+export async function buildLiveB1Data() {
+  const productByBarcode = {};
+  Object.values(TEST_B1.data)
+    .flat()
+    .forEach((branch) =>
+      (branch.products || []).forEach(({ product }) => {
+        if (product && product.barcode) productByBarcode[product.barcode] = product;
+      })
+    );
+  const barcodes = Object.keys(productByBarcode);
+  const lists = await Promise.all(
+    barcodes.map((bc) => getPriceListByBarcode(bc).catch(() => []))
+  );
+
+  /* The B1 demo asks about Rami Levy — keep only its branches (like the real
+     flow, where the agent resolves the requested chain's supermarketIDs). */
+  const CHAIN_FILTER = "רמי לוי";
+  const chains = {}; // chain name → Map(branchKey → branch)
+  lists.forEach((prices, i) => {
+    const product = productByBarcode[barcodes[i]];
+    (prices || []).forEach((pd) => {
+      const sm = pd.supermarket || {};
+      if (!sm.name || sm.name !== CHAIN_FILTER) return;
+      const chain = sm.name;
+      const key = `${sm.name}|${sm.address || ""}`;
+      if (!chains[chain]) chains[chain] = new Map();
+      if (!chains[chain].has(key)) {
+        chains[chain].set(key, {
+          branchName: sm.name,
+          branchAddress: sm.address || "",
+          products: [],
+        });
+      }
+      chains[chain].get(key).products.push({
+        product,
+        price: {
+          price: pd.price,
+          hasDiscount: pd.hasDiscount,
+          discount: pd.discount || null,
+        },
+      });
+    });
+  });
+
+  const data = {};
+  Object.entries(chains).forEach(([chain, branchMap]) => {
+    data[chain] = [...branchMap.values()];
+  });
+  if (!Object.keys(data).length) return null;
+
+  return {
+    messageToUser:
+      "להלן מחירי דוריטוס העדכניים בכל סניפי רמי לוי. הקש על סניף כדי להשוות מולו.",
+    messageType: "B1 Result",
+    actions: [],
+    data,
+  };
+}
+
 export const ALL_TESTS = [
   {
     id: "b1",
@@ -233,6 +298,7 @@ export const ALL_TESTS = [
     icon: "\uD83D\uDCCA",
     description: "תצוגת מחירי מוצרים בסניפים",
     data: TEST_B1,
+    buildData: buildLiveB1Data,
   },
   {
     id: "message",

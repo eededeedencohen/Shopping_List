@@ -13,7 +13,7 @@ import { calculateTotalPrice } from "./priceCalculations";
  *
  * @returns {{ value:number, label:string, family:string }}
  */
-function unitPrice(lineTotal, quantity, unitWeight, weight) {
+export function unitPrice(lineTotal, quantity, unitWeight, weight) {
   const q = Number(quantity) > 0 ? Number(quantity) : 1;
   const perPack = (Number(lineTotal) || 0) / q;
   const uw = String(unitWeight || "");
