@@ -2,6 +2,16 @@
    Test data – fake AI responses for each type
    ────────────────────────────────────────────── */
 import { getPriceListByBarcode } from "../../../services/priceService";
+import B1_RICH_DATA from "../b1Data.json";
+
+/* the alternate B1 fixture — 8 branches with mixed deals (rich board demo) */
+export const TEST_B1_RICH = {
+  messageToUser:
+    "להלן השוואת מחירי דוריטוס בסניפי רמי לוי, כולל מבצעים פעילים.",
+  messageType: "B1 Result",
+  actions: [],
+  data: B1_RICH_DATA,
+};
 
 export const TEST_B1 = {
   messageToUser:
@@ -299,6 +309,13 @@ export const ALL_TESTS = [
     description: "תצוגת מחירי מוצרים בסניפים",
     data: TEST_B1,
     buildData: buildLiveB1Data,
+  },
+  {
+    id: "b1rich",
+    label: "B1 - עם מבצעים",
+    icon: "🏷️",
+    description: "לוח מחירים עשיר עם מבצעים (נתוני דמו)",
+    data: TEST_B1_RICH,
   },
   {
     id: "message",

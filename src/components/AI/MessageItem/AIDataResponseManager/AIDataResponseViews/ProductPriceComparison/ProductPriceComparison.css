@@ -542,6 +542,7 @@
 }
 
 .ppc__focus {
+  position: relative; /* anchors the ✕ close button */
   display: flex;
   align-items: center;
   gap: 9px;
@@ -788,5 +789,415 @@
   }
   .ppc__row {
     opacity: 1;
+  }
+}
+
+/* ═══════════════ branch bar-board ("סניפים" view) ═══════════════
+   Y = branches, X = price. Every product is a horizontal bar in its own
+   color; a deal splits it into a bright part (per-unit deal price) and a
+   darker continuation up to the regular price. RTL: the axis (₪0) sits on
+   the RIGHT and bars grow leftward, so the tip = the price. */
+
+.ppcb__key {
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* compact: data must not sink below the fold */
+  gap: 5px;
+  margin: 2px 0 8px;
+}
+.ppcb__key-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 7px 4px 8px;
+  border-radius: 11px;
+  background: rgba(255, 255, 255, 0.09);
+  border: 1px solid color-mix(in srgb, var(--clr) 45%, transparent);
+  color: #fff;
+  cursor: pointer;
+  font: inherit;
+  text-align: right;
+  min-width: 0;
+  transition: opacity 0.2s ease, filter 0.2s ease;
+}
+.ppcb__key-item .ppc__legend-img {
+  width: 26px;
+  height: 26px;
+  flex: none;
+}
+.ppcb__key-item.is-off {
+  opacity: 0.35;
+  filter: grayscale(0.8);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+.ppcb__key-text {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+.ppcb__key-name {
+  font-size: 0.66rem;
+  font-weight: 800;
+  line-height: 1.2;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 3; /* wrap, don't truncate — names must stay readable */
+  -webkit-box-orient: vertical;
+}
+.ppcb__key-dot {
+  display: inline-block;
+  vertical-align: -1px;
+  margin-inline-end: 4px;
+  width: 9px;
+  height: 9px;
+  border-radius: 3px;
+  background: var(--clr);
+  box-shadow: 0 0 8px color-mix(in srgb, var(--clr) 70%, transparent);
+}
+.ppcb__key-sub {
+  font-size: 0.6rem;
+  color: rgba(255, 255, 255, 0.55);
+}
+.ppcb__key-price {
+  font-size: 0.7rem;
+  font-weight: 900;
+  color: var(--clr);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  margin-inline-start: auto;
+}
+/* slim sticky color key — stays pinned while the tall board scrolls */
+.ppcb__rail {
+  position: sticky;
+  top: 0;
+  z-index: 6;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px 10px;
+  align-items: center;
+  padding: 5px 10px;
+  margin: 0 0 6px;
+  border-radius: 11px;
+  background: rgba(15, 18, 40, 0.97);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+}
+.ppcb__rail-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.6rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.85);
+  white-space: nowrap;
+}
+.ppcb__rail-chip i {
+  width: 8px;
+  height: 8px;
+  border-radius: 3px;
+  background: var(--clr);
+  box-shadow: 0 0 6px color-mix(in srgb, var(--clr) 60%, transparent);
+}
+.ppcb__key-deals {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 0.66rem;
+  color: rgba(255, 255, 255, 0.75);
+  margin: 0 2px 6px;
+}
+.ppcb__key-sample {
+  display: inline-flex;
+  width: 34px;
+  height: 10px;
+  border-radius: 3px;
+  overflow: hidden;
+  flex: none;
+}
+.ppcb__key-sample .is-light {
+  width: 60%;
+  background: #818cf8;
+}
+.ppcb__key-sample .is-dark {
+  width: 40%;
+  background: color-mix(in srgb, #818cf8 40%, #141a33);
+  border-right: 1.5px solid rgba(255, 255, 255, 0.9);
+  box-sizing: border-box;
+}
+.ppcb__insight {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.85);
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+  padding: 6px 10px;
+  margin: 0 0 8px;
+}
+.ppc__focus-deal {
+  font-style: normal;
+  font-size: 0.64rem;
+  font-weight: 700;
+  color: #fbbf24;
+}
+
+.ppcb__plot {
+  position: relative;
+  padding-bottom: 18px;
+}
+.ppcb__grid {
+  position: absolute;
+  inset: 0 0 18px 0;
+  pointer-events: none;
+}
+.ppcb__grid i {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: rgba(255, 255, 255, 0.08);
+}
+.ppcb__grid i.is-axis {
+  width: 2px;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 2px;
+}
+.ppcb__branch {
+  position: relative;
+  padding: 8px 0 9px;
+  border-bottom: 1px dashed rgba(255, 255, 255, 0.1);
+}
+.ppcb__branch:last-of-type {
+  border-bottom: none;
+}
+.ppcb__bhead {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-bottom: 6px;
+  min-width: 0;
+}
+.ppcb__blogo {
+  flex: none;
+  width: 24px;
+  height: 24px;
+  border-radius: 7px;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+.ppcb__blogo img {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+}
+.ppcb__bname {
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: #fff;
+  white-space: nowrap;
+}
+.ppcb__baddr {
+  font-size: 0.66rem;
+  color: rgba(255, 255, 255, 0.55);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+.ppcb__bsub {
+  font-size: 0.62rem;
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.55);
+  margin: -2px 31px 7px 0; /* aligns under the name, past the logo */
+}
+.ppcb__btag {
+  flex: none;
+  font-size: 0.6rem;
+  font-weight: 800;
+  color: #6ee7b7;
+  background: rgba(16, 185, 129, 0.16);
+  border: 1px solid rgba(52, 211, 153, 0.45);
+  padding: 2px 8px;
+  border-radius: 999px;
+}
+.ppcb__btag--same {
+  color: #a5b4fc;
+  background: rgba(129, 140, 248, 0.14);
+  border-color: rgba(129, 140, 248, 0.42);
+}
+.ppcb__btag--nodeal {
+  color: #fda4af;
+  background: rgba(251, 113, 133, 0.12);
+  border-color: rgba(251, 113, 133, 0.4);
+}
+.ppcb__barrow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  min-height: 22px; /* even rhythm whether or not a row carries pills */
+  padding: 2.5px 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font: inherit;
+}
+.ppcb__bar {
+  flex: none;
+  height: 15px;
+  display: flex;
+  border-radius: 9px 3px 3px 9px; /* RTL: the tip (left) is rounded */
+  overflow: hidden;
+  box-shadow: 0 0 9px color-mix(in srgb, var(--clr) 30%, transparent);
+  transform-origin: right center;
+  animation: ppcbGrow 0.5s cubic-bezier(0.22, 1, 0.36, 1) var(--d) both;
+}
+.ppcb__seg {
+  height: 100%;
+}
+.ppcb__seg.is-light {
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--clr) 80%, #fff),
+    var(--clr)
+  );
+}
+.ppcb__seg.is-dark {
+  /* the "without the deal" tail — same hue, clearly dimmer but still ABOVE
+     the card background, outlined so it never melts away on dim screens */
+  background: color-mix(in srgb, var(--clr) 48%, #161c38);
+  border-right: 2px solid rgba(255, 255, 255, 0.9);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--clr) 45%, transparent);
+  box-sizing: border-box;
+  min-width: 5px;
+}
+.ppcb__barlabel {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 5px;
+  font-size: 0.72rem;
+  color: #fff;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+  animation: ppcbFade 0.4s ease calc(var(--d) + 0.25s) both;
+}
+.ppcb__barlabel b {
+  font-weight: 900;
+  color: var(--clr);
+}
+.ppcb__cond {
+  /* the deal's purchase condition — honest fine print, ghost-quiet so the
+     colored bars stay the loudest layer */
+  font-style: normal;
+  font-size: 0.56rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.55);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 999px;
+  padding: 1px 6px;
+  align-self: center;
+}
+.ppcb__cond--rare {
+  color: #fcd34d;
+  border-color: rgba(252, 211, 77, 0.35);
+  background: rgba(252, 211, 77, 0.08);
+}
+.ppcb__key-deal {
+  display: block;
+  font-style: normal;
+  font-size: 0.58rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.7);
+  text-align: left;
+}
+.ppc__focus-close {
+  /* floats on the strip's corner, clear of the price/image content */
+  position: absolute;
+  top: -8px;
+  inset-inline-end: -6px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  cursor: pointer;
+  font-size: 0.58rem;
+  line-height: 1;
+  color: rgba(255, 255, 255, 0.85);
+  background: rgba(30, 34, 60, 0.92);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+}
+.ppcb__plot.has-focus .ppcb__barrow:not(.is-focused) {
+  opacity: 0.55;
+  transition: opacity 0.2s ease;
+}
+.ppcb__barrow.is-focused .ppcb__bar {
+  box-shadow: 0 0 0 2px #fff,
+    0 0 14px color-mix(in srgb, var(--clr) 60%, transparent);
+}
+.ppcb__gaps {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 8px;
+  margin-top: 3px;
+  font-size: 0.62rem;
+  color: rgba(255, 255, 255, 0.5);
+}
+.ppcb__gap {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: rgba(255, 255, 255, 0.65);
+}
+.ppcb__gap i {
+  width: 7px;
+  height: 7px;
+  border-radius: 2px;
+  background: var(--clr);
+  opacity: 0.55;
+}
+.ppcb__axis {
+  position: absolute;
+  right: 0;
+  left: 0;
+  bottom: 0;
+  height: 15px;
+  pointer-events: none;
+}
+.ppcb__axis span {
+  position: absolute;
+  transform: translateX(50%);
+  font-size: 0.62rem;
+  color: rgba(255, 255, 255, 0.6);
+  font-variant-numeric: tabular-nums;
+}
+@keyframes ppcbGrow {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+@keyframes ppcbFade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ppcb__bar,
+  .ppcb__barlabel {
+    animation: none;
   }
 }
