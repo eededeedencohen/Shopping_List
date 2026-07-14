@@ -1,151 +1,329 @@
-.ppd_wrapper {
+/* ─────────────────────────────────────────────────────────────────────────
+   Remove-from-cart show — the ORIGINAL two-act story, polished:
+     act 1: 0–0.7s   cart rolls in (left), bin rolls in (right), red stage
+            0.72–1.14s the product RISES OUT of the cart gradually — clipped by
+                      the .ppd_emerge window whose bottom edge = basket rim
+            1.05–1.65s arcs through the air into the bin (ring on the fall)
+     act 2: 1.9–2.35s the cart CHARGES at the bin
+            2.35s     CRASH! the bin flies off-screen spinning (product inside),
+                      shards burst, the title pops
+            2.5–3.4s  the cart TURNS AROUND and drives back out
+   Modal auto-closes at ~3.5s.
+   ───────────────────────────────────────────────────────────────────────── */
+
+.ppd_product-animation-delete {
   position: fixed;
   top: 50%;
   left: 50%;
-  width: 300px;
-  height: 300px;
-  transform: translate(-50%, -50%);
-  pointer-events: none;
+  transform: translate(-50%, -54%);
   z-index: 9999;
+  pointer-events: none;
 }
 
-/* שלב 1: עגלה נכנסת */
+.ppd_scene {
+  position: relative;
+  width: 320px;
+  height: 300px;
+  font-family: "Heebo", "Open Sans", sans-serif;
+  direction: rtl;
+}
+
+/* ── stage ── */
+.ppd_glow {
+  position: absolute;
+  bottom: 6px;
+  left: 50%;
+  width: 260px;
+  height: 120px;
+  transform: translateX(-50%);
+  background: radial-gradient(
+    ellipse at center,
+    rgba(251, 113, 133, 0.32) 0%,
+    rgba(244, 63, 94, 0.1) 45%,
+    transparent 72%
+  );
+  filter: blur(6px);
+  animation: ppd_fadeIn 0.6s ease 0.15s both, ppd_fadeOut 0.5s ease 2.9s forwards;
+}
+.ppd_floor {
+  position: absolute;
+  bottom: 14px;
+  left: 50%;
+  width: 220px;
+  height: 14px;
+  transform: translateX(-50%);
+  border-radius: 50%;
+  background: rgba(20, 4, 8, 0.4);
+  filter: blur(5px);
+  animation: ppd_fadeIn 0.6s ease 0.2s both, ppd_fadeOut 0.5s ease 2.9s forwards;
+}
+
+/* ── the cart (left) — rolls in, kicks the product out, then ATTACKS ── */
 .ppd_cart {
   position: absolute;
   bottom: 20px;
-  left: -200px;
-  width: 80px;
-  animation: ppd_cartEnter 1s ease-out forwards,
-    ppd_cartCrashRotateReturn 1.5s ease-in forwards;
-  animation-delay: 0s, 2s;
-  z-index: 10;
+  left: 8px;
+  width: 128px;
+  height: 128px;
+  animation: ppd_cartIn 0.75s cubic-bezier(0.22, 1, 0.36, 1) both,
+    ppd_kick 0.35s ease 0.85s forwards,
+    ppd_cartAttack 1.6s cubic-bezier(0.4, 0, 0.6, 1) 1.85s forwards;
 }
-
-/* שלב 2: המוצר יוצא בקשת ואז נופל */
-.ppd_product {
-  position: absolute;
-  bottom: 70px;
-  left: 80px;
-  animation: ppd_productArcOut 1s ease-out forwards,
-    ppd_productFall 0.5s ease-in forwards;
-  animation-delay: 0s, 1s;
-  opacity: 1;
-  animation-fill-mode: forwards;
-}
-
-/* עטיפה של המוצר והתג ביחד */
-.ppd_product-wrapper {
-  position: relative;
-  animation: ppd_productReveal 0.5s ease-in-out forwards;
-  animation-delay: 1s;
-}
-
-.ppd_product-image {
-  width: 60px;
+.ppd_cart-image {
+  width: 100%;
   height: auto;
+  filter: drop-shadow(0 10px 14px rgba(0, 0, 0, 0.35));
 }
 
-.ppd_badge {
+/* ── the bin (right) ── */
+.ppd_bin {
   position: absolute;
-  bottom: -10px;
-  right: -10px;
-  background-color: #f50057;
-  color: white;
-  font-weight: bold;
-  font-size: 14px;
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
+  bottom: 20px;
+  right: 10px;
+  width: 104px;
+  height: 128px;
+  animation: ppd_binIn 0.75s cubic-bezier(0.22, 1, 0.36, 1) 0.1s both,
+    ppd_binCatch 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) 1.68s forwards,
+    ppd_binFly 0.85s cubic-bezier(0.3, 0, 0.7, 0.4) 2.32s forwards;
+}
+.ppd_bin-image {
+  width: 100%;
+  height: auto;
+  filter: drop-shadow(0 10px 14px rgba(0, 0, 0, 0.4));
+}
+/* ── the flying product ── */
+/* reveal window: bottom edge = the basket rim line; anything below it reads
+   as "inside the cart" (and, at the far end, "inside the bin") */
+.ppd_emerge {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 118px;
+  height: 192px;
+  overflow: hidden;
+}
+/* outer: horizontal journey from above the cart to above the bin
+   (bottom is measured from the rim line: 128px scene = 10px here) */
+.ppd_arc-x {
+  position: absolute;
+  bottom: 10px;
+  left: 40px;
+  animation: ppd_arcX 0.6s cubic-bezier(0.35, 0, 0.7, 1) 1.05s both,
+    ppd_fadeOut 0.25s ease 1.62s forwards;
+}
+/* inner: climb out of the cart, then the vertical arc.
+   The rise easing is slow-start (nothing sudden — the product creeps over the
+   rim) with a small overshoot pop once it has cleared the basket.
+   arcY MUST be `forwards`, not `both`: both animate transform, and a
+   later-in-list `both` back-fills translateY(0) from t=0, silently killing
+   the rise (HANDOFF §6.5). The rise ends exactly when arcY starts. */
+.ppd_arc-y {
+  animation: ppd_rise 0.33s cubic-bezier(0.5, 0, 0.3, 1.4) 0.72s both,
+    ppd_arcY 0.6s cubic-bezier(0.45, 0, 0.85, 1) 1.05s forwards;
+}
+.ppd_product-tile {
+  position: relative;
+  width: 84px;
+  height: 84px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 2px solid white;
+  opacity: 0;
+  animation: ppd_appear 0.01s linear 0.7s both, ppd_spin 0.6s ease 1.05s both;
 }
-
-/* שלב 3–4: הפח נשאר קבוע ואז עף כשהעגלה מתנגשת */
-.ppd_garbage {
+.ppd_product-image,
+.ppd_product-tile img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 10px 16px rgba(0, 0, 0, 0.4));
+}
+.ppd_badge {
   position: absolute;
-  bottom: 20px;
-  right: 13px;
-  width: 80px;
-  animation: ppd_garbageFlyAway 0.6s ease-out forwards;
-  animation-delay: 2.5s;
-  z-index: 11;
+  top: -8px;
+  inset-inline-end: -8px;
+  width: 26px;
+  height: 26px;
+  padding: 6px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  background: linear-gradient(135deg, #fda4af, #e11d48);
+  border: 2px solid #fff;
+  box-shadow: 0 4px 10px rgba(225, 29, 72, 0.5);
+  /* pops only once the product has cleared the rim (a mid-emerge pop shows a
+     half-clipped circle on the rim line) */
+  animation: ppd_pop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) 1.02s both;
+}
+.ppd_badge svg {
+  width: 100%;
+  height: 100%;
 }
 
-/* === אנימציות === */
-
-@keyframes ppd_cartEnter {
-  to {
-    left: 80px;
-  }
+/* ── impact effects (over the bin) ── */
+.ppd_ring {
+  position: absolute;
+  bottom: 132px;
+  right: 44px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 3px solid rgba(251, 113, 133, 0.9);
+  opacity: 0;
+  animation: ppd_ring 0.6s cubic-bezier(0.22, 1, 0.36, 1) 1.66s both;
+}
+.ppd_ring--crash {
+  bottom: 70px;
+  right: 60px;
+  border-color: rgba(251, 191, 36, 0.9);
+  animation-delay: 2.36s;
+}
+.ppd_shards {
+  position: absolute;
+  bottom: 142px;
+  right: 55px;
+}
+.ppd_shards i {
+  --a: 0deg;
+  --c: #fb7185;
+  --d: 2s;
+  position: absolute;
+  width: 7px;
+  height: 11px;
+  border-radius: 2px;
+  background: var(--c);
+  opacity: 0;
+  animation: ppd_shard 0.8s cubic-bezier(0.22, 1, 0.36, 1) var(--d) both;
 }
 
-@keyframes ppd_productArcOut {
-  0% {
-    opacity: 1;
-    transform: translate(0, 20px);
-  }
-  30% {
-    opacity: 1;
-    transform: translate(60px, -90px);
-  }
+/* ── title ── */
+.ppd_title {
+  position: absolute;
+  bottom: -34px;
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  padding: 7px 20px;
+  border-radius: 999px;
+  font-size: 1.05rem;
+  font-weight: 900;
+  color: #fff;
+  background: linear-gradient(135deg, #f43f5e, #be123c);
+  box-shadow: 0 8px 22px rgba(225, 29, 72, 0.5);
+  opacity: 0;
+  animation: ppd_popCenter 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) 2.5s both,
+    ppd_fadeOut 0.4s ease 3.1s forwards;
+}
+
+/* ── keyframes ── */
+@keyframes ppd_cartIn {
+  0% { transform: translateX(-260px) rotate(-4deg); opacity: 0; }
+  60% { opacity: 1; }
+  80% { transform: translateX(10px) rotate(2deg); }
+  100% { transform: translateX(0) rotate(0); opacity: 1; }
+}
+@keyframes ppd_binIn {
+  0% { transform: translateX(240px) rotate(4deg); opacity: 0; }
+  60% { opacity: 1; }
+  80% { transform: translateX(-8px) rotate(-2deg); }
+  100% { transform: translateX(0) rotate(0); opacity: 1; }
+}
+@keyframes ppd_kick {
+  0% { transform: scale(1, 1); }
+  40% { transform: scale(1.05, 0.94) rotate(2deg); }
+  100% { transform: scale(1, 1) rotate(0); }
+}
+@keyframes ppd_binCatch {
+  0% { transform: scale(1, 1); }
+  30% { transform: scale(1.1, 0.88) rotate(3deg); }
+  60% { transform: scale(0.95, 1.07) rotate(-2deg); }
+  100% { transform: scale(1, 1) rotate(0); }
+}
+/* act 2: the cart charges at the bin, crashes, TURNS AROUND and drives back */
+@keyframes ppd_cartAttack {
+  0% { transform: translateX(0) rotate(0); }
+  8% { transform: translateX(-14px) rotate(-3deg); } /* wind-up */
+  30% { transform: translateX(150px) rotate(4deg); } /* charge! */
+  34% { transform: translateX(142px) rotate(-4deg); } /* recoil on impact */
+  46% { transform: translateX(138px) rotate(0) scaleX(1); }
+  54% { transform: translateX(132px) rotate(0) scaleX(-1); } /* turn around */
+  100% { transform: translateX(-300px) rotate(-5deg) scaleX(-1); } /* drive off */
+}
+/* the bin gets LAUNCHED off-screen, spinning, product inside */
+@keyframes ppd_binFly {
+  0% { transform: translate(0, 0) rotate(0) scale(1); opacity: 1; }
   100% {
-    opacity: 1;
-    transform: translate(140px, -40px);
-  }
-}
-
-@keyframes ppd_productFall {
-  0% {
-    transform: translate(140px, -40px);
-    opacity: 1;
-    scale: 1;
-  }
-  100% {
-    transform: translate(140px, 60px);
+    transform: translate(190px, -340px) rotate(560deg) scale(0.55);
     opacity: 0;
   }
 }
-
-@keyframes ppd_productReveal {
-  0% {
-    scale: 1;
-  }
-  100% {
-    scale: 1;
-  }
+@keyframes ppd_appear {
+  to { opacity: 1; }
 }
-
-@keyframes ppd_garbageFlyAway {
+/* starts fully hidden below the rim line, then climbs out gradually */
+@keyframes ppd_rise {
+  0% { transform: translateY(100px) scale(0.7); }
+  100% { transform: translateY(0) scale(1); }
+}
+@keyframes ppd_arcX {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(158px); }
+}
+@keyframes ppd_arcY {
+  0% { transform: translateY(0); }
+  42% { transform: translateY(-56px); }
+  100% { transform: translateY(46px); }
+}
+@keyframes ppd_spin {
+  0% { rotate: 0deg; }
+  100% { rotate: 24deg; }
+}
+@keyframes ppd_ring {
+  0% { opacity: 0.95; transform: scale(0.4); }
+  100% { opacity: 0; transform: scale(4); }
+}
+@keyframes ppd_shard {
   0% {
-    transform: rotate(0deg) translateX(0);
     opacity: 1;
+    transform: rotate(var(--a)) translateY(0) rotate(0deg) scale(1);
   }
   100% {
-    transform: rotate(70deg) translateX(250px) translateY(-100px);
     opacity: 0;
+    transform: rotate(var(--a)) translateY(-72px) rotate(220deg) scale(0.55);
   }
 }
+@keyframes ppd_pop {
+  0% { opacity: 0; transform: scale(0.3); }
+  100% { opacity: 1; transform: scale(1); }
+}
+@keyframes ppd_popCenter {
+  0% { opacity: 0; transform: translateX(-50%) scale(0.3); }
+  100% { opacity: 1; transform: translateX(-50%) scale(1); }
+}
+@keyframes ppd_fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes ppd_fadeOut {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
 
-@keyframes ppd_cartCrashRotateReturn {
-  0% {
-    left: 80px;
-    transform: rotate(0deg);
-  }
-  30% {
-    left: 180px;
-    transform: rotate(0deg);
-  }
-  60% {
-    transform: scaleX(-1);
-  }
-  61% {
-    /* שומר על ההיפוך */
-    transform: scaleX(-1);
-  }
-  100% {
-    left: -200px;
-    transform: scaleX(-1); /* נשאר בהיפוך */
+@media (prefers-reduced-motion: reduce) {
+  .ppd_cart,
+  .ppd_bin,
+  .ppd_arc-x,
+  .ppd_arc-y,
+  .ppd_product-tile,
+  .ppd_badge,
+  .ppd_ring,
+  .ppd_shards i,
+  .ppd_title,
+  .ppd_glow,
+  .ppd_floor {
+    animation-duration: 0.01s !important;
+    animation-delay: 0s !important;
   }
 }

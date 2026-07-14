@@ -1,105 +1,297 @@
+/* ─────────────────────────────────────────────────────────────────────────
+   Add-to-cart show. Timeline (modal auto-closes at ~3.5s):
+     0.0–0.8s  cart rolls in (wheel-bounce), stage glow fades in
+     0.5s      product tile pops in above, hovers
+     1.0–1.7s  product falls with a wobble, squashes & clips into the basket
+     1.7s      CATCH: cart bounce, impact ring, confetti, check pop, +×N floats,
+               "נוסף לעגלה!" title
+     2.6–3.4s  cart rolls away happily with the product inside, stage fades
+   ───────────────────────────────────────────────────────────────────────── */
+
 .ppa_product-animation-add {
   position: fixed;
   top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%);
+  transform: translate(-50%, -54%);
   z-index: 9999;
   pointer-events: none;
 }
 
-.ppa_product-animation-sequence {
+.ppa_scene {
   position: relative;
-  width: 200px;
-  height: 200px;
+  width: 280px;
+  height: 300px;
+  font-family: "Heebo", "Open Sans", sans-serif;
+  direction: rtl;
 }
 
-.ppa_cart-image {
+/* ── stage ── */
+.ppa_glow {
   position: absolute;
-  bottom: 0;
-  left: -200px;
-  width: 150px;
-  animation: ppa_cartIn 1s ease-out forwards, ppa_cartOut 1s ease-in forwards;
-  animation-delay: 0s, 1.7s;
-}
-
-.ppa_product-image-container {
-  position: absolute;
-  top: -150px;
+  bottom: 6px;
   left: 50%;
-  transform: translateX(-70%);
-  animation: ppa_productDropPosition 0.7s ease-in forwards;
-  animation-delay: 1s;
+  width: 220px;
+  height: 120px;
+  transform: translateX(-50%);
+  background: radial-gradient(
+    ellipse at center,
+    rgba(52, 211, 153, 0.35) 0%,
+    rgba(34, 211, 238, 0.12) 45%,
+    transparent 72%
+  );
+  filter: blur(6px);
+  animation: ppa_fadeIn 0.6s ease 0.15s both, ppa_fadeOut 0.5s ease 2.9s forwards;
 }
-
-.ppa_product-image-wrapper {
-  position: relative;
-  display: inline-block;
-  animation: ppa_productDropAndClip 0.7s ease-in forwards;
-  animation-delay: 1s;
-}
-
-.ppa_product-image {
-  width: 80px;
-  height: auto;
-}
-
-.ppa_product-amount-badge {
+.ppa_floor {
   position: absolute;
-  bottom: 0px;
-  right: -1px;
-  background-color: #0cff3c;
-  color: white;
-  font-weight: bold;
-  font-size: 18px;
-  width: 35px;
-  height: 35px;
+  bottom: 14px;
+  left: 50%;
+  width: 170px;
+  height: 14px;
+  transform: translateX(-50%);
   border-radius: 50%;
+  background: rgba(8, 12, 26, 0.35);
+  filter: blur(5px);
+  animation: ppa_fadeIn 0.6s ease 0.2s both, ppa_fadeOut 0.5s ease 2.9s forwards;
+}
+
+/* ── the cart ── */
+.ppa_cart {
+  position: absolute;
+  bottom: 18px;
+  left: 50%;
+  width: 150px;
+  height: 150px;
+  transform: translateX(-50%);
+  animation: ppa_cartIn 0.8s cubic-bezier(0.22, 1, 0.36, 1) both,
+    ppa_cartCatch 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) 1.68s forwards,
+    ppa_cartOut 0.8s cubic-bezier(0.5, 0, 0.75, 0.4) 2.6s forwards;
+}
+.ppa_cart-image {
+  width: 100%;
+  height: auto;
+  filter: drop-shadow(0 10px 14px rgba(0, 0, 0, 0.35));
+}
+.ppa_check {
+  position: absolute;
+  top: 2px;
+  right: -4px;
+  width: 34px;
+  height: 34px;
+  padding: 7px;
+  border-radius: 50%;
+  color: #fff;
+  background: linear-gradient(135deg, #34d399, #059669);
+  border: 2.5px solid #fff;
+  box-shadow: 0 6px 14px rgba(5, 150, 105, 0.55);
+  animation: ppa_popPlain 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) 1.95s both;
+}
+.ppa_check svg {
+  width: 100%;
+  height: 100%;
+}
+
+/* ── the product ── */
+.ppa_product-track {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  animation: ppa_productFall 0.7s cubic-bezier(0.5, 0, 0.9, 0.6) 1s both;
+}
+/* bare product — no frame; product images are (or will be) transparent PNGs */
+.ppa_product-tile {
+  position: relative;
+  width: 96px;
+  height: 96px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 3px solid white;
-  box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+  animation: ppa_tileIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) 0.5s both,
+    ppa_hover 0.6s ease-in-out 0.9s,
+    ppa_tileWobble 0.7s ease 1s both,
+    ppa_tileClip 0.7s cubic-bezier(0.5, 0, 0.9, 0.6) 1s both;
+}
+.ppa_product-image,
+.ppa_product-tile img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 12px 18px rgba(0, 0, 0, 0.4));
+}
+.ppa_product-amount-badge {
+  position: absolute;
+  bottom: -9px;
+  right: -9px;
+  min-width: 34px;
+  height: 34px;
+  padding: 0 7px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.95rem;
+  font-weight: 900;
+  color: #06281a;
+  background: linear-gradient(135deg, #6ee7b7, #34d399);
+  border: 2.5px solid #fff;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.5);
 }
 
-/* אנימציות */
+/* ── impact effects ── */
+.ppa_ring {
+  position: absolute;
+  bottom: 92px;
+  left: 50%;
+  width: 26px;
+  height: 26px;
+  transform: translateX(-50%);
+  border-radius: 50%;
+  border: 3px solid rgba(110, 231, 183, 0.9);
+  opacity: 0;
+  animation: ppa_ring 0.65s cubic-bezier(0.22, 1, 0.36, 1) 1.7s both;
+}
+.ppa_confetti {
+  position: absolute;
+  bottom: 105px;
+  left: 50%;
+}
+.ppa_confetti i {
+  --a: 0deg;
+  --c: #34d399;
+  --d: 1.7s;
+  position: absolute;
+  width: 7px;
+  height: 11px;
+  border-radius: 2px;
+  background: var(--c);
+  opacity: 0;
+  transform-origin: center;
+  animation: ppa_confetti 0.9s cubic-bezier(0.22, 1, 0.36, 1) var(--d) both;
+}
+.ppa_float {
+  position: absolute;
+  bottom: 150px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 1.5rem;
+  font-weight: 900;
+  color: #6ee7b7;
+  text-shadow: 0 2px 10px rgba(5, 150, 105, 0.6);
+  opacity: 0;
+  animation: ppa_floatUp 1s ease 1.75s both;
+}
+
+/* ── title ── */
+.ppa_title {
+  position: absolute;
+  bottom: -34px;
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  padding: 7px 20px;
+  border-radius: 999px;
+  font-size: 1.05rem;
+  font-weight: 900;
+  color: #fff;
+  background: linear-gradient(135deg, #10b981, #059669);
+  box-shadow: 0 8px 22px rgba(5, 150, 105, 0.5);
+  opacity: 0;
+  animation: ppa_pop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) 1.85s both,
+    ppa_fadeOut 0.4s ease 3.1s forwards;
+}
+
+/* ── keyframes ── */
 @keyframes ppa_cartIn {
-  to {
-    left: 0px;
-  }
+  0% { transform: translateX(-320px) rotate(-4deg); opacity: 0; }
+  60% { opacity: 1; }
+  80% { transform: translateX(calc(-50% + 10px)) rotate(2deg); }
+  100% { transform: translateX(-50%) rotate(0deg); opacity: 1; }
 }
-
+@keyframes ppa_cartCatch {
+  0% { transform: translateX(-50%) scale(1, 1); }
+  30% { transform: translateX(-50%) scale(1.08, 0.9) rotate(-2.5deg); }
+  60% { transform: translateX(-50%) scale(0.96, 1.06) rotate(1.5deg); }
+  100% { transform: translateX(-50%) scale(1, 1) rotate(0); }
+}
 @keyframes ppa_cartOut {
-  to {
-    left: 300px;
-  }
+  0% { transform: translateX(-50%) rotate(0); opacity: 1; }
+  30% { transform: translateX(-30%) rotate(3deg); }
+  100% { transform: translateX(240px) rotate(6deg); opacity: 0; }
 }
-
-@keyframes ppa_productDropPosition {
+@keyframes ppa_tileIn {
+  0% { opacity: 0; transform: translateY(-26px) scale(0.6); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes ppa_hover {
+  0%, 100% { margin-top: 0; }
+  50% { margin-top: -6px; }
+}
+@keyframes ppa_productFall {
+  0% { top: 0; }
+  72% { top: 118px; }
+  86% { top: 132px; }
+  100% { top: 148px; }
+}
+@keyframes ppa_tileWobble {
+  0% { rotate: 0deg; }
+  40% { rotate: -7deg; }
+  75% { rotate: 5deg; }
+  100% { rotate: 0deg; }
+}
+@keyframes ppa_tileClip {
+  0%, 68% { clip-path: inset(-20% -20% -20% -20%); }
+  84% { clip-path: inset(-20% -20% 34% -20%); }
+  100% { clip-path: inset(-20% -20% 100% -20%); }
+}
+@keyframes ppa_ring {
+  0% { opacity: 0.95; transform: translateX(-50%) scale(0.4); }
+  100% { opacity: 0; transform: translateX(-50%) scale(4.4); }
+}
+@keyframes ppa_confetti {
   0% {
-    top: -150px;
-  }
-  70% {
-    top: 40px;
-  }
-  85% {
-    top: 60px;
+    opacity: 1;
+    transform: rotate(var(--a)) translateY(0) rotate(0deg) scale(1);
   }
   100% {
-    top: 80px;
+    opacity: 0;
+    transform: rotate(var(--a)) translateY(-86px) rotate(240deg) scale(0.55);
   }
 }
+@keyframes ppa_floatUp {
+  0% { opacity: 0; transform: translate(-50%, 8px) scale(0.7); }
+  25% { opacity: 1; transform: translate(-50%, -6px) scale(1.15); }
+  100% { opacity: 0; transform: translate(-50%, -44px) scale(1); }
+}
+@keyframes ppa_popPlain {
+  0% { opacity: 0; transform: scale(0.3); }
+  100% { opacity: 1; transform: scale(1); }
+}
+@keyframes ppa_pop {
+  0% { opacity: 0; transform: translateX(-50%) scale(0.3); }
+  100% { opacity: 1; transform: translateX(-50%) scale(1); }
+}
+@keyframes ppa_fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes ppa_fadeOut {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
 
-@keyframes ppa_productDropAndClip {
-  0% {
-    clip-path: inset(0% 0% 0% 0%);
-  }
-  70% {
-    clip-path: inset(0% 0% 0% 0%);
-  }
-  85% {
-    clip-path: inset(0% 0% 30% 0%);
-  }
-  100% {
-    clip-path: inset(0% 0% 100% 0%);
+@media (prefers-reduced-motion: reduce) {
+  .ppa_cart,
+  .ppa_product-track,
+  .ppa_product-tile,
+  .ppa_ring,
+  .ppa_confetti i,
+  .ppa_float,
+  .ppa_title,
+  .ppa_glow,
+  .ppa_floor,
+  .ppa_check {
+    animation-duration: 0.01s !important;
+    animation-delay: 0s !important;
   }
 }
