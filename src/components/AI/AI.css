@@ -584,12 +584,10 @@
   overflow-x: hidden;
 }
 
-/* Soft gradient mask at the top of the scroll area — content that scrolls
-   under the settings button fades out instead of appearing through it. */
-.ai-container .messages-container {
-  mask-image: linear-gradient(180deg, transparent 0, #000 32px, #000 100%);
-  -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 32px, #000 100%);
-}
+/* NOTE: a top fade via mask-image used to live here — but a mask on an
+   ancestor creates a new backdrop root in Chromium, silently DISABLING
+   backdrop-filter for every glass bubble/card inside the chat. Removed so the
+   glass actually blurs the animated theme background behind it. */
 
 /* ---------- USER INPUT BAR ---------- */
 .ai-container .user-text-box {
