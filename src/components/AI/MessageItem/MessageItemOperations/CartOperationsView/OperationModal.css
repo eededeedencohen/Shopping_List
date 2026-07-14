@@ -1,26 +1,28 @@
-/* .modal1-window {
-
-} */
-
-/* @keyframes slide-left {
-  0% {
-    transform: translateX(150%) translateY(5%);
-  }
-  100% {
-    transform: translateX(50%) translateY(5%);
-  }
+/* The fullscreen stage for the cart-operation animation. Scoped with
+   .op-anim-overlay so the shared .modal-overlay class used by other modals is
+   untouched. A soft vignette focuses the eye on the animation, with a gentle
+   fade-in/out feel. */
+.modal-overlay.op-anim-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 6000;
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  background: radial-gradient(
+    130% 130% at 50% 42%,
+    rgba(8, 12, 26, 0.08) 0%,
+    rgba(8, 12, 26, 0.42) 100%
+  );
+  animation: opAnimFade 0.28s ease both;
 }
 
-@keyframes slide-right {
-  0% {
-    transform: translateX(50%) translateY(5%);
+@keyframes opAnimFade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .modal-overlay.op-anim-overlay {
+    animation: none;
   }
-  100% {
-    transform: translateX(150%) translateY(5%);
-  }
-} */
-/* השכבה שמכסה את כל המסך */
-.modal-overlay {
-  -webkit-backdrop-filter: blur(6px); /* תמיכה בספארי */
-  backdrop-filter: blur(6px); /* תמיכה בדפדפנים מודרניים */
 }

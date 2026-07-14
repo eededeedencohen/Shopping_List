@@ -16,7 +16,10 @@ const OperationModal = ({ isOpen, children, onClose }) => {
   }, [isOpen, isRendered]);
 
   const handleOverlayClick = (event) => {
-    if (event.target.className === "modal-overlay") {
+    if (
+      event.target.classList &&
+      event.target.classList.contains("op-anim-overlay")
+    ) {
       onClose();
     }
   };
@@ -27,7 +30,7 @@ const OperationModal = ({ isOpen, children, onClose }) => {
   }
 
   return ReactDOM.createPortal(
-    <div className="modal-overlay" onClick={handleOverlayClick}>
+    <div className="modal-overlay op-anim-overlay" onClick={handleOverlayClick}>
       <div>{children}</div>
     </div>,
     document.getElementById("modal-root")

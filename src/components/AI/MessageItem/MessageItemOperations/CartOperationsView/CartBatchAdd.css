@@ -1,133 +1,216 @@
-/* ╔══════════════════════════════════╗
-   ║  Cart Batch Add – E1 results    ║
-   ╚══════════════════════════════════╝ */
+/* ─────────────────────────────────────────────────────────────────────────
+   AI batch add card — receipt-style inline panel: bouncing cart header,
+   product rows sliding in one after another (each earning its ✓), and a
+   summary footer. Self-contained opaque panel → legible on every AI theme.
+   ───────────────────────────────────────────────────────────────────────── */
 
-.cba_container {
+.cba {
   width: 100%;
-  border-radius: 18px;
-  overflow: hidden;
-  background: rgba(255, 255, 255, 0.08);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-}
-
-/* ── Header ── */
-.cba_header {
-  padding: 12px 16px;
-  background: rgba(255, 255, 255, 0.1);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  text-align: center;
+  max-width: 420px;
+  margin: 6px auto;
+  padding: 14px 12px 12px;
+  border-radius: 20px;
   direction: rtl;
-}
-
-.cba_header-text {
+  font-family: "Heebo", "Open Sans", sans-serif;
   color: #fff;
-  font-size: 0.9rem;
-  font-weight: 600;
-  letter-spacing: 0.3px;
+  /* the chat-bubble glass recipe — native to the AI chat, not a foreign panel */
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(12px) saturate(140%);
+  -webkit-backdrop-filter: blur(12px) saturate(140%);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
-/* ── Product list ── */
-.cba_list {
-  display: flex;
-  flex-direction: column;
-  max-height: 350px;
-  overflow-y: auto;
-  scrollbar-width: thin;
-  scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
-}
-
-.cba_list::-webkit-scrollbar {
-  width: 4px;
-}
-.cba_list::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.2);
-  border-radius: 4px;
-}
-
-/* ── Single product row ── */
-.cba_row {
+/* ── header ── */
+.cba__head {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 10px 14px;
-  direction: rtl;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-  animation: cba_slideIn 0.35s ease both;
+  padding: 2px 2px 12px;
 }
-
-.cba_row:last-child {
-  border-bottom: none;
-}
-
-.cba_row:hover {
-  background: rgba(255, 255, 255, 0.06);
-}
-
-@keyframes cba_slideIn {
-  from {
-    opacity: 0;
-    transform: translateX(-12px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-/* ── Product image ── */
-.cba_row-img-wrap {
-  flex-shrink: 0;
-  width: 48px;
-  height: 48px;
-  border-radius: 10px;
-  background: rgba(255, 255, 255, 0.12);
-  border: 1px solid rgba(255, 255, 255, 0.15);
+.cba__cart {
+  position: relative;
+  flex: none;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  overflow: hidden;
+  color: #fff;
+  background: rgba(16, 185, 129, 0.18);
+  border: 1.5px solid rgba(52, 211, 153, 0.5);
+  box-shadow: 0 0 20px rgba(16, 185, 129, 0.25);
+  animation: cbaBounce 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) 0.2s both;
 }
-
-.cba_row-img {
-  width: 40px;
-  height: 40px;
-  object-fit: contain;
+.cba__cart-icon {
+  width: 26px;
+  height: 26px;
 }
-
-/* ── Product info ── */
-.cba_row-info {
-  flex: 1;
+/* the shared shopping-cart.svg has no fill attribute (renders black); make it
+   follow the circle's white color without touching the shared asset */
+.cba__cart-icon path {
+  fill: currentColor;
+}
+.cba__cart-count {
+  position: absolute;
+  top: -7px;
+  inset-inline-end: -7px;
+  min-width: 24px;
+  height: 24px;
+  padding: 0 5px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.72rem;
+  font-weight: 900;
+  color: #06281a;
+  background: linear-gradient(135deg, #6ee7b7, #34d399);
+  box-shadow: 0 4px 10px rgba(16, 185, 129, 0.45);
+  animation: cbaPop 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) 0.55s both;
+}
+.cba__head-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
   min-width: 0;
 }
-
-.cba_row-name {
+.cba__title {
+  font-size: 0.98rem;
+  font-weight: 900;
   color: #fff;
-  font-size: 0.85rem;
-  line-height: 1.3;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
+}
+.cba__subtitle {
+  font-style: normal;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #6ee7b7;
 }
 
-/* ── Amount badge ── */
-.cba_row-amount {
-  flex-shrink: 0;
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background: rgba(76, 175, 80, 0.35);
-  border: 1px solid rgba(76, 175, 80, 0.5);
+/* ── rows ── */
+.cba__list {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  max-height: 320px;
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+.cba__list::-webkit-scrollbar {
+  display: none;
+}
+.cba__row {
+  --d: 0s;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  opacity: 0;
+  animation: cbaSlide 0.45s cubic-bezier(0.22, 1, 0.36, 1) var(--d) both;
+}
+.cba__row-img {
+  flex: none;
+  width: 46px;
+  height: 46px;
+  border-radius: 11px;
+  background: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.22);
   display: flex;
   align-items: center;
   justify-content: center;
+  overflow: hidden;
+}
+.cba__row-img img {
+  max-width: 88%;
+  max-height: 88%;
+  object-fit: contain;
+}
+.cba__row-name {
+  flex: 1;
+  min-width: 0;
+  font-size: 0.84rem;
+  font-weight: 700;
+  color: #fff;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.cba__row-qty {
+  flex: none;
+  padding: 2px 9px;
+  border-radius: 999px;
+  font-size: 0.76rem;
+  font-weight: 900;
+  color: #a7f3d0;
+  background: rgba(16, 185, 129, 0.14);
+  border: 1px solid rgba(52, 211, 153, 0.3);
+  font-variant-numeric: tabular-nums;
+}
+.cba__row-check {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  padding: 4px;
+  border-radius: 50%;
+  color: #fff;
+  background: linear-gradient(135deg, #34d399, #059669);
+  box-shadow: 0 3px 8px rgba(5, 150, 105, 0.45);
+  animation: cbaPop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)
+    calc(var(--d) + 0.3s) both;
+}
+.cba__row-check svg {
+  width: 100%;
+  height: 100%;
 }
 
-.cba_amount-value {
-  color: #fff;
-  font-size: 0.8rem;
-  font-weight: 700;
+/* ── footer ── */
+.cba__foot {
+  --d: 0.6s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 10px;
+  padding: 8px;
+  border-radius: 12px;
+  font-size: 0.78rem;
+  font-weight: 800;
+  color: #a7f3d0;
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px dashed rgba(52, 211, 153, 0.35);
+  animation: cbaPop 0.5s ease var(--d) both;
+}
+.cba__foot svg {
+  width: 13px;
+  height: 13px;
+}
+
+/* ── keyframes ── */
+@keyframes cbaBounce {
+  0% { opacity: 0; transform: scale(0.5); }
+  60% { opacity: 1; transform: scale(1.12); }
+  100% { transform: scale(1); }
+}
+@keyframes cbaPop {
+  0% { opacity: 0; transform: scale(0.3); }
+  100% { opacity: 1; transform: scale(1); }
+}
+@keyframes cbaSlide {
+  0% { opacity: 0; transform: translateX(-14px); }
+  100% { opacity: 1; transform: translateX(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cba__cart,
+  .cba__cart-count,
+  .cba__row,
+  .cba__row-check,
+  .cba__foot {
+    animation: none;
+    opacity: 1;
+  }
 }
