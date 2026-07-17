@@ -15,8 +15,9 @@ import { ReactComponent as AiIcon2 } from "./robot.svg";
 import { ReactComponent as PieChartIcon } from "./pie-chart.svg";
 import { ReactComponent as TransactionHistoryIcon } from "./transaction-history.svg";
 import { ReactComponent as WishlistIcon } from "./wishlist.svg";
-import { ReactComponent as BarcodeIcon} from "./barcode.svg";
+import { ReactComponent as BarcodeIcon } from "./barcode.svg";
 import { ReactComponent as HomeIcon } from "./home.svg";
+import { ReactComponent as HandIcon } from "./hand.svg";
 function Toolbar() {
   const { totalAmount } = useCartTotals(); // ← כמות בעגלה
   const [selectedPage, setSelectedPage] = useState(window.location.pathname);
@@ -56,7 +57,7 @@ function Toolbar() {
   /* ניווט */
   const toggleDrawer = () => {
     // 👈 שימוש פשוט ונוח בפונקציית הרטט
-    vibrate(50); 
+    vibrate(50);
     setIsOpen(!isOpen);
   };
   const closeDrawer = () => isOpen && setIsOpen(false);
@@ -165,14 +166,17 @@ function Toolbar() {
           </Link>
 
           {/* Products Server */}
-          <Link to="/products-server" onClick={() => handleNavClick("/products-server")}>
+          <Link
+            to="/products-server"
+            onClick={() => handleNavClick("/products-server")}
+          >
             <div
               className={`nav-item ${
                 selectedPage === "/products-server" ? "selected-page" : ""
               }`}
             >
               <div className="nav-icon">
-                <GroceryIcon2 className="svg-icon" />
+                <HandIcon className="svg-icon" />
               </div>
               <h1>מוצרים (שרת)</h1>
             </div>
@@ -236,7 +240,10 @@ function Toolbar() {
             </div>
           </Link>
 
-          <Link to="/barcode-scanner" onClick={() => handleNavClick("/barcode-scanner")}>
+          <Link
+            to="/barcode-scanner"
+            onClick={() => handleNavClick("/barcode-scanner")}
+          >
             <div
               className={`nav-item ${
                 selectedPage === "/barcode-scanner" ? "selected-page" : ""
