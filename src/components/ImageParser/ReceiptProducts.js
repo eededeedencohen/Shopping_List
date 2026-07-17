@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import "./ReceiptProducts.css";
 import SupermarketImage from "../Images/SupermarketImage";
 import ProductImageDisplay from "../Images/ProductImageService";
+import { IconClose } from "../Icons/UiIcons";
 
 const SUPERMARKET_NAMES = [
   "BE",
@@ -48,6 +49,7 @@ function ReceiptProducts({
   setProducts,
   totalPrice,
   setTotalPrice,
+  consistency,
   onConfirm,
   onCancel,
   error,
@@ -215,6 +217,17 @@ function ReceiptProducts({
         </div>
       </div>
 
+      {/* ── Consistency warnings: the extracted lines don't add up to the
+             receipt's own summary — the user should review before saving ── */}
+      {consistency && !consistency.ok && (
+        <div className="receipt-consistency-warning">
+          <b>⚠ הנתונים שחולצו לא מסתדרים עם סיכום הקבלה — בדוק לפני שמירה:</b>
+          {consistency.notes.map((note, i) => (
+            <div key={i}>• {note}</div>
+          ))}
+        </div>
+      )}
+
       {/* ── Dashed separator ── */}
       <div className="receipt-edit-separator">
         ═══════ {products.length} פריטים ═══════
@@ -286,7 +299,7 @@ function ReceiptProducts({
                   removeProduct(index);
                 }}
               >
-                ✕
+                <IconClose />
               </button>
             </div>
 

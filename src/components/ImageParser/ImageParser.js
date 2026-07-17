@@ -4,6 +4,7 @@ import axios from "axios";
 import { DOMAIN } from "../../constants";
 import ReceiptProducts from "./ReceiptProducts";
 import "./ImageParser.css";
+import { IconArrowRight, IconClose } from "../Icons/UiIcons";
 
 function ImageParser() {
   const navigate = useNavigate();
@@ -26,6 +27,7 @@ function ImageParser() {
   const [date, setDate] = useState("");
   const [products, setProducts] = useState([]);
   const [totalPrice, setTotalPrice] = useState(0);
+  const [consistency, setConsistency] = useState(null);
 
   // Error state
   const [error, setError] = useState(null);
@@ -67,6 +69,7 @@ function ImageParser() {
       setDate(data.date);
       setProducts(data.products);
       setTotalPrice(data.totalPrice);
+      setConsistency(data.consistency || null);
       setStep("review");
     } catch (err) {
       setError(err.response?.data?.message || "שגיאה בעיבוד הקבלה. נסה שוב.");
@@ -97,11 +100,16 @@ function ImageParser() {
         subcategory: p.subcategory || "Other",
         price: p.price || 0,
         hasDiscount: p.hasDiscount || false,
+        /* prefer the REAL deal terms from the receipt ("מבצע N ב-Y") over
+           derived values, so history records the promotion as printed */
         discount: p.hasDiscount
           ? {
-              units: p.amount || 1,
-              priceForUnit: p.totalPrice / (p.amount || 1),
-              totalPrice: p.totalPrice || 0,
+              units: p.dealUnits || p.amount || 1,
+              priceForUnit:
+                p.dealUnits && p.dealTotal
+                  ? Math.round((p.dealTotal / p.dealUnits) * 100) / 100
+                  : p.totalPrice / (p.amount || 1),
+              totalPrice: p.dealTotal || p.totalPrice || 0,
             }
           : { units: 0, priceForUnit: 0, totalPrice: 0 },
       })),
@@ -133,7 +141,7 @@ function ImageParser() {
     <div className="scanner-container">
       {/* Back Button */}
       <button className="scanner-back-btn" onClick={() => navigate(-1)}>
-        →
+        <IconArrowRight />
       </button>
 
       <div className="scanner-title">סריקת קבלה להיסטוריה</div>
@@ -207,7 +215,7 @@ function ImageParser() {
                 className="scanner-preview-image"
               />
               <button className="scanner-preview-remove" onClick={removeImage}>
-                ✕
+                <IconClose />
               </button>
             </div>
           )}
@@ -250,6 +258,7 @@ function ImageParser() {
           setProducts={setProducts}
           totalPrice={totalPrice}
           setTotalPrice={setTotalPrice}
+          consistency={consistency}
           onConfirm={handleSaveToHistory}
           onCancel={handleCancel}
           error={error}

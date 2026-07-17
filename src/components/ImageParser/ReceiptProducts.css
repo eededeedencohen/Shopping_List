@@ -502,3 +502,20 @@
 .receipt-cancel-btn:active {
   background: #f0f0f0;
 }
+
+/* ── consistency warning (extracted lines vs the receipt's summary) ── */
+.receipt-consistency-warning {
+  margin: 10px 0 4px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: #fef3c7;
+  border: 1px solid #f59e0b;
+  color: #92400e;
+  font-size: 0.82rem;
+  line-height: 1.6;
+  text-align: right;
+}
+.receipt-consistency-warning b {
+  display: block;
+  margin-bottom: 4px;
+}
