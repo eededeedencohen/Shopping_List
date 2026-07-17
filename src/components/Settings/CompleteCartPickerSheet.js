@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import ReactDOM from "react-dom";
 import useBodyScrollLock from "../../hooks/useBodyScrollLock";
 import "../BottomNav/SupermarketPickerSheet.css";
+import { IconClose } from "../Icons/UiIcons";
 
 /**
  * Bottom-sheet picker for the "complete cart" definition — a flat, searchable
@@ -64,7 +65,7 @@ export default function CompleteCartPickerSheet({
             onClick={onClose}
             aria-label="סגור"
           >
-            ✕
+            <IconClose />
           </button>
         </div>
 

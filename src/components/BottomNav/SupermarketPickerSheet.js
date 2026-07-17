@@ -3,6 +3,7 @@ import ReactDOM from "react-dom";
 import SupermarketImage from "../Images/SupermarketImage";
 import useBodyScrollLock from "../../hooks/useBodyScrollLock";
 import "./SupermarketPickerSheet.css";
+import { IconClose, IconChevronLeft } from "../Icons/UiIcons";
 
 /**
  * A bottom-sheet supermarket picker for action #5's "custom selection" compare
@@ -119,7 +120,7 @@ export default function SupermarketPickerSheet({
             onClick={onClose}
             aria-label="סגור"
           >
-            ✕
+            <IconClose />
           </button>
         </div>
 
@@ -161,7 +162,7 @@ export default function SupermarketPickerSheet({
                       className={`smpick__chev${isOpen ? " is-open" : ""}`}
                       aria-hidden="true"
                     >
-                      ‹
+                      <IconChevronLeft />
                     </span>
                   </button>
                 </div>

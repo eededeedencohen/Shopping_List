@@ -9,6 +9,7 @@ import { DOMAIN } from "../../constants";
 import { ReactComponent as SearchIcon } from "./search.svg";
 import { ReactComponent as ScheduleIcon } from "./schedule.svg";
 import generateReceiptPDF from "./generateReceiptPDF";
+import { IconArrowRight } from "../Icons/UiIcons";
 
 const formatDate = (dateString) => {
   const dateObj = new Date(dateString);
@@ -97,7 +98,7 @@ const HistoryList = () => {
     <div className={`receipt-container receipt-theme--${receiptTheme}`}>
       {/* Back Button */}
       <button className="receipt-back-btn" onClick={handleBack}>
-        ←
+        <IconArrowRight />
       </button>
 
       {/* Print Receipt PDF Button */}

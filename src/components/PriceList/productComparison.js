@@ -9,6 +9,7 @@ import AddFromScraperModal from "../Scraper/AddFromScraperModal";
 import { DOMAIN } from "../../constants";
 import useBodyScrollLock from "../../hooks/useBodyScrollLock";
 import "./productComparison.css";
+import { IconClose } from "../Icons/UiIcons";
 
 const priceFormat = (price) =>
   typeof price === "number" ? price.toFixed(2) : "—";
@@ -507,7 +508,7 @@ export default function ProductComparison({ barcode }) {
             onClick={() => setImageLightboxOpen(false)}
             aria-label="סגור"
           >
-            ×
+            <IconClose />
           </button>
           <div
             className="compareM__lightbox-stage"

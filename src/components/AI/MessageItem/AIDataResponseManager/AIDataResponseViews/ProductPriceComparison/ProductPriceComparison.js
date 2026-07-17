@@ -3,6 +3,7 @@ import "./ProductPriceComparison.css";
 import SupermarketImage from "../../../../../Images/SupermarketImage";
 import { ProductImageDisplay } from "../../../../../Images/ProductImageService";
 import { unitPrice } from "../../../../../../utils/optimizeCart";
+import { IconClose } from "../../../../../Icons/UiIcons";
 
 /* B1 — interactive price board. Three views over the same data:
    • "סניפים" — the branch bar-board (default): Y axis = branches, X axis =
@@ -598,7 +599,7 @@ export default function ProductPriceComparison({ data }) {
                 aria-label="סגירה"
                 onClick={() => setFocusPoint(null)}
               >
-                ✕
+                <IconClose />
               </button>
               <span className="ppc__focus-img">
                 <ProductImageDisplay
@@ -864,7 +865,7 @@ export default function ProductPriceComparison({ data }) {
                 aria-label="סגירה"
                 onClick={() => setFocusPoint(null)}
               >
-                ✕
+                <IconClose />
               </button>
               <span className="ppc__focus-img">
                 <ProductImageDisplay

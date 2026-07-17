@@ -5,6 +5,7 @@ import BrandsFilter from "./BrandsFilter/BrandsFilter";
 import AlternativeProductsModal from "./AlternativeProductsModal/AlternativeProductsModal";
 import "./ProductSettings.css";
 import { useSettingsOperations } from "../../hooks/optimizationHooks";
+import { IconChevronLeft } from "../Icons/UiIcons";
 
 function ToggleRow({ label, hint, checked, onChange }) {
   return (
@@ -84,7 +85,7 @@ export default function ProductSettings({ product }) {
               <line x1="21" y1="21" x2="16.65" y2="16.65" />
             </svg>
             <span>הצג מוצרים תואמים</span>
-            <span className="ps-view-alts-btn__chevron" aria-hidden="true">‹</span>
+            <span className="ps-view-alts-btn__chevron" aria-hidden="true"><IconChevronLeft /></span>
           </button>
 
           <AlternativeProductsModal

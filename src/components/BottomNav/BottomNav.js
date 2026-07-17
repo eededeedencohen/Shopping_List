@@ -38,6 +38,7 @@ import { ReactComponent as HistoryIcon } from "../Toolbar/transaction-history.sv
 import { ReactComponent as ReceiptIcon } from "../Toolbar/wishlist.svg";
 import { ReactComponent as PieChartIcon } from "../Toolbar/pie-chart.svg";
 import { ReactComponent as BarcodeIcon } from "../Toolbar/barcode.svg";
+import { IconClose, IconChevronLeft, IconChevronRight } from "../Icons/UiIcons";
 
 /* The 5 actions shown in the AI action sheet.
    - "ניווט"                    → expands to the navigation sub-categories (pages).
@@ -1185,7 +1186,7 @@ export default function BottomNav() {
                 aria-label="חזרה"
                 onClick={() => setView("main")}
               >
-                ›
+                <IconChevronRight />
               </button>
             ) : (
               <span aria-hidden="true" />
@@ -1197,7 +1198,7 @@ export default function BottomNav() {
               aria-label="סגור"
               onClick={close}
             >
-              ✕
+              <IconClose />
             </button>
           </div>
 
@@ -1220,7 +1221,7 @@ export default function BottomNav() {
                     <span className="ai-sheet__item-label">{a.label}</span>
                     {a.view && (
                       <span className="ai-sheet__chevron" aria-hidden="true">
-                        ‹
+                        <IconChevronLeft />
                       </span>
                     )}
                   </button>
@@ -1486,7 +1487,7 @@ export default function BottomNav() {
                   </span>
                 </span>
                 <span className="ai-sheet__chevron" aria-hidden="true">
-                  ‹
+                  <IconChevronLeft />
                 </span>
               </button>
               <button
@@ -1508,7 +1509,7 @@ export default function BottomNav() {
                   </span>
                 </span>
                 <span className="ai-sheet__chevron" aria-hidden="true">
-                  ‹
+                  <IconChevronLeft />
                 </span>
               </button>
               <button
@@ -1525,7 +1526,7 @@ export default function BottomNav() {
                   </span>
                 </span>
                 <span className="ai-sheet__chevron" aria-hidden="true">
-                  ‹
+                  <IconChevronLeft />
                 </span>
               </button>
             </div>
@@ -1554,7 +1555,7 @@ export default function BottomNav() {
                       </span>
                     </span>
                     <span className="ai-sheet__chevron" aria-hidden="true">
-                      ‹
+                      <IconChevronLeft />
                     </span>
                   </button>
                 </>
@@ -1578,7 +1579,7 @@ export default function BottomNav() {
                       </span>
                     </span>
                     <span className="ai-sheet__chevron" aria-hidden="true">
-                      ‹
+                      <IconChevronLeft />
                     </span>
                   </button>
                   <button
@@ -1595,7 +1596,7 @@ export default function BottomNav() {
                       </span>
                     </span>
                     <span className="ai-sheet__chevron" aria-hidden="true">
-                      ‹
+                      <IconChevronLeft />
                     </span>
                   </button>
                 </>
@@ -1627,7 +1628,7 @@ export default function BottomNav() {
                       </span>
                     </span>
                     <span className="ai-sheet__chevron" aria-hidden="true">
-                      ‹
+                      <IconChevronLeft />
                     </span>
                   </button>
                 </>
@@ -1655,7 +1656,7 @@ export default function BottomNav() {
                       </span>
                     </span>
                     <span className="ai-sheet__chevron" aria-hidden="true">
-                      ‹
+                      <IconChevronLeft />
                     </span>
                   </button>
                   <button
@@ -1676,7 +1677,7 @@ export default function BottomNav() {
                       </span>
                     </span>
                     <span className="ai-sheet__chevron" aria-hidden="true">
-                      ‹
+                      <IconChevronLeft />
                     </span>
                   </button>
                 </>

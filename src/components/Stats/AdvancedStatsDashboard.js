@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { DOMAIN } from "../../constants";
 import s from "./AdvancedStatsDashboard.module.css";
+import { IconClose } from "../Icons/UiIcons";
 
 /* ════════════════════════════════════════════════════════════════
    DESIGN TOKENS
@@ -1395,19 +1396,19 @@ export default function AdvancedStatsDashboard() {
         <div className={s.activeRow}>
           {flt.chains.map((c) => (
             <span key={"ch" + c} className={s.activeChip}><I.Store style={{ width: 10, height: 10 }} />{c}
-              <button onClick={() => removeFrom("chains", c)} aria-label={`הסר ${c}`}>×</button></span>
+              <button onClick={() => removeFrom("chains", c)} aria-label={`הסר ${c}`}><IconClose /></button></span>
           ))}
           {flt.cities.map((c) => (
             <span key={"ci" + c} className={s.activeChip}><I.Map style={{ width: 10, height: 10 }} />{c}
-              <button onClick={() => removeFrom("cities", c)} aria-label={`הסר ${c}`}>×</button></span>
+              <button onClick={() => removeFrom("cities", c)} aria-label={`הסר ${c}`}><IconClose /></button></span>
           ))}
           {flt.cats.map((c) => (
             <span key={"ca" + c} className={s.activeChip}><span className={s.chipDot} style={{ background: catColorOf(c) }} />{c}
-              <button onClick={() => removeFrom("cats", c)} aria-label={`הסר ${c}`}>×</button></span>
+              <button onClick={() => removeFrom("cats", c)} aria-label={`הסר ${c}`}><IconClose /></button></span>
           ))}
           {(flt.min || flt.max) && (
             <span className={s.activeChip}>₪{flt.min || 0}–{flt.max ? `₪${flt.max}` : "∞"}
-              <button onClick={() => setFlt((f) => ({ ...f, min: "", max: "" }))} aria-label="הסר טווח סכום">×</button></span>
+              <button onClick={() => setFlt((f) => ({ ...f, min: "", max: "" }))} aria-label="הסר טווח סכום"><IconClose /></button></span>
           )}
           <button className={s.clearAll} onClick={resetAll}>נקה הכל</button>
         </div>

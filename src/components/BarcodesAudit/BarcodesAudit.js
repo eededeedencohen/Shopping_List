@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { DOMAIN } from "../../constants";
 import "./BarcodesAudit.css";
+import { IconClose } from "../Icons/UiIcons";
 
 const SOURCE_TABS = [
   { value: "missing", label: "חסרים ב-DB" },
@@ -314,7 +315,7 @@ export default function BarcodesAudit() {
                   onClick={() => setQuery("")}
                   aria-label="נקה חיפוש"
                 >
-                  ×
+                  <IconClose />
                 </button>
               )}
               <span className="ba-search-hint">
@@ -449,7 +450,7 @@ export default function BarcodesAudit() {
                   onClick={() => setImageQuery("")}
                   aria-label="נקה חיפוש"
                 >
-                  ×
+                  <IconClose />
                 </button>
               )}
               <label className="ba-thumbs-toggle">
@@ -718,7 +719,7 @@ export default function BarcodesAudit() {
                   onClick={() => setScrapeQuery("")}
                   aria-label="נקה חיפוש"
                 >
-                  ×
+                  <IconClose />
                 </button>
               )}
               <span className="ba-search-hint">

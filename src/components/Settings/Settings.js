@@ -17,6 +17,7 @@ import SupermarketImage from "../Images/SupermarketImage";
 import CompleteCartPickerSheet from "./CompleteCartPickerSheet";
 import { rebuildAvailabilityIndex } from "../../services/productAvailabilityService";
 import { BUILD_VERSION } from "../../buildInfo";
+import { IconClose } from "../Icons/UiIcons";
 
 /* A fixed "demo" cart — one button fills the active cart with these and switches
    to the chosen supermarket (for presentations). */
@@ -850,7 +851,7 @@ export default function Settings() {
                         onClick={() => toggleSupermarket(id)}
                         aria-label="הסר"
                       >
-                        ×
+                        <IconClose />
                       </button>
                     </span>
                   );
@@ -923,7 +924,7 @@ export default function Settings() {
                       onClick={() => toggleName(name)}
                       aria-label="הסר"
                     >
-                      ×
+                      <IconClose />
                     </button>
                   </span>
                 ))}
@@ -1132,7 +1133,7 @@ function BranchPickerModal({
             onClick={onClose}
             aria-label="סגור"
           >
-            ×
+            <IconClose />
           </button>
         </header>
 
@@ -1196,7 +1197,7 @@ function ChainGrid({ chains, onPickChain }) {
             onClick={() => setQuery("")}
             aria-label="נקה"
           >
-            ×
+            <IconClose />
           </button>
         )}
       </div>
@@ -1343,7 +1344,7 @@ function ChainBranches({
               onClick={() => setQuery("")}
               aria-label="נקה"
             >
-              ×
+              <IconClose />
             </button>
           )}
         </div>

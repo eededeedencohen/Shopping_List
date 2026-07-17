@@ -11,6 +11,7 @@ import {
 } from "../WeightAccuracyHelpers";
 import useBodyScrollLock from "../../../hooks/useBodyScrollLock";
 import "./AlternativeProductsModal.css";
+import { IconClose } from "../../Icons/UiIcons";
 
 /**
  * Modal that lists the products that currently satisfy the product's
@@ -222,7 +223,7 @@ export default function AlternativeProductsModal({
             onClick={onClose}
             aria-label="סגור"
           >
-            ×
+            <IconClose />
           </button>
         </header>
 
@@ -450,7 +451,7 @@ function StoresBreakdownModal({
             onClick={onClose}
             aria-label="סגור"
           >
-            ×
+            <IconClose />
           </button>
         </header>
 
