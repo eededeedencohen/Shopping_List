@@ -17,7 +17,9 @@ import {
   useProductList,
   usePriceMap,
   useCartActions,
+  useFullCart,
 } from "../../hooks/appHooks";
+import { runCompareOptimization } from "../../utils/optimizeCart";
 import { useAiSettings } from "../../context/AiSettingsContext";
 import { useCart } from "../../context/CartContext2";
 import { useCompleteCartPreferences } from "../../context/CompleteCartPreferencesContext";
@@ -123,6 +125,161 @@ function buildOptimizeSummary(result, lang) {
   return `${s}.`;
 }
 
+/* Spoken summary of a voice-triggered cart completion (action #6). */
+function buildCompleteSummary(result, lang) {
+  const en = lang === "en";
+  if (!result || result.empty) {
+    if (result && result.reason === "no-names") {
+      return en
+        ? 'You haven\'t defined a "complete cart" list yet — pick products in the settings first.'
+        : 'עוד לא הגדרת רשימת "עגלה שלמה" — בחר מוצרים בהגדרות ואז נסה שוב.';
+    }
+    return en
+      ? "I couldn't complete the cart right now."
+      : "לא הצלחתי להשלים את העגלה כרגע.";
+  }
+  if (!result.addedCount) {
+    return en
+      ? "Your cart is already complete — everything from your list is in it."
+      : "העגלה שלך כבר מלאה — כל המוצרים מהרשימה נמצאים בה.";
+  }
+  const added =
+    result.addedCount === 1
+      ? en
+        ? "one product was added"
+        : "נוסף מוצר אחד"
+      : en
+      ? `${result.addedCount} products were added`
+      : `נוספו ${result.addedCount} מוצרים`;
+  const missing = result.missingCount
+    ? en
+      ? `, and for ${result.missingCount} I couldn't find a match`
+      : `, ול-${result.missingCount} לא מצאתי מוצר מתאים`
+    : "";
+  return en
+    ? `I completed your cart — ${added}${missing}.`
+    : `השלמתי את העגלה — ${added}${missing}.`;
+}
+
+/* Spoken summary of a voice-triggered complete-and-switch (action #7). */
+function buildCc7Summary(result, lang) {
+  const en = lang === "en";
+  if (!result || result.empty) {
+    if (result && result.reason === "no-names") {
+      return en
+        ? 'You haven\'t defined a "complete cart" list yet — pick products in the settings first.'
+        : 'עוד לא הגדרת רשימת "עגלה שלמה" — בחר מוצרים בהגדרות ואז נסה שוב.';
+    }
+    return en
+      ? "I couldn't complete and compare right now."
+      : "לא הצלחתי להשלים ולהשוות כרגע.";
+  }
+  const c = result.completedCount || 0;
+  const compPart =
+    c === 0
+      ? en
+        ? "Your cart was already complete"
+        : "העגלה כבר הייתה מלאה"
+      : c === 1
+      ? en
+        ? "I added one product"
+        : "השלמתי מוצר אחד"
+      : en
+      ? `I added ${c} products`
+      : `השלמתי ${c} מוצרים`;
+  if (!result.compareWin || result.applySupermarketID == null) {
+    return en
+      ? `${compPart}. No store in the group beat your current supermarket, so we stayed put.`
+      : `${compPart}. אף סופר בקבוצה לא יצא זול יותר מהנוכחי, אז נשארנו בסופר הנוכחי.`;
+  }
+  const nm = (result.targetSupermarket && result.targetSupermarket.name) || "";
+  return en
+    ? `${compPart} and compared the stores. Best value: ${nm} — about ${Math.round(
+        result.afterTotal
+      )} shekels, saving around ${Math.round(
+        result.savings
+      )}. I switched your cart there.`
+    : `${compPart} והשוויתי בין הסופרים. הכי משתלם: ${nm} — בערך ${Math.round(
+        result.afterTotal
+      )} שקלים, חיסכון של כ-${Math.round(
+        result.savings
+      )} שקלים. העברתי את העגלה אליו.`;
+}
+
+/* Spoken + history summaries of a voice-triggered supermarket comparison.
+   `spoken` is read aloud (short, ends with the follow-up options); `forHistory`
+   is appended to the server conversation file so the NEXT utterance ("switch
+   to the second one" / "עבור לרמי לוי") can resolve against the ranking. */
+function buildCompareSummary(result, lang) {
+  const en = lang === "en";
+  if (!result || result.empty) {
+    return {
+      spoken: en
+        ? "I couldn't compare the supermarkets right now."
+        : "לא הצלחתי להשוות בין הסופרים כרגע.",
+      forHistory: "השוואת הסופרים נכשלה — אין דירוג.",
+    };
+  }
+  const ranked = result.ranked || [];
+  const listText = ranked
+    .map(
+      (r, i) =>
+        `${i + 1}. ${r.name} ₪${Number(r.total).toFixed(2)}${
+          r.missing ? ` (חסרים ${r.missing} מוצרים)` : ""
+        }`
+    )
+    .join("; ");
+  const forHistory = `הוצגה השוואת עגלה בין סופרים. דירוג (מהזול ליקר): ${listText}. המשתמש מתבקש כעת להחליט — להחליף לזול ביותר, לעבור לסופר אחר מהדירוג (לפי שם או מיקום), או לבטל ולהישאר בסופר הנוכחי.`;
+
+  const win = result.targetSupermarket || {};
+  const winName = win.name || "";
+  const runners = ranked
+    .filter((r) => String(r.supermarketID) !== String(win.supermarketID))
+    .slice(0, 2);
+
+  if (en) {
+    if (result.compareNoWin) {
+      return {
+        spoken: `I compared ${ranked.length} chains — your current cart is already the cheapest. Say a store name if you still want to switch, or say cancel.`,
+        forHistory,
+      };
+    }
+    const runnersTxt = runners.length
+      ? ` Next: ${runners
+          .map((r) => `${r.name} at ${Math.round(r.total)} shekels`)
+          .join(", then ")}.`
+      : "";
+    return {
+      spoken: `I compared ${ranked.length} chains. The best value is ${winName} at about ${Math.round(
+        result.afterTotal
+      )} shekels — saving you around ${Math.round(
+        result.savings
+      )} shekels.${runnersTxt} Say "switch" to apply, name another store, or say "cancel".`,
+      forHistory,
+    };
+  }
+
+  if (result.compareNoWin) {
+    return {
+      spoken: `השוויתי בין ${ranked.length} רשתות, והעגלה הנוכחית שלך כבר הזולה ביותר. אם בכל זאת תרצה לעבור, אמור את שם הסופר, או אמור ביטול.`,
+      forHistory,
+    };
+  }
+  const runnersTxt = runners.length
+    ? ` אחריו: ${runners
+        .map((r) => `${r.name} ב-${Math.round(r.total)} שקלים`)
+        .join(", ואז ")}.`
+    : "";
+  return {
+    spoken: `השוויתי בין ${ranked.length} רשתות. הכי משתלם: ${winName}, בערך ${Math.round(
+      result.afterTotal
+    )} שקלים — חיסכון של כ-${Math.round(
+      result.savings
+    )} שקלים.${runnersTxt} כדי להחליף אמור "החלף", לסופר אחר אמור את שמו, ולביטול אמור "בטל".`,
+    forHistory,
+  };
+}
+
 /**
  * BottomNav — slim blue bar with the robot "coin". Tapping the coin opens a
  * bottom action sheet (5 actions):
@@ -141,6 +298,7 @@ export default function BottomNav() {
   } = useProductList();
   const { pricesMap } = usePriceMap();
   const { cart, setCart } = useCart();
+  const { fullCart } = useFullCart();
   const { allSupermarkets } = useSupermarkets();
   const { replaceSupermarket } = useCartActions();
   const { completeCartNames } = useCompleteCartPreferences();
@@ -201,11 +359,21 @@ export default function BottomNav() {
 
   /* Action #5 — compare the cart across a chosen SET of supermarkets and build
      the cart for the cheapest among them (same reveal as #4), then switch the
-     cart to that store. `supers` is the resolved supermarket objects. */
-  const startCompare = (supers) => {
+     cart to that store. `supers` is the resolved supermarket objects.
+     A VOICE-triggered compare holds the overlay open on the ranking (no
+     auto-apply) — the user decides by speaking (apply_compare). */
+  const [compareVoice, setCompareVoice] = useState(false);
+  const compareVoiceRef = useRef(null); // { transcript } while awaiting a result
+  const pendingCompareRef = useRef(null); // { result } awaiting a spoken decision
+  const startCompare = (supers, viaVoice = false) => {
     if (!supers || !supers.length) return;
     close();
     setPickerOpen(false);
+    setCompareVoice(!!viaVoice);
+    if (!viaVoice) {
+      compareVoiceRef.current = null;
+      pendingCompareRef.current = null;
+    }
     setCompareCandidates(supers);
     setComparing(true);
   };
@@ -226,6 +394,8 @@ export default function BottomNav() {
       setCart({ ...cart, supermarketID: targetId, products: optimizedProducts });
     }
     setComparing(false);
+    setCompareVoice(false);
+    pendingCompareRef.current = null;
     navigate("/cart");
   };
 
@@ -537,6 +707,233 @@ export default function BottomNav() {
         }
       }
 
+      /* Voice action #5 — compare the cart across a group of supermarkets.
+         Opens the compare overlay in hold-open mode; when the ranking is ready
+         handleCompareResult speaks it and records it in the history, and the
+         NEXT utterance decides (apply_compare below). */
+      case "compare_supermarkets": {
+        const products = (cart && cart.products) || [];
+        if (!products.length) {
+          speak(
+            ttsLanguage === "en"
+              ? "Your cart is empty — there's nothing to compare yet."
+              : "העגלה שלך ריקה — אין עדיין מה להשוות."
+          );
+          return { history: "keep" };
+        }
+        let supers = [];
+        if (cmd.group === "talpiot") supers = talpiotSupermarkets;
+        else if (cmd.group === "online") supers = onlineSupermarkets;
+        else if (cmd.group === "custom") {
+          const names = cmd.supermarketNames || [];
+          supers = (allSupermarkets || []).filter(
+            (s) =>
+              s &&
+              s.name &&
+              names.some(
+                (n) => s.name === n || s.name.includes(n) || n.includes(s.name)
+              )
+          );
+        }
+        if (!supers.length) {
+          speak(
+            ttsLanguage === "en"
+              ? "I couldn't find those supermarkets."
+              : "לא מצאתי את הסופרים המבוקשים."
+          );
+          return { history: "keep" };
+        }
+        compareVoiceRef.current = { transcript: transcript || "" };
+        startCompare(supers, true);
+        return { history: "keep" }; // the ranking is appended once it's ready
+      }
+
+      /* Voice action #6 — complete the cart from the user's defined list.
+         Decisive: the overlay reveals and auto-applies (merge), then the
+         result summary is spoken (handleCompleteResult). */
+      case "complete_cart": {
+        if (!completeCartNames || !completeCartNames.length) {
+          speak(
+            ttsLanguage === "en"
+              ? 'You haven\'t defined a "complete cart" list yet — pick products in the settings first.'
+              : 'עוד לא הגדרת רשימת "עגלה שלמה" — בחר מוצרים בהגדרות ואז נסה שוב.'
+          );
+          return { history: "keep" };
+        }
+        completeViaVoiceRef.current = true;
+        startComplete(
+          cmd.strategy === "lastPurchased" ? "lastPurchased" : "cheapest"
+        );
+        return { history: "clear" };
+      }
+
+      /* Voice action #7 — complete the cart AND switch to the cheapest store
+         of a group. Decisive like the sheet path: auto-applies, then speaks. */
+      case "complete_and_compare": {
+        if (!completeCartNames || !completeCartNames.length) {
+          speak(
+            ttsLanguage === "en"
+              ? 'You haven\'t defined a "complete cart" list yet — pick products in the settings first.'
+              : 'עוד לא הגדרת רשימת "עגלה שלמה" — בחר מוצרים בהגדרות ואז נסה שוב.'
+          );
+          return { history: "keep" };
+        }
+        let supers = [];
+        if (cmd.group === "online") supers = onlineSupermarkets;
+        else if (cmd.group === "custom") {
+          const names = cmd.supermarketNames || [];
+          supers = (allSupermarkets || []).filter(
+            (s) =>
+              s &&
+              s.name &&
+              names.some(
+                (n) => s.name === n || s.name.includes(n) || n.includes(s.name)
+              )
+          );
+        } else supers = talpiotSupermarkets; // "talpiot" is the voice default
+        if (!supers.length) {
+          speak(
+            ttsLanguage === "en"
+              ? "I couldn't find those supermarkets."
+              : "לא מצאתי את הסופרים המבוקשים."
+          );
+          return { history: "keep" };
+        }
+        cc7ViaVoiceRef.current = true;
+        setCc7Strategy(
+          cmd.strategy === "lastPurchased" ? "lastPurchased" : "cheapest"
+        );
+        startCompleteCompare(supers);
+        return { history: "clear" };
+      }
+
+      /* The spoken decision after a compare ranking was presented. */
+      case "apply_compare": {
+        const pending = pendingCompareRef.current;
+        if (!pending || !pending.result) return { history: "keep" };
+        const result = pending.result;
+
+        if (cmd.decision === "cancel") {
+          pendingCompareRef.current = null;
+          setCompareVoice(false);
+          setComparing(false);
+          speak(
+            ttsLanguage === "en"
+              ? "Okay, staying at the current supermarket."
+              : "בסדר, נשארים בסופר הנוכחי."
+          );
+          return { history: "clear" };
+        }
+
+        /* decision === "apply" — to the winner, or to a named/ranked store */
+        const ranked = result.ranked || [];
+        let target = null;
+        if (
+          Number.isInteger(cmd.rank) &&
+          cmd.rank >= 1 &&
+          cmd.rank <= ranked.length
+        ) {
+          target = ranked[cmd.rank - 1];
+        } else if (cmd.supermarketName) {
+          const want = String(cmd.supermarketName).trim();
+          target = ranked.find(
+            (r) =>
+              r.name && (r.name.includes(want) || want.includes(r.name))
+          );
+          if (!target) {
+            speak(
+              ttsLanguage === "en"
+                ? "That store wasn't part of the comparison."
+                : "הסופר הזה לא היה חלק מההשוואה."
+            );
+            return { history: "keep" };
+          }
+        }
+
+        const winnerId =
+          result.targetSupermarket && result.targetSupermarket.supermarketID;
+
+        if (!target || String(target.supermarketID) === String(winnerId)) {
+          if (result.compareNoWin || !result.optimizedProducts) {
+            pendingCompareRef.current = null;
+            setCompareVoice(false);
+            setComparing(false);
+            speak(
+              ttsLanguage === "en"
+                ? "Your current cart is already the cheapest — staying put."
+                : "העגלה הנוכחית שלך כבר הזולה ביותר — נשארים."
+            );
+            return { history: "clear" };
+          }
+          const nm =
+            (result.targetSupermarket && result.targetSupermarket.name) || "";
+          applyCompare(result.optimizedProducts, result);
+          speak(
+            ttsLanguage === "en"
+              ? `Switched to ${nm}. The cart total is about ${Math.round(
+                  result.afterTotal
+                )} shekels.`
+              : `החלפתי ל${nm}. סך העגלה בערך ${Math.round(
+                  result.afterTotal
+                )} שקלים.`
+          );
+          return { history: "clear" };
+        }
+
+        /* a non-winner store from the ranking → build ITS cart head-to-head
+           against the current one, then apply honestly */
+        try {
+          speak(
+            ttsLanguage === "en"
+              ? `One moment, building your cart at ${target.name}…`
+              : `רגע, בונה את העגלה ב${target.name}…`
+          );
+          const branches = (allSupermarkets || []).filter(
+            (s) => s && s.name === target.name
+          );
+          const single = await runCompareOptimization(
+            fullCart,
+            branches.length
+              ? branches
+              : [{ supermarketID: target.supermarketID, name: target.name }]
+          );
+          pendingCompareRef.current = null;
+          setCompareVoice(false);
+          if (
+            single &&
+            !single.empty &&
+            !single.compareNoWin &&
+            single.optimizedProducts
+          ) {
+            applyCompare(single.optimizedProducts, single);
+            speak(
+              ttsLanguage === "en"
+                ? `Switched to ${target.name}. The cart total is about ${Math.round(
+                    single.afterTotal
+                  )} shekels.`
+                : `עברנו ל${target.name}. סך העגלה בערך ${Math.round(
+                    single.afterTotal
+                  )} שקלים.`
+            );
+            return { history: "clear" };
+          }
+          setComparing(false);
+          speak(
+            ttsLanguage === "en"
+              ? `At ${target.name} the cart doesn't come out cheaper, so I stayed at the current supermarket.`
+              : `ב${target.name} העגלה לא יוצאת זולה יותר מהנוכחית, אז נשארתי בסופר הנוכחי.`
+          );
+          return { history: "clear" };
+        } catch (e) {
+          speak(
+            ttsLanguage === "en"
+              ? "I couldn't switch right now, please try again."
+              : "לא הצלחתי להחליף כרגע, נסה שוב."
+          );
+          return { history: "keep" };
+        }
+      }
+
       case "select_supermarket": {
         let items = (ranked.status === "done" && ranked.items) || [];
         if (!items.length) {
@@ -586,6 +983,17 @@ export default function BottomNav() {
     route: n.to,
   }));
 
+  /* distinct chain names for the NLU — lets the user compare BY NAME
+     ("תשווה בין רמי לוי ושופרסל"); the agent normalizes against this list */
+  const chainNames = useMemo(
+    () => [
+      ...new Set(
+        (allSupermarkets || []).map((s) => s && s.name).filter(Boolean)
+      ),
+    ],
+    [allSupermarkets]
+  );
+
   const {
     state: voiceState,
     error: voiceError,
@@ -596,11 +1004,13 @@ export default function BottomNav() {
     stopRecording,
     startHandsFree,
     stopHandsFree,
+    appendHistory,
     speak,
   } = useVoiceCommand({
     pages: navPages,
     categories: allCategories,
     subCategories: all_sub_categories,
+    supermarkets: chainNames,
     ttsLanguage,
     ttsVoice,
     micThreshold,
@@ -614,6 +1024,35 @@ export default function BottomNav() {
     if (!optimizeViaVoiceRef.current) return;
     optimizeViaVoiceRef.current = false;
     speak(buildOptimizeSummary(result, ttsLanguage));
+  };
+
+  /* Voice-triggered complete (#6) / complete+switch (#7): both are decisive —
+     the overlay auto-applies as usual and we only SPEAK the outcome. */
+  const completeViaVoiceRef = useRef(false);
+  const cc7ViaVoiceRef = useRef(false);
+  const handleCompleteResult = (result) => {
+    if (!completeViaVoiceRef.current) return;
+    completeViaVoiceRef.current = false;
+    speak(buildCompleteSummary(result, ttsLanguage));
+  };
+  const handleCc7Result = (result) => {
+    if (!cc7ViaVoiceRef.current) return;
+    cc7ViaVoiceRef.current = false;
+    speak(buildCc7Summary(result, ttsLanguage));
+  };
+
+  /* Voice-triggered compare: when the ranking is ready, speak it, remember it
+     for the spoken decision (apply_compare), and append it to the server-held
+     conversation so the next utterance can reference the ranking. The button
+     path stays silent and auto-applies as before. */
+  const handleCompareResult = (result) => {
+    if (!compareVoiceRef.current) return;
+    const { transcript } = compareVoiceRef.current;
+    compareVoiceRef.current = null;
+    pendingCompareRef.current = { result };
+    const summary = buildCompareSummary(result, ttsLanguage);
+    speak(summary.spoken);
+    appendHistory(transcript || "השוואת סופרים", summary.forHistory);
   };
 
   /* ── Coin gestures ───────────────────────────────────────────────────
@@ -1300,8 +1739,15 @@ export default function BottomNav() {
         open={comparing}
         mode="compare"
         candidateSupermarkets={compareCandidates}
-        onClose={() => setComparing(false)}
+        holdOpen={compareVoice}
+        onClose={() => {
+          setComparing(false);
+          setCompareVoice(false);
+          compareVoiceRef.current = null;
+          pendingCompareRef.current = null;
+        }}
         onApply={applyCompare}
+        onResult={handleCompareResult}
       />
       <CartOptimizeOverlay
         open={completing}
@@ -1310,6 +1756,7 @@ export default function BottomNav() {
         completeStrategy={completeStrategy}
         onClose={() => setCompleting(false)}
         onApply={applyComplete}
+        onResult={handleCompleteResult}
       />
       <CartOptimizeOverlay
         open={completeComparing}
@@ -1319,6 +1766,7 @@ export default function BottomNav() {
         candidateSupermarkets={cc7Candidates}
         onClose={() => setCompleteComparing(false)}
         onApply={applyCompleteCompare}
+        onResult={handleCc7Result}
       />
       <SupermarketPickerSheet
         open={pickerOpen}

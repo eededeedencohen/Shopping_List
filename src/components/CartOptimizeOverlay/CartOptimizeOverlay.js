@@ -133,6 +133,9 @@ export default function CartOptimizeOverlay({
   candidateSupermarkets,
   completeNames,
   completeStrategy = "cheapest",
+  /* voice flow: don't auto-continue at the end of the reveal — stay on the
+     summary and wait for an explicit apply/close (spoken or tapped) */
+  holdOpen = false,
 }) {
   const completeCompare = mode === "completeCompare";
   const compare = mode === "compare" || completeCompare;
@@ -173,6 +176,8 @@ export default function CartOptimizeOverlay({
   onApplyRef.current = onApply;
   const onResultRef = useRef(onResult);
   onResultRef.current = onResult;
+  const holdOpenRef = useRef(holdOpen);
+  holdOpenRef.current = holdOpen;
   const resultRef = useRef(result);
   resultRef.current = result;
 
@@ -285,6 +290,7 @@ export default function CartOptimizeOverlay({
     );
 
     const finish = () => {
+      if (holdOpenRef.current) return; // voice decides — no auto-continue
       if (finishedRef.current) return;
       finishedRef.current = true;
       const r = resultRef.current;
@@ -745,6 +751,40 @@ export default function CartOptimizeOverlay({
                 )}
               </div>
             )}
+
+            {/* honest ranking of every store that was evaluated — the winner
+                is highlighted; totals include unplaceable items kept at the
+                current store's prices */}
+            {compare && !completeCompare && result && result.ranked && result.ranked.length > 1 && (
+              <div className="copt__rank">
+                <div className="copt__rank-title">דירוג הסופרים שנבדקו</div>
+                {result.ranked.map((r, i) => {
+                  const winner =
+                    result.targetSupermarket &&
+                    String(r.supermarketID) ===
+                      String(result.targetSupermarket.supermarketID);
+                  return (
+                    <div
+                      key={r.supermarketID}
+                      className={`copt__rank-row${winner ? " is-winner" : ""}`}
+                    >
+                      <span className="copt__rank-pos">{i + 1}</span>
+                      <span className="copt__rank-logo">
+                        <SupermarketImage supermarketName={r.name} />
+                      </span>
+                      <span className="copt__rank-name">
+                        {r.name}
+                        {r.address ? <i>{r.address}</i> : null}
+                      </span>
+                      <span className="copt__rank-price">
+                        {money(r.total)}
+                        {r.missing > 0 && <i>חסרים {r.missing}</i>}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
 
           <div className="copt__foot">
@@ -760,11 +800,13 @@ export default function CartOptimizeOverlay({
                 <IconArrow />
               </span>
             </button>
-            <span
-              className="copt__progress"
-              style={{ animationDuration: `${totalMs}ms` }}
-              aria-hidden="true"
-            />
+            {!holdOpen && (
+              <span
+                className="copt__progress"
+                style={{ animationDuration: `${totalMs}ms` }}
+                aria-hidden="true"
+              />
+            )}
           </div>
         </div>
       )}

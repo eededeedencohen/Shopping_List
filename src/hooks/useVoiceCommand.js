@@ -34,6 +34,7 @@ const LEVEL_SMOOTH = 0.4; // wave smoothing (higher = snappier)
  * @param {Array}      opts.pages          [{ index, label, route }]
  * @param {string[]}   opts.categories
  * @param {string[][]} opts.subCategories
+ * @param {string[]}   opts.supermarkets   distinct chain names (compare by name)
  * @param {string}     opts.ttsLanguage    "he" | "en"
  * @param {string}     opts.ttsVoice
  * @param {number}     opts.micThreshold    VAD RMS threshold (hands-free)
@@ -43,6 +44,7 @@ export default function useVoiceCommand({
   pages,
   categories,
   subCategories,
+  supermarkets,
   ttsLanguage,
   ttsVoice,
   micThreshold,
@@ -92,6 +94,7 @@ export default function useVoiceCommand({
     pages,
     categories,
     subCategories,
+    supermarkets,
     ttsLanguage,
     ttsVoice,
     micThreshold,
@@ -309,6 +312,7 @@ export default function useVoiceCommand({
           pages: cfg.pages || [],
           categories: cfg.categories || [],
           subCategories: cfg.subCategories || [],
+          supermarkets: cfg.supermarkets || [],
         })
       );
       fd.append("ttsLanguage", cfg.ttsLanguage || "he");
@@ -639,6 +643,19 @@ export default function useVoiceCommand({
     [persistHistory]
   );
 
+  /* Append a turn whose assistant side is only known AFTER an async action
+     finishes (e.g. the compare ranking, computed by the overlay) — so the next
+     spoken command can reference it ("switch to the second one"). */
+  const appendHistory = useCallback(
+    (user, assistant) =>
+      persistHistory({
+        action: "append",
+        user: String(user || ""),
+        assistant: String(assistant || ""),
+      }),
+    [persistHistory]
+  );
+
   /* Speak an arbitrary line in the reply voice (server TTS), routed through the
      same analyser so the waves react. Used to voice a result summary the app
      composes AFTER an action runs (e.g. the cart-optimization outcome). */
@@ -715,6 +732,7 @@ export default function useVoiceCommand({
     startHandsFree,
     stopHandsFree,
     clearHistory,
+    appendHistory,
     speak,
   };
 }

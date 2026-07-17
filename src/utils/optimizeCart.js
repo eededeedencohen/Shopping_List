@@ -333,6 +333,34 @@ export async function runCompareOptimization(fullCart, candidateSupermarkets) {
     supermarketID: chosen.supermarketID,
   };
 
+  /* Honest ranking of ALL evaluated stores (for the on-screen ranking strip and
+     the spoken voice summary): a store's total = its optimized cart + the items
+     it can't place, kept at the current store's prices. Same ordering rule as
+     the winner pick — fewest misses first, then cheapest. */
+  const ranked = withExists
+    .map((c) => {
+      const missing = (c.nonExistsProducts || []).length;
+      const keptSum = (c.nonExistsProducts || [])
+        .map(
+          (np) =>
+            origBy[String(np.oldBarcode != null ? np.oldBarcode : np.barcode)]
+        )
+        .filter(Boolean)
+        .reduce((s, o) => s + (Number(o.totalPrice) || 0), 0);
+      const sm = smById[String(c.supermarketID)] || {
+        supermarketID: c.supermarketID,
+      };
+      return {
+        supermarketID: c.supermarketID,
+        name: sm.name || `#${c.supermarketID}`,
+        address: sm.address || "",
+        city: sm.city || "",
+        missing,
+        total: Number(((Number(c.totalPrice) || 0) + keptSum).toFixed(2)),
+      };
+    })
+    .sort((a, b) => a.missing - b.missing || a.total - b.total);
+
   // items the chosen store can't place → keep them from the current cart
   const kept = (chosen.nonExistsProducts || [])
     .map(
@@ -383,6 +411,7 @@ export async function runCompareOptimization(fullCart, candidateSupermarkets) {
       optimizedProducts: null,
       targetSupermarket: chosenSM,
       supermarket: fullCart.supermarket,
+      ranked,
     };
   }
 
@@ -483,6 +512,7 @@ export async function runCompareOptimization(fullCart, candidateSupermarkets) {
     optimizedProducts,
     targetSupermarket: chosenSM,
     supermarket: fullCart.supermarket,
+    ranked,
   };
 }
 
