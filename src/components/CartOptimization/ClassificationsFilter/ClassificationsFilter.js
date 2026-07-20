@@ -36,7 +36,9 @@ export default function ClassificationsFilter({ barcode, rules }) {
 
   if (!familyDef) return null;
 
-  const rows = familyDef.types || [];
+  /* the "מותג" row duplicates the existing BrandsFilter — hide it here */
+  const rows = (familyDef.types || []).filter((t) => t.name !== "מותג");
+  if (!rows.length) return null;
   const ruleOf = (rowName) => (rules && rules.rows && rules.rows[rowName]) || {};
   const stateOf = (rowName, tag) => {
     const r = ruleOf(rowName);
