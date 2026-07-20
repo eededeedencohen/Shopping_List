@@ -916,3 +916,12 @@
     animation: none;
   }
 }
+
+/* ── Action #8: find-product-on-shelf panel ── */
+.ai-sheet__find-empty {
+  padding: 22px 8px;
+  text-align: center;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #94a3b8;
+}

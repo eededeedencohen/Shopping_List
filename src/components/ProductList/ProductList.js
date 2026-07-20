@@ -25,6 +25,11 @@ import CategoryNavigation from "./CategoryNavigation";
 import SubCategoryNavigation from "./SubCategoryNavigation";
 import ProductComparisonModal from "../PriceList/productComparisonModal";
 import ProductComparison from "../PriceList/productComparison";
+import {
+  peekShelfTarget,
+  consumeShelfTarget,
+  onShelfTarget,
+} from "../../utils/shelfTarget";
 
 /* -------------------------------- */
 /* פונקציות עזר (אינן משתנות)      */
@@ -440,6 +445,43 @@ function ProductsList() {
     (a, b) => (a.unitPrice == null) - (b.unitPrice == null)
   );
 
+  /* Shelf navigation (action #8): when a target is set, scroll to the first
+     matching product card and flash it. Two triggers cover every case:
+       • after-render effect — arriving here by navigation / subcategory change
+       • store subscription — the user is ALREADY on the right subcategory,
+         so no re-render would otherwise happen */
+  const orderedRef = useRef([]);
+  orderedRef.current = orderedProducts;
+
+  const tryShelfScroll = useMemo(
+    () => () => {
+      const shelfTarget = peekShelfTarget();
+      if (!shelfTarget) return;
+      const hit = orderedRef.current.find((p) =>
+        shelfTarget.barcodes.has(String(p.barcode))
+      );
+      if (!hit) return; // another subcategory rendered — try again next render
+      consumeShelfTarget();
+      requestAnimationFrame(() => {
+        const card = document.getElementById(`product-card-${hit.barcode}`);
+        if (!card) return;
+        card.scrollIntoView({ behavior: "smooth", block: "center" });
+        card.classList.add("shelf-target-flash");
+        setTimeout(() => card.classList.remove("shelf-target-flash"), 2600);
+      });
+    },
+    []
+  );
+
+  useEffect(() => {
+    if (!isLoadingProducts) tryShelfScroll();
+  });
+
+  useEffect(
+    () => onShelfTarget(() => setTimeout(tryShelfScroll, 60)),
+    [tryShelfScroll]
+  );
+
   if (isLoadingProducts) {
     return (
       <div className={styles['spinner-container']}>
@@ -521,6 +563,7 @@ function ProductsList() {
               const priceUnavailable = typeof product.unitPrice !== "number";
               return (
               <div
+                id={`product-card-${product.barcode}`}
                 className={`${styles['list__product-card']} ${
                   priceUnavailable ? styles['list__product-card--unavailable'] : ''
                 }`}

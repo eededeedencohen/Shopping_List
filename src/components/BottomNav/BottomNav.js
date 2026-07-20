@@ -24,6 +24,8 @@ import { useAiSettings } from "../../context/AiSettingsContext";
 import { useCart } from "../../context/CartContext2";
 import { useCompleteCartPreferences } from "../../context/CompleteCartPreferencesContext";
 import { useSupermarkets } from "../../hooks/optimizationHooks";
+import { useClassificationsCtx } from "../../context/classificationsContext";
+import { setShelfTarget } from "../../utils/shelfTarget";
 import {
   getCheapestSupermarketIDsByCart,
   getRankedSupermarketsByCart,
@@ -53,6 +55,22 @@ const ACTIONS = [
   { key: "a5", label: "השווה מחירים בין סופרים", view: "compare" },
   { key: "a6", label: "השלם את העגלה", view: "complete" },
   { key: "a7", label: "השלם ועבור לסופר הזול", view: "complete7" },
+  { key: "a8", label: "מצא מוצר במדף", view: "find" },
+];
+
+/* Action #8 — extra shelf targets beyond the classification families:
+   generalNames that sit DEEP in their subcategory's scroll (cottage, ski
+   cheese, shredded yellow…). Strings must match the DB generalName exactly;
+   names that don't resolve to products are silently hidden from the panel. */
+const SHELF_EXTRA_GENERALS = [
+  "קוטג'",
+  "סקי",
+  "שמנת חמוצה",
+  "גבינת שמנת",
+  "גבינה צהובה מגורדת",
+  "גבינת מוצרלה",
+  "גבינת קשקבל",
+  "גבינת גאודה",
 ];
 
 /* Curated Talpiot-area supermarket IDs (industrial/commercial zone + very close).
@@ -303,6 +321,8 @@ export default function BottomNav() {
   const { allSupermarkets } = useSupermarkets();
   const { replaceSupermarket } = useCartActions();
   const { completeCartNames } = useCompleteCartPreferences();
+  const { families, byBarcode, isLoaded: classificationsLoaded } =
+    useClassificationsCtx();
 
   const [open, setOpen] = useState(false);
   const [optimizing, setOptimizing] = useState(false); // action #4 overlay
@@ -476,6 +496,61 @@ export default function BottomNav() {
     close();
     navigate("/products");
   };
+
+  /* ── Action #8: shelf navigation ──
+     Deep-navigate to the products of a classification family: resolve the
+     family's products (join key = barcode), pick their majority
+     category+subcategory, hand the barcodes to ProductsList through the
+     shelf-target store, and open the products page — ProductsList scrolls
+     the rest of the way to the actual shelf. */
+  const goToShelf = (target) => {
+    const matches =
+      target.type === "family"
+        ? (products || []).filter(
+            (p) => byBarcode[String(p.barcode)]?.family === target.name
+          )
+        : (products || []).filter(
+            (p) => (p.generalName || "").trim() === target.name
+          );
+    if (!matches.length) return;
+
+    const counts = new Map();
+    matches.forEach((p) => {
+      const key = `${p.category}|||${p.subcategory}`;
+      counts.set(key, (counts.get(key) || 0) + 1);
+    });
+    const [bestKey] = [...counts.entries()].sort((a, b) => b[1] - a[1])[0];
+    const [category, subcategory] = bestKey.split("|||");
+
+    const ci = allCategories.indexOf(category);
+    const si = (all_sub_categories[ci] || []).indexOf(subcategory);
+    if (ci === -1 || si === -1) return;
+
+    setShelfTarget(
+      matches
+        .filter((p) => p.category === category && p.subcategory === subcategory)
+        .map((p) => p.barcode)
+    );
+    goToSubCategory(ci, si);
+  };
+
+  /* action #8 targets: classification families + curated deep-scroll
+     generalNames (only ones that actually resolve to products), Hebrew order */
+  const shelfTargets = useMemo(() => {
+    const famNames = (families || []).map((f) => f.family);
+    const generalSet = new Set(
+      (products || [])
+        .map((p) => (p.generalName || "").trim())
+        .filter(Boolean)
+    );
+    const extras = SHELF_EXTRA_GENERALS.filter(
+      (n) => generalSet.has(n) && !famNames.includes(n)
+    );
+    return [
+      ...famNames.map((name) => ({ type: "family", name })),
+      ...extras.map((name) => ({ type: "general", name })),
+    ].sort((a, b) => a.name.localeCompare(b.name, "he"));
+  }, [families, products]);
 
   /* ── Cheapest supermarket(s) for the current cart (action #3) ──
      Two modes:
@@ -1154,6 +1229,7 @@ export default function BottomNav() {
       : "השוואת מחירים בין סופרים",
     complete: "השלמת העגלה",
     complete7: "השלמה ומעבר לסופר הזול",
+    find: "מצא מוצר במדף",
   };
 
   const sheet =
@@ -1275,6 +1351,38 @@ export default function BottomNav() {
                   </div>
                 );
               })}
+            </div>
+          )}
+
+          {/* ── Find a product on the shelf (action #8) ──
+              Manual for now — the voice intent will call goToShelf later. */}
+          {view === "find" && (
+            <div className="ai-sheet__groups">
+              <div className="ai-sheet__group-title">
+                בחרו מוצר — נפתח את תת-הקטגוריה שלו ונגלול עד המדף
+              </div>
+              {!classificationsLoaded ? (
+                <div className="ai-sheet__find-empty">טוען מוצרים…</div>
+              ) : shelfTargets.length === 0 ? (
+                <div className="ai-sheet__find-empty">אין מוצרים מסווגים</div>
+              ) : (
+                <ul className="ai-sheet__list">
+                  {shelfTargets.map((target) => (
+                    <li key={target.name}>
+                      <button
+                        type="button"
+                        className="ai-sheet__item"
+                        onClick={() => goToShelf(target)}
+                      >
+                        <span className="ai-sheet__item-label">{target.name}</span>
+                        <span className="ai-sheet__chevron" aria-hidden="true">
+                          <IconChevronLeft />
+                        </span>
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
             </div>
           )}
 
