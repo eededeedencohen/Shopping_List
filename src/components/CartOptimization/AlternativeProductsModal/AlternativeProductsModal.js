@@ -10,6 +10,10 @@ import {
   formatProductWeight,
 } from "../WeightAccuracyHelpers";
 import useBodyScrollLock from "../../../hooks/useBodyScrollLock";
+import {
+  useClassificationsCtx,
+  barcodePassesClassificationRules,
+} from "../../../context/classificationsContext";
 import "./AlternativeProductsModal.css";
 import { IconClose } from "../../Icons/UiIcons";
 
@@ -37,6 +41,7 @@ export default function AlternativeProductsModal({
   const { pricesMap } = usePriceMap();
   const { supermarketIDs: selectedSupermarketIDs } = useSettings();
   const { allSupermarkets } = useSupermarkets();
+  const { byBarcode: classificationsByBarcode } = useClassificationsCtx();
   /* breakdown sub-modal: clicking the X/N "סופרים" chip drills into the
      per-store yes/no list. */
   const [isStoresBreakdownOpen, setIsStoresBreakdownOpen] = useState(false);
@@ -107,6 +112,7 @@ export default function AlternativeProductsModal({
     const maxAllowed = baseWeight + formatProductWeight(maxGain, productDetails.unitWeight);
 
     const blackList = new Set(productSettings?.blackListBrands || []);
+    const classificationRules = productSettings?.classificationRules || null;
 
     const out = [];
     for (const p of products) {
@@ -116,6 +122,8 @@ export default function AlternativeProductsModal({
       } else if ((p.generalName || "").trim() !== targetGeneral) {
         continue;
       }
+      /* the classification pre-filter — mirrors the server semantics */
+      if (!barcodePassesClassificationRules(p.barcode, classificationRules, classificationsByBarcode)) continue;
       if (blackList.has(p.brand)) continue;
       const pWeight = formatProductWeight(p.weight, p.unitWeight);
       if (pWeight < minAllowed - 0.0001 || pWeight > maxAllowed + 0.0001) continue;
@@ -133,7 +141,7 @@ export default function AlternativeProductsModal({
       return a.unitPrice - b.unitPrice;
     });
     return out;
-  }, [products, productDetails, productSettings, barcode, pricesMap, explicitAlternatives]);
+  }, [products, productDetails, productSettings, barcode, pricesMap, explicitAlternatives, classificationsByBarcode]);
 
   /* Fetch per-barcode availability once the modal is open and we know the
      matched candidates. Re-runs if the matched set changes. */

@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import ProductDetails from "./ProductDetails";
 import WeightAccuracy from "./WeightAccuracy";
 import BrandsFilter from "./BrandsFilter/BrandsFilter";
+import ClassificationsFilter from "./ClassificationsFilter/ClassificationsFilter";
 import AlternativeProductsModal from "./AlternativeProductsModal/AlternativeProductsModal";
 import "./ProductSettings.css";
 import { useSettingsOperations } from "../../hooks/optimizationHooks";
@@ -61,6 +62,10 @@ export default function ProductSettings({ product }) {
             productUnitWeight={product.productDetails.unitWeight}
             currentWeightGain={product.productSettings.maxWeightGain}
             currentWeightLoss={product.productSettings.maxWeightLoss}
+          />
+          <ClassificationsFilter
+            barcode={product.barcode}
+            rules={product.productSettings.classificationRules}
           />
           <BrandsFilter
             generalName={product.productDetails.generalName}

@@ -6,6 +6,7 @@ import { ProductContextProvider } from "./context/ProductContext";
 import { PriceContextProvider } from "./context/PriceContext";
 import { CartContextProvider } from "./context/CartContext";
 import { CartOptimizationContextProvider } from "./context/cart-optimizationContext";
+import { ClassificationsProvider } from "./context/classificationsContext";
 import { CartContextProvider2 } from "./context/CartContext2";
 import { PriceContextProvider2 } from "./context/PriceContext2";
 import { ProductContextProvider2 } from "./context/ProductContext2";
@@ -30,6 +31,7 @@ root.render(
           <CartContextProvider2>
             <PriceContextProvider2>
                 <ProductContextProvider2>
+                  <ClassificationsProvider>
                   <CartOptimizationContextProvider>
                     <CartOptimizationProvider>
                       <AiSettingsProvider>
@@ -53,6 +55,7 @@ root.render(
                       </AiSettingsProvider>
                     </CartOptimizationProvider>
                   </CartOptimizationContextProvider>
+                  </ClassificationsProvider>
                 </ProductContextProvider2>
             </PriceContextProvider2>
           </CartContextProvider2>

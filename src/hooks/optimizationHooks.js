@@ -7,6 +7,7 @@
 
 import { useMemo, useCallback } from "react";
 import { useCartOptimizationCtx } from "../context/CartOptimizationContext";
+import { useClassificationsCtx } from "../context/classificationsContext";
 
 /* ───────────────────────── 1) useSettings (STATE בלבד) ───────────────────────── */
 export const useSettings = () => {
@@ -195,6 +196,80 @@ export const useSettingsOperations = () => {
       )
     );
 
+  /* ─────────────  ⬤  CLASSIFICATION-TAG RULES  ⬤  ─────────────
+     productSettings.classificationRules = { family, rows: { row: {green, red} } }
+     none→green→red→none per tap; the rules ride the existing V2 payload. */
+  const updateClassificationRules = (barcode, family, updater) =>
+    setProductsSettings((arr) =>
+      arr.map((p) => {
+        if (p.barcode !== barcode) return p;
+        const prev = p.productSettings.classificationRules || {
+          family,
+          rows: {},
+        };
+        const rows = updater({ ...prev.rows });
+        return {
+          ...p,
+          productSettings: {
+            ...p.productSettings,
+            classificationRules: { family, rows },
+          },
+        };
+      })
+    );
+
+  const cycleClassificationTag = (barcode, family, rowName, tag) =>
+    updateClassificationRules(barcode, family, (rows) => {
+      const row = {
+        green: [...((rows[rowName] || {}).green || [])],
+        red: [...((rows[rowName] || {}).red || [])],
+      };
+      if (row.green.includes(tag)) {
+        row.green = row.green.filter((t) => t !== tag);
+        row.red.push(tag); // green → red
+      } else if (row.red.includes(tag)) {
+        row.red = row.red.filter((t) => t !== tag); // red → none
+      } else {
+        row.green.push(tag); // none → green
+      }
+      rows[rowName] = row;
+      return rows;
+    });
+
+  const resetClassificationRow = (barcode, family, rowName) =>
+    updateClassificationRules(barcode, family, (rows) => {
+      delete rows[rowName];
+      return rows;
+    });
+
+  const classificationBlankToRed = (barcode, family, rowName, allTags) =>
+    updateClassificationRules(barcode, family, (rows) => {
+      const row = {
+        green: [...((rows[rowName] || {}).green || [])],
+        red: [...((rows[rowName] || {}).red || [])],
+      };
+      const colored = new Set([...row.green, ...row.red]);
+      (allTags || []).forEach((t) => {
+        if (!colored.has(t)) row.red.push(t);
+      });
+      rows[rowName] = row;
+      return rows;
+    });
+
+  const setClassificationRangeGreen = (barcode, family, rowName, tags) =>
+    updateClassificationRules(barcode, family, (rows) => {
+      const row = {
+        green: [...((rows[rowName] || {}).green || [])],
+        red: [...((rows[rowName] || {}).red || [])],
+      };
+      (tags || []).forEach((t) => {
+        if (!row.green.includes(t)) row.green.push(t);
+        row.red = row.red.filter((x) => x !== t);
+      });
+      rows[rowName] = row;
+      return rows;
+    });
+
   /* ─────────────  ⬤  RETURN API  ⬤  ───────────── */
   return {
     /* per-product toggles – מה שהרכיב צריך */
@@ -216,6 +291,26 @@ export const useSettingsOperations = () => {
     removeBrandFromBlackList,
     changeMaxWeightGain,
     changeMaxWeightLoss,
+
+    /* classification-tag rules */
+    cycleClassificationTag,
+    resetClassificationRow,
+    classificationBlankToRed,
+    setClassificationRangeGreen,
+  };
+};
+
+/* ───────────── useProductClassifications — the tag rows of one product ──
+   Returns the product's classification family (rows + all tag values) and
+   its own tags, or nulls when the product carries no classifications. */
+export const useProductClassifications = (barcode) => {
+  const { byBarcode, byFamily, isLoaded } = useClassificationsCtx();
+  const info = byBarcode[String(barcode)];
+  return {
+    isLoaded,
+    family: info ? info.family : null,
+    familyDef: info ? byFamily[info.family] || null : null,
+    tags: info ? info.tags : null,
   };
 };
 
