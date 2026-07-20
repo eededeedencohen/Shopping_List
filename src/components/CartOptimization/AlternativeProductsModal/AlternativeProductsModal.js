@@ -1,47 +1,37 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import ReactDOM from "react-dom";
-import axios from "axios";
-import { useProductList, usePriceMap } from "../../../hooks/appHooks";
 import { useSettings, useSupermarkets } from "../../../hooks/optimizationHooks";
 import { getAvailabilityPerBarcode } from "../../../services/productAvailabilityService";
 import { ProductImageDisplay } from "../../Images/ProductImageService";
-import { DOMAIN } from "../../../constants";
-import {
-  formatProductWeight,
-} from "../WeightAccuracyHelpers";
 import useBodyScrollLock from "../../../hooks/useBodyScrollLock";
-import {
-  useClassificationsCtx,
-  barcodePassesClassificationRules,
-} from "../../../context/classificationsContext";
 import "./AlternativeProductsModal.css";
 import { IconClose } from "../../Icons/UiIcons";
 
 /**
  * Modal that lists the products that currently satisfy the product's
- * "alternative product" settings — same group(s), weight in range,
- * brand not blacklisted.
+ * "alternative product" settings. The matching itself lives in
+ * useMatchingAlternatives (hooks/alternativesHooks.js) — the SAME
+ * computation that feeds the live counters — and arrives here as props.
  *
  * Props:
- *   isOpen          : bool
- *   onClose         : fn
- *   barcode         : string  — the source product whose settings drive the filter
- *   productDetails  : { name, brand, weight, unitWeight, generalName }
- *   productSettings : { maxWeightGain, maxWeightLoss, blackListBrands }
+ *   isOpen               : bool
+ *   onClose              : fn
+ *   barcode              : string — the source product
+ *   productDetails       : { name, generalName, ... }
+ *   matches              : the matching products, price-sorted
+ *   explicitAlternatives : string[] — explicit mapping (empty = generalName rule)
  */
 export default function AlternativeProductsModal({
   isOpen,
   onClose,
   barcode,
   productDetails,
-  productSettings,
+  matches,
+  explicitAlternatives,
 }) {
   useBodyScrollLock(isOpen);
-  const { products } = useProductList();
-  const { pricesMap } = usePriceMap();
   const { supermarketIDs: selectedSupermarketIDs } = useSettings();
   const { allSupermarkets } = useSupermarkets();
-  const { byBarcode: classificationsByBarcode } = useClassificationsCtx();
   /* breakdown sub-modal: clicking the X/N "סופרים" chip drills into the
      per-store yes/no list. */
   const [isStoresBreakdownOpen, setIsStoresBreakdownOpen] = useState(false);
@@ -54,94 +44,6 @@ export default function AlternativeProductsModal({
   const [supermarketsWithAnyMatch, setSupermarketsWithAnyMatch] = useState(
     () => new Set()
   );
-
-  /* Explicit AlternativeProducts mapping for the source barcode. When the
-     map has an entry, those barcodes win over generalName matching. */
-  const [explicitAlternatives, setExplicitAlternatives] = useState(null);
-  /* null = not loaded yet, undefined = no entry, array = the alternatives list */
-
-  useEffect(() => {
-    if (!isOpen || !barcode) return undefined;
-    let cancelled = false;
-    setExplicitAlternatives(null);
-    (async () => {
-      try {
-        const res = await axios.get(
-          `${DOMAIN}/api/v1/alternative-products/${encodeURIComponent(barcode)}`
-        );
-        if (cancelled) return;
-        const doc = res?.data?.data?.alternativeProduct;
-        if (doc && Array.isArray(doc.alternatives) && doc.alternatives.length) {
-          setExplicitAlternatives(doc.alternatives.map(String));
-        } else {
-          setExplicitAlternatives(undefined); // explicit "no entry"
-        }
-      } catch {
-        if (!cancelled) setExplicitAlternatives(undefined);
-      }
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, [isOpen, barcode]);
-
-  const matches = useMemo(() => {
-    if (!products?.length || !productDetails) return [];
-
-    /* Two-tier candidate selection:
-       1) AlternativeProducts mapping for the source barcode — wins when set.
-       2) Fallback — products with the same generalName as the source.
-       This mirrors the backend resolveAlternativeBarcodes rule so what you
-       see here matches what the optimizer would pick. */
-    const hasExplicit =
-      Array.isArray(explicitAlternatives) && explicitAlternatives.length > 0;
-    const explicitSet = hasExplicit
-      ? new Set(explicitAlternatives)
-      : null;
-    const targetGeneral = (productDetails.generalName || "").trim();
-    if (!hasExplicit && !targetGeneral) return [];
-
-    /* Source product weight, normalized to base unit (g / ml). */
-    const baseWeight = formatProductWeight(
-      productDetails.weight,
-      productDetails.unitWeight,
-    );
-    const maxGain = productSettings?.maxWeightGain ?? 0;
-    const maxLoss = productSettings?.maxWeightLoss ?? 0;
-    const minAllowed = baseWeight - formatProductWeight(maxLoss, productDetails.unitWeight);
-    const maxAllowed = baseWeight + formatProductWeight(maxGain, productDetails.unitWeight);
-
-    const blackList = new Set(productSettings?.blackListBrands || []);
-    const classificationRules = productSettings?.classificationRules || null;
-
-    const out = [];
-    for (const p of products) {
-      if (p.barcode === barcode) continue;
-      if (hasExplicit) {
-        if (!explicitSet.has(String(p.barcode))) continue;
-      } else if ((p.generalName || "").trim() !== targetGeneral) {
-        continue;
-      }
-      /* the classification pre-filter — mirrors the server semantics */
-      if (!barcodePassesClassificationRules(p.barcode, classificationRules, classificationsByBarcode)) continue;
-      if (blackList.has(p.brand)) continue;
-      const pWeight = formatProductWeight(p.weight, p.unitWeight);
-      if (pWeight < minAllowed - 0.0001 || pWeight > maxAllowed + 0.0001) continue;
-      out.push({
-        ...p,
-        unitPrice: pricesMap?.[p.barcode]?.price ?? null,
-      });
-    }
-
-    /* sort by price ascending (unknown prices to the bottom) */
-    out.sort((a, b) => {
-      if (a.unitPrice == null && b.unitPrice == null) return 0;
-      if (a.unitPrice == null) return 1;
-      if (b.unitPrice == null) return -1;
-      return a.unitPrice - b.unitPrice;
-    });
-    return out;
-  }, [products, productDetails, productSettings, barcode, pricesMap, explicitAlternatives, classificationsByBarcode]);
 
   /* Fetch per-barcode availability once the modal is open and we know the
      matched candidates. Re-runs if the matched set changes. */

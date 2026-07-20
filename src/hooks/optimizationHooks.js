@@ -270,6 +270,27 @@ export const useSettingsOperations = () => {
       return rows;
     });
 
+  /* The range slider owns the green set of a numeric row: green becomes
+     EXACTLY the selected values (reds inside the range are cleared, reds
+     outside survive). Full span = no whitelist at all — green stays empty so
+     family products missing this row keep passing, like all-white. */
+  const setClassificationRowGreenExact = (barcode, family, rowName, tags, allTags) =>
+    updateClassificationRules(barcode, family, (rows) => {
+      const selected = [...(tags || [])];
+      const isFullSpan =
+        Array.isArray(allTags) && selected.length >= allTags.length;
+      const green = isFullSpan ? [] : selected;
+      const red = ((rows[rowName] || {}).red || []).filter(
+        (t) => !selected.includes(t)
+      );
+      if (!green.length && !red.length) delete rows[rowName];
+      else rows[rowName] = { green, red };
+      return rows;
+    });
+
+  const clearClassificationRules = (barcode, family) =>
+    updateClassificationRules(barcode, family, () => ({}));
+
   /* ─────────────  ⬤  RETURN API  ⬤  ───────────── */
   return {
     /* per-product toggles – מה שהרכיב צריך */
@@ -297,6 +318,8 @@ export const useSettingsOperations = () => {
     resetClassificationRow,
     classificationBlankToRed,
     setClassificationRangeGreen,
+    setClassificationRowGreenExact,
+    clearClassificationRules,
   };
 };
 

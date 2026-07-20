@@ -1,0 +1,185 @@
+/* ═══════════════════════════════════════════════
+   Classifications sheet — tag groups inside BottomSheet
+   ═══════════════════════════════════════════════ */
+
+.cs-legend {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.66rem;
+  font-weight: 700;
+  color: #64748b;
+}
+
+.cs-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  display: inline-block;
+  margin-inline-start: 8px;
+}
+
+.cs-dot--green { background: #4ade80; }
+.cs-dot--red { background: #f87171; }
+
+.cs-group {
+  padding: 12px 0 10px;
+}
+
+.cs-group + .cs-group {
+  border-top: 1px dashed #e2e8f0;
+}
+
+.cs-group-head {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.cs-group-name {
+  margin: 0;
+  flex: 1;
+  font-size: 0.84rem;
+  font-weight: 800;
+  color: #334155;
+}
+
+.cs-groupbtn {
+  border: 1px solid #e2e8f0;
+  background: #fff;
+  color: #64748b;
+  border-radius: 999px;
+  font-size: 0.66rem;
+  font-weight: 700;
+  padding: 3px 10px;
+  cursor: pointer;
+  font-family: inherit;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.cs-groupbtn:active { transform: scale(0.96); }
+
+/* ─── numeric range slider ─── */
+.cs-slider {
+  padding: 2px 14px 0;
+}
+
+.cs-slider-track {
+  position: relative;
+  height: 36px;
+  touch-action: none;
+  cursor: pointer;
+}
+
+.cs-slider-rail {
+  position: absolute;
+  top: 15px;
+  left: 0;
+  right: 0;
+  height: 6px;
+  border-radius: 999px;
+  background: #e2e8f0;
+  pointer-events: none;
+}
+
+.cs-slider-fill {
+  position: absolute;
+  top: 15px;
+  height: 6px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #34d399, #10b981);
+  pointer-events: none;
+}
+
+.cs-tick {
+  position: absolute;
+  top: 11px;
+  width: 14px;
+  height: 14px;
+  margin-right: -7px;
+  border-radius: 50%;
+  background: #fff;
+  border: 2px solid #cbd5e1;
+  pointer-events: none;
+  box-sizing: border-box;
+}
+
+.cs-tick.in {
+  border-color: #10b981;
+  background: #d1fae5;
+}
+
+.cs-tick.red {
+  border-color: #f87171;
+  background: #fee2e2;
+}
+
+.cs-handle {
+  position: absolute;
+  top: 7px;
+  width: 22px;
+  height: 22px;
+  margin-right: -11px;
+  border-radius: 50%;
+  background: #fff;
+  border: 3px solid #059669;
+  box-shadow: 0 2px 8px rgba(5, 150, 105, 0.35);
+  pointer-events: none;
+  box-sizing: border-box;
+}
+
+.cs-slider-edge {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.64rem;
+  font-weight: 700;
+  color: #94a3b8;
+  padding: 2px 0 0;
+}
+
+.cs-slider-out {
+  text-align: center;
+  font-size: 0.78rem;
+  font-weight: 800;
+  color: #059669;
+  margin-top: 2px;
+}
+
+.cs-slider-out.is-full {
+  color: #94a3b8;
+  font-weight: 700;
+}
+
+/* ─── string chips ─── */
+.cs-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.cs-chip {
+  border-radius: 999px;
+  padding: 5px 14px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  background: #fff;
+  color: #334155;
+  border: 1.5px solid #cbd5e1;
+  transition: background 0.12s ease, border-color 0.12s ease, color 0.12s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.cs-chip--green {
+  background: #dcfce7;
+  color: #166534;
+  border-color: #4ade80;
+}
+
+.cs-chip--red {
+  background: #fee2e2;
+  color: #991b1b;
+  border-color: #f87171;
+}

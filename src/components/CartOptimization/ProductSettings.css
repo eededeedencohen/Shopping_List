@@ -1,25 +1,230 @@
 /* ═══════════════════════════════════════════════
-   Product card (per-product settings)
+   Product accordion row (per-product settings)
    ═══════════════════════════════════════════════ */
 
 .ps-card {
-  padding: 14px 16px 16px;
-  background: rgba(255, 255, 255, 0.92);
+  background: rgba(255, 255, 255, 0.94);
   backdrop-filter: blur(14px) saturate(140%);
   -webkit-backdrop-filter: blur(14px) saturate(140%);
   border: 1px solid rgba(15, 23, 42, 0.08);
-  border-radius: 18px;
-  box-shadow:
-    0 4px 14px rgba(15, 23, 42, 0.06),
-    0 1px 0 rgba(255, 255, 255, 0.85) inset;
+  border-radius: 16px;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
   font-family: "Heebo", "Open Sans", Arial, sans-serif;
+  overflow: hidden;
+  transition: box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.ps-card.is-open {
+  border-color: rgba(37, 99, 235, 0.3);
+  box-shadow: 0 8px 24px rgba(29, 78, 216, 0.13);
+}
+
+/* ─── collapsed head ─── */
+.ps-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 13px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.ps-card.is-muted .ps-head {
+  opacity: 0.62;
+}
+
+.ps-card.is-muted.is-open .ps-head {
+  opacity: 1;
+}
+
+.ps-thumb {
+  position: relative;
+  width: 50px;
+  height: 50px;
+  border-radius: 12px;
+  background: #f8fafc;
+  border: 1px solid #eef2f7;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: visible;
+}
+
+/* neutral package icon behind the image — shows through when the product
+   has no picture instead of an empty white box */
+.ps-thumb::before {
+  content: "";
+  position: absolute;
+  inset: 11px;
+  background: center / contain no-repeat
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23cbd5e1' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z'/%3E%3Cpolyline points='3.29 7 12 12 20.71 7'/%3E%3Cline x1='12' y1='22' x2='12' y2='12'/%3E%3C/svg%3E");
+}
+
+.ps-thumb-img {
+  position: relative;
+  z-index: 1;
+  max-width: calc(100% - 6px);
+  max-height: calc(100% - 6px);
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  display: block;
+  border-radius: 9px;
+  background: #fff;
+}
+
+/* the "אין תמונה" placeholder div from ProductImageDisplay — neutralize it
+   so the package icon underneath does the talking */
+.ps-thumb div.ps-thumb-img {
+  min-height: 0 !important;
+  background: transparent !important;
+  font-size: 0;
+}
+
+.ps-thumb-qty {
+  position: absolute;
+  top: -7px;
+  left: -7px;
+  z-index: 2;
+  background: #1d4ed8;
+  color: #fff;
+  font-size: 0.62rem;
+  font-weight: 800;
+  padding: 1px 6px;
+  border-radius: 999px;
+  border: 2px solid #fff;
+  font-variant-numeric: tabular-nums;
+}
+
+.ps-head-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.ps-head-name {
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: 800;
+  color: #0f172a;
+  letter-spacing: -0.1px;
+  line-height: 1.3;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  unicode-bidi: plaintext;
+}
+
+.ps-head-meta {
+  margin: 1px 0 5px;
+  font-size: 0.72rem;
+  color: #94a3b8;
+  font-weight: 600;
+  display: flex;
+  gap: 4px 6px;
+  flex-wrap: wrap;
+  unicode-bidi: plaintext;
+}
+
+.ps-head-meta > span:not(:last-child)::after {
+  content: "·";
+  margin-inline-start: 6px;
+  color: #cbd5e1;
+}
+
+.ps-badges {
+  display: flex;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+
+.ps-badge {
+  font-size: 0.63rem;
+  font-weight: 800;
+  padding: 2px 8px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.ps-badge::before {
+  content: "";
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.ps-badge--on {
+  background: #ecfdf5;
+  color: #059669;
+  border: 1px solid #a7f3d0;
+}
+
+.ps-badge--filters {
+  background: #eff6ff;
+  color: #1d4ed8;
+  border: 1px solid #bfdbfe;
+}
+
+.ps-badge--match {
+  background: #f0fdf4;
+  color: #059669;
+  border: 1px solid #bbf7d0;
+}
+
+.ps-badge--none {
+  background: #fef2f2;
+  color: #dc2626;
+  border: 1px solid #fecaca;
+}
+
+.ps-badge--off {
+  background: #f8fafc;
+  color: #94a3b8;
+  border: 1px solid #e2e8f0;
+}
+
+.ps-head-chev {
+  color: #94a3b8;
+  flex-shrink: 0;
+  display: flex;
+  transition: transform 0.25s ease;
+}
+
+.ps-head-chev svg {
+  width: 15px;
+  height: 15px;
+}
+
+.ps-card.is-open .ps-head-chev {
+  transform: rotate(90deg);
+  color: #2563eb;
+}
+
+/* ─── expanded body ─── */
+.ps-body {
+  padding: 0 13px 14px;
+  animation: ps-body-in 0.25s ease;
+}
+
+@keyframes ps-body-in {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
 }
 
 .ps-options {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  margin-bottom: 8px;
+  gap: 7px;
+  margin-bottom: 10px;
 }
 
 /* iOS-style toggle row */
@@ -29,7 +234,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  padding: 12px 14px;
+  padding: 10px 13px;
   background: #f8fafc;
   border: 1px solid #e2e8f0;
   border-radius: 12px;
@@ -53,14 +258,14 @@
 }
 
 .ps-toggle-label {
-  font-size: 0.92rem;
+  font-size: 0.86rem;
   font-weight: 700;
   color: #0f172a;
   letter-spacing: -0.1px;
 }
 
 .ps-toggle-hint {
-  font-size: 0.74rem;
+  font-size: 0.7rem;
   font-weight: 500;
   color: #64748b;
   line-height: 1.35;
@@ -76,8 +281,8 @@
 
 .ps-toggle-track {
   position: relative;
-  width: 44px;
-  height: 26px;
+  width: 42px;
+  height: 24px;
   background: #cbd5e1;
   border-radius: 999px;
   transition: background 0.22s ease;
@@ -92,10 +297,9 @@
 .ps-toggle-thumb {
   position: absolute;
   top: 3px;
-  /* RTL convention: thumb starts on the right (off), slides to left when on */
   right: 3px;
-  width: 20px;
-  height: 20px;
+  width: 18px;
+  height: 18px;
   background: #ffffff;
   border-radius: 50%;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.22);
@@ -103,96 +307,146 @@
 }
 
 .ps-toggle.is-on .ps-toggle-thumb {
-  right: calc(100% - 23px);
+  right: calc(100% - 21px);
 }
 
-/* Replace-only block */
-.ps-replace-options {
-  margin-top: 4px;
-  padding-top: 14px;
-  border-top: 1px dashed rgba(15, 23, 42, 0.08);
+/* ─── uniform summary rows ─── */
+.ps-srows {
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  overflow: hidden;
+  margin-bottom: 10px;
+  background: #fff;
+}
+
+.ps-srow {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 12px;
+  background: #fff;
+  border: none;
+  font-family: inherit;
+  text-align: right;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.ps-srow + .ps-srow {
+  border-top: 1px solid #f1f5f9;
+}
+
+.ps-srow:active {
+  background: #f8fafc;
+}
+
+.ps-srow-ico {
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 0.95rem;
+}
+
+.ps-srow-ico--w { background: #eff6ff; }
+.ps-srow-ico--t { background: #f5f3ff; }
+.ps-srow-ico--b { background: #fefce8; }
+
+.ps-srow-txt {
+  flex: 1;
+  min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 1px;
 }
 
-/* Tags */
-.ps-tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  padding-top: 2px;
+.ps-srow-label {
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: #0f172a;
 }
 
-.ps-tag {
-  background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
-  color: #1d4ed8;
-  font-size: 0.74rem;
-  font-weight: 700;
-  padding: 4px 10px;
-  border-radius: 999px;
-  border: 1px solid rgba(37, 99, 235, 0.2);
-  letter-spacing: -0.1px;
-}
-
-.ps-tags-state {
-  font-size: 0.78rem;
+.ps-srow-val {
+  font-size: 0.72rem;
+  font-weight: 600;
   color: #94a3b8;
-  font-style: italic;
-  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-/* ─── "View matching alternatives" button ─── */
-.ps-view-alts-btn {
-  margin-top: 10px;
+.ps-srow-val.is-active {
+  color: #1d4ed8;
+}
+
+.ps-srow-chev {
+  color: #cbd5e1;
+  flex-shrink: 0;
+  display: flex;
+}
+
+.ps-srow-chev svg {
+  width: 14px;
+  height: 14px;
+}
+
+/* ─── CTA with live count ─── */
+.ps-cta {
   width: 100%;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
   padding: 11px 16px;
-  border: 1px solid rgba(37, 99, 235, 0.22);
-  border-radius: 14px;
-  background:
-    linear-gradient(180deg, rgba(255,255,255,0.7) 0%, rgba(241,245,249,0.7) 100%),
-    linear-gradient(135deg, #dbeafe 0%, #ddd6fe 100%);
-  background-blend-mode: overlay;
-  color: #1d4ed8;
+  border: none;
+  border-radius: 13px;
+  background: linear-gradient(135deg, #2563eb 0%, #4f46e5 100%);
+  color: #fff;
   font-family: inherit;
-  font-size: 0.9rem;
+  font-size: 0.88rem;
   font-weight: 800;
   letter-spacing: -0.2px;
   cursor: pointer;
-  box-shadow:
-    0 4px 14px rgba(37, 99, 235, 0.12),
-    0 1px 0 rgba(255, 255, 255, 0.9) inset;
-  transition: transform 0.15s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+  box-shadow: 0 6px 16px rgba(37, 99, 235, 0.3);
+  transition: transform 0.15s ease, box-shadow 0.18s ease;
   -webkit-tap-highlight-color: transparent;
 }
 
-.ps-view-alts-btn:hover {
-  border-color: rgba(37, 99, 235, 0.5);
-  box-shadow:
-    0 6px 18px rgba(37, 99, 235, 0.20),
-    0 1px 0 rgba(255, 255, 255, 0.9) inset;
-}
-
-.ps-view-alts-btn:active {
+.ps-cta:active {
   transform: scale(0.98);
 }
 
-.ps-view-alts-btn svg {
-  width: 16px;
-  height: 16px;
-  color: #2563eb;
+.ps-cta svg {
+  width: 15px;
+  height: 15px;
 }
 
-.ps-view-alts-btn__chevron {
-  margin-inline-start: auto;
-  font-size: 1.05rem;
-  font-weight: 800;
-  color: #93c5fd;
-  line-height: 1;
+.ps-cta-count {
+  background: rgba(255, 255, 255, 0.22);
+  border-radius: 999px;
+  padding: 1px 9px;
+  font-size: 0.8rem;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ─── weight editor inside its sheet ─── */
+.ps-weight-sheet {
+  padding: 6px 0 10px;
+}
+
+/* the sheet already carries the title — hide the inner one and the box chrome */
+.ps-weight-sheet .wa-wrapper {
+  background: none;
+  border: none;
+  padding: 4px 2px;
+}
+
+.ps-weight-sheet .wa-title {
+  display: none;
 }
 
 /* legacy class names — neutralized to avoid old styles bleeding through */
