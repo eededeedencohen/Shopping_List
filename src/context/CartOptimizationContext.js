@@ -6,7 +6,8 @@ import React, {
   createContext,
   useState,
   useEffect,
-  useRef,
+  useMemo,
+  useCallback,
   useContext,
 } from "react";
 import {
@@ -43,10 +44,16 @@ export const CartOptimizationProvider = ({ children }) => {
   const [isOptimalCartsCalculated, setIsOptimalCartsCalculated] =
     useState(false);
   const [isOptimalCartsUploaded, setIsOptimalCartsUploaded] = useState(false);
+  /* set when a calculation fails — the results page shows a retry state
+     instead of an eternal spinner */
+  const [optimalCartsError, setOptimalCartsError] = useState(false);
+  /* true only while a calculation is in flight — lets the results page tell
+     "loading" apart from "never calculated" (refresh / direct URL) */
+  const [isCalculatingOptimalCarts, setIsCalculatingOptimalCarts] =
+    useState(false);
 
-  /* snapshot של fullCart מכלל הקונטקסטים */
+  /* the live cart from the app context (reactive — no stale-ref snapshot) */
   const { fullCart } = useFullCart();
-  const fullCartRef = useRef(null);
 
   /* ──────────────── INIT: טבלאות כלליות ──────────────── */
   useEffect(() => {
@@ -77,7 +84,6 @@ export const CartOptimizationProvider = ({ children }) => {
   useEffect(() => {
     if (!fullCart?.productsWithPrices) return;
 
-    fullCartRef.current = fullCart;
     setProductsSettings(
       fullCart.productsWithPrices.map(({ product, amount }) => ({
         barcode: product.barcode,
@@ -98,10 +104,12 @@ export const CartOptimizationProvider = ({ children }) => {
   }, [fullCart]);
 
   /* ─────────────────────── SERVER‑SIDE ACTIONS ─────────────────────── */
-  const calculateOptimalCarts = async () => {
+  const calculateOptimalCarts = useCallback(async () => {
     /* Critical: reset the "calculated" flag before kicking off so the
        LoadingCart shows on EVERY calculation, not just the first one. */
     setIsOptimalCartsCalculated(false);
+    setOptimalCartsError(false);
+    setIsCalculatingOptimalCarts(true);
     setOptimalCarts([]);
     try {
       const { data } = await getOptimalSupermarketCarts(
@@ -113,14 +121,18 @@ export const CartOptimizationProvider = ({ children }) => {
           data.optimalCarts.map((c) => ({ ...c, deletedProducts: [] })),
         );
         setIsOptimalCartsCalculated(true);
+      } else {
+        setOptimalCartsError(true);
       }
     } catch (err) {
       console.error("calculateOptimalCarts failed", err);
-      setIsOptimalCartsCalculated(false);
+      setOptimalCartsError(true);
+    } finally {
+      setIsCalculatingOptimalCarts(false);
     }
-  };
+  }, [supermarketIDs, productsSettings]);
 
-  const fetchOptimalCartsOnce = async () => {
+  const fetchOptimalCartsOnce = useCallback(async () => {
     try {
       const { data } = await getOptimalSupermarketCarts(
         supermarketIDs,
@@ -134,62 +146,98 @@ export const CartOptimizationProvider = ({ children }) => {
       console.error("getOptimalSupermarketCarts failed", err);
       setIsOptimalCartsUploaded(false);
     }
-  };
+  }, [supermarketIDs, productsSettings]);
 
-  const getPriceByProductBarcodeAndSupermarketID = (bc, id) =>
-    getPriceObjectByProductBarcodeAndSupermarketID(bc, id).then((r) => r.data?.price);
+  const getPriceByProductBarcodeAndSupermarketID = useCallback(
+    (bc, id) =>
+      getPriceObjectByProductBarcodeAndSupermarketID(bc, id).then(
+        (r) => r.data?.price,
+      ),
+    [],
+  );
 
-  const getReplacementProductsByGeneralNameAndSupermarketID = (gn, id) =>
-    getListReplecementProductsByGeneralNameAndSupermarketID(gn, id).then(
-      (r) => r.data?.products ?? [],
-    );
+  const getReplacementProductsByGeneralNameAndSupermarketID = useCallback(
+    (gn, id) =>
+      getListReplecementProductsByGeneralNameAndSupermarketID(gn, id).then(
+        (r) => r.data?.products ?? [],
+      ),
+    [],
+  );
 
-  const getProductByBarcode = async (barcode) => {
+  const getProductByBarcode = useCallback(async (barcode) => {
     try {
       const res = await getByBarcode(barcode);
-      return JSON.parse(res.data).data.products?.[0] ?? null;
+      const body = typeof res.data === "string" ? JSON.parse(res.data) : res.data;
+      return body?.data?.products?.[0] ?? null;
     } catch (err) {
       console.error("getProductByBarcode failed", err);
       return null;
     }
-  };
+  }, []);
 
-  /* ───────────────────────── PROVIDER VALUE ───────────────────────── */
-  const value = {
-    /* — STATE (blue nodes) — */
-    canReplaceSettings,
-    setCanReplaceSettings,
-    canRoundUpSettings,
-    setCanRoundUpSettings,
+  /* ───────────────────────── PROVIDER VALUE ─────────────────────────
+     Memoized — per-row live controls (steppers, sheets) re-render on every
+     context change, so an unstable value object would be felt jank. */
+  const value = useMemo(
+    () => ({
+      /* — STATE (blue nodes) — */
+      canReplaceSettings,
+      setCanReplaceSettings,
+      canRoundUpSettings,
+      setCanRoundUpSettings,
 
-    supermarketIDs,
-    setSupermarketIDs,
+      supermarketIDs,
+      setSupermarketIDs,
 
-    productsSettings,
-    setProductsSettings,
-    isProductsSettingsUploaded,
+      productsSettings,
+      setProductsSettings,
+      isProductsSettingsUploaded,
 
-    allSupermarkets,
-    isAllSupermarketsUploaded,
+      allSupermarkets,
+      isAllSupermarketsUploaded,
 
-    allBrands,
-    isAllBrandsUploaded,
+      allBrands,
+      isAllBrandsUploaded,
 
-    optimalCarts,
-    setOptimalCarts,
-    isOptimalCartsCalculated,
-    isOptimalCartsUploaded,
+      optimalCarts,
+      setOptimalCarts,
+      isOptimalCartsCalculated,
+      isOptimalCartsUploaded,
+      optimalCartsError,
+      isCalculatingOptimalCarts,
 
-    /* — SERVER actions (green nodes) — */
-    calculateOptimalCarts,
-    fetchOptimalCartsOnce,
-    getPriceByProductBarcodeAndSupermarketID,
-    getReplacementProductsByGeneralNameAndSupermarketID,
-    getProductByBarcode,
+      /* — SERVER actions (green nodes) — */
+      calculateOptimalCarts,
+      fetchOptimalCartsOnce,
+      getPriceByProductBarcodeAndSupermarketID,
+      getReplacementProductsByGeneralNameAndSupermarketID,
+      getProductByBarcode,
 
-    /* snapshot */
-    fullCart: fullCartRef.current,
-  };
+      fullCart,
+    }),
+    [
+      canReplaceSettings,
+      canRoundUpSettings,
+      supermarketIDs,
+      productsSettings,
+      isProductsSettingsUploaded,
+      allSupermarkets,
+      isAllSupermarketsUploaded,
+      allBrands,
+      isAllBrandsUploaded,
+      optimalCarts,
+      isOptimalCartsCalculated,
+      isOptimalCartsUploaded,
+      optimalCartsError,
+      isCalculatingOptimalCarts,
+      calculateOptimalCarts,
+      fetchOptimalCartsOnce,
+      getPriceByProductBarcodeAndSupermarketID,
+      getReplacementProductsByGeneralNameAndSupermarketID,
+      getProductByBarcode,
+      fullCart,
+    ],
+  );
 
   return (
     <CartOptimizationContext.Provider value={value}>

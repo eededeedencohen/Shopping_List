@@ -14,8 +14,10 @@ const LoadingCart = () => {
   const [idx, setIdx] = useState(0);
 
   useEffect(() => {
+    /* the story stops at the last message instead of looping back to the
+       start — a long calculation shouldn't look like it restarted */
     const interval = setInterval(() => {
-      setIdx((i) => (i + 1) % MESSAGES.length);
+      setIdx((i) => Math.min(i + 1, MESSAGES.length - 1));
     }, 1800);
     return () => clearInterval(interval);
   }, []);
@@ -51,11 +53,11 @@ const LoadingCart = () => {
       </div>
 
       <h2 className="lc-title">
-        מחשבים את העגלה
-        <span className="lc-title-accent"> הזולה ביותר</span>
+        {"מחשבים את העגלה "}
+        <span className="lc-title-accent">הזולה ביותר</span>
       </h2>
 
-      <p className="lc-status" key={idx}>
+      <p className="lc-status" key={idx} aria-live="polite">
         {MESSAGES[idx]}
       </p>
 

@@ -14,7 +14,7 @@ import Test from "./components/Test/Test";
 import ListProductsSettings from "./components/CartOptimization/ListProductsSettings";
 import OptimalCartsSettings from "./components/CartOptimization/OptimalCartsSettings/OptimalCartsSettings";
 import OptimalsSupermarketCarts from "./components/CartOptimization/OptimalsSupermarketCarts/OptimalsSupermarketCarts";
-import OptimalCart from "./components/CartOptimization/OptimalsSupermarketCarts/OptimalSupermarketCart/OptimalCart";
+import OptimalCartV2 from "./components/CartOptimization/OptimalsSupermarketCarts/OptimalSupermarketCart/OptimalCartV2";
 import ExpenseOverview from "./components/Stats/ExpenseOverview";
 import AI from "./components/AI/AI";
 import ProductsListTest from "./components/HooksTest/ProductsListTest";
@@ -61,7 +61,7 @@ function Routing() {
       />
       <Route
         path="/optimal-supermarket-carts/:supermarketID"
-        element={<OptimalCart />}
+        element={<OptimalCartV2 />}
       />
       <Route path="/expense-overview" element={<ExpenseOverview />} />
       <Route path="/ai" element={<AI />} />

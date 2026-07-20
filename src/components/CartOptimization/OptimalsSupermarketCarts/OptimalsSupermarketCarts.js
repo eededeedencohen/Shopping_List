@@ -7,8 +7,12 @@ import "./OptimalsSupermarketCarts.css";
 import {
   useSupermarkets,
   useOptimalCarts,
+  useCalculateOptimalCarts,
 } from "../../../hooks/optimizationHooks";
-import { useFullCart } from "../../../hooks/appHooks";
+import {
+  buildOriginalPriceMap,
+  computeCartStats,
+} from "../../../utils/optimalCartMath";
 
 const ChevronIcon = (props) => (
   <svg
@@ -25,13 +29,26 @@ const ChevronIcon = (props) => (
   </svg>
 );
 
+/* Results list — honest numbers only:
+     • savings are computed over the products each store actually offers
+       (computeCartStats), a partial cart states its scope, a pricier store
+       shows a red delta instead of hiding it.
+     • the banner references the cheapest FULL cart by name and never moves
+       when the user changes the sort.
+     • default sort "מומלץ" = completeness, then price — a one-item cart can
+       no longer outrank a full one. */
 const OptimalsSupermarketCarts = () => {
   const navigate = useNavigate();
   const { allSupermarkets } = useSupermarkets();
-  const { optimalCarts, isOptimalCartsCalculated } = useOptimalCarts();
-  const { fullCart } = useFullCart();
-  const [selectedSupermarketID, setSelectedSupermarketID] = useState(0);
-  const [sortBy, setSortBy] = useState("price"); // "price" | "completeness"
+  const {
+    optimalCarts,
+    isOptimalCartsCalculated,
+    fullCart,
+    optimalCartsError,
+    isCalculatingOptimalCarts,
+  } = useOptimalCarts();
+  const { calculateOptimalCarts } = useCalculateOptimalCarts();
+  const [sortBy, setSortBy] = useState("recommended"); // "recommended" | "price"
 
   const totalProducts = fullCart?.productsWithPrices?.length || 0;
   const originalTotalPrice =
@@ -40,122 +57,206 @@ const OptimalsSupermarketCarts = () => {
       0
     ) || 0;
 
-  const sortedCarts = useMemo(() => {
+  const originalMap = useMemo(() => buildOriginalPriceMap(fullCart), [fullCart]);
+
+  const enriched = useMemo(() => {
     if (!Array.isArray(optimalCarts)) return [];
-    const list = [...optimalCarts];
+    return optimalCarts.map((cart) => ({
+      cart,
+      stats: computeCartStats(cart, originalMap, totalProducts),
+    }));
+  }, [optimalCarts, originalMap, totalProducts]);
+
+  /* the banner's anchor: cheapest cart that offers EVERYTHING — data-driven,
+     independent of the current sort */
+  const bestFull = useMemo(() => {
+    const fulls = enriched.filter((e) => e.stats.isFull);
+    if (!fulls.length) return null;
+    return fulls.reduce((a, b) => (b.stats.total < a.stats.total ? b : a));
+  }, [enriched]);
+
+  const sorted = useMemo(() => {
+    const list = [...enriched];
     if (sortBy === "price") {
-      list.sort((a, b) => (a.totalPrice ?? Infinity) - (b.totalPrice ?? Infinity));
+      list.sort((a, b) => a.stats.total - b.stats.total);
     } else {
       list.sort(
         (a, b) =>
-          (a.nonExistsProducts?.length ?? 0) -
-          (b.nonExistsProducts?.length ?? 0)
+          a.stats.missingCount - b.stats.missingCount ||
+          a.stats.total - b.stats.total
       );
     }
     return list;
-  }, [optimalCarts, sortBy]);
+  }, [enriched, sortBy]);
 
-  const cheapestPrice = sortedCarts[0]?.totalPrice;
+  if (optimalCartsError) {
+    return (
+      <div className="osc-page">
+        <div className="osc-state">
+          <div className="osc-state-icon">⚠️</div>
+          <h2>החישוב נכשל</h2>
+          <p>לא הצלחנו לחשב את העגלות. בדקו את החיבור ונסו שוב.</p>
+          <div className="osc-state-actions">
+            <button type="button" className="osc-state-btn osc-state-btn--primary" onClick={calculateOptimalCarts}>
+              נסו שוב
+            </button>
+            <button type="button" className="osc-state-btn" onClick={() => navigate("/optimal-carts-settings")}>
+              חזרה להגדרות
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
-  if (!isOptimalCartsCalculated) {
+  if (!isOptimalCartsCalculated && isCalculatingOptimalCarts) {
     return <LoadingCart />;
   }
 
-  // Detail view: when a supermarket is selected, defer to the item itself
-  // (it renders <OptimalCartV2/> internally when isShowFullOptimalCart=true).
-  // We just narrow the list to the selected one so only its detail shows.
-  const visible =
-    selectedSupermarketID === 0
-      ? sortedCarts
-      : sortedCarts.filter((c) => c.supermarketID === selectedSupermarketID);
+  if (!isOptimalCartsCalculated || !sorted.length) {
+    /* refresh / direct URL (state is in-memory) or an empty result —
+       an actionable state instead of an eternal spinner */
+    return (
+      <div className="osc-page">
+        <div className="osc-state">
+          <div className="osc-state-icon">🛒</div>
+          <h2>אין תוצאות להצגה</h2>
+          <p>
+            {!isOptimalCartsCalculated
+              ? "כדי לראות עגלות אופטימליות, הריצו חישוב מעמוד ההגדרות."
+              : "לא נבחרו סופרים להשוואה, או שהעגלה ריקה."}
+          </p>
+          <div className="osc-state-actions">
+            <button type="button" className="osc-state-btn osc-state-btn--primary" onClick={() => navigate("/optimal-carts-settings")}>
+              חזרה להגדרות
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  const bannerSavings = bestFull ? originalTotalPrice - bestFull.stats.total : 0;
+  const bestFullName = bestFull
+    ? allSupermarkets.find(
+        (s) => s.supermarketID === bestFull.cart.supermarketID
+      )?.name || "הסופר הזול"
+    : null;
+
+  const grouped =
+    sortBy === "recommended"
+      ? {
+          full: sorted.filter((e) => e.stats.isFull),
+          partial: sorted.filter((e) => !e.stats.isFull),
+        }
+      : null;
+
+  const renderCard = (entry, rank) => {
+    const supermarketDetails = allSupermarkets.find(
+      (s) => s.supermarketID === entry.cart.supermarketID
+    );
+    return (
+      <SupermarketOptimalCartItem
+        key={entry.cart.supermarketID}
+        optimalCart={entry.cart}
+        stats={entry.stats}
+        supermarketDetails={supermarketDetails}
+        rank={rank}
+        isBestFull={
+          !!bestFull && entry.cart.supermarketID === bestFull.cart.supermarketID
+        }
+        onOpen={() =>
+          navigate(`/optimal-supermarket-carts/${entry.cart.supermarketID}`)
+        }
+      />
+    );
+  };
+
+  let rank = 0;
 
   return (
     <div className="osc-page">
-      {selectedSupermarketID === 0 && (
-        <header className="osc-header">
-          <button
-            type="button"
-            className="osc-back"
-            onClick={() => navigate("/optimal-carts-settings")}
-          >
-            <ChevronIcon />
-            חזרה להגדרות
-          </button>
-          <h1 className="osc-title">העגלות האופטימליות</h1>
-          <p className="osc-subtitle">
-            השוונו {sortedCarts.length} סופרים עבור {totalProducts}{" "}
-            {totalProducts === 1 ? "מוצר" : "מוצרים"} בעגלה
-          </p>
+      <header className="osc-header">
+        <button
+          type="button"
+          className="osc-back"
+          onClick={() => navigate("/optimal-carts-settings")}
+        >
+          <ChevronIcon />
+          חזרה להגדרות
+        </button>
+        <h1 className="osc-title">העגלות האופטימליות</h1>
+        <p className="osc-subtitle">
+          השוונו {sorted.length} סופרים עבור {totalProducts}{" "}
+          {totalProducts === 1 ? "מוצר" : "מוצרים"} בעגלה
+        </p>
 
-          {originalTotalPrice > 0 &&
-            typeof cheapestPrice === "number" &&
-            cheapestPrice < originalTotalPrice && (
-              <div className="osc-savings-banner">
-                <div className="osc-savings-banner-icon">
-                  <svg
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2.2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    aria-hidden="true"
-                  >
-                    <polyline points="20 6 9 17 4 12" />
-                  </svg>
-                </div>
-                <div className="osc-savings-banner-text">
-                  <span className="osc-savings-banner-line">
-                    ניתן לחסוך עד
-                  </span>
-                  <span className="osc-savings-banner-amount">
-                    ₪{(originalTotalPrice - cheapestPrice).toFixed(2)}
-                  </span>
-                  <span className="osc-savings-banner-percent">
-                    (
-                    {(
-                      ((originalTotalPrice - cheapestPrice) /
-                        originalTotalPrice) *
-                      100
-                    ).toFixed(1)}
-                    %)
-                  </span>
-                </div>
-              </div>
-            )}
+        {/* the banner never changes with the sort — it anchors to a named,
+            auditable fact about the cheapest FULL cart */}
+        {bestFull && bannerSavings > 0.005 && (
+          <div className="osc-savings-banner">
+            <div className="osc-savings-banner-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <polyline points="20 6 9 17 4 12" />
+              </svg>
+            </div>
+            <div className="osc-savings-banner-text">
+              <span className="osc-savings-banner-line">
+                ניתן לחסוך <b className="osc-savings-banner-amount">₪{bannerSavings.toFixed(2)}</b>{" "}
+                <span className="osc-savings-banner-percent">
+                  ({((bannerSavings / originalTotalPrice) * 100).toFixed(1)}%)
+                </span>{" "}
+                ב{bestFullName}
+              </span>
+              <span className="osc-savings-banner-sub">
+                כל {totalProducts} המוצרים זמינים · לעומת ₪{originalTotalPrice.toFixed(2)} בעגלה שלך
+              </span>
+            </div>
+          </div>
+        )}
+        {bestFull && bannerSavings <= 0.005 && (
+          <div className="osc-savings-banner osc-savings-banner--neutral">
+            <div className="osc-savings-banner-text">
+              <span className="osc-savings-banner-line">
+                העגלה שלך כבר זולה — הסופר המלא הזול ביותר יקר ב־
+                <b>₪{Math.abs(bannerSavings).toFixed(2)}</b>
+              </span>
+            </div>
+          </div>
+        )}
+        {!bestFull && (
+          <div className="osc-savings-banner osc-savings-banner--info">
+            <div className="osc-savings-banner-text">
+              <span className="osc-savings-banner-line">
+                אף סופר לא מציע את כל {totalProducts} המוצרים
+              </span>
+              <span className="osc-savings-banner-sub">
+                ההשוואות מחושבות לפי המוצרים הזמינים בכל סופר בלבד
+              </span>
+            </div>
+          </div>
+        )}
 
-          <CartsFilter sortBy={sortBy} setSortBy={setSortBy} />
-        </header>
-      )}
+        <CartsFilter sortBy={sortBy} setSortBy={setSortBy} />
+      </header>
 
       <div className="osc-list">
-        {visible.map((cart, idx) => {
-          const supermarketDetails = allSupermarkets.find(
-            (s) => s.supermarketID === cart.supermarketID
-          );
-          const isCheapest =
-            selectedSupermarketID === 0 &&
-            sortBy === "price" &&
-            typeof cart.totalPrice === "number" &&
-            cart.totalPrice === cheapestPrice;
-          const savings =
-            originalTotalPrice > 0
-              ? originalTotalPrice - (cart.totalPrice ?? 0)
-              : 0;
-          return (
-            <SupermarketOptimalCartItem
-              key={cart.supermarketID}
-              optimalCart={cart}
-              originalCart={fullCart}
-              supermarketDetails={supermarketDetails}
-              onSelectedSupermarket={setSelectedSupermarketID}
-              isCheapest={isCheapest}
-              rank={selectedSupermarketID === 0 ? idx + 1 : null}
-              savings={savings}
-              totalProducts={totalProducts}
-            />
-          );
-        })}
+        {grouped ? (
+          <>
+            {grouped.full.length > 0 && (
+              <div className="osc-group">עגלות מלאות ({grouped.full.length})</div>
+            )}
+            {grouped.full.map((e) => renderCard(e, ++rank))}
+            {grouped.partial.length > 0 && (
+              <div className="osc-group">
+                עגלות חלקיות ({grouped.partial.length}) · ההשוואה לפי המוצרים הזמינים בלבד
+              </div>
+            )}
+            {grouped.partial.map((e) => renderCard(e, ++rank))}
+          </>
+        ) : (
+          sorted.map((e) => renderCard(e, ++rank))
+        )}
       </div>
     </div>
   );

@@ -110,22 +110,22 @@
 }
 
 .osc-savings-banner-text {
-  display: inline-flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  gap: 4px 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
   flex: 1;
   unicode-bidi: plaintext;
 }
 
 .osc-savings-banner-line {
-  font-size: 0.85rem;
+  font-size: 0.88rem;
   font-weight: 600;
   color: #065f46;
+  line-height: 1.4;
 }
 
 .osc-savings-banner-amount {
-  font-size: 1.3rem;
+  font-size: 1.2rem;
   font-weight: 800;
   color: #047857;
   letter-spacing: -0.3px;
@@ -139,11 +139,125 @@
   font-variant-numeric: tabular-nums;
 }
 
+.osc-savings-banner-sub {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #059669;
+}
+
+/* pricier / no-full-cart banner variants */
+.osc-savings-banner--neutral {
+  background: #f8fafc;
+  border-color: #e2e8f0;
+  box-shadow: none;
+}
+
+.osc-savings-banner--neutral .osc-savings-banner-line {
+  color: #334155;
+}
+
+.osc-savings-banner--neutral b {
+  color: #b91c1c;
+}
+
+.osc-savings-banner--info {
+  background: #fffbeb;
+  border-color: #fde68a;
+  box-shadow: none;
+}
+
+.osc-savings-banner--info .osc-savings-banner-line {
+  color: #92400e;
+}
+
+.osc-savings-banner--info .osc-savings-banner-sub {
+  color: #b45309;
+}
+
+/* ── Group headers ──────────────────────────── */
+.osc-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 4px 2px 0;
+  font-size: 0.74rem;
+  font-weight: 800;
+  color: #64748b;
+}
+
+.osc-group::after {
+  content: "";
+  flex: 1;
+  border-top: 1px dashed #cbd5e1;
+}
+
 /* ── Carts list ─────────────────────────────── */
 .osc-list {
   display: flex;
   flex-direction: column;
   gap: 12px;
+}
+
+/* ── Empty / error states ───────────────────── */
+.osc-state {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 8px;
+  padding: 60px 24px;
+}
+
+.osc-state-icon {
+  font-size: 2.4rem;
+  margin-bottom: 4px;
+}
+
+.osc-state h2 {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.osc-state p {
+  margin: 0;
+  font-size: 0.88rem;
+  color: #64748b;
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+.osc-state-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.osc-state-btn {
+  border: 1px solid #e2e8f0;
+  background: #fff;
+  border-radius: 13px;
+  padding: 10px 20px;
+  font-family: inherit;
+  font-size: 0.86rem;
+  font-weight: 800;
+  color: #334155;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.osc-state-btn--primary {
+  background: linear-gradient(135deg, #2563eb, #4f46e5);
+  border-color: transparent;
+  color: #fff;
+  box-shadow: 0 6px 16px rgba(37, 99, 235, 0.3);
+}
+
+.osc-state-btn:active {
+  transform: scale(0.97);
 }
 
 /* legacy classes — neutralized */

@@ -364,9 +364,20 @@ export const useCalculateOptimalCarts = () => {
 
 /* ─────────────────────── 6) useOptimalCarts (STATE) ─────────────────────── */
 export const useOptimalCarts = () => {
-  const { optimalCarts, isOptimalCartsCalculated, fullCart } =
-    useCartOptimizationCtx();
-  return { optimalCarts, isOptimalCartsCalculated, fullCart };
+  const {
+    optimalCarts,
+    isOptimalCartsCalculated,
+    fullCart,
+    optimalCartsError,
+    isCalculatingOptimalCarts,
+  } = useCartOptimizationCtx();
+  return {
+    optimalCarts,
+    isOptimalCartsCalculated,
+    fullCart,
+    optimalCartsError,
+    isCalculatingOptimalCarts,
+  };
 };
 
 /* ─────────────────────── 7) useOptimalCartsOperation ─────────────────────── */
@@ -442,7 +453,11 @@ export const useOptimalCartsOperation = () => {
     });
   };
 
-  /* ───────────── החלפת מוצר ───────────── */
+  /* ───────────── החלפת מוצר ─────────────
+     Row identity is ALWAYS the original-cart barcode (oldBarcode) — the same
+     key changeOptimalProductQuantity / deleteProductFromOptimalCart match on,
+     so edits keep working after a replacement. Totals are always re-summed
+     (one formula everywhere — no arithmetic drift). */
   const replaceProductInOptimalCart = (
     oldBarcode,
     newBarcode,
@@ -455,47 +470,46 @@ export const useOptimalCartsOperation = () => {
       if (cartIdx === -1) return prev;
 
       const cart = prev[cartIdx];
-      const newCartTotal = cart.totalPrice - oldTotalPrice + newTotalPrice;
-
       let updatedCart;
 
-      if (oldTotalPrice !== 0) {
-        /* המוצר כבר נמצא ב-existsProducts */
+      const wasInCart = cart.existsProducts.some(
+        (p) => p.oldBarcode === oldBarcode
+      );
+
+      if (wasInCart) {
         const updatedExists = cart.existsProducts.map((p) =>
-          p.barcode === oldBarcode
+          p.oldBarcode === oldBarcode
             ? { ...p, barcode: newBarcode, totalPrice: newTotalPrice }
             : p
         );
-        updatedCart = {
-          ...cart,
-          existsProducts: updatedExists,
-          totalPrice: newCartTotal,
-        };
+        updatedCart = { ...cart, existsProducts: updatedExists };
       } else {
-        /* המוצר היה ב-nonExistsProducts */
+        /* המוצר היה ב-nonExistsProducts — קידום לעגלה */
         const prod = productsSettings.find((p) => p.barcode === oldBarcode);
         const qty = prod?.quantity ?? 1;
 
-        const updatedNonExists = cart.nonExistsProducts.filter(
-          (p) => p.oldBarcode !== oldBarcode
-        );
-        const updatedExists = [
-          ...cart.existsProducts,
-          {
-            barcode: newBarcode,
-            totalPrice: newTotalPrice,
-            oldBarcode,
-            quantity: qty,
-            oldQuantity: qty,
-          },
-        ];
         updatedCart = {
           ...cart,
-          existsProducts: updatedExists,
-          nonExistsProducts: updatedNonExists,
-          totalPrice: newCartTotal,
+          nonExistsProducts: cart.nonExistsProducts.filter(
+            (p) => p.oldBarcode !== oldBarcode
+          ),
+          existsProducts: [
+            ...cart.existsProducts,
+            {
+              barcode: newBarcode,
+              totalPrice: newTotalPrice,
+              oldBarcode,
+              quantity: qty,
+              oldQuantity: qty,
+            },
+          ],
         };
       }
+
+      updatedCart.totalPrice = updatedCart.existsProducts.reduce(
+        (acc, p) => acc + p.totalPrice,
+        0
+      );
 
       const next = [...prev];
       next[cartIdx] = updatedCart;

@@ -1,77 +1,51 @@
-import React, { useState } from "react";
+import React from "react";
 import "./SupermarketOptimalCartItem.css";
 import SupermarketImage from "../../Images/SupermarketImage";
 import { useProducts } from "../../../context/ProductContext";
-import OptimalCartV2 from "./OptimalSupermarketCart/OptimalCartV2";
 
+/* One store card in the results list. Pure presentation — navigation happens
+   via onOpen (a real route push), stats arrive pre-computed from the honest
+   formulas so this card can never disagree with the detail page. */
 const SupermarketOptimalCartItem = ({
   optimalCart,
+  stats,
   supermarketDetails,
-  originalCart,
-  onSelectedSupermarket,
-  isCheapest,
   rank,
-  savings,
-  totalProducts,
+  isBestFull,
+  onOpen,
 }) => {
-  const [isShowFullOptimalCart, setIsShowFullOptimalCart] = useState(false);
   const { getProductDetailsByBarcode } = useProducts();
 
-  const handleNavigateToOptimalCart = () => {
-    setIsShowFullOptimalCart(true);
-    onSelectedSupermarket(optimalCart.supermarketID);
-  };
-
-  if (isShowFullOptimalCart) {
-    return (
-      <OptimalCartV2
-        optimalCart={optimalCart}
-        supermarketDetails={supermarketDetails}
-        originalCart={originalCart}
-        onClickBack={() => {
-          setIsShowFullOptimalCart(false);
-          onSelectedSupermarket(0);
-        }}
-      />
-    );
-  }
-
   const missingNames = (optimalCart.nonExistsProducts || []).map(
-    (p) => getProductDetailsByBarcode(p.barcode)?.name || ""
+    (p) => getProductDetailsByBarcode(p.barcode)?.name || `ברקוד ${p.barcode}`
   );
-  const missingCount = missingNames.length;
-  const includedCount =
-    typeof totalProducts === "number" ? totalProducts - missingCount : null;
 
-  const showSavings = typeof savings === "number" && savings > 0;
+  const scopeSuffix =
+    stats.isFull || stats.coveredCount === 0
+      ? ""
+      : stats.coveredCount === 1
+      ? " על מוצר אחד"
+      : ` על ${stats.coveredCount} מוצרים`;
 
   return (
     <article
-      className={`socc-card ${isCheapest ? "is-cheapest" : ""}`}
-      onClick={handleNavigateToOptimalCart}
+      className={`socc-card${isBestFull ? " is-cheapest" : ""}`}
+      onClick={onOpen}
       role="button"
       tabIndex={0}
       onKeyDown={(e) => {
         if (e.key === "Enter" || e.key === " ") {
           e.preventDefault();
-          handleNavigateToOptimalCart();
+          onOpen();
         }
       }}
     >
-      {isCheapest && (
+      {isBestFull && (
         <span className="socc-best-badge">
-          <svg
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2.2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            aria-hidden="true"
-          >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
             <path d="M12 2l2.39 4.84L20 7.5l-3.95 3.85L17 17l-5-2.62L7 17l.95-5.65L4 7.5l5.61-.66L12 2z" />
           </svg>
-          הזולה ביותר
+          הזולה עם כל המוצרים
         </span>
       )}
 
@@ -81,31 +55,32 @@ const SupermarketOptimalCartItem = ({
             supermarketName={supermarketDetails?.name}
             className="socc-logo"
           />
-          {rank != null && !isCheapest && (
-            <span className="socc-rank">{rank}</span>
-          )}
+          {rank != null && <span className="socc-rank">{rank}</span>}
         </div>
 
         <div className="socc-info">
-          <h3 className="socc-name">{supermarketDetails?.name}</h3>
+          <h3 className="socc-name">
+            <span className="socc-name-text">{supermarketDetails?.name}</span>
+            <span
+              className={`socc-cov ${stats.isFull ? "socc-cov--full" : "socc-cov--part"}`}
+              title={
+                stats.isFull
+                  ? "כל המוצרים זמינים בסופר זה"
+                  : `${stats.coveredCount} מתוך ${stats.denominator} מוצרים זמינים`
+              }
+            >
+              {stats.coveredCount}/{stats.denominator}
+            </span>
+          </h3>
           {(supermarketDetails?.address || supermarketDetails?.city) && (
             <p className="socc-address">
               {supermarketDetails?.address}
-              {supermarketDetails?.city
-                ? `, ${supermarketDetails.city}`
-                : ""}
+              {supermarketDetails?.city ? `, ${supermarketDetails.city}` : ""}
             </p>
           )}
-          {includedCount != null && (
-            <p className="socc-stock">
-              {includedCount} {includedCount === 1 ? "מוצר זמין" : "מוצרים זמינים"}
-              {totalProducts ? ` מתוך ${totalProducts}` : ""}
-              {missingCount > 0 && (
-                <span className="socc-stock-missing">
-                  {" · "}
-                  חסרים {missingCount}
-                </span>
-              )}
+          {stats.missingCount > 0 && (
+            <p className="socc-missing-line">
+              חסרים: {missingNames.join(", ")}
             </p>
           )}
         </div>
@@ -113,33 +88,27 @@ const SupermarketOptimalCartItem = ({
         <div className="socc-price-block">
           <span className="socc-price">
             <span className="socc-price-currency">₪</span>
-            {(optimalCart.totalPrice ?? 0).toFixed(2)}
+            {stats.total.toFixed(2)}
           </span>
-          {showSavings && (
-            <span className="socc-savings">
-              חוסכים ₪{savings.toFixed(2)}
+          {stats.savings > 0.005 && (
+            <span className="socc-delta socc-delta--save">
+              חוסכים ₪{stats.savings.toFixed(2)}
+              {scopeSuffix}
+            </span>
+          )}
+          {stats.savings < -0.005 && (
+            <span className="socc-delta socc-delta--cost">
+              יקר ב־₪{Math.abs(stats.savings).toFixed(2)}
             </span>
           )}
         </div>
-      </div>
 
-      {missingCount > 0 && (
-        <div className="socc-missing">
-          <span className="socc-missing-label">חסרים בסופר זה:</span>
-          <div className="socc-missing-tags">
-            {missingNames.slice(0, 4).map((name, i) => (
-              <span key={i} className="socc-missing-tag">
-                {name}
-              </span>
-            ))}
-            {missingNames.length > 4 && (
-              <span className="socc-missing-tag socc-missing-tag--more">
-                +{missingNames.length - 4}
-              </span>
-            )}
-          </div>
-        </div>
-      )}
+        <span className="socc-chev" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="15 18 9 12 15 6" />
+          </svg>
+        </span>
+      </div>
     </article>
   );
 };

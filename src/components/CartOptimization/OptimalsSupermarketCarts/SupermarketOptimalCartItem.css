@@ -1,275 +1,226 @@
 /* ═══════════════════════════════════════════════
-   Supermarket-cart card (per-supermarket result)
+   Store card in the optimal-carts results list
    ═══════════════════════════════════════════════ */
 
 .socc-card {
   position: relative;
-  display: flex;
-  flex-direction: column;
-  padding: 14px 16px 14px;
-  border: 1px solid rgba(15, 23, 42, 0.08);
-  border-radius: 18px;
-  background: rgba(255, 255, 255, 0.92);
+  background: rgba(255, 255, 255, 0.94);
   backdrop-filter: blur(14px) saturate(140%);
   -webkit-backdrop-filter: blur(14px) saturate(140%);
-  box-shadow:
-    0 4px 14px rgba(15, 23, 42, 0.06),
-    0 1px 0 rgba(255, 255, 255, 0.85) inset;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 16px;
+  padding: 12px 13px;
   cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
-  transition: transform 0.18s ease, box-shadow 0.2s ease, border-color 0.2s ease;
   font-family: "Heebo", "Open Sans", Arial, sans-serif;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+  transition: transform 0.16s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .socc-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.12);
-  border-color: rgba(37, 99, 235, 0.22);
+  transform: translateY(-1px);
+  border-color: rgba(37, 99, 235, 0.24);
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.09);
 }
 
 .socc-card:active {
   transform: scale(0.99);
 }
 
+.socc-card:focus-visible {
+  outline: 2px solid #2563eb;
+  outline-offset: 2px;
+}
+
 .socc-card.is-cheapest {
-  background: linear-gradient(180deg, #f0fdf4 0%, #ffffff 100%);
   border-color: rgba(16, 185, 129, 0.4);
-  box-shadow:
-    0 6px 20px rgba(16, 185, 129, 0.18),
-    0 1px 0 rgba(255, 255, 255, 0.9) inset;
 }
 
 .socc-best-badge {
   position: absolute;
   top: -10px;
-  right: 14px;
+  inset-inline-start: 14px;
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  padding: 4px 10px 4px 8px;
-  background: linear-gradient(135deg, #10b981 0%, #047857 100%);
-  color: #ffffff;
-  font-size: 0.72rem;
+  background: linear-gradient(135deg, #10b981, #047857);
+  color: #fff;
+  font-size: 0.66rem;
   font-weight: 800;
+  padding: 2px 10px;
   border-radius: 999px;
-  box-shadow: 0 4px 10px rgba(16, 185, 129, 0.4);
-  letter-spacing: -0.1px;
-  z-index: 1;
+  box-shadow: 0 3px 8px rgba(16, 185, 129, 0.4);
 }
 
 .socc-best-badge svg {
-  width: 12px;
-  height: 12px;
-  flex-shrink: 0;
+  width: 11px;
+  height: 11px;
 }
 
-/* ── Main row ───────────────────────────────── */
 .socc-main {
-  display: grid;
-  grid-template-columns: 64px 1fr auto;
-  gap: 12px;
+  display: flex;
   align-items: center;
+  gap: 11px;
 }
 
 .socc-logo-wrap {
   position: relative;
-  width: 64px;
-  height: 64px;
+  width: 48px;
+  height: 48px;
+  border-radius: 13px;
+  background: #ffffff;
+  border: 1px solid #eef2f7;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #f8fafc;
-  border: 1px solid #f1f5f9;
-  border-radius: 14px;
-  overflow: hidden;
-  padding: 6px;
-}
-
-.socc-card.is-cheapest .socc-logo-wrap {
-  background: #ffffff;
-  border-color: rgba(16, 185, 129, 0.25);
+  flex-shrink: 0;
+  overflow: visible;
 }
 
 .socc-logo {
-  max-width: 100%;
-  max-height: 100%;
-  width: auto;
-  height: auto;
+  max-width: calc(100% - 8px);
+  max-height: calc(100% - 8px);
   object-fit: contain;
-  display: block;
+  border-radius: 9px;
 }
 
 .socc-rank {
   position: absolute;
   top: -6px;
-  left: -6px;
-  min-width: 22px;
-  height: 22px;
-  padding: 0 6px;
-  display: inline-flex;
+  inset-inline-start: -6px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #2563eb;
+  color: #fff;
+  font-size: 0.62rem;
+  font-weight: 800;
+  display: flex;
   align-items: center;
   justify-content: center;
-  background: #ffffff;
-  color: #1d4ed8;
-  border: 1.5px solid rgba(37, 99, 235, 0.3);
-  border-radius: 999px;
-  font-size: 0.72rem;
-  font-weight: 800;
+  border: 2px solid #fff;
   font-variant-numeric: tabular-nums;
-  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.08);
 }
 
 .socc-info {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
+  flex: 1;
   min-width: 0;
-  text-align: right;
 }
 
 .socc-name {
   margin: 0;
-  font-size: 1rem;
+  font-size: 0.9rem;
   font-weight: 800;
   color: #0f172a;
-  letter-spacing: -0.2px;
-  unicode-bidi: plaintext;
-  word-break: break-word;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  min-width: 0;
+}
+
+.socc-name-text {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  line-height: 1.25;
+}
+
+.socc-cov {
+  font-size: 0.62rem;
+  font-weight: 800;
+  padding: 1px 8px;
+  border-radius: 999px;
+  font-variant-numeric: tabular-nums;
+  flex-shrink: 0;
+}
+
+.socc-cov--full {
+  background: #ecfdf5;
+  color: #047857;
+  border: 1px solid #a7f3d0;
+}
+
+.socc-cov--part {
+  background: #fff7ed;
+  color: #b45309;
+  border: 1px solid #fed7aa;
 }
 
 .socc-address {
-  margin: 0;
-  font-size: 0.78rem;
-  color: #64748b;
-  font-weight: 500;
-  unicode-bidi: plaintext;
-}
-
-.socc-stock {
-  margin: 2px 0 0;
-  font-size: 0.74rem;
+  margin: 1px 0 0;
+  font-size: 0.72rem;
   font-weight: 600;
-  color: #475569;
-  unicode-bidi: plaintext;
+  color: #94a3b8;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.socc-stock-missing {
+.socc-missing-line {
+  margin: 3px 0 0;
+  font-size: 0.7rem;
+  font-weight: 600;
   color: #b45309;
-  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-/* ── Price column ───────────────────────────── */
 .socc-price-block {
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-  gap: 4px;
-  padding-inline-start: 10px;
-  border-inline-start: 1px solid rgba(15, 23, 42, 0.08);
+  gap: 3px;
+  flex-shrink: 0;
+  padding-inline-start: 12px;
+  border-inline-start: 1px solid rgba(15, 23, 42, 0.06);
 }
 
 .socc-price {
-  display: inline-flex;
-  align-items: baseline;
-  gap: 2px;
-  font-size: 1.4rem;
-  font-weight: 800;
+  font-size: 1.18rem;
+  font-weight: 900;
   color: #0f172a;
-  letter-spacing: -0.5px;
+  letter-spacing: -0.3px;
   font-variant-numeric: tabular-nums;
-  line-height: 1;
-  white-space: nowrap;
-}
-
-.socc-card.is-cheapest .socc-price {
-  color: #047857;
+  line-height: 1.1;
 }
 
 .socc-price-currency {
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: #94a3b8;
+  font-size: 0.72rem;
+  font-weight: 700;
+  margin-inline-end: 1px;
 }
 
-.socc-card.is-cheapest .socc-price-currency {
-  color: #059669;
-}
-
-.socc-savings {
-  font-size: 0.74rem;
+.socc-delta {
+  font-size: 0.62rem;
   font-weight: 800;
+  padding: 1px 8px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.socc-delta--save {
+  background: #ecfdf5;
   color: #047857;
-  background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
-  padding: 2px 8px;
-  border-radius: 999px;
-  white-space: nowrap;
-  border: 1px solid rgba(16, 185, 129, 0.35);
-  letter-spacing: -0.1px;
-  font-variant-numeric: tabular-nums;
+  border: 1px solid #a7f3d0;
 }
 
-/* ── Missing-products list (chips) ─────────── */
-.socc-missing {
-  margin-top: 12px;
-  padding-top: 12px;
-  border-top: 1px dashed rgba(15, 23, 42, 0.08);
+.socc-delta--cost {
+  background: #fef2f2;
+  color: #b91c1c;
+  border: 1px solid #fecaca;
+}
+
+.socc-chev {
+  color: #cbd5e1;
+  flex-shrink: 0;
   display: flex;
-  flex-direction: column;
-  gap: 6px;
-  text-align: right;
 }
 
-.socc-missing-label {
-  font-size: 0.74rem;
-  font-weight: 700;
-  color: #b45309;
-  letter-spacing: -0.1px;
-}
-
-.socc-missing-tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 5px;
-}
-
-.socc-missing-tag {
-  display: inline-flex;
-  align-items: center;
-  padding: 3px 9px;
-  background: #fff7ed;
-  color: #9a3412;
-  border: 1px solid #fed7aa;
-  border-radius: 999px;
-  font-size: 0.74rem;
-  font-weight: 600;
-  letter-spacing: -0.1px;
-  unicode-bidi: plaintext;
-  max-width: 100%;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.socc-missing-tag--more {
-  background: #f1f5f9;
-  color: #475569;
-  border-color: #e2e8f0;
-  font-weight: 700;
-}
-
-/* ── Responsive ────────────────────────────── */
-@media (max-width: 380px) {
-  .socc-main {
-    grid-template-columns: 56px 1fr auto;
-    gap: 10px;
-  }
-  .socc-logo-wrap {
-    width: 56px;
-    height: 56px;
-  }
-  .socc-price {
-    font-size: 1.2rem;
-  }
+.socc-chev svg {
+  width: 15px;
+  height: 15px;
 }
 
 /* legacy classes — neutralized */
