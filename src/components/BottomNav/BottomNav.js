@@ -18,7 +18,10 @@ import {
   usePriceMap,
   useCartActions,
   useFullCart,
+  useUpdateActiveCart,
 } from "../../hooks/appHooks";
+import OperationModal from "../AI/MessageItem/MessageItemOperations/CartOperationsView/OperationModal";
+import ProductAnimationAdd from "../AI/MessageItem/MessageItemOperations/CartOperationsView/ProductAnimationAdd";
 import { runCompareOptimization } from "../../utils/optimizeCart";
 import { useAiSettings } from "../../context/AiSettingsContext";
 import { useCart } from "../../context/CartContext2";
@@ -319,12 +322,21 @@ export default function BottomNav() {
   const { cart, setCart } = useCart();
   const { fullCart } = useFullCart();
   const { allSupermarkets } = useSupermarkets();
-  const { replaceSupermarket } = useCartActions();
+  const { replaceSupermarket, add: addToCart, update: updateInCart } =
+    useCartActions();
+  const { sendActiveCart } = useUpdateActiveCart();
   const { completeCartNames } = useCompleteCartPreferences();
   const { families, byBarcode, isLoaded: classificationsLoaded } =
     useClassificationsCtx();
 
   const [open, setOpen] = useState(false);
+  /* shelf session (voice #8 → #9): the products of the subcategory the user
+     navigated to with find_product — the NLU may only add_product from it.
+     Cleared by any other voice command. */
+  const [shelfSession, setShelfSession] = useState([]);
+  /* the AI-page drop-into-cart animation for a voice add */
+  const [voiceAdd, setVoiceAdd] = useState(null); // {barcode, amount, key}
+  const voiceAddTimerRef = useRef(null);
   const [optimizing, setOptimizing] = useState(false); // action #4 overlay
   const [comparing, setComparing] = useState(false); // action #5 overlay
   const [compareCandidates, setCompareCandidates] = useState([]);
@@ -531,6 +543,17 @@ export default function BottomNav() {
         .filter((p) => p.category === category && p.subcategory === subcategory)
         .map((p) => p.barcode)
     );
+
+    /* open a shelf session: ALL products of that subcategory, so a follow-up
+       "תוסיף..." (voice #9) can resolve any of them by name */
+    setShelfSession(
+      (products || [])
+        .filter(
+          (p) => p.category === category && p.subcategory === subcategory
+        )
+        .map((p) => ({ name: p.name, barcode: p.barcode }))
+    );
+
     goToSubCategory(ci, si);
   };
 
@@ -716,6 +739,16 @@ export default function BottomNav() {
 
     if (!cmd) return { history: "keep" };
 
+    /* the shelf session (voice #8 → #9) survives only find_product /
+       add_product chains — any other resolved command closes it */
+    if (
+      cmd.actionType !== "find_product" &&
+      cmd.actionType !== "add_product" &&
+      cmd.actionType !== "none"
+    ) {
+      setShelfSession([]);
+    }
+
     switch (cmd.actionType) {
       case "navigate": {
         if (!cmd.route) return { history: "keep" };
@@ -730,6 +763,48 @@ export default function BottomNav() {
         )
           return { history: "keep" };
         goToSubCategory(cmd.categoryIndex, cmd.subIndex);
+        return { history: "clear" };
+      }
+
+      case "find_product": {
+        /* voice command #8 — the server snapped productName to the shelf
+           catalog we sent, so an exact match is expected here. goToShelf also
+           opens the shelf session that enables a follow-up add_product. */
+        const target = shelfTargets.find((t) => t.name === cmd.productName);
+        if (!target) return { history: "keep" };
+        goToShelf(target);
+        return { history: "clear" };
+      }
+
+      case "add_product": {
+        /* voice command #9 — only valid inside a shelf session opened by #8.
+           The server snapped productName against the session list we sent. */
+        if (!shelfSession.length) return { history: "keep" };
+        const prod =
+          shelfSession.find((p) => p.name === cmd.productName) ||
+          shelfSession.find(
+            (p) =>
+              p.name.includes(cmd.productName || "") ||
+              (cmd.productName || "").includes(p.name)
+          );
+        if (!prod) return { history: "keep" };
+        const qty =
+          Number.isInteger(cmd.quantity) && cmd.quantity >= 1
+            ? cmd.quantity
+            : 1;
+
+        /* same mutation pattern as the AI page's cart operation */
+        const existing = ((cart && cart.products) || []).find(
+          (p) => String(p.barcode) === String(prod.barcode)
+        );
+        if (existing) updateInCart(prod.barcode, (existing.amount || 0) + qty);
+        else addToCart(prod.barcode, qty);
+        sendActiveCart();
+
+        /* the AI-page drop-into-cart animation, auto-closing */
+        clearTimeout(voiceAddTimerRef.current);
+        setVoiceAdd({ barcode: prod.barcode, amount: qty, key: Date.now() });
+        voiceAddTimerRef.current = setTimeout(() => setVoiceAdd(null), 3500);
         return { history: "clear" };
       }
 
@@ -1087,6 +1162,8 @@ export default function BottomNav() {
     categories: allCategories,
     subCategories: all_sub_categories,
     supermarkets: chainNames,
+    shelfProducts: shelfTargets.map((t) => t.name),
+    shelfSessionProducts: shelfSession.map((p) => p.name),
     ttsLanguage,
     ttsVoice,
     micThreshold,
@@ -1838,6 +1915,22 @@ export default function BottomNav() {
         </button>
       </nav>
       {sheet}
+      {/* voice #9 — the AI-page drop-into-cart animation for an added product */}
+      {voiceAdd && (
+        <OperationModal
+          key={voiceAdd.key}
+          isOpen
+          onClose={() => {
+            clearTimeout(voiceAddTimerRef.current);
+            setVoiceAdd(null);
+          }}
+        >
+          <ProductAnimationAdd
+            barcode={voiceAdd.barcode}
+            amount={voiceAdd.amount}
+          />
+        </OperationModal>
+      )}
       <CartOptimizeOverlay
         open={optimizing}
         onClose={() => setOptimizing(false)}

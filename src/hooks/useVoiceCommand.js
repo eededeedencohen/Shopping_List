@@ -35,6 +35,7 @@ const LEVEL_SMOOTH = 0.4; // wave smoothing (higher = snappier)
  * @param {string[]}   opts.categories
  * @param {string[][]} opts.subCategories
  * @param {string[]}   opts.supermarkets   distinct chain names (compare by name)
+ * @param {string[]}   opts.shelfProducts  shelf-target names (find_product)
  * @param {string}     opts.ttsLanguage    "he" | "en"
  * @param {string}     opts.ttsVoice
  * @param {number}     opts.micThreshold    VAD RMS threshold (hands-free)
@@ -45,6 +46,8 @@ export default function useVoiceCommand({
   categories,
   subCategories,
   supermarkets,
+  shelfProducts,
+  shelfSessionProducts,
   ttsLanguage,
   ttsVoice,
   micThreshold,
@@ -95,6 +98,8 @@ export default function useVoiceCommand({
     categories,
     subCategories,
     supermarkets,
+    shelfProducts,
+    shelfSessionProducts,
     ttsLanguage,
     ttsVoice,
     micThreshold,
@@ -313,6 +318,8 @@ export default function useVoiceCommand({
           categories: cfg.categories || [],
           subCategories: cfg.subCategories || [],
           supermarkets: cfg.supermarkets || [],
+          shelfProducts: cfg.shelfProducts || [],
+          shelfSessionProducts: cfg.shelfSessionProducts || [],
         })
       );
       fd.append("ttsLanguage", cfg.ttsLanguage || "he");
