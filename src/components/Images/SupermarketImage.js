@@ -26,6 +26,16 @@ import shiraMarketImage from "./supermarketsImages/שירה מרקט.png";
 import shaareRevahaImage from "./supermarketsImages/שערי רווחה.png";
 import plentyBlessingOfTheNameNearHomeImage from "./supermarketsImages/שפע ברכת השם קרוב לבית.png";
 import marketGoodImage from "./supermarketsImages/good מרקט.png";
+import expressMehadrinImage from "./supermarketsImages/אקספרס מהדרין.png";
+import haChishukImage from "./supermarketsImages/החישוק.png";
+import woltMarketImage from "./supermarketsImages/וולט מרקט.png";
+import hetziHinamImage from "./supermarketsImages/חצי חינם.png";
+import tivTaamImage from "./supermarketsImages/טיב טעם.png";
+import yeinotBitanImage from "./supermarketsImages/יינות ביתן.png";
+import netoHisachonImage from "./supermarketsImages/נטו חיסכון.png";
+import superSapirImage from "./supermarketsImages/סופר ספיר.png";
+import quikImage from "./supermarketsImages/קוויק.png";
+import keshetTeamimImage from "./supermarketsImages/קשת טעמים.png";
 
 // "BE",
 // "Carrefour city (קרפור סיטי)",
@@ -63,11 +73,21 @@ const BRAND_FALLBACKS = [
   ["מחסני השוק", marketWarehouseForYouImage],
   ["שוק העיר", cityMarketImage],
   ["סופר פארם", superPharmImage],
+  ["סופר ספיר", superSapirImage],
   ["שפע ברכת השם", plentyBlessingOfTheNameNearHomeImage],
   ["ויקטורי", victoryImage],
   ["קרפור", carrefoutImage],
   ["Carrefour", carrefoutImage],
   ["שופרסל", myShufersalImage],
+  ["אקספרס מהדרין", expressMehadrinImage],
+  ["החישוק", haChishukImage],
+  ["וולט מרקט", woltMarketImage],
+  ["חצי חינם", hetziHinamImage],
+  ["טיב טעם", tivTaamImage],
+  ["יינות ביתן", yeinotBitanImage],
+  ["נטו חיסכון", netoHisachonImage],
+  ["קוויק", quikImage],
+  ["קשת טעמים", keshetTeamimImage],
 ];
 
 const getSupermarketImage = (supermarketName) => {
