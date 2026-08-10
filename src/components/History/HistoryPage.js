@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from "react";
+import React, { useEffect, useState, useMemo, useRef } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
 import SupermarketImage from "../Images/SupermarketImage";
@@ -20,7 +20,16 @@ const HistoryPage = () => {
   /* selection mode for bulk-delete */
   const [isSelectionMode, setIsSelectionMode] = useState(false);
   const [selectedIds, setSelectedIds] = useState(() => new Set());
-  const [isDeleting, setIsDeleting] = useState(false);
+
+  /* deferred-commit delete: tapping מחק removes the receipts from the list
+     immediately and shows a 6s ביטול snackbar; the server DELETE fires only
+     when the snackbar closes (timeout / a new delete / leaving the page) —
+     so undo is a trivial, reliable client-side restore. */
+  const [pendingDelete, setPendingDelete] = useState(null); // {items:[receipt]}
+  const [deleteNotice, setDeleteNotice] = useState(null); // error text
+  const pendingRef = useRef(null);
+  pendingRef.current = pendingDelete;
+  const snackTimerRef = useRef(null);
 
   const { allSupermarkets, isAllSupermarketsUploaded } = useCartOptimizationCtx();
 
@@ -38,35 +47,63 @@ const HistoryPage = () => {
     });
   };
 
-  const handleDeleteSelected = async () => {
-    if (!selectedIds.size || isDeleting) return;
-    const count = selectedIds.size;
-    if (
-      !window.confirm(
-        count === 1
-          ? "למחוק את הקבלה שנבחרה?"
-          : `למחוק ${count} קבלות שנבחרו?`
-      )
-    ) {
-      return;
-    }
-    setIsDeleting(true);
-    const ids = [...selectedIds];
+  const commitPendingDelete = async (pending) => {
+    if (!pending || !pending.items.length) return;
+    const ids = pending.items.map((c) => c._id);
     const results = await Promise.allSettled(
       ids.map((id) => axios.delete(`${DOMAIN}/api/v1/history/${id}`))
     );
-    const succeededIds = new Set(
-      ids.filter((_, i) => results[i].status === "fulfilled")
+    const failedItems = pending.items.filter(
+      (_, i) => results[i].status === "rejected"
     );
-    setHistory((prev) => prev.filter((c) => !succeededIds.has(c._id)));
-    const failed = results.filter((r) => r.status === "rejected").length;
-    if (failed > 0) {
-      console.error(`Failed to delete ${failed}/${count} receipts`);
-      alert(`${count - failed} מתוך ${count} נמחקו. ${failed} נכשלו — נסה שוב.`);
+    if (failedItems.length) {
+      console.error(`Failed to delete ${failedItems.length}/${ids.length} receipts`);
+      /* bring the ones that survived on the server back into the list */
+      setHistory((prev) => [...prev, ...failedItems]);
+      setDeleteNotice(
+        failedItems.length === 1
+          ? "קבלה אחת לא נמחקה — נסו שוב"
+          : `${failedItems.length} קבלות לא נמחקו — נסו שוב`
+      );
+      setTimeout(() => setDeleteNotice(null), 5000);
     }
-    exitSelection();
-    setIsDeleting(false);
   };
+
+  const handleDeleteSelected = () => {
+    if (!selectedIds.size) return;
+    /* a new delete commits the previous pending one (single-undo model) */
+    if (pendingRef.current) {
+      clearTimeout(snackTimerRef.current);
+      commitPendingDelete(pendingRef.current);
+    }
+    const items = history.filter((c) => selectedIds.has(c._id));
+    setHistory((prev) => prev.filter((c) => !selectedIds.has(c._id)));
+    const pending = { items };
+    setPendingDelete(pending);
+    snackTimerRef.current = setTimeout(() => {
+      setPendingDelete(null);
+      pendingRef.current = null;
+      commitPendingDelete(pending);
+    }, 6000);
+    exitSelection();
+  };
+
+  const undoDelete = () => {
+    clearTimeout(snackTimerRef.current);
+    const pending = pendingRef.current;
+    pendingRef.current = null;
+    setPendingDelete(null);
+    if (pending) setHistory((prev) => [...prev, ...pending.items]);
+  };
+
+  /* leaving the page flushes a pending delete */
+  useEffect(() => {
+    return () => {
+      clearTimeout(snackTimerRef.current);
+      if (pendingRef.current) commitPendingDelete(pendingRef.current);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     const fetchHistory = async () => {
@@ -202,7 +239,15 @@ const HistoryPage = () => {
               onClick={() => (isSelectionMode ? exitSelection() : setIsSelectionMode(true))}
               aria-pressed={isSelectionMode}
             >
-              {isSelectionMode ? "ביטול" : "בחר"}
+              {!isSelectionMode && (
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <polyline points="3 6 5 6 21 6" />
+                  <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+                  <path d="M10 11v6M14 11v6" />
+                  <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
+                </svg>
+              )}
+              {isSelectionMode ? "ביטול" : "מחיקה"}
             </button>
           )}
         </div>
@@ -360,7 +405,7 @@ const HistoryPage = () => {
               type="button"
               className="history-selection-delete"
               onClick={handleDeleteSelected}
-              disabled={!selectedIds.size || isDeleting}
+              disabled={!selectedIds.size}
             >
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                 <polyline points="3 6 5 6 21 6" />
@@ -368,11 +413,30 @@ const HistoryPage = () => {
                 <path d="M10 11v6M14 11v6" />
                 <path d="M9 6V4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2" />
               </svg>
-              {isDeleting ? "מוחק…" : "מחק"}
+              מחק
             </button>
           </div>
         )}
         </>
+      )}
+
+      {/* undo snackbar for a pending delete */}
+      {pendingDelete && (
+        <div className="history-snack" role="status" aria-live="polite">
+          <span className="history-snack-text">
+            {pendingDelete.items.length === 1
+              ? "הקבלה הוסרה מההיסטוריה"
+              : `${pendingDelete.items.length} קבלות הוסרו מההיסטוריה`}
+          </span>
+          <button type="button" className="history-snack-undo" onClick={undoDelete}>
+            ביטול
+          </button>
+        </div>
+      )}
+      {deleteNotice && (
+        <div className="history-snack history-snack--error" role="alert">
+          <span className="history-snack-text">{deleteNotice}</span>
+        </div>
       )}
     </div>
   );
