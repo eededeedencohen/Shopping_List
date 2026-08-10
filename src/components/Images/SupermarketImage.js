@@ -55,6 +55,21 @@ import marketGoodImage from "./supermarketsImages/good מרקט.png";
 // "שפע ברכת השם קרוב לבית"
 // "good מרקט",
 
+/* Online/variant branches (e.g. "רמי לוי באינטרנט", "שופרסל אונליין") have no
+   dedicated logo — fall back to the parent chain's logo by brand substring.
+   Order matters: more specific brand names must come before shorter ones. */
+const BRAND_FALLBACKS = [
+  ["רמי לוי", ramiLeviImage],
+  ["מחסני השוק", marketWarehouseForYouImage],
+  ["שוק העיר", cityMarketImage],
+  ["סופר פארם", superPharmImage],
+  ["שפע ברכת השם", plentyBlessingOfTheNameNearHomeImage],
+  ["ויקטורי", victoryImage],
+  ["קרפור", carrefoutImage],
+  ["Carrefour", carrefoutImage],
+  ["שופרסל", myShufersalImage],
+];
+
 const getSupermarketImage = (supermarketName) => {
   switch (supermarketName) {
     case "BE":
@@ -111,8 +126,11 @@ const getSupermarketImage = (supermarketName) => {
       return plentyBlessingOfTheNameNearHomeImage;
     case "good מרקט":
       return marketGoodImage;
-    default:
-      return marketGoodImage;
+    default: {
+      const name = String(supermarketName || "");
+      const brand = BRAND_FALLBACKS.find(([key]) => name.includes(key));
+      return brand ? brand[1] : marketGoodImage;
+    }
   }
 };
 
