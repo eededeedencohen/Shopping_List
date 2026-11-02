@@ -1,65 +1,168 @@
-.pcm__modal-overlay {
+/* ═══════════════════════════════════════════════════════════════
+   Product comparison — bottom sheet shell (`pcs__*`)
+   Slides up from the bottom on phones, centered dialog from 640px.
+   The content inside is `productComparison.css` (`pc*`).
+   ═══════════════════════════════════════════════════════════════ */
+
+.pcs {
   position: fixed;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background: rgba(15, 23, 42, 0.45);
-  backdrop-filter: blur(8px);
-  padding: 1.5rem 1.25rem;
+  inset: 0;
   z-index: 9999;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  background: rgba(10, 25, 60, 0.5);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  animation: pcsFade 0.22s ease both;
+  font-family: "Heebo", "Open Sans", "Rubik", "Segoe UI", Arial, sans-serif;
+  -webkit-tap-highlight-color: transparent;
 }
 
-.pcm__modal-window {
-  background: #f8fafc;
-  border-radius: 18px;
-  box-shadow: 0 24px 48px rgba(15, 23, 42, 0.2);
-  border: 1px solid #e2e8f0;
-  max-width: 720px;
-  width: min(88vw, 720px);
-  max-height: 84vh;
-  overflow: auto;
+.pcs.is-closing {
+  animation: pcsFadeOut 0.24s ease forwards;
+}
+
+.pcs__sheet {
   position: relative;
-  animation: pcm__slide-down 0.35s ease;
+  width: 100%;
+  max-width: 560px;
+  max-height: min(92dvh, 100%);
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(180deg, #ffffff 0%, #f0f4fb 100%);
+  border-radius: 26px 26px 0 0;
+  box-shadow:
+    0 -18px 50px rgba(15, 23, 42, 0.32),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  /* `backwards` only: once the slide-up is over the inline drag transform
+     must win (fill-mode both would pin translateY(0) forever) */
+  animation: pcsUp 0.34s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+  will-change: transform;
 }
 
-.pcm__close-button-container {
-  position: fixed;
-  top: 18px;
-  left: 18px;
-  z-index: 10000;
+/* spring back after a short drag; none while the finger is down */
+.pcs__sheet:not(.is-dragging) {
+  transition: transform 0.26s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.pcs__sheet.is-dragging {
+  transition: none;
 }
 
-.pcm__close-button {
-  background: #ef4444;
-  color: white;
-  border: 1px solid #fecaca;
+.pcs.is-closing .pcs__sheet {
+  /* continues from wherever the drag left it (--drag) */
+  animation: pcsDown 0.24s ease-in forwards;
+  transition: none;
+}
+
+@keyframes pcsUp {
+  from { transform: translateY(100%); }
+  to   { transform: translateY(0); }
+}
+@keyframes pcsDown {
+  from { transform: translateY(var(--drag, 0px)); }
+  to   { transform: translateY(110%); }
+}
+@keyframes pcsFade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes pcsFadeOut {
+  from { opacity: 1; }
+  to   { opacity: 0; }
+}
+
+/* ── grip + title bar (= the drag handle) ── */
+.pcs__handle {
+  flex: none;
+  padding: 8px 14px 8px;
+  touch-action: none;
+  cursor: grab;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.pcs__handle:active {
+  cursor: grabbing;
+}
+
+.pcs__grip {
+  display: block;
+  width: 44px;
+  height: 5px;
+  margin: 0 auto 10px;
   border-radius: 999px;
-  padding: 0.4rem 0.7rem;
-  box-shadow: 0 8px 16px rgba(239, 68, 68, 0.35);
+  background: rgba(15, 23, 42, 0.16);
+}
+
+.pcs__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.pcs__title {
+  margin: 0;
+  font-size: 1.08rem;
+  font-weight: 800;
+  color: #0f172a;
+  letter-spacing: -0.2px;
+}
+
+.pcs__x {
+  flex: none;
+  width: 34px;
+  height: 34px;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(15, 23, 42, 0.06);
+  color: #475569;
+  font-size: 1rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
-  width: auto;
-  font-weight: 600;
+  transition: background 0.15s ease, transform 0.15s ease;
+}
+.pcs__x:active {
+  transform: scale(0.92);
+  background: rgba(15, 23, 42, 0.1);
 }
 
+/* ── the scrolling body ── */
+.pcs__scroll {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  padding: 0 14px 18px;
+  /* touch-scrolled sheet: no scrollbar track along the edge */
+  scrollbar-width: none;
+}
+.pcs__scroll::-webkit-scrollbar {
+  display: none;
+}
 
-@keyframes pcm__slide-down {
-  0% {
-    transform: translateY(-100%);
+/* wide screens: a centered dialog instead of a sheet */
+@media (min-width: 640px) {
+  .pcs {
+    align-items: center;
+    padding: 24px;
   }
-
-  100% {
-    transform: translateY(0);
+  .pcs__sheet {
+    border-radius: 26px;
+    max-height: 86vh;
+    box-shadow: 0 30px 70px rgba(15, 23, 42, 0.38);
   }
 }
 
-@media (max-width: 600px) {
-  .pcm__modal-window {
-    width: 88vw;
-    height: auto;
-    max-height: 82vh;
+@media (prefers-reduced-motion: reduce) {
+  .pcs,
+  .pcs__sheet,
+  .pcs.is-closing,
+  .pcs.is-closing .pcs__sheet {
+    animation-duration: 0.01s;
   }
 }
