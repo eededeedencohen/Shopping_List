@@ -1492,7 +1492,7 @@
   height: 44px;
   max-width: calc(100% - 24px);
   margin: 0;
-  padding: 0 6px 0 14px;
+  padding: 0 10px 0 14px;
   border: 1px solid rgba(255, 255, 255, 0.14);
   border-radius: 999px;
   background: rgba(15, 23, 42, 0.84);
@@ -1507,10 +1507,41 @@
     inset 0 1px 0 rgba(255, 255, 255, 0.12);
   -webkit-tap-highlight-color: transparent;
   animation: cmpDockIn 0.5s cubic-bezier(0.22, 1, 0.36, 1) backwards;
-  transition: transform 0.15s ease;
+  transition: transform 0.15s ease, box-shadow 0.2s ease;
+  touch-action: none; /* the chip is draggable: the page must not scroll under the finger */
+  user-select: none;
+  -webkit-user-select: none;
 }
 .cmp-dock:active {
   transform: translateX(-50%) scale(0.97);
+}
+/* placed by the user: absolute spot, no centring transform */
+.cmp-dock.is-placed {
+  animation: none;
+  transition: box-shadow 0.2s ease;
+}
+.cmp-dock.is-placed:active {
+  transform: none;
+}
+.cmp-dock.is-dragging {
+  transform: scale(1.05) !important;
+  box-shadow:
+    0 18px 40px rgba(15, 23, 42, 0.45),
+    inset 0 1px 0 rgba(255, 255, 255, 0.16);
+  cursor: grabbing;
+}
+.cmp-dock__grip {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  width: 10px;
+  height: 16px;
+  margin-inline-end: -2px;
+  color: rgba(255, 255, 255, 0.4);
+}
+.cmp-dock__grip svg {
+  width: 10px;
+  height: 16px;
 }
 .cmp-dock__logo {
   flex: none;
