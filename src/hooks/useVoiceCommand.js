@@ -644,6 +644,26 @@ export default function useVoiceCommand({
     refreshMode();
   }, [stopMicAnalyser, stopReply, releaseStream, refreshMode]);
 
+  /* ── "Hush": cut the AI's speech RIGHT NOW ──
+     Tap-to-interrupt. Stops the TTS element (its 'pause' event runs
+     endSpeaking → mode refresh), drops the wave level, and leaves everything
+     else as it was: hands-free keeps listening for the next utterance, a
+     single-shot command is already idle. The command the reply described has
+     already been executed (or is executing) — only the voice is cut.
+     Returns true when there was speech to cut. */
+  const stopSpeaking = useCallback(() => {
+    const hadSpeech =
+      speakingRef.current ||
+      (ttsAudioRef.current &&
+        !ttsAudioRef.current.paused &&
+        !ttsAudioRef.current.ended);
+    if (!hadSpeech) return false;
+    stopReply();
+    levelRef.current = 0;
+    refreshMode();
+    return true;
+  }, [stopReply, refreshMode]);
+
   /* Explicit "reset the conversation" action (also exposed to the caller). */
   const clearHistory = useCallback(
     () => persistHistory({ action: "clear" }),
@@ -738,6 +758,7 @@ export default function useVoiceCommand({
     stopRecording,
     startHandsFree,
     stopHandsFree,
+    stopSpeaking,
     clearHistory,
     appendHistory,
     speak,

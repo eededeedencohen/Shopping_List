@@ -1318,6 +1318,7 @@ export default function BottomNav() {
     stopRecording,
     startHandsFree,
     stopHandsFree,
+    stopSpeaking,
     appendHistory,
     speak,
   } = useVoiceCommand({
@@ -1376,6 +1377,10 @@ export default function BottomNav() {
      • double-tap            → enter hands-free continuous mode
      • single tap (idle)     → open the action sheet
      • single tap (hands-free / recording) → exit / stop
+     • single tap WHILE THE ROBOT SPEAKS → hush: the speech stops right there.
+       In hands-free the robot keeps listening for the next command; in
+       single-shot it just goes quiet (long-press for the next command).
+     • long-press while it speaks → hush + start recording at once (barge-in).
      Pointer events only ARM the long-press; taps resolve in onClick (the
      click-through-safe path that opens the modal). A single tap waits one
      double-tap window before opening the sheet, so a 2nd tap can promote it. */
@@ -1394,10 +1399,21 @@ export default function BottomNav() {
     clearTimeout(longPressTimer.current);
     longPressTimer.current = setTimeout(() => {
       longPressFired.current = true;
+      // barge-in: a long-press while the robot is still talking cuts the
+      // speech first, so the mic never records the robot's own voice
+      stopSpeaking();
       haptic("recStart");
       uiSound("recStart");
       startRecording();
     }, LONG_PRESS_MS);
+  };
+
+  /* Hush — stop the robot mid-sentence. No sound (silence is the point),
+     just a light tick so the tap is acknowledged. */
+  const hush = () => {
+    const cut = stopSpeaking();
+    if (cut) haptic("light");
+    return cut;
   };
 
   const cancelLongPress = () => clearTimeout(longPressTimer.current);
@@ -1406,6 +1422,12 @@ export default function BottomNav() {
     if (longPressFired.current) {
       // the press that just ended was a long-press (recording started) → not a tap
       longPressFired.current = false;
+      return;
+    }
+    if (voiceMode === "speaking") {
+      // tap while it talks = "quiet". Hands-free stays on (it resumes
+      // listening by itself); single-shot simply returns to idle.
+      hush();
       return;
     }
     if (handsFree) {
@@ -1464,7 +1486,7 @@ export default function BottomNav() {
         ? { text: "מקשיב… דברו", kind: "recording" }
         : { text: "מקליט… הקישו לסיום", kind: "recording" }
       : voiceMode === "speaking"
-      ? { text: "משיב…", kind: "speaking" }
+      ? { text: "משיב… הקישו כדי להשתיק", kind: "speaking" }
       : voiceMode === "processing"
       ? { text: "חושב…", kind: "processing" }
       : voiceMode === "listening"
@@ -1627,6 +1649,12 @@ export default function BottomNav() {
                   <IconDoubleTap />
                   <span>
                     <b>הקשה כפולה</b> — שיחה רציפה
+                  </span>
+                </span>
+                <span className="ai-sheet__tip">
+                  <IconSpeaker />
+                  <span>
+                    <b>הקשה בזמן שהוא מדבר</b> — משתיקה אותו
                   </span>
                 </span>
               </div>
@@ -2165,7 +2193,7 @@ export default function BottomNav() {
           className={`bottom-nav__btn${
             voiceMode !== "idle" ? ` bottom-nav__btn--${voiceMode}` : ""
           }${open && !closing ? " is-open" : ""}`}
-          aria-label="פעולות — הקשה לתפריט, הקשה כפולה לדיבור רציף, לחיצה ארוכה להקלטה"
+          aria-label="פעולות — הקשה לתפריט, הקשה כפולה לדיבור רציף, לחיצה ארוכה להקלטה, הקשה בזמן דיבור משתיקה"
           aria-haspopup="dialog"
           aria-expanded={open}
           aria-pressed={handsFree || recording}
