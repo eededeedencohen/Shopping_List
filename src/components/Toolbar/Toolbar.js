@@ -1,52 +1,91 @@
-import React, { useState, useEffect, useRef } from "react";
-import { Link } from "react-router-dom";
+import React, { useState, useEffect, useRef, useCallback } from "react";
+import ReactDOM from "react-dom";
+import { Link, useLocation } from "react-router-dom";
 import SearchBar from "../SearchBar/SearchBar";
 import SearchModal from "../SearchBar/SearchModal";
 import SettingsModal from "../Settings/SettingsModal";
-import { useCartTotals } from "../../hooks/appHooks";
-import useVibrate from "../../hooks/useVibrate";
+import { useCartTotals, useFullCart } from "../../hooks/appHooks";
 import useBodyScrollLock from "../../hooks/useBodyScrollLock";
+import { haptic } from "../../utils/haptics";
+import { uiSound, primeUiSound } from "../../utils/uiSound";
+import { BUILD_VERSION } from "../../buildInfo";
 import "./Toolbar.css";
 
-import SearchIcon from "./search.svg";
 import { ReactComponent as ShoppingCartIcon } from "../Cart/Icons/shopping-cart.svg";
-import { ReactComponent as GroceryIcon2 } from "./grocery2.svg";
-import { ReactComponent as AiIcon2 } from "./robot.svg";
+import { ReactComponent as GroceryIcon } from "./grocery2.svg";
+import { ReactComponent as AiIcon } from "./robot.svg";
 import { ReactComponent as PieChartIcon } from "./pie-chart.svg";
-import { ReactComponent as TransactionHistoryIcon } from "./transaction-history.svg";
-import { ReactComponent as WishlistIcon } from "./wishlist.svg";
+import { ReactComponent as HistoryIcon } from "./transaction-history.svg";
+import { ReactComponent as ReceiptIcon } from "./wishlist.svg";
 import { ReactComponent as BarcodeIcon } from "./barcode.svg";
 import { ReactComponent as HomeIcon } from "./home.svg";
-import { ReactComponent as HandIcon } from "./hand.svg";
+import {
+  IconSearch,
+  IconSettings,
+  IconClose,
+  IconChevron,
+  IconServer,
+} from "./ToolbarIcons";
+
+/* ── Drawer navigation — grouped, each item carries its own hue (the same
+   palette as the home-page tiles so the app reads as ONE system). ── */
+const NAV_GROUPS = [
+  {
+    title: "ראשי",
+    items: [
+      { to: "/", label: "בית", hint: "המסך הראשי", Icon: HomeIcon, tone: "blue" },
+      { to: "/products", label: "מוצרים", hint: "עיון והוספה לעגלה", Icon: GroceryIcon, tone: "green" },
+      { to: "/cart", label: "עגלת קניות", hint: "ניהול העגלה", Icon: ShoppingCartIcon, tone: "sky", badge: true },
+      { to: "/ai", label: "עוזר AI", hint: "שאל, השווה, ייעל", Icon: AiIcon, tone: "teal" },
+    ],
+  },
+  {
+    title: "כלים",
+    items: [
+      { to: "/image-parser", label: "סריקת קבלות", hint: "צילום קבלה להיסטוריה", Icon: ReceiptIcon, tone: "amber" },
+      { to: "/advanced-stats", label: "סטטיסטיקות", hint: "גרפים וניתוח הוצאות", Icon: PieChartIcon, tone: "pink" },
+      { to: "/history", label: "היסטוריית קניות", hint: "קניות קודמות", Icon: HistoryIcon, tone: "violet" },
+      { to: "/barcode-scanner", label: "סורק ברקוד", hint: "סריקת מוצר במצלמה", Icon: BarcodeIcon, tone: "slate" },
+    ],
+  },
+  {
+    title: "מתקדם",
+    items: [
+      { to: "/products-server", label: "מוצרים (שרת)", hint: "קטלוג ישירות מהשרת", Icon: IconServer, tone: "indigo", stroke: true },
+    ],
+  },
+];
+
+const SWIPE_CLOSE_PX = 72; // drag the panel this far to the right → close
+
+function formatPrice(n) {
+  if (typeof n !== "number" || Number.isNaN(n)) return null;
+  return `₪${n.toFixed(2).replace(/\.00$/, "")}`;
+}
+
 function Toolbar() {
-  const { totalAmount } = useCartTotals(); // ← כמות בעגלה
-  const [selectedPage, setSelectedPage] = useState(window.location.pathname);
+  const { totalAmount, totalPrice } = useCartTotals();
+  const { fullCart } = useFullCart();
+  const location = useLocation();
   const [isOpen, setIsOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
   useBodyScrollLock(isOpen);
 
-  const vibrate = useVibrate();
-
-  /* אפקט פופ + פלאש צבע (ירוק בהוספה, אדום בהורדה) */
+  /* ── cart badge: pop + colour flash (green when adding, red when removing) ── */
   const [pop, setPop] = useState(false);
   const [direction, setDirection] = useState(null); // 'up' | 'down' | null
   const prevAmountRef = useRef(null);
   useEffect(() => {
-    // דילוג על הריצה הראשונה כדי לא להבהב בטעינה
     if (prevAmountRef.current === null) {
-      prevAmountRef.current = totalAmount;
-      return;
+      prevAmountRef.current = totalAmount; // skip the first run (no flash on load)
+      return undefined;
     }
-
     const prev = prevAmountRef.current;
     prevAmountRef.current = totalAmount;
-
-    if (totalAmount === prev || totalAmount === 0) return;
-
+    if (totalAmount === prev || totalAmount === 0) return undefined;
     setDirection(totalAmount > prev ? "up" : "down");
     setPop(true);
-
     const t = setTimeout(() => {
       setPop(false);
       setDirection(null);
@@ -54,73 +93,271 @@ function Toolbar() {
     return () => clearTimeout(t);
   }, [totalAmount]);
 
-  /* ניווט */
-  const toggleDrawer = () => {
-    // 👈 שימוש פשוט ונוח בפונקציית הרטט
-    vibrate(50);
-    setIsOpen(!isOpen);
+  /* ── drawer open / close ── */
+  const isOpenRef = useRef(false);
+  isOpenRef.current = isOpen;
+  const openDrawer = useCallback(() => {
+    primeUiSound();
+    haptic("light");
+    uiSound("open");
+    setIsOpen(true);
+  }, []);
+  const closeDrawer = useCallback(() => {
+    if (isOpenRef.current) uiSound("close");
+    setIsOpen(false);
+  }, []);
+  const toggleDrawer = () => (isOpen ? closeDrawer() : openDrawer());
+
+  // any route change closes the drawer (links inside it, the bottom nav, back…)
+  useEffect(() => {
+    setIsOpen(false);
+  }, [location.pathname]);
+
+  // Escape closes
+  useEffect(() => {
+    if (!isOpen) return undefined;
+    const onKey = (e) => e.key === "Escape" && closeDrawer();
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [isOpen, closeDrawer]);
+
+  /* ── swipe-to-close (drag the panel to the right) ── */
+  const panelRef = useRef(null);
+  const dragRef = useRef({ active: false, x0: 0, y0: 0, dx: 0, t0: 0, axis: null });
+  const [dragX, setDragX] = useState(0);
+  const [dragging, setDragging] = useState(false);
+
+  const onPanelPointerDown = (e) => {
+    if (e.pointerType === "mouse" && e.button !== 0) return;
+    dragRef.current = { active: true, x0: e.clientX, y0: e.clientY, dx: 0, t0: Date.now(), axis: null };
   };
-  const closeDrawer = () => isOpen && setIsOpen(false);
-  const handleNavClick = (path) => {
-    setSelectedPage(path);
+  const onPanelPointerMove = (e) => {
+    const d = dragRef.current;
+    if (!d.active) return;
+    const dx = e.clientX - d.x0;
+    const dy = e.clientY - d.y0;
+    if (!d.axis) {
+      if (Math.abs(dx) < 6 && Math.abs(dy) < 6) return;
+      d.axis = Math.abs(dx) > Math.abs(dy) ? "x" : "y";
+      if (d.axis === "x") setDragging(true);
+    }
+    if (d.axis !== "x") return;
+    d.dx = Math.max(0, dx); // only towards the right edge (where it came from)
+    setDragX(d.dx);
+  };
+  const swallowClickRef = useRef(false);
+  const endDrag = () => {
+    const d = dragRef.current;
+    if (!d.active) return;
+    d.active = false;
+    const fast = d.dx > 28 && Date.now() - d.t0 < 220;
+    setDragging(false);
+    setDragX(0);
+    if (d.axis === "x" && d.dx > 10) {
+      // a horizontal drag must not also "click" the link under the finger
+      swallowClickRef.current = true;
+      setTimeout(() => {
+        swallowClickRef.current = false;
+      }, 0);
+    }
+    if (d.axis === "x" && (d.dx > SWIPE_CLOSE_PX || fast)) {
+      haptic("light");
+      closeDrawer();
+    }
+  };
+  const onPanelClickCapture = (e) => {
+    if (swallowClickRef.current) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+  };
+
+  const onNavItem = () => {
+    haptic("selection");
+    uiSound("select");
     closeDrawer();
   };
-  const handleCartClick = () => {
-    setSelectedPage("");
-    closeDrawer();
-  };
+
+  const storeName = fullCart && fullCart.supermarket && fullCart.supermarket.name;
+  const priceText = formatPrice(
+    fullCart && typeof fullCart.totalPrice === "number" ? fullCart.totalPrice : totalPrice
+  );
+
+  const drawer = ReactDOM.createPortal(
+    <div
+      className={`drawer-root${isOpen ? " is-open" : ""}`}
+      dir="rtl"
+      aria-hidden={!isOpen}
+    >
+      <div className="drawer-veil" onClick={closeDrawer} />
+      <aside
+        ref={panelRef}
+        className={`drawer-panel${dragging ? " is-dragging" : ""}`}
+        style={dragX ? { transform: `translateX(${dragX}px)` } : undefined}
+        role="dialog"
+        aria-modal="true"
+        aria-label="תפריט ראשי"
+        onPointerDown={onPanelPointerDown}
+        onPointerMove={onPanelPointerMove}
+        onPointerUp={endDrag}
+        onPointerCancel={endDrag}
+        onClickCapture={onPanelClickCapture}
+      >
+        <div className="drawer-head">
+          <div className="drawer-brand">
+            <span className="drawer-brand__mark" aria-hidden="true">
+              <ShoppingCartIcon />
+            </span>
+            <span className="drawer-brand__text">
+              <span className="drawer-brand__title">Smart Cart</span>
+              <span className="drawer-brand__sub">העוזר החכם לקניות</span>
+            </span>
+          </div>
+          <button
+            type="button"
+            className="drawer-close"
+            aria-label="סגירת התפריט"
+            onClick={closeDrawer}
+          >
+            <IconClose />
+          </button>
+        </div>
+
+        <Link to="/cart" className="drawer-cart" onClick={onNavItem} style={{ "--i": 0 }}>
+          <span className="drawer-cart__icon" aria-hidden="true">
+            <ShoppingCartIcon />
+            {totalAmount > 0 && <span className="drawer-cart__count">{totalAmount}</span>}
+          </span>
+          <span className="drawer-cart__text">
+            <span className="drawer-cart__title">
+              {totalAmount > 0 ? "העגלה שלך" : "העגלה ריקה"}
+            </span>
+            <span className="drawer-cart__meta">
+              {totalAmount > 0
+                ? [
+                    `${totalAmount} פריטים`,
+                    priceText,
+                    storeName,
+                  ]
+                    .filter(Boolean)
+                    .join(" · ")
+                : "הוסיפו מוצרים מהקטלוג"}
+            </span>
+          </span>
+          <span className="drawer-cart__chev" aria-hidden="true">
+            <IconChevron />
+          </span>
+        </Link>
+
+        <nav className="drawer-nav" aria-label="ניווט">
+          {NAV_GROUPS.map((group, gi) => (
+            <div className="drawer-group" key={group.title}>
+              <div className="drawer-group__title">{group.title}</div>
+              <ul className="drawer-list">
+                {group.items.map(({ to, label, hint, Icon, tone, badge, stroke }, ii) => {
+                  const active = location.pathname === to;
+                  return (
+                    <li key={to}>
+                      <Link
+                        to={to}
+                        className={`drawer-item drawer-item--${tone}${active ? " is-active" : ""}`}
+                        aria-current={active ? "page" : undefined}
+                        onClick={onNavItem}
+                        style={{ "--i": gi * 4 + ii + 1 }}
+                      >
+                        <span className={`drawer-item__icon${stroke ? " drawer-item__icon--stroke" : ""}`} aria-hidden="true">
+                          <Icon />
+                        </span>
+                        <span className="drawer-item__text">
+                          <span className="drawer-item__label">{label}</span>
+                          <span className="drawer-item__hint">{hint}</span>
+                        </span>
+                        {badge && totalAmount > 0 && (
+                          <span className="drawer-item__badge">{totalAmount}</span>
+                        )}
+                        <span className="drawer-item__chev" aria-hidden="true">
+                          <IconChevron />
+                        </span>
+                      </Link>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          ))}
+        </nav>
+
+        <div className="drawer-foot">
+          <button
+            type="button"
+            className="drawer-foot__settings"
+            onClick={() => {
+              haptic("selection");
+              uiSound("select");
+              setIsOpen(false);
+              setIsSettingsModalOpen(true);
+            }}
+          >
+            <IconSettings />
+            <span>הגדרות</span>
+          </button>
+          <span className="drawer-foot__version">גרסה {BUILD_VERSION}</span>
+        </div>
+      </aside>
+    </div>,
+    document.getElementById("modal-root")
+  );
 
   return (
-    <nav className="toolbar">
-      {/* חיפוש */}
-      <div className="search-icon">
-        <img
-          src={SearchIcon}
-          alt="Search"
-          onClick={() => setIsModalOpen(true)}
-        />
-      </div>
-      <SearchModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
-        <SearchBar closeModal={() => setIsModalOpen(false)} />
-      </SearchModal>
-
-      {/* המבורגר */}
-      <div className="hamburger-menu" onClick={toggleDrawer}>
-        &#9776;
-      </div>
-
-      {/* הגדרות */}
+    <nav className="toolbar" dir="rtl">
+      {/* ☰ — three bars that fold into an ✕ while the drawer is open */}
       <button
         type="button"
-        className="settings-link"
-        onClick={() => setIsSettingsModalOpen(true)}
-        aria-label="הגדרות"
+        className={`tb-btn tb-menu hamburger-menu${isOpen ? " is-open" : ""}`}
+        aria-label={isOpen ? "סגירת התפריט" : "פתיחת התפריט"}
+        aria-expanded={isOpen}
+        onClick={toggleDrawer}
       >
-        <svg
-          className="settings-icon"
-          width="22"
-          height="22"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          aria-hidden="true"
-        >
-          <circle cx="12" cy="12" r="3" />
-          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
-        </svg>
+        <span className="tb-menu__bars" aria-hidden="true">
+          <span />
+          <span />
+          <span />
+        </span>
       </button>
 
-      <SettingsModal
-        isOpen={isSettingsModalOpen}
-        onClose={() => setIsSettingsModalOpen(false)}
-      />
+      <button
+        type="button"
+        className="tb-btn search-icon"
+        aria-label="חיפוש מוצר"
+        onClick={() => {
+          haptic("selection");
+          setIsModalOpen(true);
+        }}
+      >
+        <IconSearch />
+      </button>
 
-      {/* עגלה */}
-      <Link to="/cart" onClick={handleCartClick}>
-        <div className="cart-icon">
+      <button
+        type="button"
+        className="tb-btn settings-link"
+        aria-label="הגדרות"
+        onClick={() => {
+          haptic("selection");
+          setIsSettingsModalOpen(true);
+        }}
+      >
+        <IconSettings className="settings-icon" />
+      </button>
+
+      <span className="tb-spacer" aria-hidden="true" />
+
+      <Link
+        to="/cart"
+        className="tb-cart"
+        aria-label={totalAmount > 0 ? `עגלת קניות, ${totalAmount} פריטים` : "עגלת קניות"}
+        onClick={() => haptic("selection")}
+      >
+        <span className="cart-icon">
           <ShoppingCartIcon className="cart-icon__svg" aria-hidden="true" />
           {totalAmount > 0 && (
             <span
@@ -131,138 +368,18 @@ function Toolbar() {
               {totalAmount}
             </span>
           )}
-        </div>
+        </span>
       </Link>
 
-      {/* Drawer */}
-      <div className={`drawer ${isOpen ? "open" : ""}`}>
-        <div className="routes-icons">
-          {/* Home */}
-          <Link to="/" onClick={() => handleNavClick("/")}>
-            <div
-              className={`nav-item ${
-                selectedPage === "/" ? "selected-page" : ""
-              }`}
-            >
-              <div className="nav-icon">
-                <HomeIcon className="svg-icon" />
-              </div>
-              <h1>בית</h1>
-            </div>
-          </Link>
-
-          {/* Products */}
-          <Link to="/products" onClick={() => handleNavClick("/products")}>
-            <div
-              className={`nav-item ${
-                selectedPage === "/products" ? "selected-page" : ""
-              }`}
-            >
-              <div className="nav-icon">
-                <GroceryIcon2 className="svg-icon" />
-              </div>
-              <h1>מוצרים</h1>
-            </div>
-          </Link>
-
-          {/* Products Server */}
-          <Link
-            to="/products-server"
-            onClick={() => handleNavClick("/products-server")}
-          >
-            <div
-              className={`nav-item ${
-                selectedPage === "/products-server" ? "selected-page" : ""
-              }`}
-            >
-              <div className="nav-icon">
-                <HandIcon className="svg-icon" />
-              </div>
-              <h1>מוצרים (שרת)</h1>
-            </div>
-          </Link>
-
-          <Link
-            to="/image-parser"
-            onClick={() => handleNavClick("/image-parser")}
-          >
-            <div
-              className={`nav-item ${
-                selectedPage === "/image-parser" ? "selected-page" : ""
-              }`}
-            >
-              <div className="nav-icon">
-                <WishlistIcon className="svg-icon" />
-              </div>
-              <h1>סריקת קבלות</h1>
-            </div>
-          </Link>
-
-          <Link
-            to="/advanced-stats"
-            onClick={() => handleNavClick("/advanced-stats")}
-          >
-            <div
-              className={`nav-item ${
-                selectedPage === "/advanced-stats" ? "selected-page" : ""
-              }`}
-            >
-              <div className="nav-icon">
-                <PieChartIcon className="svg-icon" />
-              </div>
-              <h1>סטטיסטיקות</h1>
-            </div>
-          </Link>
-
-          <Link to="/history" onClick={() => handleNavClick("/history")}>
-            <div
-              className={`nav-item ${
-                selectedPage === "/history" ? "selected-page" : ""
-              }`}
-            >
-              <div className="nav-icon">
-                <TransactionHistoryIcon className="svg-icon" />
-              </div>
-              <h1>היסטוריית קניות</h1>
-            </div>
-          </Link>
-
-          <Link to="/ai" onClick={() => handleNavClick("/ai")}>
-            <div
-              className={`nav-item ${
-                selectedPage === "/ai" ? "selected-page" : ""
-              }`}
-            >
-              <div className="nav-icon">
-                <AiIcon2 className="svg-icon" />
-              </div>
-              <h1>עוזר AI</h1>
-            </div>
-          </Link>
-
-          <Link
-            to="/barcode-scanner"
-            onClick={() => handleNavClick("/barcode-scanner")}
-          >
-            <div
-              className={`nav-item ${
-                selectedPage === "/barcode-scanner" ? "selected-page" : ""
-              }`}
-            >
-              <div className="nav-icon">
-                <BarcodeIcon className="svg-icon" />
-              </div>
-              <h1>סורק ברקוד</h1>
-            </div>
-          </Link>
-        </div>
-      </div>
-
-      {/* Overlay */}
-      <div
-        className={`overlay ${isOpen ? "visible" : ""}`}
-        onClick={closeDrawer}
+      <SearchModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
+        <SearchBar closeModal={() => setIsModalOpen(false)} />
+      </SearchModal>
+      <SettingsModal
+        isOpen={isSettingsModalOpen}
+        onClose={() => setIsSettingsModalOpen(false)}
       />
+
+      {drawer}
     </nav>
   );
 }

@@ -1,128 +1,145 @@
-/* ───────────────── Toolbar ───────────────── */
+/* ═══════════════════════════════════════════════════════════════════════
+   Toolbar (row 1 of the .App grid) + the side drawer (portaled to #modal-root)
+   ═══════════════════════════════════════════════════════════════════════ */
 .toolbar {
-  /* Row 1 of the .App grid (in-flow, no longer position:fixed). position:
-     relative keeps it the anchor for its absolutely-positioned icons and,
-     together with z-index, gives it a stacking context. */
+  --tb-h: var(--toolbar-h, 56px);
+  --tb-blue-1: #1f86ea;
+  --tb-blue-2: #0b63cc;
+  --tb-ink: #ffffff;
+
   position: relative;
-  width: 100%;
+  z-index: 1000; /* above page content; the drawer lives in #modal-root */
   display: flex;
-  justify-content: flex-end;
-  padding: 10px;
-  background-color: #0074cf;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 1);
-  /* High enough that the drawer (a child of .toolbar) outranks any
-     floating control on page routes (e.g. the AI settings gear at
-     z-index: 10). Without this, the toolbar's own stacking context
-     would cap the drawer at z-index: 10 globally. */
-  z-index: 1000;
+  align-items: center;
+  gap: 4px;
+  width: 100%;
+  height: calc(var(--tb-h) + env(safe-area-inset-top, 0px));
+  padding: env(safe-area-inset-top, 0px) 10px 0 12px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.14) 0%, rgba(255, 255, 255, 0) 55%),
+    linear-gradient(180deg, var(--tb-blue-1) 0%, var(--tb-blue-2) 100%);
+  box-shadow: 0 2px 16px rgba(8, 60, 120, 0.22);
+  color: var(--tb-ink);
+  font-family: "Heebo", "Open Sans", Arial, sans-serif;
 }
 
-/* Search icon */
-.toolbar .search-icon {
-  position: absolute;
-  top: 50%;
-  right: 2.5rem;
-  transform: translateY(-50%);
-  cursor: pointer;
-  padding-top: 6px;
-}
-
-.toolbar .search-icon img {
-  width: 20px;
-  height: 20px;
-}
-
-/* Settings icon */
-.toolbar .settings-link {
-  position: absolute;
-  top: 50%;
-  right: 4.7rem;
-  transform: translateY(-50%);
+/* ── round glass control buttons (menu / search / settings) ── */
+.tb-btn {
+  flex: 0 0 auto;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 34px;
-  height: 34px;
+  width: 42px;
+  height: 42px;
+  margin: 0;
   padding: 0;
   border: 0;
-  border-radius: 10px;
-  background: transparent;
-  color: #fff;
-  text-decoration: none;
-  font-family: inherit;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--tb-ink);
+  font-size: 22px; /* icons are 1em */
   cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
   -webkit-appearance: none;
   appearance: none;
-  outline: none;
-  transition: background 0.2s ease, transform 0.2s ease;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    background 0.18s ease,
+    transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.tb-btn:hover {
+  background: rgba(255, 255, 255, 0.18);
+}
+.tb-btn:active {
+  transform: scale(0.9);
+  background: rgba(255, 255, 255, 0.24);
+}
+.tb-btn:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.85);
+  outline-offset: 2px;
 }
 
-.toolbar .settings-link:hover {
-  background: rgba(255, 255, 255, 0.12);
-}
-
-.toolbar .settings-link:active {
-  transform: translateY(-50%) scale(0.92) rotate(45deg);
-}
-
-.toolbar .settings-icon {
-  display: block;
-  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.2));
+/* settings gear spins a little when pressed */
+.tb-btn .settings-icon {
   transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
 }
-
-.toolbar .settings-link:hover .settings-icon {
+.tb-btn.settings-link:active .settings-icon {
   transform: rotate(60deg);
 }
 
-/* Cart icon */
-.toolbar .cart-icon {
+/* ── hamburger: 3 bars that fold into an ✕ while the drawer is open ── */
+.tb-menu__bars {
+  position: relative;
+  display: block;
+  width: 20px;
+  height: 14px;
+}
+.tb-menu__bars span {
   position: absolute;
-  top: 50%;
-  left: 8px;
-  transform: translateY(-50%);
-  cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
-  color: #fff;
+  left: 0;
+  width: 100%;
+  height: 2.2px;
+  border-radius: 2px;
+  background: currentColor;
+  transition:
+    transform 0.34s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.2s ease,
+    width 0.3s ease;
+}
+.tb-menu__bars span:nth-child(1) { top: 0; }
+.tb-menu__bars span:nth-child(2) { top: 6px; width: 70%; }
+.tb-menu__bars span:nth-child(3) { top: 12px; }
+.tb-menu.is-open .tb-menu__bars span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+.tb-menu.is-open .tb-menu__bars span:nth-child(2) { opacity: 0; width: 0; }
+.tb-menu.is-open .tb-menu__bars span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+
+.tb-spacer {
+  flex: 1 1 auto;
+}
+
+/* ── cart (far left, the row's end in RTL) ── */
+.tb-cart {
+  flex: 0 0 auto;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1);
+  width: 44px;
+  height: 44px;
+  color: var(--tb-ink);
+  text-decoration: none;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
-
-.toolbar .cart-icon:active {
-  transform: translateY(-50%) scale(0.92);
+.tb-cart:active {
+  transform: scale(0.9);
 }
-
+.cart-icon {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
 .cart-icon__svg {
-  width: 32px;
-  height: 32px;
+  width: 30px;
+  height: 30px;
   display: block;
-  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.25));
-  transition: filter 0.2s ease;
+  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.22));
 }
-
-.toolbar .cart-icon:hover .cart-icon__svg {
-  filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.35));
-}
-
 .cart-icon__svg path {
   fill: currentColor;
 }
 
-/* מונה פריטים */
+/* item counter */
 .cart-badge {
   position: absolute;
-  bottom: -3px;
-  right: -6px;
-  width: 20px;
+  bottom: -5px;
+  left: -7px;
+  min-width: 20px;
   height: 20px;
-  padding: 0;
-  border-radius: 50%;
+  padding: 0 5px;
+  border-radius: 999px;
   background: #ffffff;
   color: #0f172a;
-  font-size: 0.8rem;
+  font-size: 0.76rem;
   font-weight: 800;
   letter-spacing: -0.3px;
   display: flex;
@@ -131,189 +148,500 @@
   line-height: 1;
   pointer-events: none;
   box-shadow:
-    0 2px 8px rgba(0, 0, 0, 0.28),
-    0 0 0 2px #0074cf;
+    0 2px 8px rgba(0, 0, 0, 0.26),
+    0 0 0 2px var(--tb-blue-2);
 }
-
-/* פונט קטן יותר ל-3+ ספרות */
 .cart-badge.cart-badge--small {
-  font-size: 0.72rem;
+  font-size: 0.68rem;
   letter-spacing: -0.4px;
 }
 
-/* ───────────────── Overlay ───────────────── */
-.overlay {
-  position: fixed;
-  inset: 0;
-  display: none;
-  background-color: rgba(0, 0, 0, 0.5);
-  z-index: 9;
-}
-
-.overlay.visible {
-  display: block;
-}
-
-/* ───────────────── Drawer (RTL — opens from the right) ───────────────── */
-.drawer {
-  position: fixed;
-  top: 0;
-  right: 0;
-  width: 0;
-  height: 100%;
-  overflow-x: hidden;
-  background-color: transparent;
-  backdrop-filter: blur(12px) saturate(50%);
-  box-shadow: inset 5px 2px 18px rgb(255 255 255);
-  transition: width 0.5s ease;
-  transition-delay: 0.1s; /* שמירה על הדיליי המקורי לפתיחת המגירה */
-  z-index: 100000;
-  direction: rtl;
-}
-
-.drawer.open {
-  width: 230px;
-}
-
-.drawer a {
-  text-decoration: none;
-}
-
-.hamburger-menu {
-  color: beige;
-  font-weight: 900;
-}
-
-/* ───────────── Route list ───────────── */
-.routes-icons {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start; /* in an RTL column, flex-start = right edge */
-  margin-top: 10px;
-}
-
-.nav-item {
-  display: flex;
-  /* No flex-direction override — the drawer's `direction: rtl` already
-     places the first DOM child (the icon) on the right. */
-  align-items: center;
-  overflow-x: hidden;
-  padding-right: 8px;
-
-  /* צבע בסיס + מעבר אחד שישפיע גם על ה-svg וגם על הכותרת */
-  color: rgb(215, 215, 215);
-  transition: color 0.3s ease-in-out;
-}
-
-/* Hover משנה צבע אחד → הכל מסתנכרן */
-.nav-item:hover {
-  color: rgb(255, 115, 0);
-}
-
-/* Icon container */
-.drawer .nav-icon {
-  position: relative;
-  width: 60px;
-  height: 60px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  border-radius: 50%;
-}
-
-/* Embedded SVG */
-.svg-icon {
-  width: 25px;
-  height: 25px;
-  fill: currentColor; /* יורש את הצבע מה-.nav-item */
-}
-
-/* Title */
-.nav-item h1 {
-  margin: 5px 0 0;
-  padding: 0;
-  font-size: 1rem;
-  font-weight: 900;
-  white-space: nowrap;
-  color: currentColor; /* יורש גם הוא */
-}
-
-/* ───────────────── Misc ───────────────── */
-.link-nav {
-  width: 100%;
-}
-
-.selected-page {
-  color: rgb(255, 255, 255);
-  background-color: #00000084;
-  border-radius: 5px;
-  width: 220px;
-  color: rgb(255 120 0);
-}
-
-/* שמור על מפתח keyframes אם תרצה אנימציה עתידית */
-@keyframes colorWave {
-  0% {
-    background-position: 100% 0;
-  }
-}
-
-/* אפקט POP */
 @keyframes popAnim {
-  0%   { transform: scale(1); }
-  50%  { transform: scale(1.4); }
+  0% { transform: scale(1); }
+  50% { transform: scale(1.4); }
   100% { transform: scale(1); }
 }
-
-/* ── פלאש ירוק על הוספה — מסונכרן עם הפופ ── */
 @keyframes badgeUpFlash {
-  0% {
-    background: #ffffff;
-    color: #0f172a;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.28), 0 0 0 2px #0074cf;
-  }
-  50% {
-    background: linear-gradient(160deg, #34d399 0%, #059669 100%);
-    color: #fff;
-    box-shadow: 0 4px 14px rgba(5, 150, 105, 0.6), 0 0 0 2px #0074cf;
-  }
-  100% {
-    background: #ffffff;
-    color: #0f172a;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.28), 0 0 0 2px #0074cf;
-  }
+  0%, 100% { background: #ffffff; color: #0f172a; }
+  50% { background: linear-gradient(160deg, #34d399 0%, #059669 100%); color: #fff; box-shadow: 0 4px 14px rgba(5, 150, 105, 0.6), 0 0 0 2px var(--tb-blue-2); }
 }
-
-/* ── פלאש אדום על הורדה — מסונכרן עם הפופ ── */
 @keyframes badgeDownFlash {
-  0% {
-    background: #ffffff;
-    color: #0f172a;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.28), 0 0 0 2px #0074cf;
-  }
-  50% {
-    background: linear-gradient(160deg, #ff7b7b 0%, #e11d48 100%);
-    color: #fff;
-    box-shadow: 0 4px 14px rgba(225, 29, 72, 0.6), 0 0 0 2px #0074cf;
-  }
-  100% {
-    background: #ffffff;
-    color: #0f172a;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.28), 0 0 0 2px #0074cf;
-  }
+  0%, 100% { background: #ffffff; color: #0f172a; }
+  50% { background: linear-gradient(160deg, #ff7b7b 0%, #e11d48 100%); color: #fff; box-shadow: 0 4px 14px rgba(225, 29, 72, 0.6), 0 0 0 2px var(--tb-blue-2); }
+}
+.cart-badge.pop { animation: popAnim 0.3s ease; }
+.cart-badge.pop.cart-badge--up { animation: popAnim 0.3s ease, badgeUpFlash 0.3s ease; }
+.cart-badge.pop.cart-badge--down { animation: popAnim 0.3s ease, badgeDownFlash 0.3s ease; }
+
+/* ═══════════════════════════════════════════════════════════════════════
+   Drawer — opens from the RIGHT (RTL). Lives in #modal-root so it sits above
+   everything (the veil covers the toolbar too).
+   ═══════════════════════════════════════════════════════════════════════ */
+.drawer-root {
+  position: fixed;
+  inset: 0;
+  z-index: 10500;
+  visibility: hidden;
+  pointer-events: none;
+  transition: visibility 0s linear 0.48s;
+  font-family: "Heebo", "Open Sans", Arial, sans-serif;
+  direction: rtl;
+}
+.drawer-root.is-open {
+  visibility: visible;
+  pointer-events: auto;
+  transition-delay: 0s;
 }
 
-/* פופ בלבד — בלי כיוון */
-.cart-badge.pop {
-  animation: popAnim 0.3s ease;
+.drawer-veil {
+  position: absolute;
+  inset: 0;
+  background: rgba(8, 22, 44, 0.42);
+  -webkit-backdrop-filter: blur(6px) saturate(120%);
+  backdrop-filter: blur(6px) saturate(120%);
+  opacity: 0;
+  transition: opacity 0.36s ease;
+}
+.drawer-root.is-open .drawer-veil {
+  opacity: 1;
 }
 
-/* פופ + פלאש ירוק (גודל וצבע במקביל) */
-.cart-badge.pop.cart-badge--up {
-  animation: popAnim 0.3s ease, badgeUpFlash 0.3s ease;
+.drawer-panel {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: min(86vw, 330px);
+  display: flex;
+  flex-direction: column;
+  padding: calc(14px + env(safe-area-inset-top, 0px)) 14px calc(12px + env(safe-area-inset-bottom, 0px));
+  background:
+    radial-gradient(120% 60% at 100% 0%, rgba(96, 165, 250, 0.22) 0%, rgba(96, 165, 250, 0) 60%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.94) 0%, rgba(238, 246, 255, 0.95) 100%);
+  -webkit-backdrop-filter: blur(26px) saturate(170%);
+  backdrop-filter: blur(26px) saturate(170%);
+  border-radius: 28px 0 0 28px;
+  box-shadow:
+    -22px 0 60px rgba(8, 30, 70, 0.24),
+    inset 1px 0 0 rgba(255, 255, 255, 0.7);
+  transform: translateX(104%);
+  transition: transform 0.48s cubic-bezier(0.32, 0.72, 0, 1);
+  touch-action: pan-y; /* vertical scroll stays native; horizontal drags reach JS */
+  overflow: hidden;
+}
+/* touch-action is NOT inherited — without this the scrollable nav list
+   (touch-action: auto) lets the browser claim a horizontal swipe as a pan and
+   fire pointercancel, killing the swipe-to-close gesture. */
+.drawer-panel * {
+  touch-action: pan-y;
+}
+.drawer-root.is-open .drawer-panel {
+  transform: translateX(0);
+}
+.drawer-panel.is-dragging {
+  transition: none;
 }
 
-/* פופ + פלאש אדום */
-.cart-badge.pop.cart-badge--down {
-  animation: popAnim 0.3s ease, badgeDownFlash 0.3s ease;
+/* ── header: brand + close ── */
+.drawer-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 2px 4px 14px;
+}
+.drawer-brand {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  min-width: 0;
+}
+.drawer-brand__mark {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 15px;
+  background: linear-gradient(140deg, #4f9bff 0%, #2563eb 60%, #1d4ed8 100%);
+  color: #fff;
+  box-shadow:
+    0 8px 18px rgba(37, 99, 235, 0.35),
+    inset 0 1px 1px rgba(255, 255, 255, 0.55);
+}
+.drawer-brand__mark svg {
+  width: 24px;
+  height: 24px;
+}
+.drawer-brand__mark svg path {
+  fill: currentColor;
+}
+.drawer-brand__text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.drawer-brand__title {
+  font-size: 1.12rem;
+  font-weight: 800;
+  letter-spacing: -0.2px;
+  color: #0f172a;
+  line-height: 1.15;
+}
+.drawer-brand__sub {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #64748b;
+}
+.drawer-close {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(15, 23, 42, 0.06);
+  color: #334155;
+  font-size: 18px;
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+  -webkit-tap-highlight-color: transparent;
+  transition: background 0.15s ease, transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.drawer-close:active {
+  transform: scale(0.88) rotate(90deg);
+  background: rgba(15, 23, 42, 0.12);
+}
+
+/* ── live cart status card ── */
+.drawer-cart {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 12px;
+  margin: 0 0 10px;
+  border-radius: 18px;
+  border: 1px solid rgba(37, 99, 235, 0.14);
+  background: linear-gradient(135deg, rgba(219, 234, 254, 0.9) 0%, rgba(255, 255, 255, 0.85) 100%);
+  text-decoration: none;
+  color: inherit;
+  box-shadow: 0 6px 18px rgba(37, 99, 235, 0.1);
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease;
+}
+.drawer-cart:active {
+  transform: scale(0.98);
+}
+.drawer-cart__icon {
+  position: relative;
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 14px;
+  background: #fff;
+  color: #2563eb;
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.16);
+}
+.drawer-cart__icon svg {
+  width: 22px;
+  height: 22px;
+}
+.drawer-cart__icon svg path {
+  fill: currentColor;
+}
+.drawer-cart__count {
+  position: absolute;
+  top: -6px;
+  left: -6px;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 6px rgba(37, 99, 235, 0.4);
+}
+.drawer-cart__text {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+.drawer-cart__title {
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: #0f172a;
+}
+.drawer-cart__meta {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #475569;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.drawer-cart__chev {
+  flex: 0 0 auto;
+  color: #94a3b8;
+  font-size: 18px;
+  display: inline-flex;
+}
+
+/* ── navigation ── */
+.drawer-nav {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  padding: 2px 0 6px;
+  scrollbar-width: none;
+}
+.drawer-nav::-webkit-scrollbar {
+  display: none;
+}
+.drawer-group + .drawer-group {
+  margin-top: 8px;
+}
+.drawer-group__title {
+  padding: 8px 10px 5px;
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  color: #94a3b8;
+}
+.drawer-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.drawer-item {
+  --tone-bg: rgba(96, 165, 250, 0.2);
+  --tone-fg: #2563eb;
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 52px;
+  padding: 7px 10px 7px 8px;
+  border-radius: 15px;
+  color: #0f172a;
+  text-decoration: none;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    background 0.18s ease,
+    transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.drawer-item:active {
+  transform: scale(0.975);
+  background: rgba(15, 23, 42, 0.05);
+}
+.drawer-item.is-active {
+  background: rgba(37, 99, 235, 0.1);
+}
+/* active indicator — a soft pill on the right edge (the row's start) */
+.drawer-item::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: 0;
+  width: 4px;
+  height: 0;
+  border-radius: 999px;
+  background: #2563eb;
+  transform: translateY(-50%);
+  transition: height 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.drawer-item.is-active::before {
+  height: 26px;
+}
+
+.drawer-item__icon {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  background: var(--tone-bg);
+  color: var(--tone-fg);
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.6);
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.drawer-item:active .drawer-item__icon {
+  transform: scale(0.92);
+}
+.drawer-item__icon svg {
+  width: 20px;
+  height: 20px;
+  fill: currentColor;
+}
+.drawer-item__icon svg path,
+.drawer-item__icon svg circle,
+.drawer-item__icon svg rect,
+.drawer-item__icon svg polygon {
+  fill: currentColor;
+}
+.drawer-item__icon--stroke svg {
+  fill: none;
+}
+.drawer-item__icon--stroke svg * {
+  fill: none !important;
+  stroke: currentColor;
+}
+.drawer-item__text {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+.drawer-item__label {
+  font-size: 0.98rem;
+  font-weight: 700;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.drawer-item.is-active .drawer-item__label {
+  color: #1d4ed8;
+}
+.drawer-item__hint {
+  font-size: 0.74rem;
+  font-weight: 500;
+  color: #64748b;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.drawer-item__badge {
+  flex: 0 0 auto;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 800;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.drawer-item__chev {
+  flex: 0 0 auto;
+  display: inline-flex;
+  color: #cbd5e1;
+  font-size: 16px;
+  transition: transform 0.2s ease, color 0.2s ease;
+}
+.drawer-item.is-active .drawer-item__chev {
+  color: #60a5fa;
+}
+
+/* hues — the home-page tile palette */
+.drawer-item--blue   { --tone-bg: rgba(96, 165, 250, 0.22);  --tone-fg: #2563eb; }
+.drawer-item--sky    { --tone-bg: rgba(56, 189, 248, 0.22);  --tone-fg: #0284c7; }
+.drawer-item--green  { --tone-bg: rgba(74, 222, 128, 0.25);  --tone-fg: #16a34a; }
+.drawer-item--teal   { --tone-bg: rgba(45, 212, 191, 0.25);  --tone-fg: #0d9488; }
+.drawer-item--amber  { --tone-bg: rgba(251, 191, 36, 0.25);  --tone-fg: #d97706; }
+.drawer-item--pink   { --tone-bg: rgba(244, 114, 182, 0.25); --tone-fg: #db2777; }
+.drawer-item--violet { --tone-bg: rgba(167, 139, 250, 0.25); --tone-fg: #7c3aed; }
+.drawer-item--slate  { --tone-bg: rgba(148, 163, 184, 0.25); --tone-fg: #475569; }
+.drawer-item--indigo { --tone-bg: rgba(129, 140, 248, 0.25); --tone-fg: #4f46e5; }
+
+/* ── footer ── */
+.drawer-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 10px 4px 0;
+  border-top: 1px solid rgba(15, 23, 42, 0.07);
+}
+.drawer-foot__settings {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 40px;
+  padding: 0 14px 0 12px;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.06);
+  color: #0f172a;
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+  -webkit-tap-highlight-color: transparent;
+  transition: background 0.15s ease, transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.drawer-foot__settings svg {
+  font-size: 18px;
+}
+.drawer-foot__settings:active {
+  transform: scale(0.95);
+  background: rgba(15, 23, 42, 0.12);
+}
+.drawer-foot__version {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #94a3b8;
+  direction: ltr;
+}
+
+/* ── staggered entrance of the rows every time the drawer opens ── */
+@keyframes drawerItemIn {
+  from {
+    opacity: 0;
+    transform: translateX(-14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+/* fill-mode `backwards`: hidden until its turn, then back to normal styles
+   (so :active / .is-active transforms keep working after the entrance) */
+.drawer-root.is-open .drawer-cart,
+.drawer-root.is-open .drawer-item {
+  animation: drawerItemIn 0.46s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+  animation-delay: calc(90ms + var(--i, 0) * 26ms);
+}
+/* while the user is dragging, rows must not replay */
+.drawer-panel.is-dragging .drawer-cart,
+.drawer-panel.is-dragging .drawer-item {
+  animation: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .drawer-panel,
+  .drawer-veil,
+  .tb-menu__bars span,
+  .drawer-item,
+  .drawer-cart {
+    transition: none;
+    animation: none;
+  }
 }
