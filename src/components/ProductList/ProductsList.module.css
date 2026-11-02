@@ -28,6 +28,46 @@
   --offset-top: 100px;
 }
 
+/* ── Page entrance ─────────────────────────────────────────────────
+   Plays once per visit: ProductList.js keeps `.list__entering` on the page
+   root for ~1.2s after the shelf renders. The navigation bars drop in from
+   above (CategoryNavigation.css / SubCategoryNavigation.css) and the first
+   screenful of cards rises in a stagger — the same beat as the home page's
+   cards. Only the first 16 cards animate (the rest are below the fold), the
+   stagger index comes from the card's inline `--i`. A card that is being
+   flashed by the shelf navigation skips the entrance (one `animation` per
+   element — the flash must win). */
+@keyframes shelfCardIn {
+  from {
+    opacity: 0;
+    transform: translateY(22px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.list__entering .list__products-container {
+  /* the rising cards must not open a transient scrollbar on the container */
+  overflow-y: hidden;
+}
+
+.list__entering
+  .list__product-card:nth-child(-n + 16):not(:global(.shelf-target-flash)) {
+  /* `backwards`: the from-state holds during the delay; once done the card
+     is back on its plain styles (no lingering transform/opacity) */
+  animation: shelfCardIn 0.42s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+  animation-delay: calc(90ms + var(--i, 0) * 40ms);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .list__entering
+    .list__product-card:nth-child(-n + 16):not(:global(.shelf-target-flash)) {
+    animation: none;
+  }
+}
+
 /* כרטיס מוצר - Glowing Glass */
 .list__product-card {
   position: relative;

@@ -38,6 +38,12 @@ import { prefetchProductImages, whenIdle } from "../../utils/productImages";
 /* כמה כרטיסים ראשונים טוענים תמונה מיד (המסך הראשון ברשימה/ברשת);
    השאר נטענים lazy כשמתקרבים אליהם בגלילה. */
 const EAGER_IMAGE_COUNT = 8;
+/* Page entrance (same beat as the home page): the navigation bars drop in
+   and the first screenful of cards rises in a stagger. The `list__entering`
+   class that drives it (ProductsList.module.css) lives this long after the
+   shelf renders, so later re-renders (subcategory swipes) don't replay it. */
+const ENTRANCE_MS = 1200;
+const ENTRANCE_STAGGER_MAX = 15; // cards beyond this share the last delay
 
 export const convertWeightUnit = (weightUnit) => {
   if (!weightUnit) return "";
@@ -158,6 +164,16 @@ function ProductsList() {
   /* כאן נשמור את ה-inline style שנחיל על ה-container (כדי ליצור אנימציות) */
   const [containerStyle, setContainerStyle] = useState({});
 
+  /* אנימציית הכניסה לעמוד — פעילה רק בשנייה הראשונה אחרי שהמדף מוצג */
+  const [entering, setEntering] = useState(true);
+  const enteringRef = useRef(true);
+  enteringRef.current = entering;
+  useEffect(() => {
+    if (isLoadingProducts) return undefined;
+    const timer = setTimeout(() => setEntering(false), ENTRANCE_MS);
+    return () => clearTimeout(timer);
+  }, [isLoadingProducts]);
+
   /* refs לזיהוי כיוון Swipe */
   const startTouch = useRef({ x: 0, y: 0 });
   const swipeDirection = useRef(null);
@@ -182,6 +198,9 @@ function ProductsList() {
   const handleTouchStart = (event) => {
     swipeDirection.current = null;
     setContainerStyle({});
+    // a touch during the entrance ends it — nothing should still be
+    // drifting in while the user scrolls or swipes
+    if (enteringRef.current) setEntering(false);
     const touch = event.touches[0];
     startTouch.current = { x: touch.clientX, y: touch.clientY };
   };
@@ -558,7 +577,14 @@ function ProductsList() {
         })()}
       </div>
 
-      <div className={styles['list__product-list']}>
+      <div
+        className={[
+          styles['list__product-list'],
+          entering && styles['list__entering'],
+        ]
+          .filter(Boolean)
+          .join(" ")}
+      >
         {/* ניווט הקטגוריות */}
         <CategoryNavigation />
         {/* ניווט תתי־קטגוריות */}
@@ -604,6 +630,10 @@ function ProductsList() {
                   priceUnavailable ? styles['list__product-card--unavailable'] : ''
                 }`}
                 key={product.barcode}
+                /* entrance stagger index (ProductsList.module.css) */
+                style={{
+                  "--i": Math.min(productIndex, ENTRANCE_STAGGER_MAX),
+                }}
               >
                 {product.discount && (
                   <div className={styles['list__product-badge']}>מבצע</div>
