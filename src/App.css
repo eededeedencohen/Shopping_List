@@ -35,6 +35,18 @@
   /* padding-bottom: var(--bottom-nav-space); */
 }
 
+/* The bottom bar's wave dips into this row (see --dock-overlap): the bar
+   overlaps the LAST --dock-overlap px of the scroll area. Every page root
+   gets that much TRANSPARENT bottom border: with the global border-box
+   sizing the page's content area still ends at the bar's straight edge
+   (nothing hides under the bar; height:100% pages are unaffected), while the
+   page's BACKGROUND keeps painting under the border — so the wave's dip shows
+   the real page, not the app backdrop. A transparent border (not padding /
+   margin) is what makes both true at once. */
+.App .app-scroll > * {
+  border-bottom: var(--dock-overlap, 0px) solid transparent;
+}
+
 .App::before {
   content: "";
   position: fixed; /* קבוע למסך, לא לתוכן */

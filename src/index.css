@@ -8,6 +8,14 @@
      page content can never slide under it). Keep in sync with BottomNav.css
      --nav-bar-h. Used to lift any page-level fixed elements above the bar. */
   --bottom-nav-h: 58px;
+  /* The bottom bar's top edge is a WAVE that dips around the robot. The
+     scroll area extends this far UNDER the bar (the nav's grid row is that
+     much shorter than the painted bar), so the dip shows the page itself —
+     content, background, everything — instead of the app's backdrop. Must
+     be ≥ the deepest point of the wave (see BottomNav/useDockShape.js:
+     F_IDLE 52 → 33.6px). Page roots get this much transparent bottom border
+     (App.css) so their content still clears the bar. */
+  --dock-overlap: 34px;
   /* The robot circle peeks ~14px above the bar. The single scroll area
      (.app-scroll) reserves this much at its bottom edge so the last content
      clears the peeking circle. */

@@ -35,15 +35,24 @@
   width: 100%;
   z-index: 50;
   direction: ltr;
-  height: calc(var(--nav-bar-h) + env(safe-area-inset-bottom, 0px));
+  /* The grid row is SHORTER than the painted bar by --dock-overlap: the bar
+     overflows upward over the scroll area, so the wave's dip shows the page
+     scrolling underneath (index.css / App.css explain the pairing). The
+     bar's straight top edge still sits exactly --bottom-nav-h above the
+     viewport bottom, so every page's fixed bottom element stays put. */
+  height: calc(var(--nav-bar-h) - var(--dock-overlap, 0px) + env(safe-area-inset-bottom, 0px));
 }
 
-/* The blue bar fills the WHOLE grid row; its top edge dips into the cradle
-   around the coin (clip-path set by useDockShape). The sheen follows the
-   wave because the clip cuts the gradient background. */
+/* The blue bar: anchored to the bottom, taller than the row (see above);
+   its top edge dips into the cradle around the coin (clip-path set by
+   useDockShape). The sheen follows the wave because the clip cuts the
+   gradient background. */
 .bottom-nav__bar {
   position: absolute;
-  inset: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: calc(var(--nav-bar-h) + env(safe-area-inset-bottom, 0px));
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0) 45%),
     linear-gradient(180deg, var(--bar-1) 0%, var(--bar-2) 100%);
@@ -56,7 +65,10 @@
    bar and under the waves/coin. */
 .bottom-nav__voicebg {
   position: absolute;
-  inset: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: calc(var(--nav-bar-h) + env(safe-area-inset-bottom, 0px));
   background:
     radial-gradient(
       circle calc(var(--fab) * 1.9) at 50% 100%,

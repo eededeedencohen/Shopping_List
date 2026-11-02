@@ -14,7 +14,7 @@ import { useLayoutEffect, useRef } from "react";
    straight into the two shape elements' inline style (no React re-render
    per frame). Coordinates: element box, y down, the bar's top edge at y=0,
    the coin centre at (width/2, COIN_CY). */
-export const F_IDLE = 52;
+export const F_IDLE = 52; // dip at the coin's edge ≈ 33.6px — keep ≤ --dock-overlap (index.css)
 export const F_ACTIVE = 20;
 const COIN_CY = 23; // = nav-bar-h - 3 - fab/2 (see BottomNav.css)
 const R = 30; // concave arc radius — must stay < the 32px coin radius
