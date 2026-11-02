@@ -23,17 +23,12 @@
   --vlevel: 0; /* live voice amplitude 0..1 (set by VoiceWaves) — coin + waves */
 
   /* ── The CRADLE: the bar's top edge is a WAVE, not a punched hole ──
-     Straight edge → convex shoulder (r=20) → concave arc hugging the coin
-     (r=30, i.e. 2px INSIDE the 32px coin, so the arc itself is always hidden
-     behind the coin and no see-through gap ever appears) → shoulder → edge.
-     Geometry in a 240×58 strip centred on the coin (coin centre at 120,23):
-       shoulders start at x = 120 ± 49.9 (tangent to the edge, centre y=20),
-       meet the coin arc at (120 ± 29.94, 21.2) — the edge dips ~21px there.
-     Used as a MASK: the strip's SVG for the top 58px + plain rectangles for
-     the sides and the safe-area below. Keep the two mask copies (bar,
-     voicebg) identical. */
-  --cradle-w: 240px;
-  --cradle: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 58'%3E%3Cpath fill='black' d='M0,0 H70.1 A20,20 0 0 1 90.06,21.2 A30,30 0 1 0 149.94,21.2 A20,20 0 0 1 169.9,0 H240 V58 H0 Z'/%3E%3C/svg%3E");
+     Straight edge → convex shoulders → concave arc hugging the coin (r=30,
+     i.e. 2px INSIDE the 32px coin, so the arc is always hidden behind it and
+     no see-through gap ever appears) → shoulder → edge. The shape is a live
+     `clip-path: path()` written by useDockShape.js onto .bottom-nav__bar and
+     .bottom-nav__voicebg: WIDE shoulders while idle, TIGHT ones (animated)
+     in the voice modes. Geometry constants live in that file. */
 
   position: relative;
   flex: 0 0 auto;
@@ -44,31 +39,21 @@
 }
 
 /* The blue bar fills the WHOLE grid row; its top edge dips into the cradle
-   around the coin. The sheen follows the wave because the mask clips the
-   gradient background. */
+   around the coin (clip-path set by useDockShape). The sheen follows the
+   wave because the clip cuts the gradient background. */
 .bottom-nav__bar {
   position: absolute;
   inset: 0;
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0) 45%),
     linear-gradient(180deg, var(--bar-1) 0%, var(--bar-2) 100%);
-  -webkit-mask:
-    linear-gradient(#000, #000) left top / calc(50% - var(--cradle-w) / 2) 100% no-repeat,
-    linear-gradient(#000, #000) right top / calc(50% - var(--cradle-w) / 2) 100% no-repeat,
-    var(--cradle) center top / var(--cradle-w) var(--nav-bar-h) no-repeat,
-    linear-gradient(#000, #000) center bottom / var(--cradle-w) calc(100% - var(--nav-bar-h)) no-repeat;
-  mask:
-    linear-gradient(#000, #000) left top / calc(50% - var(--cradle-w) / 2) 100% no-repeat,
-    linear-gradient(#000, #000) right top / calc(50% - var(--cradle-w) / 2) 100% no-repeat,
-    var(--cradle) center top / var(--cradle-w) var(--nav-bar-h) no-repeat,
-    linear-gradient(#000, #000) center bottom / var(--cradle-w) calc(100% - var(--nav-bar-h)) no-repeat;
 }
 
 /* ── Voice-active backdrop ──────────────────────────────────────────
    While the voice engine is active, a DARK backdrop (with a mode-coloured glow
    rising from the coin) crossfades over the blue bar so the waves + coin pop.
-   A SEPARATE sibling with the SAME cradle mask, painted over the blue bar and
-   under the waves/coin. */
+   A SEPARATE sibling carrying the SAME live clip-path, painted over the blue
+   bar and under the waves/coin. */
 .bottom-nav__voicebg {
   position: absolute;
   inset: 0;
@@ -79,16 +64,6 @@
       rgba(var(--bar-accent, 56, 189, 248), 0) 64%
     ),
     linear-gradient(180deg, #152455 0%, #080f24 100%);
-  -webkit-mask:
-    linear-gradient(#000, #000) left top / calc(50% - var(--cradle-w) / 2) 100% no-repeat,
-    linear-gradient(#000, #000) right top / calc(50% - var(--cradle-w) / 2) 100% no-repeat,
-    var(--cradle) center top / var(--cradle-w) var(--nav-bar-h) no-repeat,
-    linear-gradient(#000, #000) center bottom / var(--cradle-w) calc(100% - var(--nav-bar-h)) no-repeat;
-  mask:
-    linear-gradient(#000, #000) left top / calc(50% - var(--cradle-w) / 2) 100% no-repeat,
-    linear-gradient(#000, #000) right top / calc(50% - var(--cradle-w) / 2) 100% no-repeat,
-    var(--cradle) center top / var(--cradle-w) var(--nav-bar-h) no-repeat,
-    linear-gradient(#000, #000) center bottom / var(--cradle-w) calc(100% - var(--nav-bar-h)) no-repeat;
   opacity: 0;
   transition: opacity 0.4s ease;
   pointer-events: none;

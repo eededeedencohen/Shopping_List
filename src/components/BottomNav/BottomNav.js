@@ -11,6 +11,7 @@ import "./BottomNav.css";
 import useBodyScrollLock from "../../hooks/useBodyScrollLock";
 import useVoiceCommand from "../../hooks/useVoiceCommand";
 import VoiceWaves from "./VoiceWaves";
+import useDockShape from "./useDockShape";
 import CartOptimizeOverlay from "../CartOptimizeOverlay/CartOptimizeOverlay";
 import SupermarketPickerSheet from "./SupermarketPickerSheet";
 import {
@@ -1592,6 +1593,14 @@ export default function BottomNav() {
   );
 
   const recording = voiceMode === "recording";
+
+  /* the dock's wave edge: wide while idle, tightens around the robot (with
+     a small overshoot) the moment a voice mode starts — see useDockShape */
+  const navRef = useRef(null);
+  const barRef = useRef(null);
+  const voicebgRef = useRef(null);
+  useDockShape(navRef, [barRef, voicebgRef], voiceMode !== "idle");
+
   /* status chip above the bar: text + which icon / colour family */
   const hint =
     voiceState === "starting"
@@ -2283,9 +2292,10 @@ export default function BottomNav() {
             : ""
         }`}
         aria-label="סרגל תחתון"
+        ref={navRef}
       >
-        <div className="bottom-nav__bar" aria-hidden="true" />
-        <div className="bottom-nav__voicebg" aria-hidden="true" />
+        <div className="bottom-nav__bar" aria-hidden="true" ref={barRef} />
+        <div className="bottom-nav__voicebg" aria-hidden="true" ref={voicebgRef} />
         {hint && (
           <div
             className={`voice-hint voice-hint--${hint.kind}`}
