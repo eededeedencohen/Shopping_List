@@ -1,6 +1,21 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { DOMAIN } from "../constants";
 import { isHushPhrase } from "../utils/hushPhrase";
+import {
+  startAiSession,
+  endAiSession,
+  reportAiTurn,
+} from "../services/aiSessionService";
+import { BUILD_VERSION } from "../buildInfo";
+
+/* ── Research log (AiSession) ───────────────────────────────────
+   Every chat with the robot is logged on the server (text only — never the
+   audio) so it can be reviewed ✓/✗ later. A SESSION spans from the moment the
+   robot is turned on until it is turned off:
+     • hands-free: double-tap → single tap (or the page going away)
+     • single-shot: a run of long-press commands; closed after this much
+       silence (mirrors the server's conversation-context TTL) */
+const SINGLE_SESSION_IDLE_MS = 90 * 1000;
 
 /* Conversation history is OWNED BY THE SERVER (a single JSON file). This hook
    only DRIVES it: after a command resolves it tells the server to clear the file
@@ -124,6 +139,11 @@ export default function useVoiceCommand({
   const levelRef = useRef(0);
   const modeRef = useRef("idle");
 
+  // research log: the open session + the turn whose reply is playing
+  const sessionRef = useRef({ id: null, mode: null, promise: null });
+  const lastTurnRef = useRef(null); // { sessionId, turnId }
+  const singleIdleTimerRef = useRef(null);
+
   // latest config/handler (avoid stale closures inside async callbacks)
   const cfgRef = useRef({});
   cfgRef.current = {
@@ -191,6 +211,57 @@ export default function useVoiceCommand({
     const target = Math.min(value / LEVEL_DIVISOR, 1);
     levelRef.current += (target - levelRef.current) * LEVEL_SMOOTH;
   };
+
+  /* ── Research log: session lifecycle ── */
+  const closeSession = useCallback((reason) => {
+    clearTimeout(singleIdleTimerRef.current);
+    singleIdleTimerRef.current = null;
+    const s = sessionRef.current;
+    const id = s.id;
+    sessionRef.current = { id: null, mode: null, promise: null };
+    lastTurnRef.current = null;
+    if (id) endAiSession(id, reason);
+  }, []);
+
+  /* the open session's id for `mode` — opening one (once) if needed; a
+     mode switch (a long-press session, then a double-tap) closes the old one */
+  const ensureSession = useCallback(
+    async (mode) => {
+      const s = sessionRef.current;
+      if (s.id && s.mode === mode) return s.id;
+      if (s.promise && s.mode === mode) return s.promise;
+      if (s.id || s.promise) closeSession("user");
+      const cfg = cfgRef.current;
+      const promise = startAiSession({
+        mode,
+        version: BUILD_VERSION,
+        ttsLanguage: cfg.ttsLanguage || "he",
+        ttsVoice: cfg.ttsVoice || "",
+      }).then((id) => {
+        if (sessionRef.current.promise === promise) {
+          sessionRef.current = { id, mode, promise: null };
+        }
+        return id;
+      });
+      sessionRef.current = { id: null, mode, promise };
+      return promise;
+    },
+    [closeSession]
+  );
+
+  /* a single-shot session stays open while commands keep coming */
+  const touchSingleSession = useCallback(() => {
+    clearTimeout(singleIdleTimerRef.current);
+    singleIdleTimerRef.current = setTimeout(() => {
+      if (sessionRef.current.mode === "single") closeSession("idle");
+    }, SINGLE_SESSION_IDLE_MS);
+  }, [closeSession]);
+
+  /* the user cut the robot off (tap / barge-in) → mark the turn */
+  const markInterrupted = useCallback(() => {
+    const t = lastTurnRef.current;
+    if (t) reportAiTurn(t.sessionId, t.turnId, { interrupted: true });
+  }, []);
 
   /* Persist the conversation outcome to the server-owned history file. */
   const persistHistory = useCallback((body) => {
@@ -363,9 +434,18 @@ export default function useVoiceCommand({
         refreshMode();
       }
 
+      /* the research-log session this utterance belongs to */
+      let sessionId = null;
+      try {
+        sessionId = await ensureSession(isHandsFree ? "handsfree" : "single");
+      } catch (e) {
+        sessionId = null;
+      }
+
       const cfg = cfgRef.current;
       const fd = new FormData();
       fd.append("file", new File([blob], `voice.${ext}`, { type: mime }));
+      if (sessionId) fd.append("sessionId", sessionId);
       fd.append(
         "context",
         JSON.stringify({
@@ -400,6 +480,24 @@ export default function useVoiceCommand({
           json.command = { actionType: "hush", speech: "" };
         }
 
+        /* the server logged this utterance as a turn; if it had to open a
+           fresh session (ours was unknown / already closed) adopt that one */
+        if (json.sessionId && json.turnId) {
+          if (json.sessionId !== sessionRef.current.id) {
+            sessionRef.current = {
+              id: json.sessionId,
+              mode: isHandsFree ? "handsfree" : "single",
+              promise: null,
+            };
+          }
+          lastTurnRef.current = {
+            sessionId: json.sessionId,
+            turnId: json.turnId,
+          };
+        }
+        const pageRoute =
+          typeof window !== "undefined" ? window.location.pathname : "";
+
         if (json.audioUrl) {
           await playReply(`${DOMAIN}/${json.audioUrl}`);
         }
@@ -408,14 +506,39 @@ export default function useVoiceCommand({
         // JSON: "clear" (succeeded), "append" (show_cheapest → record the list),
         // or "keep" (failed / not understood → leave context for a retry).
         let directive = { history: "keep" };
+        let handlerFailed = false;
         if (json.command && typeof cfg.onCommand === "function") {
           try {
             const r = await cfg.onCommand(json.command, json.transcript);
             if (r && r.history) directive = r;
           } catch (e) {
-            /* ignore handler errors */
+            handlerFailed = true;
           }
         }
+
+        /* research log: what actually happened with the command */
+        if (json.sessionId && json.turnId) {
+          const action = (json.command && json.command.actionType) || "none";
+          const status = handlerFailed
+            ? "failed"
+            : directive.outcome ||
+              (action === "hush"
+                ? "silent"
+                : action === "none"
+                ? "not_understood"
+                : directive.history === "keep"
+                ? "ignored"
+                : "done");
+          reportAiTurn(json.sessionId, json.turnId, {
+            outcome: {
+              status,
+              detail: directive.detail || directive.summary || "",
+              history: directive.history,
+            },
+            pageRoute,
+          });
+        }
+        if (!isHandsFree) touchSingleSession();
 
         const transcript = (json.transcript || "").trim();
         if (directive.history === "clear") {
@@ -443,7 +566,14 @@ export default function useVoiceCommand({
         }
       }
     },
-    [setPhase, persistHistory, playReply, refreshMode]
+    [
+      setPhase,
+      persistHistory,
+      playReply,
+      refreshMode,
+      ensureSession,
+      touchSingleSession,
+    ]
   );
 
   /* ── Mic analyser: feeds the waves, and (hands-free) the VAD loop ── */
@@ -574,6 +704,7 @@ export default function useVoiceCommand({
                 stopReply(); // hush — the 'pause' event finishes the bookkeeping
                 levelRef.current = 0;
                 refreshMode(); // → "listening" at once
+                markInterrupted();
               }
             } else {
               loudSinceRef.current = null;
@@ -608,7 +739,7 @@ export default function useVoiceCommand({
           micRafRef.current = requestAnimationFrame(loop);
         });
     },
-    [ensureCtx, refreshMode, sendBlob, stopReply]
+    [ensureCtx, refreshMode, sendBlob, stopReply, markInterrupted]
   );
 
   /* ── Single-shot recording (long-press) ── */
@@ -734,7 +865,8 @@ export default function useVoiceCommand({
     quietSinceRef.current = null;
     refreshMode();
     startMicAnalyser(stream, true); // VAD on
-  }, [refreshMode, startMicAnalyser]);
+    ensureSession("handsfree"); // the chat starts now (robot turned on)
+  }, [refreshMode, startMicAnalyser, ensureSession]);
 
   const stopHandsFree = useCallback(() => {
     handsFreeRef.current = false;
@@ -758,7 +890,8 @@ export default function useVoiceCommand({
     releaseStream();
     levelRef.current = 0;
     refreshMode();
-  }, [stopMicAnalyser, stopReply, releaseStream, refreshMode]);
+    closeSession("user"); // the chat ends here (robot turned off)
+  }, [stopMicAnalyser, stopReply, releaseStream, refreshMode, closeSession]);
 
   /* ── "Hush": cut the AI's speech RIGHT NOW ──
      Tap-to-interrupt. Stops the TTS element (its 'pause' event runs
@@ -777,8 +910,9 @@ export default function useVoiceCommand({
     stopReply();
     levelRef.current = 0;
     refreshMode();
+    markInterrupted();
     return true;
-  }, [stopReply, refreshMode]);
+  }, [stopReply, refreshMode, markInterrupted]);
 
   /* Explicit "reset the conversation" action (also exposed to the caller). */
   const clearHistory = useCallback(
@@ -807,10 +941,18 @@ export default function useVoiceCommand({
       const msg = (text || "").trim();
       if (!msg) return;
       try {
+        /* name the turn this line belongs to → logged as its follow-up */
+        const t = lastTurnRef.current || {};
         const res = await fetch(`${DOMAIN}/api/v1/general-ai/speak`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ text: msg, ttsLanguage, ttsVoice }),
+          body: JSON.stringify({
+            text: msg,
+            ttsLanguage,
+            ttsVoice,
+            sessionId: t.sessionId || undefined,
+            turnId: t.turnId || undefined,
+          }),
         });
         const json = await res.json();
         if (json && json.audioUrl) {
@@ -830,9 +972,19 @@ export default function useVoiceCommand({
     return () => clearTimeout(t);
   }, [error]);
 
+  // the page going away (tab closed, phone locked long enough) ends the chat
+  useEffect(() => {
+    const onHide = () => {
+      if (sessionRef.current.id) closeSession("unload");
+    };
+    window.addEventListener("pagehide", onHide);
+    return () => window.removeEventListener("pagehide", onHide);
+  }, [closeSession]);
+
   // cleanup on unmount
   useEffect(
     () => () => {
+      closeSession("unload");
       try {
         if (
           mediaRecorderRef.current &&
@@ -861,7 +1013,7 @@ export default function useVoiceCommand({
         /* ignore */
       }
     },
-    []
+    [closeSession]
   );
 
   return {

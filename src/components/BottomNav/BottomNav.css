@@ -851,6 +851,7 @@
 .ai-sheet__item--pink   { --tone-bg: rgba(244, 114, 182, 0.25); --tone-fg: #db2777; }
 .ai-sheet__item--violet { --tone-bg: rgba(167, 139, 250, 0.25); --tone-fg: #7c3aed; }
 .ai-sheet__item--slate  { --tone-bg: rgba(148, 163, 184, 0.25); --tone-fg: #475569; }
+.ai-sheet__item--indigo { --tone-bg: rgba(129, 140, 248, 0.25); --tone-fg: #4f46e5; }
 
 /* Products view: sub-categories grouped under their category heading. */
 .ai-sheet__groups {

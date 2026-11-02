@@ -42,6 +42,17 @@ export const IconChevron = (props) => (
   </svg>
 );
 
+/* FILLED clipboard-with-check — the AI research log (drawer + bottom-nav
+   navigation lists both paint icons with fill: currentColor) */
+export const IconResearch = (props) => (
+  <svg viewBox="0 0 24 24" width="1em" height="1em" aria-hidden="true" {...props}>
+    <path
+      fill="currentColor"
+      d="M9 2a2 2 0 0 0-2 2H6a3 3 0 0 0-3 3v12a3 3 0 0 0 3 3h12a3 3 0 0 0 3-3V7a3 3 0 0 0-3-3h-1a2 2 0 0 0-2-2H9zm0 2h6v2H9V4zm7.7 7.3a1 1 0 0 1 0 1.4l-5 5a1 1 0 0 1-1.4 0l-2.5-2.5a1 1 0 1 1 1.4-1.4L11 15.6l4.3-4.3a1 1 0 0 1 1.4 0z"
+    />
+  </svg>
+);
+
 /* a tiny server/stack glyph for the developer "products (server)" page */
 export const IconServer = (props) => (
   <svg {...base} {...props}>

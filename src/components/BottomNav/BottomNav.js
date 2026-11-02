@@ -44,6 +44,7 @@ import { ReactComponent as ReceiptIcon } from "../Toolbar/wishlist.svg";
 import { ReactComponent as PieChartIcon } from "../Toolbar/pie-chart.svg";
 import { ReactComponent as BarcodeIcon } from "../Toolbar/barcode.svg";
 import { IconClose, IconChevronLeft, IconChevronRight } from "../Icons/UiIcons";
+import { IconResearch } from "../Toolbar/ToolbarIcons";
 import {
   IconCompass,
   IconGrid,
@@ -182,6 +183,7 @@ const NAV_ITEMS = [
   { to: "/advanced-stats", label: "סטטיסטיקות", Icon: PieChartIcon, tone: "pink" },
   { to: "/barcode-scanner", label: "סורק ברקוד", Icon: BarcodeIcon, tone: "slate" },
   { to: "/ai", label: "עוזר AI", Icon: RobotIcon, tone: "teal" },
+  { to: "/ai-history", label: "מחקר AI", Icon: IconResearch, tone: "indigo" },
 ];
 
 /* sheet exit animation length (ms) — keep in sync with BottomNav.css */
@@ -885,7 +887,9 @@ export default function BottomNav() {
        • { history: "append", summary } — show_cheapest succeeded → keep + record
                                           the list so the follow-up can resolve.
        • { history: "keep" }            — failed / not understood → leave as-is
-                                          (so the user can retry with context). */
+                                          (so the user can retry with context).
+     Optional `detail` (what happened, in words) and `outcome` (a status that
+     overrides the one derived from `history`) go to the research log. */
   const performCommand = async (cmd, transcript) => {
     // Voice → optimize the cart ("תחליף לי את המוצרים למשתלמים יותר", "תהפוך את
     // העגלה לאופטימלית", "תייעל את העגלה"). Primary path is the server intent
@@ -906,7 +910,13 @@ export default function BottomNav() {
       /אופטימ|ייעל|משתלמ|תחליף.*מוצר|מוצר.*(משתלמ|זול)/.test(t);
     if (optimizeIntent) {
       startOptimize(true);
-      return { history: "clear" };
+      return {
+        history: "clear",
+        detail:
+          cmd && cmd.actionType === "optimize_cart"
+            ? "ייעול העגלה נפתח"
+            : "ייעול העגלה נפתח (זוהה לפי מילות מפתח בתמלול)",
+      };
     }
 
     if (!cmd) return { history: "keep" };
@@ -924,8 +934,12 @@ export default function BottomNav() {
     switch (cmd.actionType) {
       case "navigate": {
         if (!cmd.route) return { history: "keep" };
+        const page = NAV_ITEMS.find((n) => n.to === cmd.route);
         goTo(cmd.route);
-        return { history: "clear" };
+        return {
+          history: "clear",
+          detail: `ניווט אל ${page ? page.label : cmd.route}`,
+        };
       }
 
       case "open_subcategory": {
@@ -935,7 +949,15 @@ export default function BottomNav() {
         )
           return { history: "keep" };
         goToSubCategory(cmd.categoryIndex, cmd.subIndex);
-        return { history: "clear" };
+        return {
+          history: "clear",
+          detail: `נפתחה תת-קטגוריה: ${
+            allCategories[cmd.categoryIndex] || cmd.categoryIndex
+          } › ${
+            (all_sub_categories[cmd.categoryIndex] || [])[cmd.subIndex] ||
+            cmd.subIndex
+          }`,
+        };
       }
 
       case "find_product": {
@@ -943,15 +965,27 @@ export default function BottomNav() {
            catalog we sent, so an exact match is expected here. goToShelf also
            opens the shelf session that enables a follow-up add_product. */
         const target = shelfTargets.find((t) => t.name === cmd.productName);
-        if (!target) return { history: "keep" };
+        if (!target) {
+          return {
+            history: "keep",
+            outcome: "failed",
+            detail: `המדף "${cmd.productName}" לא נמצא ברשימת היעדים`,
+          };
+        }
         goToShelf(target);
-        return { history: "clear" };
+        return { history: "clear", detail: `גלילה למדף: ${target.name}` };
       }
 
       case "add_product": {
         /* voice command #9 — only valid inside a shelf session opened by #8.
            The server snapped productName against the session list we sent. */
-        if (!shelfSession.length) return { history: "keep" };
+        if (!shelfSession.length) {
+          return {
+            history: "keep",
+            outcome: "failed",
+            detail: "אין מדף פעיל — צריך קודם לנווט למוצר",
+          };
+        }
         const prod =
           shelfSession.find((p) => p.name === cmd.productName) ||
           shelfSession.find(
@@ -959,7 +993,13 @@ export default function BottomNav() {
               p.name.includes(cmd.productName || "") ||
               (cmd.productName || "").includes(p.name)
           );
-        if (!prod) return { history: "keep" };
+        if (!prod) {
+          return {
+            history: "keep",
+            outcome: "failed",
+            detail: `"${cmd.productName}" לא נמצא במדף הפעיל`,
+          };
+        }
         const qty =
           Number.isInteger(cmd.quantity) && cmd.quantity >= 1
             ? cmd.quantity
@@ -977,20 +1017,39 @@ export default function BottomNav() {
         clearTimeout(voiceAddTimerRef.current);
         setVoiceAdd({ barcode: prod.barcode, amount: qty, key: Date.now() });
         voiceAddTimerRef.current = setTimeout(() => setVoiceAdd(null), 3500);
-        return { history: "clear" };
+        return {
+          history: "clear",
+          detail: `נוסף לעגלה: ${prod.name} ×${qty}`,
+        };
       }
 
       case "replace_cheapest": {
         const products = (cart && cart.products) || [];
-        if (!products.length) return { history: "keep" };
+        if (!products.length) {
+          return { history: "keep", outcome: "failed", detail: "העגלה ריקה" };
+        }
         try {
           const res = await getCheapestSupermarketIDsByCart(products);
           const ids = (res && res.data && res.data.supermarketIDs) || [];
-          if (!ids.length) return { history: "keep" };
+          if (!ids.length) {
+            return {
+              history: "keep",
+              outcome: "failed",
+              detail: "לא נמצא סופר זול לעגלה",
+            };
+          }
           selectSupermarket(ids[0]);
-          return { history: "clear" };
+          const sm = supermarketLookup.get(String(ids[0])) || {};
+          return {
+            history: "clear",
+            detail: `הוחלף לסופר הזול: ${sm.name || "#" + ids[0]}`,
+          };
         } catch (e) {
-          return { history: "keep" };
+          return {
+            history: "keep",
+            outcome: "failed",
+            detail: "שגיאה בחישוב הסופר הזול",
+          };
         }
       }
 
@@ -1042,7 +1101,7 @@ export default function BottomNav() {
               ? "Your cart is empty — there's nothing to compare yet."
               : "העגלה שלך ריקה — אין עדיין מה להשוות."
           );
-          return { history: "keep" };
+          return { history: "keep", outcome: "failed", detail: "העגלה ריקה" };
         }
         let supers = [];
         if (cmd.group === "talpiot") supers = talpiotSupermarkets;
@@ -1064,11 +1123,21 @@ export default function BottomNav() {
               ? "I couldn't find those supermarkets."
               : "לא מצאתי את הסופרים המבוקשים."
           );
-          return { history: "keep" };
+          return {
+            history: "keep",
+            outcome: "failed",
+            detail: `לא נמצאו סופרים לקבוצה ${cmd.group}${
+              cmd.supermarketNames ? ` (${cmd.supermarketNames.join(", ")})` : ""
+            }`,
+          };
         }
         compareVoiceRef.current = { transcript: transcript || "" };
         startCompare(supers, true);
-        return { history: "keep" }; // the ranking is appended once it's ready
+        return {
+          history: "keep", // the ranking is appended once it's ready
+          outcome: "done",
+          detail: `השוואה נפתחה: ${cmd.group} — ${supers.length} סניפים`,
+        };
       }
 
       /* Voice action #6 — complete the cart from the user's defined list.
@@ -1087,7 +1156,12 @@ export default function BottomNav() {
         startComplete(
           cmd.strategy === "lastPurchased" ? "lastPurchased" : "cheapest"
         );
-        return { history: "clear" };
+        return {
+          history: "clear",
+          detail: `השלמת עגלה נפתחה (${
+            cmd.strategy === "lastPurchased" ? "לפי קניות קודמות" : "הזול ביותר"
+          })`,
+        };
       }
 
       /* Voice action #7 — complete the cart AND switch to the cheapest store
@@ -1127,13 +1201,24 @@ export default function BottomNav() {
           cmd.strategy === "lastPurchased" ? "lastPurchased" : "cheapest"
         );
         startCompleteCompare(supers);
-        return { history: "clear" };
+        return {
+          history: "clear",
+          detail: `השלמה ומעבר לזול נפתחו: ${cmd.group || "talpiot"} — ${
+            supers.length
+          } סניפים`,
+        };
       }
 
       /* The spoken decision after a compare ranking was presented. */
       case "apply_compare": {
         const pending = pendingCompareRef.current;
-        if (!pending || !pending.result) return { history: "keep" };
+        if (!pending || !pending.result) {
+          return {
+            history: "keep",
+            outcome: "ignored",
+            detail: "אין השוואה ממתינה להחלטה",
+          };
+        }
         const result = pending.result;
 
         if (cmd.decision === "cancel") {
@@ -1145,7 +1230,7 @@ export default function BottomNav() {
               ? "Okay, staying at the current supermarket."
               : "בסדר, נשארים בסופר הנוכחי."
           );
-          return { history: "clear" };
+          return { history: "clear", detail: "ההשוואה בוטלה — נשארנו בסופר" };
         }
 
         /* decision === "apply" — to the winner, or to a named/ranked store */
@@ -1200,7 +1285,7 @@ export default function BottomNav() {
                   result.afterTotal
                 )} שקלים.`
           );
-          return { history: "clear" };
+          return { history: "clear", detail: `הוחלף לזוכה ההשוואה: ${nm}` };
         }
 
         /* a non-winner store from the ranking → build ITS cart head-to-head
@@ -1238,7 +1323,7 @@ export default function BottomNav() {
                     single.afterTotal
                   )} שקלים.`
             );
-            return { history: "clear" };
+            return { history: "clear", detail: `הוחלף ל${target.name}` };
           }
           setComparing(false);
           speak(
@@ -1272,7 +1357,13 @@ export default function BottomNav() {
           }
         }
         // couldn't resolve → keep the list context so the user can retry
-        if (!items.length) return { history: "keep" };
+        if (!items.length) {
+          return {
+            history: "keep",
+            outcome: "failed",
+            detail: "אין רשימת סופרים לבחור ממנה",
+          };
+        }
 
         let chosen = null;
         if (
@@ -1289,10 +1380,25 @@ export default function BottomNav() {
             return nm && (nm.includes(want) || want.includes(nm));
           });
         }
-        if (!chosen) return { history: "keep" };
+        if (!chosen) {
+          return {
+            history: "keep",
+            outcome: "failed",
+            detail: `לא נמצא ברשימה: ${
+              cmd.rank != null ? `מקום ${cmd.rank}` : cmd.supermarketName || "?"
+            }`,
+          };
+        }
 
         selectSupermarket(chosen.supermarketID);
-        return { history: "clear" };
+        const chosenSm =
+          supermarketLookup.get(String(chosen.supermarketID)) || {};
+        return {
+          history: "clear",
+          detail: `נבחר מהרשימה: ${
+            chosenSm.name || "#" + chosen.supermarketID
+          }`,
+        };
       }
 
       default:
