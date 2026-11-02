@@ -158,7 +158,7 @@ const OptimalProductRow = ({
       <div className="opr-actions">
         {isMissing ? (
           <>
-            <span className="opr-miss-hint">בחרו חלופה זמינה בסופר —</span>
+            <span className="opr-miss-hint">בחרו חלופה זמינה בסופר - </span>
             <button type="button" className="opr-choosebtn" onClick={onOpenAlternatives}>
               בחר חלופה
             </button>

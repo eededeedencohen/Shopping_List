@@ -202,7 +202,7 @@ function BudgetTracker() {
       style={{ "--bt-glow": glow }}
       role="button"
       tabIndex={0}
-      aria-label="מעקב הוצאות חודשי — מעבר לסטטיסטיקות"
+      aria-label="מעקב הוצאות חודשי - מעבר לסטטיסטיקות"
       onClick={openStats}
       onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); openStats(); } }}
     >
@@ -240,7 +240,7 @@ function BudgetTracker() {
             <WalletIco /> הוצאות {monthName}
           </span>
           <div className="budget-tracker__amount-row">
-            <span className="budget-tracker__spent">{failed ? "—" : nis(shownSpent)}</span>
+            <span className="budget-tracker__spent">{failed ? "-" : nis(shownSpent)}</span>
             {budget > 0 && <span className="budget-tracker__of">מתוך {nis(budget)}</span>}
           </div>
           {/* one aligned status line — the answer to "כמה מותר לי" */}

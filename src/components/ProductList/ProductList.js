@@ -65,7 +65,7 @@ export const convertWeightUnit = (weightUnit) => {
 
 // const priceFormat = (price) => price.toFixed(2);
 const priceFormat = (price) => {
-  if (typeof price !== "number") return "—";
+  if (typeof price !== "number") return "-";
   return price.toFixed(2);
 };
 

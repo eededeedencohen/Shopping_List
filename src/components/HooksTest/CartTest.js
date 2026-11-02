@@ -119,11 +119,11 @@ const CartTest = () => {
 
         return (
           <div key={item.barcode} className="cart-test_item">
-            <strong>{item.name}</strong> – {item.brand}
+            <strong>{item.name}</strong> - {item.brand}
             <br />
             ברקוד: {item.barcode} | משקל: {item.weight}
             <br />
-            מחיר יח׳: {item.unitPrice ?? "—"}₪
+            מחיר יח׳: {item.unitPrice ?? "-"}₪
             {item.promoText && (
               <span className="cart-test_promo">(מבצע: {item.promoText})</span>
             )}

@@ -91,7 +91,7 @@ function tagsSummary(rows, rules) {
       if (nums.length) {
         const lo = Math.min(...nums);
         const hi = Math.max(...nums);
-        parts.push(`${row.name}: ${lo}–${hi}`);
+        parts.push(`${row.name}: ${lo}-${hi}`);
         continue;
       }
     }

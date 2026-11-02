@@ -222,7 +222,7 @@ const SearchBar = ({ closeModal }) => {
           <div className="sr__empty">
             <span className="sr__empty-icon" aria-hidden="true"><IconSearch /></span>
             <p className="sr__empty-title">מה מחפשים היום?</p>
-            <p className="sr__empty-sub">הקלידו שם מוצר, מותג או קטגוריה — התוצאות מופיעות תוך כדי הקלדה</p>
+            <p className="sr__empty-sub">הקלידו שם מוצר, מותג או קטגוריה - התוצאות מופיעות תוך כדי הקלדה</p>
             {recent.length > 0 && (
               <div className="sr__recent">
                 <div className="sr__recent-head">
@@ -271,7 +271,7 @@ const SearchBar = ({ closeModal }) => {
             ))}
             {results.length > VISIBLE_MAX && (
               <li className="sr__more">
-                יש עוד {results.length - VISIBLE_MAX} מוצרים — הוסיפו מילה כדי לצמצם
+                יש עוד {results.length - VISIBLE_MAX} מוצרים - הוסיפו מילה כדי לצמצם
               </li>
             )}
           </ul>

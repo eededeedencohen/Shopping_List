@@ -249,7 +249,7 @@ export const useEnrichedProducts = () => {
         discount: priceData?.discount ?? null,
         promoText:
           priceData?.hasDiscount && priceData.discount
-            ? `${priceData.discount.units} יח׳ – ${priceData.discount.totalPrice}₪`
+            ? `${priceData.discount.units} יח׳ - ${priceData.discount.totalPrice}₪`
             : null,
         amountInCart: amount,
         totalPrice: Number(lineTotal.toFixed(2)),

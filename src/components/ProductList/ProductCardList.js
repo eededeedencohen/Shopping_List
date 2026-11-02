@@ -10,7 +10,7 @@ import minusIcon from "./minus.svg";
 
 /* עיצוב מחיר */
 const priceFormat = (price) =>
-  typeof price !== "number" ? "—" : price.toFixed(2);
+  typeof price !== "number" ? "-" : price.toFixed(2);
 
 /* בלוק מחיר מבצע */
 const discountPriceFormat = ({ units, totalPrice }) => (

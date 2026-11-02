@@ -434,14 +434,14 @@ export default function ProductPriceComparison({ data }) {
     (g) => !Object.values(g.items).some((it) => it.hasDeal)
   );
   const barsInsight = allUniform
-    ? `לכל מוצר אותו מחיר בכל הסניפים שבהם הוא נמכר — אין סניף זול יותר`
+    ? `לכל מוצר אותו מחיר בכל הסניפים שבהם הוא נמכר - אין סניף זול יותר`
     : cheapestGroup
     ? `הסל הזול ביותר: ${groupLabel(cheapestGroup)} (${money(basketSum(cheapestGroup))} לכל המוצרים)`
     : anyDealBars && dealBranches < totalBranches
     ? `מבצעים פעילים ב־${dealBranches} מתוך ${totalBranches} סניפים${
         noDealGroups.length === 1
-          ? ` — ב${groupLabel(noDealGroups[0])} המחיר מלא`
-          : " — בשאר המחיר מלא"
+          ? ` - ב${groupLabel(noDealGroups[0])} המחיר מלא`
+          : " - בשאר המחיר מלא"
       }`
     : null;
 
@@ -552,7 +552,7 @@ export default function ProductPriceComparison({ data }) {
                           </i>
                         </>
                       ) : (
-                        <b dir="ltr">{`${money(r.min)}–${r.max.toFixed(2)}`}</b>
+                        <b dir="ltr">{`${money(r.min)}-${r.max.toFixed(2)}`}</b>
                       )}
                     </span>
                   )}
@@ -1197,7 +1197,7 @@ export default function ProductPriceComparison({ data }) {
 
           <div className="ppc__hint">
             {pinned
-              ? `משווה מול ${pinned.branchName} · ${pinned.branchAddress} — הקש שוב לביטול`
+              ? `משווה מול ${pinned.branchName} · ${pinned.branchAddress} - הקש שוב לביטול`
               : "הקש על סניף כדי להשוות את כולם מולו"}
           </div>
         </>

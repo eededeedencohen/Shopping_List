@@ -515,7 +515,7 @@ export default function LoadingAnimations() {
       <header className="la-header">
         <h1 className="la-page-title">גלריית אנימציות טעינה</h1>
         <p className="la-page-subtitle">
-          סגנון דואלינגו — דמויות שעושות פעולה שמתאימה למצב הטעינה.
+          סגנון דואלינגו - דמויות שעושות פעולה שמתאימה למצב הטעינה.
           לתצוגה בלבד.
         </p>
       </header>

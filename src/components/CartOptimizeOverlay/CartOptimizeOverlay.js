@@ -483,7 +483,7 @@ export default function CartOptimizeOverlay({
                   </span>
                   <span className="copt__savings-label copt__savings-label--ok">
                     {!saved
-                      ? "העגלה כבר שלמה — כל מה שהגדרת בפנים"
+                      ? "העגלה כבר שלמה - כל מה שהגדרת בפנים"
                       : result.addedCount === 1
                       ? "השלמתי מוצר אחד לעגלה"
                       : `השלמתי ${result.addedCount} מוצרים לעגלה`}
@@ -819,14 +819,14 @@ export default function CartOptimizeOverlay({
             {phase === "error"
               ? "אירעה שגיאה. נסה שוב."
               : result && result.reason === "no-names"
-              ? 'לא הגדרת "עגלה שלמה" — בחר מוצרים בהגדרות תחילה.'
+              ? 'לא הגדרת "עגלה שלמה" - בחר מוצרים בהגדרות תחילה.'
               : result && result.reason === "no-carrier"
               ? "אף אחד מהסופרים שבחרת לא מחזיק את כל מוצרי העגלה. נסה קבוצה אחרת."
               : result && result.reason === "no-candidates"
               ? "לא נבחרו סופרים להשוואה."
               : compare
-              ? "העגלה ריקה — הוסף מוצרים כדי להשוות בין הסופרים"
-              : "העגלה ריקה — הוסף מוצרים כדי לייעל אותה"}
+              ? "העגלה ריקה - הוסף מוצרים כדי להשוות בין הסופרים"
+              : "העגלה ריקה - הוסף מוצרים כדי לייעל אותה"}
           </span>
           <button type="button" className="copt__cta" onClick={onClose}>
             סגור

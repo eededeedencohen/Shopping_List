@@ -218,12 +218,12 @@ export default function AI() {
   /* ------------------------------------------------------ */
   useEffect(() => {
     if (!micEnabled) {
-      console.log("%c🎤 Mic disabled – no stream requested", "color: gray");
+      console.log("%c🎤 Mic disabled - no stream requested", "color: gray");
       setMicLevel(0);
       return;
     }
 
-    console.log("%c🎤 Mic enabled – requesting stream…", "color: cyan");
+    console.log("%c🎤 Mic enabled - requesting stream…", "color: cyan");
     let ctx, analyser, dataArray, rafId, stream;
     let cancelled = false;
 

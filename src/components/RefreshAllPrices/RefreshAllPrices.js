@@ -26,7 +26,7 @@ const PHASE_INFO = {
 const PHASE_ORDER = ["fetching", "parsing", "writing"];
 
 function formatDuration(ms) {
-  if (!ms || ms < 0) return "—";
+  if (!ms || ms < 0) return "-";
   const s = Math.round(ms / 1000);
   if (s < 60) return `${s} שנ׳`;
   const m = Math.floor(s / 60);
@@ -541,8 +541,7 @@ function SummaryView({ view, kind, starting, startError, onRetry }) {
                 <span className="rfp-err-phase">[{e.phase}]</span>{" "}
                 <span className="rfp-err-bc" dir="ltr">
                   {e.barcode}
-                </span>{" "}
-                — <span className="rfp-err-msg">{e.message}</span>
+                </span>{" "} - <span className="rfp-err-msg">{e.message}</span>
               </li>
             ))}
           </ul>

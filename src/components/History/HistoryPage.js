@@ -62,8 +62,8 @@ const HistoryPage = () => {
       setHistory((prev) => [...prev, ...failedItems]);
       setDeleteNotice(
         failedItems.length === 1
-          ? "קבלה אחת לא נמחקה — נסו שוב"
-          : `${failedItems.length} קבלות לא נמחקו — נסו שוב`
+          ? "קבלה אחת לא נמחקה - נסו שוב"
+          : `${failedItems.length} קבלות לא נמחקו - נסו שוב`
       );
       setTimeout(() => setDeleteNotice(null), 5000);
     }

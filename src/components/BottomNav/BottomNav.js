@@ -205,8 +205,8 @@ function buildOptimizeSummary(result, lang) {
   const saved = result.changedCount > 0 && result.savings > 0.005;
   if (!saved) {
     return en
-      ? "I went over every product in your cart — they're all already at the best price, nothing to optimize."
-      : "עברתי על כל המוצרים בעגלה, וכולם כבר במחיר הטוב ביותר — אין מה לייעל.";
+      ? "I went over every product in your cart - they're all already at the best price, nothing to optimize."
+      : "עברתי על כל המוצרים בעגלה, וכולם כבר במחיר הטוב ביותר - אין מה לייעל.";
   }
   const shekels = Math.round(result.savings);
   const pct = Math.round(result.savingsPct);
@@ -248,8 +248,8 @@ function buildCompleteSummary(result, lang) {
   if (!result || result.empty) {
     if (result && result.reason === "no-names") {
       return en
-        ? 'You haven\'t defined a "complete cart" list yet — pick products in the settings first.'
-        : 'עוד לא הגדרת רשימת "עגלה שלמה" — בחר מוצרים בהגדרות ואז נסה שוב.';
+        ? 'You haven\'t defined a "complete cart" list yet - pick products in the settings first.'
+        : 'עוד לא הגדרת רשימת "עגלה שלמה" - בחר מוצרים בהגדרות ואז נסה שוב.';
     }
     return en
       ? "I couldn't complete the cart right now."
@@ -257,8 +257,8 @@ function buildCompleteSummary(result, lang) {
   }
   if (!result.addedCount) {
     return en
-      ? "Your cart is already complete — everything from your list is in it."
-      : "העגלה שלך כבר מלאה — כל המוצרים מהרשימה נמצאים בה.";
+      ? "Your cart is already complete - everything from your list is in it."
+      : "העגלה שלך כבר מלאה - כל המוצרים מהרשימה נמצאים בה.";
   }
   const added =
     result.addedCount === 1
@@ -274,8 +274,8 @@ function buildCompleteSummary(result, lang) {
       : `, ול-${result.missingCount} לא מצאתי מוצר מתאים`
     : "";
   return en
-    ? `I completed your cart — ${added}${missing}.`
-    : `השלמתי את העגלה — ${added}${missing}.`;
+    ? `I completed your cart - ${added}${missing}.`
+    : `השלמתי את העגלה - ${added}${missing}.`;
 }
 
 /* Spoken summary of a voice-triggered complete-and-switch (action #7). */
@@ -284,8 +284,8 @@ function buildCc7Summary(result, lang) {
   if (!result || result.empty) {
     if (result && result.reason === "no-names") {
       return en
-        ? 'You haven\'t defined a "complete cart" list yet — pick products in the settings first.'
-        : 'עוד לא הגדרת רשימת "עגלה שלמה" — בחר מוצרים בהגדרות ואז נסה שוב.';
+        ? 'You haven\'t defined a "complete cart" list yet - pick products in the settings first.'
+        : 'עוד לא הגדרת רשימת "עגלה שלמה" - בחר מוצרים בהגדרות ואז נסה שוב.';
     }
     return en
       ? "I couldn't complete and compare right now."
@@ -311,12 +311,12 @@ function buildCc7Summary(result, lang) {
   }
   const nm = (result.targetSupermarket && result.targetSupermarket.name) || "";
   return en
-    ? `${compPart} and compared the stores. Best value: ${nm} — about ${Math.round(
+    ? `${compPart} and compared the stores. Best value: ${nm} - about ${Math.round(
         result.afterTotal
       )} shekels, saving around ${Math.round(
         result.savings
       )}. I switched your cart there.`
-    : `${compPart} והשוויתי בין הסופרים. הכי משתלם: ${nm} — בערך ${Math.round(
+    : `${compPart} והשוויתי בין הסופרים. הכי משתלם: ${nm} - בערך ${Math.round(
         result.afterTotal
       )} שקלים, חיסכון של כ-${Math.round(
         result.savings
@@ -334,7 +334,7 @@ function buildCompareSummary(result, lang) {
       spoken: en
         ? "I couldn't compare the supermarkets right now."
         : "לא הצלחתי להשוות בין הסופרים כרגע.",
-      forHistory: "השוואת הסופרים נכשלה — אין דירוג.",
+      forHistory: "השוואת הסופרים נכשלה - אין דירוג.",
     };
   }
   const ranked = result.ranked || [];
@@ -346,7 +346,7 @@ function buildCompareSummary(result, lang) {
         }`
     )
     .join("; ");
-  const forHistory = `הוצגה השוואת עגלה בין סופרים. דירוג (מהזול ליקר): ${listText}. המשתמש מתבקש כעת להחליט — להחליף לזול ביותר, לעבור לסופר אחר מהדירוג (לפי שם או מיקום), או לבטל ולהישאר בסופר הנוכחי.`;
+  const forHistory = `הוצגה השוואת עגלה בין סופרים. דירוג (מהזול ליקר): ${listText}. המשתמש מתבקש כעת להחליט - להחליף לזול ביותר, לעבור לסופר אחר מהדירוג (לפי שם או מיקום), או לבטל ולהישאר בסופר הנוכחי.`;
 
   const win = result.targetSupermarket || {};
   const winName = win.name || "";
@@ -357,7 +357,7 @@ function buildCompareSummary(result, lang) {
   if (en) {
     if (result.compareNoWin) {
       return {
-        spoken: `I compared ${ranked.length} chains — your current cart is already the cheapest. Say a store name if you still want to switch, or say cancel.`,
+        spoken: `I compared ${ranked.length} chains - your current cart is already the cheapest. Say a store name if you still want to switch, or say cancel.`,
         forHistory,
       };
     }
@@ -369,7 +369,7 @@ function buildCompareSummary(result, lang) {
     return {
       spoken: `I compared ${ranked.length} chains. The best value is ${winName} at about ${Math.round(
         result.afterTotal
-      )} shekels — saving you around ${Math.round(
+      )} shekels - saving you around ${Math.round(
         result.savings
       )} shekels.${runnersTxt} Say "switch" to apply, name another store, or say "cancel".`,
       forHistory,
@@ -390,7 +390,7 @@ function buildCompareSummary(result, lang) {
   return {
     spoken: `השוויתי בין ${ranked.length} רשתות. הכי משתלם: ${winName}, בערך ${Math.round(
       result.afterTotal
-    )} שקלים — חיסכון של כ-${Math.round(
+    )} שקלים - חיסכון של כ-${Math.round(
       result.savings
     )} שקלים.${runnersTxt} כדי להחליף אמור "החלף", לסופר אחר אמור את שמו, ולביטול אמור "בטל".`,
     forHistory,
@@ -984,7 +984,7 @@ export default function BottomNav() {
           return {
             history: "keep",
             outcome: "failed",
-            detail: "אין מדף פעיל — צריך קודם לנווט למוצר",
+            detail: "אין מדף פעיל - צריך קודם לנווט למוצר",
           };
         }
         const prod =
@@ -1099,8 +1099,8 @@ export default function BottomNav() {
         if (!products.length) {
           speak(
             ttsLanguage === "en"
-              ? "Your cart is empty — there's nothing to compare yet."
-              : "העגלה שלך ריקה — אין עדיין מה להשוות."
+              ? "Your cart is empty - there's nothing to compare yet."
+              : "העגלה שלך ריקה - אין עדיין מה להשוות."
           );
           return { history: "keep", outcome: "failed", detail: "העגלה ריקה" };
         }
@@ -1137,7 +1137,7 @@ export default function BottomNav() {
         return {
           history: "keep", // the ranking is appended once it's ready
           outcome: "done",
-          detail: `השוואה נפתחה: ${cmd.group} — ${supers.length} סניפים`,
+          detail: `השוואה נפתחה: ${cmd.group} - ${supers.length} סניפים`,
         };
       }
 
@@ -1148,8 +1148,8 @@ export default function BottomNav() {
         if (!completeCartNames || !completeCartNames.length) {
           speak(
             ttsLanguage === "en"
-              ? 'You haven\'t defined a "complete cart" list yet — pick products in the settings first.'
-              : 'עוד לא הגדרת רשימת "עגלה שלמה" — בחר מוצרים בהגדרות ואז נסה שוב.'
+              ? 'You haven\'t defined a "complete cart" list yet - pick products in the settings first.'
+              : 'עוד לא הגדרת רשימת "עגלה שלמה" - בחר מוצרים בהגדרות ואז נסה שוב.'
           );
           return { history: "keep" };
         }
@@ -1171,8 +1171,8 @@ export default function BottomNav() {
         if (!completeCartNames || !completeCartNames.length) {
           speak(
             ttsLanguage === "en"
-              ? 'You haven\'t defined a "complete cart" list yet — pick products in the settings first.'
-              : 'עוד לא הגדרת רשימת "עגלה שלמה" — בחר מוצרים בהגדרות ואז נסה שוב.'
+              ? 'You haven\'t defined a "complete cart" list yet - pick products in the settings first.'
+              : 'עוד לא הגדרת רשימת "עגלה שלמה" - בחר מוצרים בהגדרות ואז נסה שוב.'
           );
           return { history: "keep" };
         }
@@ -1204,7 +1204,7 @@ export default function BottomNav() {
         startCompleteCompare(supers);
         return {
           history: "clear",
-          detail: `השלמה ומעבר לזול נפתחו: ${cmd.group || "talpiot"} — ${
+          detail: `השלמה ומעבר לזול נפתחו: ${cmd.group || "talpiot"} - ${
             supers.length
           } סניפים`,
         };
@@ -1231,7 +1231,7 @@ export default function BottomNav() {
               ? "Okay, staying at the current supermarket."
               : "בסדר, נשארים בסופר הנוכחי."
           );
-          return { history: "clear", detail: "ההשוואה בוטלה — נשארנו בסופר" };
+          return { history: "clear", detail: "ההשוואה בוטלה - נשארנו בסופר" };
         }
 
         /* decision === "apply" — to the winner, or to a named/ranked store */
@@ -1269,8 +1269,8 @@ export default function BottomNav() {
             setComparing(false);
             speak(
               ttsLanguage === "en"
-                ? "Your current cart is already the cheapest — staying put."
-                : "העגלה הנוכחית שלך כבר הזולה ביותר — נשארים."
+                ? "Your current cart is already the cheapest - staying put."
+                : "העגלה הנוכחית שלך כבר הזולה ביותר - נשארים."
             );
             return { history: "clear" };
           }
@@ -1768,19 +1768,19 @@ export default function BottomNav() {
                 <span className="ai-sheet__tip">
                   <IconHold />
                   <span>
-                    <b>לחיצה ארוכה</b> על הרובוט — פקודה קולית
+                    <b>לחיצה ארוכה</b> על הרובוט - פקודה קולית
                   </span>
                 </span>
                 <span className="ai-sheet__tip">
                   <IconDoubleTap />
                   <span>
-                    <b>הקשה כפולה</b> — שיחה רציפה
+                    <b>הקשה כפולה</b> - שיחה רציפה
                   </span>
                 </span>
                 <span className="ai-sheet__tip">
                   <IconSpeaker />
                   <span>
-                    <b>כשהוא מדבר</b> — בשיחה רציפה פשוט דברו (או "די"); אחרת
+                    <b>כשהוא מדבר</b> - בשיחה רציפה פשוט דברו (או "די"); אחרת
                     הקישו עליו
                   </span>
                 </span>
@@ -1844,7 +1844,7 @@ export default function BottomNav() {
           {view === "find" && (
             <div className="ai-sheet__groups">
               <div className="ai-sheet__group-title">
-                בחרו מוצר — נפתח את תת-הקטגוריה שלו ונגלול עד המדף
+                בחרו מוצר - נפתח את תת-הקטגוריה שלו ונגלול עד המדף
               </div>
               {!classificationsLoaded ? (
                 <div className="ai-sheet__find-empty">טוען מוצרים…</div>
@@ -1914,7 +1914,7 @@ export default function BottomNav() {
                   )}
                   {cheapest.status === "empty" && (
                     <div className="ai-sheet__cheapest-msg">
-                      העגלה ריקה — הוסף מוצרים כדי למצוא את הסופר הזול ביותר.
+                      העגלה ריקה - הוסף מוצרים כדי למצוא את הסופר הזול ביותר.
                     </div>
                   )}
                   {cheapest.status === "error" && (
@@ -1993,7 +1993,7 @@ export default function BottomNav() {
                   )}
                   {ranked.status === "empty" && (
                     <div className="ai-sheet__cheapest-msg">
-                      העגלה ריקה — הוסף מוצרים כדי לראות את הסופרים הזולים.
+                      העגלה ריקה - הוסף מוצרים כדי לראות את הסופרים הזולים.
                     </div>
                   )}
                   {ranked.status === "error" && (
@@ -2058,8 +2058,8 @@ export default function BottomNav() {
             <div className="ai-sheet__compare">
               <p className="ai-sheet__compare-hint">
                 {compareWithComplete
-                  ? "בחר קבוצת סופרים — נשלים את העגלה ונמצא בה את הסופר הזול ביותר."
-                  : "בחר קבוצת סופרים — נמצא את העגלה הזולה ביותר ביניהם ונשווה מוצר-מול-מוצר, בדיוק כמו הייעול לסופר הנוכחי."}
+                  ? "בחר קבוצת סופרים - נשלים את העגלה ונמצא בה את הסופר הזול ביותר."
+                  : "בחר קבוצת סופרים - נמצא את העגלה הזולה ביותר ביניהם ונשווה מוצר-מול-מוצר, בדיוק כמו הייעול לסופר הנוכחי."}
               </p>
               <button
                 type="button"
@@ -2204,7 +2204,7 @@ export default function BottomNav() {
                 <>
                   <p className="ai-sheet__compare-hint">
                     עדיין לא הגדרת "עגלה שלמה". הפעולה משלימה את מה שחסר בעגלה ואז
-                    מוצאת עבורה את הסופר הזול ביותר — קודם צריך לבחור מוצרים
+                    מוצאת עבורה את הסופר הזול ביותר - קודם צריך לבחור מוצרים
                     בהגדרות.
                   </p>
                   <button
@@ -2228,7 +2228,7 @@ export default function BottomNav() {
               ) : (
                 <>
                   <p className="ai-sheet__compare-hint">
-                    שלב 1 — איך להשלים את המוצרים החסרים? (אחר כך נבחר מול אילו
+                    שלב 1 - איך להשלים את המוצרים החסרים? (אחר כך נבחר מול אילו
                     סופרים להשוות)
                   </p>
                   <button
@@ -2321,7 +2321,7 @@ export default function BottomNav() {
           className={`bottom-nav__btn${
             voiceMode !== "idle" ? ` bottom-nav__btn--${voiceMode}` : ""
           }${open && !closing ? " is-open" : ""}`}
-          aria-label="פעולות — הקשה לתפריט, הקשה כפולה לדיבור רציף, לחיצה ארוכה להקלטה, הקשה בזמן דיבור משתיקה"
+          aria-label="פעולות - הקשה לתפריט, הקשה כפולה לדיבור רציף, לחיצה ארוכה להקלטה, הקשה בזמן דיבור משתיקה"
           aria-haspopup="dialog"
           aria-expanded={open}
           aria-pressed={handsFree || recording}

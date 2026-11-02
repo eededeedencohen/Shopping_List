@@ -110,7 +110,7 @@ const ProductsGeneralSettings = () => {
         icon={<ReplaceIcon />}
         iconColor="green"
         title="החלפת מוצרים"
-        hint="מצא חלופה משתלמת — גם אם המוצר זמין"
+        hint="מצא חלופה משתלמת - גם אם המוצר זמין"
         options={REPLACE_OPTIONS}
         value={canReplaceSettings}
         onChange={handleReplace}

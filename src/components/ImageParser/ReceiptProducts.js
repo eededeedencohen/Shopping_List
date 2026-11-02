@@ -221,7 +221,7 @@ function ReceiptProducts({
              receipt's own summary — the user should review before saving ── */}
       {consistency && !consistency.ok && (
         <div className="receipt-consistency-warning">
-          <b>⚠ הנתונים שחולצו לא מסתדרים עם סיכום הקבלה — בדוק לפני שמירה:</b>
+          <b>⚠ הנתונים שחולצו לא מסתדרים עם סיכום הקבלה - בדוק לפני שמירה:</b>
           {consistency.notes.map((note, i) => (
             <div key={i}>• {note}</div>
           ))}

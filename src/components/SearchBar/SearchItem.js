@@ -12,7 +12,7 @@ export const convertWeightUnit = (weightUnit) => {
   return weightUnit || "";
 };
 
-const priceFormat = (n) => (typeof n === "number" ? n.toFixed(2) : "—");
+const priceFormat = (n) => (typeof n === "number" ? n.toFixed(2) : "-");
 
 const escapeRe = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
@@ -60,7 +60,7 @@ const SearchItem = ({ product, words, index = 0, onOpen, onIncrement, onDecremen
       className={`sr-item${amount > 0 ? " in-cart" : ""}${priced ? "" : " is-na"}`}
       style={{ "--i": Math.min(index, 9) }}
     >
-      <button type="button" className="sr-item__main" onClick={onOpen} aria-label={`${product.name} — השוואת מחירים`}>
+      <button type="button" className="sr-item__main" onClick={onOpen} aria-label={`${product.name} - השוואת מחירים`}>
         <span className="sr-item__img">
           <ProductImageDisplay barcode={product.barcode} eager={index < 8} />
         </span>

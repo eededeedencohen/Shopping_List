@@ -34,9 +34,9 @@ const ProductsListTest = () => {
         return (
           <div key={p.barcode}
                style={{ border:"1px solid #ddd", margin:"10px 0", padding:10 }}>
-            <strong>{p.name}</strong> – {p.brand}<br/>
+            <strong>{p.name}</strong> - {p.brand}<br/>
             ברקוד: {p.barcode} | משקל: {p.weight}<br/>
-            מחיר יח׳: {p.unitPrice ?? "—"}₪
+            מחיר יח׳: {p.unitPrice ?? "-"}₪
             {p.promoText && (
               <span style={{ color:"green", marginInlineStart:6 }}>
                 (מבצע: {p.promoText})

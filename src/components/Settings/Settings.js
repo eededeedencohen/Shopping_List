@@ -44,18 +44,18 @@ const DEMO_CART_PRODUCTS = [
 ];
 
 const PRODUCTS_LAYOUT_OPTIONS = [
-  { value: "list", label: "רשימה", description: "מוצר אחד בכל שורה — תצוגה מורחבת" },
-  { value: "grid", label: "רשת", description: "שני מוצרים בכל שורה — תצוגה קומפקטית" },
+  { value: "list", label: "רשימה", description: "מוצר אחד בכל שורה - תצוגה מורחבת" },
+  { value: "grid", label: "רשת", description: "שני מוצרים בכל שורה - תצוגה קומפקטית" },
 ];
 
 const AI_THEME_OPTIONS = [
-  { value: "neurons", label: "נוירונים", description: "חלקיקים זוהרים מחוברים — קלאסי וטכנולוגי" },
-  { value: "synapse", label: "רשת נוירונים", description: "הקלאסי בגרסה מלוטשת — חלקיקים חדים, חיבורים חיים ואותות" },
-  { value: "hacker", label: "סייבר האקר", description: "מעגל מודפס חי — אותות דוהרים במסלולים, גליץ' וסריקה" },
-  { value: "neon", label: "ניאון סיטי", description: "סייברפאנק עמוק — שמש ניאון, הרים וגריד אינסופי" },
-  { value: "aurora", label: "זוהר צפוני", description: "ענני צבע נעים בתנועה איטית — חולמני" },
+  { value: "neurons", label: "נוירונים", description: "חלקיקים זוהרים מחוברים - קלאסי וטכנולוגי" },
+  { value: "synapse", label: "רשת נוירונים", description: "הקלאסי בגרסה מלוטשת - חלקיקים חדים, חיבורים חיים ואותות" },
+  { value: "hacker", label: "סייבר האקר", description: "מעגל מודפס חי - אותות דוהרים במסלולים, גליץ' וסריקה" },
+  { value: "neon", label: "ניאון סיטי", description: "סייברפאנק עמוק - שמש ניאון, הרים וגריד אינסופי" },
+  { value: "aurora", label: "זוהר צפוני", description: "ענני צבע נעים בתנועה איטית - חולמני" },
   { value: "galaxy", label: "גלקסיה", description: "כוכבים מנצנצים, ערפילית וכוכבי שביט" },
-  { value: "cyber", label: "סייבר", description: "סינתווייב — שמש ניאון וגריד פרספקטיבה" },
+  { value: "cyber", label: "סייבר", description: "סינתווייב - שמש ניאון וגריד פרספקטיבה" },
 ];
 
 /* Voice-reply language + voices — shared with the AI page through AiSettingsContext. */
@@ -91,7 +91,7 @@ const TTS_VOICES = {
 };
 
 const PRICE_COMPARE_LAYOUT_OPTIONS = [
-  { value: "expanded", label: "כל הסניפים", description: "כל סניף מוצג כשורה נפרדת — תמיד" },
+  { value: "expanded", label: "כל הסניפים", description: "כל סניף מוצג כשורה נפרדת - תמיד" },
   { value: "grouped", label: "מקובצים לפי רשת", description: "סניפים זהים באותה רשת מתאחדים לשורה אחת" },
 ];
 
@@ -102,7 +102,7 @@ const RECEIPT_THEME_OPTIONS = [
 
 const CART_CARD_LAYOUT_OPTIONS = [
   { value: "default", label: "מורחבת", description: "כפתורי +/- ועדכון בשורה נפרדת מתחת" },
-  { value: "compact", label: "קומפקטית", description: "ללא שורת כפתורים — שינוי כמות בהחלקה" },
+  { value: "compact", label: "קומפקטית", description: "ללא שורת כפתורים - שינוי כמות בהחלקה" },
 ];
 
 /* mic sensitivity (VAD threshold, raw RMS units) — lower = more sensitive */
@@ -537,7 +537,7 @@ export default function Settings() {
       <div className="settings-page settings-page--hub">
         <div className="settings-page__header">
           <h1 className="settings-page__title">הגדרות</h1>
-          <p className="settings-page__subtitle">כל הגדרה במקום אחד. מתחת לכל שורה — מה מוגדר כרגע.</p>
+          <p className="settings-page__subtitle">כל הגדרה במקום אחד. מתחת לכל שורה - מה מוגדר כרגע.</p>
         </div>
 
         <label className="sh-search">
@@ -592,7 +592,7 @@ export default function Settings() {
                       <span className="sh-row__icon" aria-hidden="true"><IconResearch /></span>
                       <span className="sh-row__text">
                         <span className="sh-row__title">מחקר AI</span>
-                        <span className="sh-row__value">כל השיחות עם הרובוט — סימון ✓/✗ והערות</span>
+                        <span className="sh-row__value">כל השיחות עם הרובוט - סימון ✓/✗ והערות</span>
                       </span>
                       <span className="sh-row__chev" aria-hidden="true"><IconChevron /></span>
                     </Link>
@@ -761,7 +761,7 @@ export default function Settings() {
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                   <rect x="4" y="4" width="16" height="17" rx="2.5" /><path d="M9 2.5v3M15 2.5v3" /><polyline points="8.5 13 11 15.5 15.5 10.5" />
                 </svg>
-                מחקר AI — סקירת כל השיחות
+                מחקר AI - סקירת כל השיחות
                 <ChevronLink />
               </Link>
             </Card>
@@ -824,7 +824,7 @@ export default function Settings() {
 
         {/* ── עגלה שלמה ── */}
         {section === "complete" && (
-          <Card hint='מוצרים שתמיד צריכים להיות בעגלה. הפעולה "השלם את העגלה" (בכפתור ה-AI, או בקול) תוסיף כל מוצר כזה שחסר — לפי המחיר הזול ליחידת משקל, או לפי מה שקנית לאחרונה.'>
+          <Card hint='מוצרים שתמיד צריכים להיות בעגלה. הפעולה "השלם את העגלה" (בכפתור ה-AI, או בקול) תוסיף כל מוצר כזה שחסר - לפי המחיר הזול ליחידת משקל, או לפי מה שקנית לאחרונה.'>
             <div className="settings-row">
               <span className="settings-row__label">מוצרים בעגלה השלמה</span>
               <span className="settings-row__value">
@@ -884,7 +884,7 @@ export default function Settings() {
               </div>
               <div className="settings-row">
                 <span className="settings-row__label">מוצרים באינדקס</span>
-                <span className="settings-row__value">{isMetaLoading ? "—" : (meta && meta.productCount) || 0}</span>
+                <span className="settings-row__value">{isMetaLoading ? "-" : (meta && meta.productCount) || 0}</span>
               </div>
               <button
                 type="button"
@@ -930,7 +930,7 @@ export default function Settings() {
                 מלא עגלת הדגמה
               </button>
             </Card>
-            <Card title="אנימציות טעינה" hint="גלריית אנימציות בסגנון דואלינגו — לתצוגה בלבד.">
+            <Card title="אנימציות טעינה" hint="גלריית אנימציות בסגנון דואלינגו - לתצוגה בלבד.">
               <Link to="/loading-animations" className="settings-link-btn" onClick={() => haptic("selection")}>
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                   <circle cx="12" cy="12" r="3" /><path d="M12 1v6m0 10v6M4.22 4.22l4.24 4.24m7.08 7.08l4.24 4.24M1 12h6m10 0h6M4.22 19.78l4.24-4.24m7.08-7.08l4.24-4.24" />
@@ -1190,7 +1190,7 @@ function ChainBranches({
   const byCity = React.useMemo(() => {
     const map = new Map();
     chain.branches.forEach((b) => {
-      const city = b.city || "—";
+      const city = b.city || "-";
       if (!map.has(city)) map.set(city, []);
       map.get(city).push(b);
     });

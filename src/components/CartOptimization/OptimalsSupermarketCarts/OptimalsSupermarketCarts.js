@@ -218,7 +218,7 @@ const OptimalsSupermarketCarts = () => {
           <div className="osc-savings-banner osc-savings-banner--neutral">
             <div className="osc-savings-banner-text">
               <span className="osc-savings-banner-line">
-                העגלה שלך כבר זולה — הסופר המלא הזול ביותר יקר ב־
+                העגלה שלך כבר זולה - הסופר המלא הזול ביותר יקר ב־
                 <b>₪{Math.abs(bannerSavings).toFixed(2)}</b>
               </span>
             </div>

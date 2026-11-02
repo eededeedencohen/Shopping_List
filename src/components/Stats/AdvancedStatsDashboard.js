@@ -743,7 +743,7 @@ function Heatmap({ history, weeks = 13 }) {
                 return <span key={w} className={s.heatMonthLbl}>{show ? first.date.toLocaleDateString("he-IL", { month: "short" }) : ""}</span>;
               })}
             </div>
-            <div className={s.heatGrid} role="img" aria-label="הוצאות יומיות — 13 שבועות אחרונים">
+            <div className={s.heatGrid} role="img" aria-label="הוצאות יומיות - 13 שבועות אחרונים">
               {cols.map((col, w) => (
                 <div key={w} className={s.heatWeek}>
                   {col.map((c, d) => (
@@ -1123,9 +1123,9 @@ export default function AdvancedStatsDashboard() {
     /* Purchase-size distribution */
     const buckets = [
       { label: "עד ₪50", test: (p) => p < 50 },
-      { label: "50–100", test: (p) => p >= 50 && p < 100 },
-      { label: "100–200", test: (p) => p >= 100 && p < 200 },
-      { label: "200–400", test: (p) => p >= 200 && p < 400 },
+      { label: "50-100", test: (p) => p >= 50 && p < 100 },
+      { label: "100-200", test: (p) => p >= 100 && p < 200 },
+      { label: "200-400", test: (p) => p >= 200 && p < 400 },
       { label: "₪400+", test: (p) => p >= 400 },
     ].map((b) => ({ ...b, value: history.filter((h) => b.test(h.totalPrice || 0)).length }));
 
@@ -1179,14 +1179,14 @@ export default function AdvancedStatsDashboard() {
       });
     }
     if (stats.saved > 0) {
-      list.push({ Ico: I.Coins, tint: GOOD, text: `חסכת ${nis(stats.saved)} בזכות מבצעים — ${Math.round(stats.savedPct)}% מהסל` });
+      list.push({ Ico: I.Coins, tint: GOOD, text: `חסכת ${nis(stats.saved)} בזכות מבצעים - ${Math.round(stats.savedPct)}% מהסל` });
     }
     if (stats.cheapestChain) {
       list.push({ Ico: I.Scale, tint: BLUE, text: `הסל הממוצע הזול ביותר: ${stats.cheapestChain.name} (${nis(stats.cheapestChain.avg)} לרכישה)` });
     }
     if (stats.donutItems.length) {
       const top = stats.donutItems[0];
-      list.push({ Ico: I.Pie, tint: WARN, text: `${top.name} — ${Math.round((top.value / Math.max(stats.catTotal, 1)) * 100)}% מסך ההוצאות` });
+      list.push({ Ico: I.Pie, tint: WARN, text: `${top.name} - ${Math.round((top.value / Math.max(stats.catTotal, 1)) * 100)}% מסך ההוצאות` });
     }
     if (stats.movers.length) {
       const m = stats.movers[0];
@@ -1386,7 +1386,7 @@ export default function AdvancedStatsDashboard() {
         ))}
         {flt.period === "custom" && (
           <button className={`${s.periodChip} ${s.periodChipOn}`} onClick={() => setPeriod("all")}>
-            {flt.from ? fmtShort(flt.from) : "…"} – {flt.to ? fmtShort(flt.to) : "היום"} <I.X style={{ width: 11, height: 11 }} />
+            {flt.from ? fmtShort(flt.from) : "…"} - {flt.to ? fmtShort(flt.to) : "היום"} <I.X style={{ width: 11, height: 11 }} />
           </button>
         )}
       </div>
@@ -1407,7 +1407,7 @@ export default function AdvancedStatsDashboard() {
               <button onClick={() => removeFrom("cats", c)} aria-label={`הסר ${c}`}><IconClose /></button></span>
           ))}
           {(flt.min || flt.max) && (
-            <span className={s.activeChip}>₪{flt.min || 0}–{flt.max ? `₪${flt.max}` : "∞"}
+            <span className={s.activeChip}>₪{flt.min || 0}-{flt.max ? `₪${flt.max}` : "∞"}
               <button onClick={() => setFlt((f) => ({ ...f, min: "", max: "" }))} aria-label="הסר טווח סכום"><IconClose /></button></span>
           )}
           <button className={s.clearAll} onClick={resetAll}>נקה הכל</button>
@@ -1627,7 +1627,7 @@ export default function AdvancedStatsDashboard() {
                       </div>
                     </div>
                   ) : !budgetEditing && (
-                    <p className={s.budgetHint}>הגדר תקציב חודשי כדי לעקוב אחרי הקצב — כולל צפי לסוף החודש לפי הקצב הנוכחי.</p>
+                    <p className={s.budgetHint}>הגדר תקציב חודשי כדי לעקוב אחרי הקצב - כולל צפי לסוף החודש לפי הקצב הנוכחי.</p>
                   )}
                 </Card>
 
@@ -1644,7 +1644,7 @@ export default function AdvancedStatsDashboard() {
                       rows: [
                         { v: nis(stats.dowTotals[i]), l: "סה\"כ", c: BLUE },
                         { v: String(stats.dowCounts[i]), l: "רכישות" },
-                        { v: stats.dowCounts[i] ? nis(stats.dowTotals[i] / stats.dowCounts[i]) : "—", l: "ממוצע לרכישה" },
+                        { v: stats.dowCounts[i] ? nis(stats.dowTotals[i] / stats.dowCounts[i]) : "-", l: "ממוצע לרכישה" },
                       ],
                     })}
                   />
@@ -1683,12 +1683,12 @@ export default function AdvancedStatsDashboard() {
                   <div className={s.extGrid}>
                     <div className={s.extItem}>
                       <span className={s.extLabel}>הרכישה היקרה ביותר</span>
-                      <span className={s.extVal}>{stats.most ? nis(stats.most.totalPrice) : "—"}</span>
+                      <span className={s.extVal}>{stats.most ? nis(stats.most.totalPrice) : "-"}</span>
                       {stats.most && <span className={s.extSub}>{getChain(stats.most.supermarketName)} · {fmtShort(stats.most.date)}</span>}
                     </div>
                     <div className={s.extItem}>
                       <span className={s.extLabel}>הרכישה הזולה ביותר</span>
-                      <span className={s.extVal}>{stats.least ? nis(stats.least.totalPrice) : "—"}</span>
+                      <span className={s.extVal}>{stats.least ? nis(stats.least.totalPrice) : "-"}</span>
                       {stats.least && <span className={s.extSub}>{getChain(stats.least.supermarketName)} · {fmtShort(stats.least.date)}</span>}
                     </div>
                     <div className={s.extItem}>
@@ -1698,7 +1698,7 @@ export default function AdvancedStatsDashboard() {
                     </div>
                     <div className={s.extItem}>
                       <span className={s.extLabel}>קצב קניות</span>
-                      <span className={s.extVal}>{stats.cadence > 0 ? `כל ${stats.cadence} ימים` : "—"}</span>
+                      <span className={s.extVal}>{stats.cadence > 0 ? `כל ${stats.cadence} ימים` : "-"}</span>
                       <span className={s.extSub}>בממוצע בין רכישות</span>
                     </div>
                   </div>
@@ -1873,7 +1873,7 @@ export default function AdvancedStatsDashboard() {
                 </Card>
 
                 {stats.comparableStores.length >= 2 && (
-                  <Card Ico={I.Scale} tint={GOOD} title="איפה הסל הכי משתלם" sub="ממוצע לרכישה — רשתות עם 2+ ביקורים">
+                  <Card Ico={I.Scale} tint={GOOD} title="איפה הסל הכי משתלם" sub="ממוצע לרכישה - רשתות עם 2+ ביקורים">
                     <HBarList
                       items={[...stats.comparableStores].sort((a, b) => a.avg - b.avg).map((st, i, arr) => ({
                         label: st.name,

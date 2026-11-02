@@ -1582,7 +1582,7 @@ function prettyPrint(compressed) {
       groups.forEach(({ price, branches }) => {
         const branchesStr = branches.join(", ");
         console.log(
-          `  • ${barcode} – ${price.price} ₪  [${fmtDiscount(
+          `  • ${barcode} - ${price.price} ₪  [${fmtDiscount(
             price
           )}]  ← ${branchesStr}`
         );

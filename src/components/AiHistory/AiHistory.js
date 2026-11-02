@@ -33,7 +33,7 @@ const ACTION_LABELS = {
 const OUTCOME = {
   done: { label: "בוצע", tone: "ok" },
   silent: { label: "שתק (כמבוקש)", tone: "muted" },
-  not_understood: { label: "לא הובן — לא בוצע דבר", tone: "warn" },
+  not_understood: { label: "לא הובן - לא בוצע דבר", tone: "warn" },
   ignored: { label: "לא בוצע (ללא השפעה)", tone: "warn" },
   failed: { label: "נכשל בביצוע", tone: "bad" },
   pending: { label: "לא דווח", tone: "muted" },
@@ -247,7 +247,7 @@ function ReviewControls({ review, onChange, compact, placeholder }) {
           onChange={onNote}
           onBlur={() => flush(note)}
           rows={1}
-          placeholder={placeholder || "הערה — מה היה צריך לקרות?"}
+          placeholder={placeholder || "הערה - מה היה צריך לקרות?"}
         />
         <span className={`aih-note__saved${saved ? " is-on" : ""}`} aria-live="polite">
           נשמר
@@ -609,7 +609,7 @@ export default function AiHistory() {
         <h1 className="aih-title">מחקר AI</h1>
         <p className="aih-sub">
           כל שיחה עם הרובוט נשמרת כאן (טקסט בלבד, בלי הקלטות). סמנו ✓ או ✗ לכל
-          פקודה והוסיפו הערה — ככה נכוון אותו.
+          פקודה והוסיפו הערה - ככה נכוון אותו.
         </p>
       </header>
 
@@ -624,7 +624,7 @@ export default function AiHistory() {
             <span className="aih-stat__label">פקודות</span>
           </div>
           <div className="aih-stat aih-stat--good">
-            <span className="aih-stat__num">{pct == null ? "—" : `${pct}%`}</span>
+            <span className="aih-stat__num">{pct == null ? "-" : `${pct}%`}</span>
             <span className="aih-stat__label">טובות מהמסומנות</span>
           </div>
           <div className="aih-stat aih-stat--bad">
@@ -705,7 +705,7 @@ export default function AiHistory() {
         <div className="aih-empty">
           {query || filter !== "all"
             ? "אין שיחות שמתאימות לסינון."
-            : "עדיין אין שיחות. הקישו פעמיים על הרובוט (או לחיצה ארוכה) ודברו — השיחה תופיע כאן."}
+            : "עדיין אין שיחות. הקישו פעמיים על הרובוט (או לחיצה ארוכה) ודברו - השיחה תופיע כאן."}
         </div>
       ) : (
         <>

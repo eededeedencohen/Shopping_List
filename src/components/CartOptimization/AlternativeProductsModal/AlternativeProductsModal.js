@@ -147,7 +147,7 @@ export default function AlternativeProductsModal({
             <button
               type="button"
               className="apm-summary-stat apm-summary-stat--stores"
-              title="בכמה מהסופרים שבחרת קיים לפחות מוצר חלופי אחד — לחץ לפירוט"
+              title="בכמה מהסופרים שבחרת קיים לפחות מוצר חלופי אחד - לחץ לפירוט"
               onClick={() => setIsStoresBreakdownOpen(true)}
             >
               <svg
@@ -194,7 +194,7 @@ export default function AlternativeProductsModal({
                 חלופות מפורשות · {explicitAlternatives.length}
               </span>
             ) : productDetails?.generalName ? (
-              <span className="apm-tag" title="שם כללי — מוצרים עם שם כללי זהה ייחשבו כחלופיים">
+              <span className="apm-tag" title="שם כללי - מוצרים עם שם כללי זהה ייחשבו כחלופיים">
                 {productDetails.generalName}
               </span>
             ) : null}
@@ -230,7 +230,7 @@ export default function AlternativeProductsModal({
                     <div className="apm-meta">
                       <div className="apm-name">{p.name}</div>
                       <div className="apm-row-small">
-                        <span className="apm-brand">{p.brand || "—"}</span>
+                        <span className="apm-brand">{p.brand || "-"}</span>
                         <span className="apm-sep">·</span>
                         <span className="apm-weight">
                           {p.weight} {unitLabel(p.unitWeight)}
@@ -273,7 +273,7 @@ export default function AlternativeProductsModal({
                           <span className="apm-price-cur">₪</span>
                         </>
                       ) : (
-                        <span className="apm-price-missing">—</span>
+                        <span className="apm-price-missing">-</span>
                       )}
                     </div>
                   </li>
@@ -344,7 +344,7 @@ function StoresBreakdownModal({
     <div
       className="apm-stores-overlay"
       role="dialog"
-      aria-label="פירוט סופרים — קיים / לא קיים"
+      aria-label="פירוט סופרים - קיים / לא קיים"
       onClick={handleOverlayClick}
     >
       <div className="apm-stores-window">

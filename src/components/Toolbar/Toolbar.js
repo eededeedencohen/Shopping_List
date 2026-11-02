@@ -46,7 +46,7 @@ const NAV_GROUPS = [
       { to: "/advanced-stats", label: "סטטיסטיקות", hint: "גרפים וניתוח הוצאות", Icon: PieChartIcon, tone: "pink" },
       { to: "/history", label: "היסטוריית קניות", hint: "קניות קודמות", Icon: HistoryIcon, tone: "violet" },
       { to: "/barcode-scanner", label: "סורק ברקוד", hint: "סריקת מוצר במצלמה", Icon: BarcodeIcon, tone: "slate" },
-      { to: "/ai-history", label: "מחקר AI", hint: "כל השיחות עם הרובוט — סימון והערות", Icon: IconResearch, tone: "indigo" },
+      { to: "/ai-history", label: "מחקר AI", hint: "כל השיחות עם הרובוט - סימון והערות", Icon: IconResearch, tone: "indigo" },
     ],
   },
   {

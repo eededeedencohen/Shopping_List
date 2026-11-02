@@ -13,7 +13,7 @@ import "./productComparison.css";
 import { IconClose } from "../Icons/UiIcons";
 
 const priceFormat = (price) =>
-  typeof price === "number" ? price.toFixed(2) : "—";
+  typeof price === "number" ? price.toFixed(2) : "-";
 
 const unitWeightFormat = (unitWeight) => {
   switch (unitWeight) {
@@ -400,7 +400,7 @@ export default function ProductComparison({ barcode }) {
       {source === "scraper" && (
         <div className="pc__notice">
           <p className="pc__notice-text">
-            המוצר אינו במאגר — המחירים נשלפו מ-chp.co.il בזמן אמת
+            המוצר אינו במאגר - המחירים נשלפו מ-chp.co.il בזמן אמת
           </p>
           <button
             type="button"

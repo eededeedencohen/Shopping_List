@@ -3100,7 +3100,7 @@ const HistoryStats = () => {
     });
     const [topProductName, topProductAmount] = Object.entries(
       productUnits
-    ).sort((a, b) => b[1] - a[1])[0] || ["—", 0];
+    ).sort((a, b) => b[1] - a[1])[0] || ["-", 0];
 
     return {
       "סך‑הכל סלים": totalCarts,

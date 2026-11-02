@@ -136,7 +136,7 @@ export default function InvoiceBillAnimation({
         <div className="iba-message">
           <h2 className="iba-message-title">ההזמנה נשמרה!</h2>
           <p className="iba-message-sub">
-            סיכום הקנייה נוסף להיסטוריה — אפשר לחזור אליו בכל רגע 🧾
+            סיכום הקנייה נוסף להיסטוריה - אפשר לחזור אליו בכל רגע 🧾
           </p>
         </div>
       </div>

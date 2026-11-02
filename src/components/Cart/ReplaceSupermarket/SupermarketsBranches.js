@@ -20,7 +20,7 @@ const SupermarketsBranches = ({
     if (!selectedSupermarket) return [];
     const map = new Map();
     selectedSupermarket.branches.forEach((b) => {
-      const city = b.city || "—";
+      const city = b.city || "-";
       if (!map.has(city)) map.set(city, []);
       map.get(city).push(b);
     });

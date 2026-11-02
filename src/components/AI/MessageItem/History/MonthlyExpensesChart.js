@@ -58,7 +58,7 @@ const ChartPoint = ({ cx, cy, month, price, onEnter, onLeave }) => (
     <circle cx={cx} cy={cy} r="5" className="point" />
     {/* Native browser tooltip as a fallback */}
     <title>
-      {month} — ₪{price.toLocaleString("he-IL")}
+      {month} - ₪{price.toLocaleString("he-IL")}
     </title>
   </g>
 );

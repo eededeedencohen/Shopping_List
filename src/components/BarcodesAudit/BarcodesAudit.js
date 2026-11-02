@@ -337,8 +337,7 @@ export default function BarcodesAudit() {
 
             {sourceList.length > 500 && (
               <p className="ba-list-truncated">
-                מציג 500 ראשונים מתוך {sourceList.length.toLocaleString()} —
-                צמצם חיפוש לראות עוד
+                מציג 500 ראשונים מתוך {sourceList.length.toLocaleString()} - צמצם חיפוש לראות עוד
               </p>
             )}
           </section>
@@ -505,7 +504,7 @@ export default function BarcodesAudit() {
             {imagesList.length > (showThumbs ? 200 : 500) && (
               <p className="ba-list-truncated">
                 מציג {showThumbs ? 200 : 500} ראשונים מתוך{" "}
-                {imagesList.length.toLocaleString()} — צמצם חיפוש לראות עוד
+                {imagesList.length.toLocaleString()} - צמצם חיפוש לראות עוד
               </p>
             )}
           </section>
@@ -516,7 +515,7 @@ export default function BarcodesAudit() {
       <section className="ba-section-title">
         <h2>סקרייפ מ-chp.co.il</h2>
         <p className="ba-section-desc">
-          לכל ברקוד — מושך את עמוד chp.co.il, שומר HTML, ומאחד את כל המחירים
+          לכל ברקוד - מושך את עמוד chp.co.il, שומר HTML, ומאחד את כל המחירים
           לקובץ JSON אחד. לא נוגע ב-Mongo.
         </p>
       </section>
@@ -739,7 +738,7 @@ export default function BarcodesAudit() {
                     }`}
                   >
                     <span className="ba-result-barcode">{it.barcode}</span>
-                    <span className="ba-result-name">{it.name || "—"}</span>
+                    <span className="ba-result-name">{it.name || "-"}</span>
                     <span
                       className={`ba-result-count ${
                         it.priceCount === 0 ? "is-zero" : "is-positive"
@@ -754,8 +753,7 @@ export default function BarcodesAudit() {
 
             {scrapeList.length > 500 && (
               <p className="ba-list-truncated">
-                מציג 500 ראשונים מתוך {scrapeList.length.toLocaleString()} —
-                צמצם חיפוש לראות עוד
+                מציג 500 ראשונים מתוך {scrapeList.length.toLocaleString()} - צמצם חיפוש לראות עוד
               </p>
             )}
           </section>
