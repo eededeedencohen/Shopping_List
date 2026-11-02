@@ -1,43 +1,10 @@
-import React, { useState } from "react";
-import { DOMAIN } from "../../constants";
+/* Kept for the Scraper / ProductListServer pages. Every product image now
+   comes from the same server endpoint, so this is simply the shared
+   component (skeleton + cache-aware) under its old name. */
+import ProductImageDisplay from "./ProductImageService";
 
-function ServerProductImage({
-  barcode,
-  alt = "",
-  className = "",
-  style = {},
-}) {
-  const [failed, setFailed] = useState(false);
-
-  if (failed || !barcode) {
-    return (
-      <div
-        className={className}
-        style={{
-          ...style,
-          backgroundColor: "#f0f0f0",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          minHeight: "100px",
-          color: "#999",
-        }}
-      >
-        <span>אין תמונה</span>
-      </div>
-    );
-  }
-
-  return (
-    <img
-      src={`${DOMAIN}/api/v1/product-images/${barcode}`}
-      alt={alt || `Product ${barcode}`}
-      className={className}
-      style={style}
-      loading="lazy"
-      onError={() => setFailed(true)}
-    />
-  );
+function ServerProductImage(props) {
+  return <ProductImageDisplay {...props} />;
 }
 
 export default ServerProductImage;

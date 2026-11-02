@@ -520,7 +520,7 @@ export default function Cart() {
                     className={styles['pg-image']}
                     onClick={() => { setCurrentBarcode(item.barcode); setModalOpen(true); }}
                   >
-                    <ProductImageDisplay barcode={item.barcode} />
+                    <ProductImageDisplay barcode={item.barcode} eager />
                   </div>
 
                   {/* MIDDLE: Name + Meta */}

@@ -1,0 +1,53 @@
+/* Product image loading states (see ProductImageService.js).
+   `img.pimg.pimg--*` beats the per-page `.container img` rules on
+   specificity, so the skeleton shows regardless of where the image sits. */
+
+/* Skeleton shimmer painted as the image's own background while the bytes
+   are in flight — no wrapper element, so page layouts stay untouched. */
+img.pimg.pimg--loading {
+  color: transparent; /* hide alt text while loading */
+  background-color: rgba(148, 163, 184, 0.16);
+  background-image: linear-gradient(
+    100deg,
+    rgba(255, 255, 255, 0) 30%,
+    rgba(255, 255, 255, 0.6) 50%,
+    rgba(255, 255, 255, 0) 70%
+  );
+  background-size: 220% 100%;
+  background-repeat: no-repeat;
+  animation: pimgShimmer 1.15s ease-in-out infinite;
+}
+
+/* Soft settle once the picture arrives (only when it was actually
+   loading on screen — cached images render instantly with no animation).
+   The class is removed again on animationend (see ProductImageService.js). */
+img.pimg.pimg--reveal {
+  animation: pimgReveal 0.24s ease-out;
+}
+
+@keyframes pimgShimmer {
+  0% {
+    background-position: 120% 0;
+  }
+  100% {
+    background-position: -120% 0;
+  }
+}
+
+@keyframes pimgReveal {
+  from {
+    opacity: 0.35;
+    transform: scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  img.pimg.pimg--loading,
+  img.pimg.pimg--reveal {
+    animation: none;
+  }
+}

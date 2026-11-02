@@ -30,10 +30,15 @@ import {
   consumeShelfTarget,
   onShelfTarget,
 } from "../../utils/shelfTarget";
+import { prefetchProductImages, whenIdle } from "../../utils/productImages";
 
 /* -------------------------------- */
 /* פונקציות עזר (אינן משתנות)      */
 /* -------------------------------- */
+/* כמה כרטיסים ראשונים טוענים תמונה מיד (המסך הראשון ברשימה/ברשת);
+   השאר נטענים lazy כשמתקרבים אליהם בגלילה. */
+const EAGER_IMAGE_COUNT = 8;
+
 export const convertWeightUnit = (weightUnit) => {
   if (!weightUnit) return "";
   switch (weightUnit.toLowerCase()) {
@@ -482,6 +487,37 @@ function ProductsList() {
     [tryShelfScroll]
   );
 
+  /* Warm the image cache for the neighbouring shelves (next / previous
+     subcategory) while the current one is on screen, so a swipe lands on
+     pictures that are already in the browser cache. Runs when the browser is
+     idle after a 2s quiet period (the shelf on screen gets the bandwidth
+     first); the prefetch queue de-dupes per session and caps the batch. */
+  useEffect(() => {
+    if (isLoadingProducts) return undefined;
+    const neighbours = [
+      subCats[activeSubCategoryIndex + 1],
+      subCats[activeSubCategoryIndex - 1],
+    ].filter(Boolean);
+    if (!neighbours.length) return undefined;
+    return whenIdle(
+      () => {
+        const barcodes = neighbours.flatMap((sub) =>
+          productsWithDetails
+            .filter(
+              (p) => p.category === currentCategory && p.subcategory === sub
+            )
+            .slice(0, 12)
+            .map((p) => p.barcode)
+        );
+        prefetchProductImages(barcodes, { limit: 24 });
+      },
+      { minDelay: 2000, timeout: 3000 }
+    );
+    // productsWithDetails is read inside the idle callback on purpose — the
+    // catalog itself never changes, only its cart/price decorations do.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isLoadingProducts, currentCategory, activeSubCategoryIndex, subCats.length]);
+
   if (isLoadingProducts) {
     return (
       <div className={styles['spinner-container']}>
@@ -559,7 +595,7 @@ function ProductsList() {
                   : "אין מוצרים הקיימים בכל הסניפים המועדפים שברשימה"}
               </div>
             )}
-            {orderedProducts.map((product) => {
+            {orderedProducts.map((product, productIndex) => {
               const priceUnavailable = typeof product.unitPrice !== "number";
               return (
               <div
@@ -605,7 +641,12 @@ function ProductsList() {
                     onClick={() => openComparisonModal(product.barcode)}
                     onContextMenu={(e) => e.preventDefault()}
                   >
-                    <ProductImageDisplay barcode={product.barcode} />
+                    {/* first screenful loads eagerly (lazy would delay
+                        above-the-fold pictures); the rest stay lazy */}
+                    <ProductImageDisplay
+                      barcode={product.barcode}
+                      eager={productIndex < EAGER_IMAGE_COUNT}
+                    />
                   </div>
                 </div>
                 <div className={styles['list__product-operations']}>

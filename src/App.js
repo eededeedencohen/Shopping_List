@@ -5,6 +5,7 @@ import Toolbar from "./components/Toolbar/Toolbar";
 import BottomNav from "./components/BottomNav/BottomNav";
 import ScrollToTop from "./components/ScrollToTop/ScrollToTop";
 import SplashScreen from "./components/SplashScreen/SplashScreen";
+import ImageWarmup from "./components/Images/ImageWarmup";
 
 function App() {
   const [showSplash, setShowSplash] = useState(true);
@@ -14,6 +15,8 @@ function App() {
     <>
       {showSplash && <SplashScreen onFinish={hideSplash} />}
       <ScrollToTop />
+      {/* Pre-warms the cart's product images while the splash is showing */}
+      <ImageWarmup />
       <div className="App">
         <Toolbar />
         {/* The ONLY scroll area — sits between the fixed toolbar and the
