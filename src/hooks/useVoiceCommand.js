@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { DOMAIN } from "../constants";
+import { isHushPhrase } from "../utils/hushPhrase";
 
 /* Conversation history is OWNED BY THE SERVER (a single JSON file). This hook
    only DRIVES it: after a command resolves it tells the server to clear the file
@@ -17,6 +18,19 @@ const QUIET_RMS = 1.5; // RMS at/below this counts as silence
 const SILENCE_MS = 1000; // continuous silence that ends a hands-free utterance
 const LEVEL_DIVISOR = 38; // RMS → 0..1 normalization for the waves
 const LEVEL_SMOOTH = 0.4; // wave smoothing (higher = snappier)
+
+/* ── Voice barge-in (hands-free only) ──────────────────────────────
+   The user may talk OVER the robot: "די", "שתוק", or simply the next command.
+   The mic stream is opened with echoCancellation, so the robot's own voice
+   coming back through the speaker is mostly removed from the mic signal; what
+   survives is treated as the user only when it is LOUD (a stricter threshold
+   than the normal VAD) and SUSTAINED (not a click), and never in the first
+   moments of playback while the echo canceller is still converging. */
+const BARGE_IN_RMS_FACTOR = 1.6; // × the user's micThreshold
+const BARGE_IN_MIN_RMS = 18; // never below this (residual echo stays under it)
+const BARGE_IN_SUSTAIN_MS = 280; // must stay loud this long
+const BARGE_IN_GRACE_MS = 400; // ignore the start of playback
+const BARGE_IN_MIN_SEGMENT_MS = 1300; // shorter capture (= <0.3s speech) → noise, drop
 
 /**
  * Voice engine for the bottom-nav robot coin.
@@ -76,6 +90,11 @@ export default function useVoiceCommand({
   const busyRef = useRef(false); // hands-free upload in flight
   const segActiveRef = useRef(false); // a hands-free utterance is being captured
   const quietSinceRef = useRef(null);
+  // voice barge-in bookkeeping
+  const speakStartedAtRef = useRef(0); // when the current TTS clip started
+  const loudSinceRef = useRef(null); // the user has been loud over the robot since…
+  const segStartedAtRef = useRef(0); // when the current hands-free capture started
+  const bargeInSegRef = useRef(false); // the current capture was started by a barge-in
 
   // web-audio analysis
   const audioCtxRef = useRef(null);
@@ -256,6 +275,8 @@ export default function useVoiceCommand({
 
       audio.addEventListener("play", () => {
         speakingRef.current = true;
+        speakStartedAtRef.current = Date.now();
+        loudSinceRef.current = null;
         refreshMode();
         if (analyser && buf) {
           const step = () => {
@@ -286,6 +307,21 @@ export default function useVoiceCommand({
       const mime = (recorder && recorder.mimeType) || "audio/webm";
       const blob = new Blob(chunksRef.current, { type: mime });
       chunksRef.current = [];
+
+      /* A capture that was started by talking over the robot but ended almost
+         at once held no real words (residual echo / a cough) — drop it quietly
+         instead of sending noise and getting a spoken "didn't understand". */
+      const bargeIn = bargeInSegRef.current;
+      bargeInSegRef.current = false;
+      if (
+        isHandsFree &&
+        bargeIn &&
+        Date.now() - segStartedAtRef.current < BARGE_IN_MIN_SEGMENT_MS
+      ) {
+        busyRef.current = false;
+        refreshMode();
+        return;
+      }
 
       if (!blob.size) {
         if (isHandsFree) {
@@ -333,6 +369,17 @@ export default function useVoiceCommand({
         });
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const json = await res.json();
+
+        /* "שתוק" / "די" → the answer is silence. The server already returns no
+           audio for its "hush" intent; this guards the case where it classified
+           the phrase as "none" and sent a polite "didn't understand" clip. */
+        const hushOnly =
+          (json.command && json.command.actionType === "hush") ||
+          isHushPhrase(json.transcript);
+        if (hushOnly) {
+          json.audioUrl = null;
+          json.command = { actionType: "hush", speech: "" };
+        }
 
         if (json.audioUrl) {
           await playReply(`${DOMAIN}/${json.audioUrl}`);
@@ -434,6 +481,7 @@ export default function useVoiceCommand({
         mediaRecorderRef.current = recorder;
         segActiveRef.current = true;
         quietSinceRef.current = null;
+        segStartedAtRef.current = Date.now();
         recorder.ondataavailable = (e) => {
           if (e.data && e.data.size) chunksRef.current.push(e.data);
         };
@@ -465,6 +513,35 @@ export default function useVoiceCommand({
         const level = rms(analyser, buf);
         if (!speakingRef.current) pushLevel(level); // TTS owns level while speaking
 
+        /* voice barge-in: the user talks over the robot → cut the speech and
+           start capturing right away so their words are not lost */
+        if (
+          vad &&
+          handsFreeRef.current &&
+          speakingRef.current &&
+          !segActiveRef.current &&
+          !busyRef.current
+        ) {
+          const thr = Math.max(
+            BARGE_IN_MIN_RMS,
+            (cfgRef.current.micThreshold || 15) * BARGE_IN_RMS_FACTOR
+          );
+          const now = Date.now();
+          const inGrace = now - speakStartedAtRef.current < BARGE_IN_GRACE_MS;
+          if (!inGrace && level >= thr) {
+            if (!loudSinceRef.current) loudSinceRef.current = now;
+            else if (now - loudSinceRef.current >= BARGE_IN_SUSTAIN_MS) {
+              loudSinceRef.current = null;
+              stopReply(); // hush — the 'pause' event finishes the bookkeeping
+              levelRef.current = 0;
+              bargeInSegRef.current = true;
+              startSegment();
+            }
+          } else {
+            loudSinceRef.current = null;
+          }
+        }
+
         if (vad && handsFreeRef.current && !speakingRef.current) {
           const thr = cfgRef.current.micThreshold || 15;
           if (!segActiveRef.current && !busyRef.current && level >= thr) {
@@ -492,7 +569,7 @@ export default function useVoiceCommand({
           micRafRef.current = requestAnimationFrame(loop);
         });
     },
-    [ensureCtx, refreshMode, sendBlob]
+    [ensureCtx, refreshMode, sendBlob, stopReply]
   );
 
   /* ── Single-shot recording (long-press) ── */

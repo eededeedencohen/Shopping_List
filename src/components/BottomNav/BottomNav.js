@@ -63,6 +63,7 @@ import {
 } from "./ActionIcons";
 import { haptic } from "../../utils/haptics";
 import { uiSound, primeUiSound } from "../../utils/uiSound";
+import { isHushPhrase } from "../../utils/hushPhrase";
 
 /* The actions shown in the AI action sheet (order = visual order).
    `hero` = the signature action, rendered as the full-width gradient card;
@@ -892,6 +893,14 @@ export default function BottomNav() {
     // mis-classification or a not-yet-redeployed NLU. Kept narrow so it never
     // collides with the cheapest-SUPERMARKET intents (which don't mention מוצר).
     const t = (transcript || "").replace(/["'.,!?]/g, "");
+
+    // "שתוק" / "די" / "שקט": the user only wanted silence. The speech was
+    // already cut by the voice barge-in (or the tap); there is nothing to do
+    // and — above all — nothing to say.
+    if ((cmd && cmd.actionType === "hush") || isHushPhrase(transcript)) {
+      return { history: "keep" };
+    }
+
     const optimizeIntent =
       (cmd && cmd.actionType === "optimize_cart") ||
       /אופטימ|ייעל|משתלמ|תחליף.*מוצר|מוצר.*(משתלמ|זול)/.test(t);
@@ -1486,7 +1495,9 @@ export default function BottomNav() {
         ? { text: "מקשיב… דברו", kind: "recording" }
         : { text: "מקליט… הקישו לסיום", kind: "recording" }
       : voiceMode === "speaking"
-      ? { text: "משיב… הקישו כדי להשתיק", kind: "speaking" }
+      ? handsFree
+        ? { text: "משיב… דברו כדי לקטוע", kind: "speaking" }
+        : { text: "משיב… הקישו כדי להשתיק", kind: "speaking" }
       : voiceMode === "processing"
       ? { text: "חושב…", kind: "processing" }
       : voiceMode === "listening"
@@ -1654,7 +1665,8 @@ export default function BottomNav() {
                 <span className="ai-sheet__tip">
                   <IconSpeaker />
                   <span>
-                    <b>הקשה בזמן שהוא מדבר</b> — משתיקה אותו
+                    <b>כשהוא מדבר</b> — בשיחה רציפה פשוט דברו (או "די"); אחרת
+                    הקישו עליו
                   </span>
                 </span>
               </div>
