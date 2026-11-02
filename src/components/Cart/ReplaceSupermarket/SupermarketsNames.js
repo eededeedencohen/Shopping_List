@@ -10,12 +10,15 @@ const SORT_OPTIONS = [
   { value: "alphabetical", label: "א-ב" },
 ];
 
-const SupermarketsNames = ({ onSelectSupermarket }) => {
+/* `ignoreCart`: the picker is used for something unrelated to the planning
+   cart (the in-store companion), so the "only chains that carry every cart
+   product" filter must not appear. */
+const SupermarketsNames = ({ onSelectSupermarket, ignoreCart = false }) => {
   const { allSupermarkets, isAllSupermarketsUploaded } = useSupermarkets();
   const cartItems = useCartItems();
   const cartBarcodes = useMemo(
-    () => (cartItems || []).map((item) => item.barcode).filter(Boolean),
-    [cartItems]
+    () => (ignoreCart ? [] : (cartItems || []).map((item) => item.barcode).filter(Boolean)),
+    [cartItems, ignoreCart]
   );
   const hasCart = cartBarcodes.length > 0;
 

@@ -3,7 +3,7 @@ import Modal from "../Modal";
 import SupermarketsNames from "./SupermarketsNames";
 import SupermarketsBranches from "./SupermarketsBranches";
 
-const ReplaceSupermarket = ({ isOpen, closeModal, onSelectBranch }) => {
+const ReplaceSupermarket = ({ isOpen, closeModal, onSelectBranch, ignoreCart = false }) => {
   const [selectedSupermarket, setSelectedSupermarket] = useState(null);
 
   const handleClose = () => {
@@ -14,7 +14,7 @@ const ReplaceSupermarket = ({ isOpen, closeModal, onSelectBranch }) => {
   return (
     <Modal isOpen={isOpen} onClose={handleClose}>
       {!selectedSupermarket ? (
-        <SupermarketsNames onSelectSupermarket={setSelectedSupermarket} />
+        <SupermarketsNames onSelectSupermarket={setSelectedSupermarket} ignoreCart={ignoreCart} />
       ) : (
         <SupermarketsBranches
           selectedSupermarket={selectedSupermarket}

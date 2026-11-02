@@ -26,6 +26,8 @@ import ProductAnimationAdd from "../AI/MessageItem/MessageItemOperations/CartOpe
 import { runCompareOptimization } from "../../utils/optimizeCart";
 import { useAiSettings } from "../../context/AiSettingsContext";
 import { useCart } from "../../context/CartContext2";
+import { useCompanion } from "../../context/CompanionContext";
+import { IconCompanion } from "./ActionIcons";
 import { useCompleteCartPreferences } from "../../context/CompleteCartPreferencesContext";
 import { useSupermarkets } from "../../hooks/optimizationHooks";
 import { useClassificationsCtx } from "../../context/classificationsContext";
@@ -139,6 +141,14 @@ const ACTIONS = [
     view: "find",
     wide: true,
   },
+  {
+    key: "companion",
+    label: "ליווי בסופר",
+    caption: "קנייה בסניף: כל מוצר שנכנס לעגלה נבדק, בלי הפתעות בקופה",
+    Icon: IconCompanion,
+    tone: "green",
+    wide: true,
+  },
 ];
 
 /* hint-chip icon per voice mode */
@@ -179,6 +189,7 @@ const NAV_ITEMS = [
   { to: "/", label: "בית", Icon: HomeIcon, tone: "blue" },
   { to: "/products", label: "מוצרים", Icon: GroceryIcon, tone: "green" },
   { to: "/cart", label: "עגלת קניות", Icon: CartIcon, tone: "sky" },
+  { to: "/companion", label: "ליווי בסופר", Icon: IconCompanion, tone: "green" },
   { to: "/history", label: "היסטוריית קניות", Icon: HistoryIcon, tone: "violet" },
   { to: "/image-parser", label: "סריקת קבלות", Icon: ReceiptIcon, tone: "amber" },
   { to: "/advanced-stats", label: "סטטיסטיקות", Icon: PieChartIcon, tone: "pink" },
@@ -415,6 +426,7 @@ export default function BottomNav() {
   } = useProductList();
   const { pricesMap } = usePriceMap();
   const { cart, setCart } = useCart();
+  const companion = useCompanion();
   const { fullCart } = useFullCart();
   const { allSupermarkets } = useSupermarkets();
   const { replaceSupermarket, add: addToCart, update: updateInCart } =
@@ -1640,6 +1652,11 @@ export default function BottomNav() {
   };
 
   const runAction = (a) => {
+    if (a.key === "companion") {
+      close();
+      navigate("/companion");
+      return;
+    }
     if (a.key === "a4") startOptimize();
     else if (a.key === "a5") {
       setCompareWithComplete(false);
@@ -1741,7 +1758,9 @@ export default function BottomNav() {
                     type="button"
                     className={`ai-sheet__action ai-sheet__action--${a.tone}${
                       a.hero ? " ai-sheet__action--hero" : ""
-                    }${a.wide ? " ai-sheet__action--wide" : ""}`}
+                    }${a.wide ? " ai-sheet__action--wide" : ""}${
+                      a.key === "companion" && companion.hasSession ? " is-on" : ""
+                    }`}
                     style={{ "--i": i }}
                     onClick={() => runAction(a)}
                   >
@@ -1749,9 +1768,16 @@ export default function BottomNav() {
                       <a.Icon />
                     </span>
                     <span className="ai-sheet__action-text">
-                      <span className="ai-sheet__action-label">{a.label}</span>
+                      <span className="ai-sheet__action-label">
+                        {a.label}
+                        {a.key === "companion" && companion.hasSession && (
+                          <span className="ai-sheet__action-badge">פעיל</span>
+                        )}
+                      </span>
                       <span className="ai-sheet__action-caption">
-                        {a.caption}
+                        {a.key === "companion" && companion.hasSession
+                          ? `קנייה ב${companion.store.name} · ${companion.totals.items} פריטים · ₪${companion.totals.total.toFixed(2)}`
+                          : a.caption}
                       </span>
                     </span>
                     {a.hero && (

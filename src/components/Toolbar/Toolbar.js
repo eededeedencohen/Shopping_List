@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import ReactDOM from "react-dom";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import { IconCompanion } from "../BottomNav/ActionIcons";
 import SearchBar from "../SearchBar/SearchBar";
 import SearchModal from "../SearchBar/SearchModal";
 import { useCartTotals, useFullCart } from "../../hooks/appHooks";
@@ -36,6 +37,7 @@ const NAV_GROUPS = [
       { to: "/", label: "בית", hint: "המסך הראשי", Icon: HomeIcon, tone: "blue" },
       { to: "/products", label: "מוצרים", hint: "עיון והוספה לעגלה", Icon: GroceryIcon, tone: "green" },
       { to: "/cart", label: "עגלת קניות", hint: "ניהול העגלה", Icon: ShoppingCartIcon, tone: "sky", badge: true },
+      { to: "/companion", label: "ליווי בסופר", hint: "קנייה בסניף בלי הפתעות בקופה", Icon: IconCompanion, tone: "green", stroke: true },
       { to: "/ai", label: "עוזר AI", hint: "שאל, השווה, ייעל", Icon: AiIcon, tone: "teal" },
     ],
   },

@@ -35,6 +35,7 @@ import BarcodesAudit from "./components/BarcodesAudit/BarcodesAudit";
 import LoadingAnimations from "./components/LoadingAnimations/LoadingAnimations";
 import RefreshAllPrices from "./components/RefreshAllPrices/RefreshAllPrices";
 import AiHistory from "./components/AiHistory/AiHistory";
+import CompanionPage from "./components/Companion/CompanionPage";
 
 function Routing() {
   return (
@@ -86,6 +87,7 @@ function Routing() {
       <Route path="/refresh-all-prices" element={<RefreshAllPrices />} />
       <Route path="/ai-history" element={<AiHistory />} />
       <Route path="/ai-history/:id" element={<AiHistory />} />
+      <Route path="/companion" element={<CompanionPage />} />
     </Routes>
   );
 }

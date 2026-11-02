@@ -20,6 +20,7 @@ import { AIThemeProvider } from "./context/AIThemeContext";
 import { ReceiptThemeProvider } from "./context/ReceiptThemeContext";
 import { SupermarketPreferencesProvider } from "./context/SupermarketPreferencesContext";
 import { CompleteCartPreferencesProvider } from "./context/CompleteCartPreferencesContext";
+import { CompanionProvider } from "./context/CompanionContext";
 
 const root = createRoot(document.getElementById("root"));
 
@@ -43,7 +44,9 @@ root.render(
                                   <ReceiptThemeProvider>
                                     <SupermarketPreferencesProvider>
                                       <CompleteCartPreferencesProvider>
-                                        <App />
+                                        <CompanionProvider>
+                                          <App />
+                                        </CompanionProvider>
                                       </CompleteCartPreferencesProvider>
                                     </SupermarketPreferencesProvider>
                                   </ReceiptThemeProvider>

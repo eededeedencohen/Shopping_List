@@ -20,6 +20,8 @@ import { BUILD_VERSION } from "../../buildInfo";
 import { IconClose } from "../Icons/UiIcons";
 import { haptic, isHapticsEnabled, setHapticsEnabled } from "../../utils/haptics";
 import { uiSound, isUiSoundEnabled, setUiSoundEnabled } from "../../utils/uiSound";
+import { useCompanion } from "../../context/CompanionContext";
+import { IconCompanion } from "../BottomNav/ActionIcons";
 
 /* ═══════════════════════════════════════════════════════════════════
    Settings — a HUB of grouped rows (each shows its current value) that
@@ -397,6 +399,7 @@ const SECTIONS = [
   { key: "voice", group: "הרובוט", title: "קול ומיקרופון", subtitle: "באיזו שפה וקול הרובוט עונה, וכמה המיקרופון רגיש", Icon: IconVoice, tone: "teal", keywords: "קול שפה עברית אנגלית מיקרופון רגישות רובוט דיבור tts" },
   { key: "stores", group: "הקניות שלי", title: "סניפים מועדפים", subtitle: "הסופרים שאתה אוהב לקנות בהם", Icon: IconStore, tone: "blue", keywords: "סניפים סופר סופרמרקט מועדפים רשת זמינות" },
   { key: "complete", group: "הקניות שלי", title: "עגלה שלמה", subtitle: "מוצרים שתמיד צריכים להיות בעגלה", Icon: IconCartCheck, tone: "green", keywords: "עגלה שלמה השלמה מוצרים קבועים רשימה" },
+  { key: "companion", group: "הקניות שלי", title: "ליווי בסופר", subtitle: "כל מוצר שנכנס לעגלה נסרק, בלי הפתעות בקופה", Icon: IconCompanion, tone: "teal", keywords: "ליווי סופר סריקה מבצע חלופה זול יותר הפתעה קופה" },
   { key: "data", group: "נתונים", title: "נתונים ותחזוקה", subtitle: "אינדקס הזמינות ורענון מחירים", Icon: IconDatabase, tone: "sky", keywords: "נתונים זמינות אינדקס מחירים רענון עדכון" },
   { key: "demo", group: "נתונים", title: "הדגמה וכלים", subtitle: "עגלת הדגמה וגלריית אנימציות", Icon: IconFlask, tone: "pink", keywords: "הדגמה דמו מצגת אנימציות טעינה כלים" },
 ];
@@ -437,6 +440,7 @@ export default function Settings() {
     [products]
   );
   const { cart, setCart, sendActiveCart } = useCart();
+  const companion = useCompanion();
   const { meta, isLoading: isMetaLoading, refetch: refetchMeta } = useAvailabilityMeta();
   const [isRebuilding, setIsRebuilding] = useState(false);
   const [rebuildStatus, setRebuildStatus] = useState(null);
@@ -523,6 +527,13 @@ export default function Settings() {
         : `${preferredSupermarketIDs.length} סניפים${availableInAllMode ? " · רק מוצרים משותפים" : ""}`,
     complete:
       completeCartNames.length === 0 ? "עוד לא הוגדרו מוצרים" : `${completeCartNames.length} מוצרים ברשימה`,
+    companion: companion.hasSession
+      ? `קנייה פעילה ב${companion.store.name} · ₪${Number(companion.totals.total || 0).toFixed(2)}`
+      : `${
+          [companion.prefs.swaps && "מוצר זול יותר", companion.prefs.roundups && "השלמה למבצע"]
+            .filter(Boolean)
+            .join(" + ") || "ללא הצעות"
+        }${companion.prefs.okToasts ? " · אישור כשהכול בסדר" : ""}`,
     data: isMetaLoading ? "טוען…" : `זמינות: ${formatRelativeTime(meta && meta.updatedAt)}`,
     demo: "עגלת הדגמה · אנימציות טעינה",
   };
@@ -872,6 +883,53 @@ export default function Settings() {
               {cartGeneralNames.length ? `הוסף מהעגלה הנוכחית (${cartGeneralNames.length})` : "העגלה הנוכחית ריקה"}
             </button>
           </Card>
+        )}
+
+        {/* ── ליווי בסופר ── */}
+        {section === "companion" && (
+          <>
+            <Card hint="ליווי בסופר הוא עמוד נפרד לקנייה עצמה: בוחרים את הסניף, ומוסיפים כל מוצר ברגע שהוא נכנס לעגלה (חיפוש או סריקת ברקוד). כל מוצר נבדק מול מחירי הסניף: מוצר דומה זול יותר, מבצע שכדאי להשלים, או מוצר שלא נמכר שם. הסכום המצטבר מוצג כל הזמן, כך שאין הפתעות בקופה.">
+              <div className="settings-row">
+                <span className="settings-row__label">מצב</span>
+                <span className="settings-row__value">
+                  {companion.hasSession ? `קנייה פעילה ב${companion.store.name}` : "אין קנייה פעילה"}
+                </span>
+              </div>
+              <Link
+                to="/companion"
+                className="settings-link-btn settings-link-btn--primary"
+                onClick={() => {
+                  haptic("selection");
+                  uiSound("select");
+                }}
+              >
+                <IconCompanion />
+                {companion.hasSession ? "חזרה לקנייה" : "פתח את ליווי בסופר"}
+                <ChevronLink />
+              </Link>
+            </Card>
+            <Card title="מה הליווי מציע">
+              <ToggleRow
+                title="מוצר דומה זול יותר"
+                hint="אותו סוג מוצר, משקל דומה, מחיר נמוך יותר ליחידה בסניף הזה"
+                on={companion.prefs.swaps}
+                onToggle={() => companion.setPref("swaps", !companion.prefs.swaps)}
+              />
+              <ToggleRow
+                title="השלמה למבצע"
+                hint='כשחסרות יחידה או שתיים ל"3 ב-10" וכדומה (עד 3 יחידות נוספות)'
+                on={companion.prefs.roundups}
+                onToggle={() => companion.setPref("roundups", !companion.prefs.roundups)}
+              />
+              <ToggleRow
+                title="אישור כשהכול בסדר"
+                hint="הודעה קצרה גם כשאין זול יותר, כדי לדעת שהמוצר נסרק"
+                on={companion.prefs.okToasts}
+                onToggle={() => companion.setPref("okToasts", !companion.prefs.okToasts)}
+                last
+              />
+            </Card>
+          </>
         )}
 
         {/* ── נתונים ותחזוקה ── */}
