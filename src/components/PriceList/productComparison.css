@@ -347,6 +347,9 @@
 
 .pc-row__main {
   display: grid;
+  /* logo · info · price — the same 3 columns on every row, so all the
+     prices line up (the expand chevron lives in the info column, next to
+     "N סניפים", not in a column of its own) */
   grid-template-columns: 46px minmax(0, 1fr) auto;
   align-items: center;
   gap: 11px;
@@ -356,7 +359,6 @@
   transition: background 0.15s ease;
 }
 .pc-row.is-group .pc-row__main {
-  grid-template-columns: 46px minmax(0, 1fr) auto 28px;
   cursor: pointer;
 }
 .pc-row.is-group .pc-row__main:active {
@@ -421,15 +423,6 @@
   flex: none;
   width: 13px;
   height: 13px;
-}
-.pc-row__where-hint {
-  font-weight: 600;
-  color: var(--pc-faint);
-}
-.pc-row__where-hint::before {
-  content: "·";
-  margin-inline-end: 5px;
-  color: #cbd5e1;
 }
 .pc-row__where--addr,
 .pc-row__where--online {
@@ -543,10 +536,12 @@
   font-variant-numeric: tabular-nums;
 }
 
-/* the expand control — a round blue chevron at the left edge */
+/* the expand control — a small round blue chevron right after "N סניפים" */
 .pc-row__chev {
-  width: 28px;
-  height: 28px;
+  flex: none;
+  width: 20px;
+  height: 20px;
+  margin-inline-start: 2px;
   border-radius: 50%;
   background: #eaf1ff;
   color: var(--pc-blue);
@@ -556,8 +551,8 @@
   transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1), background 0.2s ease, color 0.2s ease;
 }
 .pc-row__chev svg {
-  width: 14px;
-  height: 14px;
+  width: 11px;
+  height: 11px;
 }
 .pc-row.is-open .pc-row__chev {
   transform: rotate(180deg);
@@ -700,9 +695,7 @@
 @media (max-width: 380px) {
   .pc__img { width: 76px; height: 76px; }
   .pc__name { font-size: 0.98rem; }
-  .pc-row__main { gap: 9px; padding: 10px 10px; }
-  .pc-row.is-group .pc-row__main { grid-template-columns: 42px minmax(0, 1fr) auto 26px; }
-  .pc-row__main { grid-template-columns: 42px minmax(0, 1fr) auto; }
+  .pc-row__main { gap: 9px; padding: 10px 10px; grid-template-columns: 42px minmax(0, 1fr) auto; }
   .pc-row__logo { width: 42px; height: 42px; }
   .pc-row__amount { font-size: 1.2rem; }
   .pc-stat__value { font-size: 1rem; }

@@ -524,8 +524,8 @@ export default function ProductComparison({ barcode }) {
                           <p className="pc-row__where">
                             <IconPin />
                             <span>{branchCount} סניפים</span>
-                            <span className="pc-row__where-hint">
-                              {isExpanded ? "הסתר" : "לפירוט"}
+                            <span className="pc-row__chev" aria-hidden="true">
+                              <IconChevron />
                             </span>
                           </p>
                         ) : place.online ? (
@@ -567,12 +567,6 @@ export default function ProductComparison({ barcode }) {
                           <span className="pc-row__strike">₪{priceFormat(priceObject.price)}</span>
                         )}
                       </div>
-
-                      {isGroup && (
-                        <span className="pc-row__chev" aria-hidden="true">
-                          <IconChevron />
-                        </span>
-                      )}
                     </div>
 
                     {isGroup && (
