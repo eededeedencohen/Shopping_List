@@ -219,10 +219,10 @@
   max-width: 100%;
   font-size: 0.66rem;
   font-weight: 600;
+  line-height: 1.25;
   color: var(--pc-faint);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  /* never truncated — a long chain name simply takes a second line */
+  overflow-wrap: anywhere;
   unicode-bidi: plaintext;
 }
 .pc-stat--best .pc-stat__sub {
@@ -429,11 +429,31 @@
   font-weight: 600;
   color: var(--pc-muted);
 }
-.pc-row__where--addr span {
+.pc-row__where--addr {
+  max-width: 100%;
+}
+
+/* ── sliding one-liner (addresses): glides back and forth when it
+   overflows, so the whole text can be read — no "…" ── */
+.pc-slide {
+  display: block;
+  flex: 1 1 auto;
   min-width: 0;
   overflow: hidden;
-  text-overflow: ellipsis;
   white-space: nowrap;
+}
+.pc-slide__in {
+  display: inline-block;
+  will-change: transform;
+}
+.pc-slide.is-sliding .pc-slide__in {
+  animation: pcSlide var(--dur, 4s) ease-in-out infinite alternate;
+}
+/* RTL: the hidden part is on the LEFT, so the text moves right to show it;
+   it rests at each end before turning back */
+@keyframes pcSlide {
+  0%, 22%   { transform: translateX(0); }
+  78%, 100% { transform: translateX(var(--shift, 0px)); }
 }
 
 /* deal line */
@@ -710,6 +730,13 @@
   .pc-seg__thumb,
   .pc-row__chev {
     transition: none;
+  }
+  /* no gliding text: let it wrap instead */
+  .pc-slide.is-sliding .pc-slide__in {
+    animation: none;
+  }
+  .pc-slide {
+    white-space: normal;
   }
 }
 

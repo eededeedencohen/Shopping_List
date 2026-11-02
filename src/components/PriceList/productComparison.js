@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import ReactDOM from "react-dom";
 import { usePriceList } from "../../context/PriceContext";
 import { usePriceCompareLayout } from "../../context/PriceCompareLayoutContext";
@@ -91,6 +91,40 @@ const branchPlace = (sm) => {
   const text = `${sm.address || ""}${sm.city ? `, ${sm.city}` : ""}`.trim();
   return { online: false, text };
 };
+
+/* ── one-line text that, when it doesn't fit, glides back and forth in
+   place so the whole of it can be read (no "…" truncation). Measures its
+   own overflow on mount + resize; nothing moves when the text fits. ── */
+function SlidingText({ text }) {
+  const ref = useRef(null);
+  const [shift, setShift] = useState(0);
+  useLayoutEffect(() => {
+    const el = ref.current;
+    if (!el) return undefined;
+    const measure = () => {
+      const over = el.scrollWidth - el.clientWidth;
+      setShift(over > 2 ? over : 0);
+    };
+    measure();
+    if (typeof ResizeObserver === "undefined") return undefined;
+    const ro = new ResizeObserver(measure);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [text]);
+  return (
+    <span
+      ref={ref}
+      className={`pc-slide${shift ? " is-sliding" : ""}`}
+      style={
+        shift
+          ? { "--shift": `${shift}px`, "--dur": `${Math.max(3.2, 1.6 + shift / 22)}s` }
+          : undefined
+      }
+    >
+      <span className="pc-slide__in">{text}</span>
+    </span>
+  );
+}
 
 /* ── skeleton while the prices load ── */
 function Skeleton() {
@@ -536,7 +570,7 @@ export default function ProductComparison({ barcode }) {
                         ) : place.text ? (
                           <p className="pc-row__where pc-row__where--addr">
                             <IconPin />
-                            <span>{place.text}</span>
+                            <SlidingText text={place.text} />
                           </p>
                         ) : null}
 
