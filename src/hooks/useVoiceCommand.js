@@ -20,17 +20,28 @@ const LEVEL_DIVISOR = 38; // RMS → 0..1 normalization for the waves
 const LEVEL_SMOOTH = 0.4; // wave smoothing (higher = snappier)
 
 /* ── Voice barge-in (hands-free only) ──────────────────────────────
-   The user may talk OVER the robot: "די", "שתוק", or simply the next command.
-   The mic stream is opened with echoCancellation, so the robot's own voice
-   coming back through the speaker is mostly removed from the mic signal; what
-   survives is treated as the user only when it is LOUD (a stricter threshold
-   than the normal VAD) and SUSTAINED (not a click), and never in the first
-   moments of playback while the echo canceller is still converging. */
-const BARGE_IN_RMS_FACTOR = 1.6; // × the user's micThreshold
-const BARGE_IN_MIN_RMS = 18; // never below this (residual echo stays under it)
-const BARGE_IN_SUSTAIN_MS = 280; // must stay loud this long
-const BARGE_IN_GRACE_MS = 400; // ignore the start of playback
-const BARGE_IN_MIN_SEGMENT_MS = 1300; // shorter capture (= <0.3s speech) → noise, drop
+   The user may talk OVER the robot: the robot stops and goes back to
+   LISTENING; whatever the user keeps saying is then captured by the normal
+   VAD like any utterance (just "די" → nothing is captured → silence).
+
+   How "the user is talking" is told apart from the robot's own voice coming
+   back through the speaker: the hands-free mic stream is opened with
+   echoCancellation, but phones differ a lot in how much residual echo is left
+   — and in how much they attenuate the USER while the far end plays. So the
+   threshold is ADAPTIVE, learned per reply: during the first moments of
+   playback (the user is presumably still quiet) we measure how much mic
+   signal each unit of TTS loudness leaves behind (the echo ratio) and the
+   residual floor; afterwards the mic must exceed that expected echo by a clear
+   margin — or an absolute minimum — for a short sustained window. */
+const BARGE_IN_GRACE_MS = 350; // learn the echo here; no cut yet
+const BARGE_IN_SUSTAIN_MS = 200; // must stay above the threshold this long
+const BARGE_IN_ECHO_MARGIN = 1.8; // × the expected residual echo
+const BARGE_IN_MIN_RMS = 8; // absolute floor of the threshold
+const BARGE_IN_RMS_FACTOR = 0.8; // × the user's micThreshold (the VAD setting)
+const BARGE_IN_MAX_RATIO = 1.2; // cap on the learned echo ratio (a polluted window)
+const BARGE_IN_MEMORY = 0.7; // how much of the previous reply's estimate carries over
+const BARGE_IN_MIN_SEGMENT_MS = 1300; // a capture right after a cut that ends at once → noise, drop
+const BARGE_IN_AFTER_CUT_MS = 1500; // "right after a cut" window
 
 /**
  * Voice engine for the bottom-nav robot coin.
@@ -93,8 +104,11 @@ export default function useVoiceCommand({
   // voice barge-in bookkeeping
   const speakStartedAtRef = useRef(0); // when the current TTS clip started
   const loudSinceRef = useRef(null); // the user has been loud over the robot since…
+  const echoRatioRef = useRef(0); // learned: mic RMS per unit of TTS RMS (residual echo)
+  const echoFloorRef = useRef(0); // learned: mic RMS floor while the robot plays
+  const lastCutAtRef = useRef(0); // when the robot was last cut off by the user
   const segStartedAtRef = useRef(0); // when the current hands-free capture started
-  const bargeInSegRef = useRef(false); // the current capture was started by a barge-in
+  const bargeInSegRef = useRef(false); // the current capture started right after a cut
 
   // web-audio analysis
   const audioCtxRef = useRef(null);
@@ -277,6 +291,10 @@ export default function useVoiceCommand({
         speakingRef.current = true;
         speakStartedAtRef.current = Date.now();
         loudSinceRef.current = null;
+        // start from a faded copy of the last reply's echo estimate, then
+        // re-learn during this reply's grace window
+        echoRatioRef.current *= BARGE_IN_MEMORY;
+        echoFloorRef.current *= BARGE_IN_MEMORY;
         refreshMode();
         if (analyser && buf) {
           const step = () => {
@@ -308,9 +326,10 @@ export default function useVoiceCommand({
       const blob = new Blob(chunksRef.current, { type: mime });
       chunksRef.current = [];
 
-      /* A capture that was started by talking over the robot but ended almost
-         at once held no real words (residual echo / a cough) — drop it quietly
-         instead of sending noise and getting a spoken "didn't understand". */
+      /* A capture that started right after the user cut the robot off but
+         ended almost at once held no real words (the tail of "די", a cough) —
+         drop it quietly instead of sending noise and getting a spoken
+         "didn't understand". */
       const bargeIn = bargeInSegRef.current;
       bargeInSegRef.current = false;
       if (
@@ -482,6 +501,8 @@ export default function useVoiceCommand({
         segActiveRef.current = true;
         quietSinceRef.current = null;
         segStartedAtRef.current = Date.now();
+        bargeInSegRef.current =
+          Date.now() - lastCutAtRef.current < BARGE_IN_AFTER_CUT_MS;
         recorder.ondataavailable = (e) => {
           if (e.data && e.data.size) chunksRef.current.push(e.data);
         };
@@ -514,31 +535,49 @@ export default function useVoiceCommand({
         if (!speakingRef.current) pushLevel(level); // TTS owns level while speaking
 
         /* voice barge-in: the user talks over the robot → cut the speech and
-           start capturing right away so their words are not lost */
+           go back to listening (the normal VAD below picks up whatever the
+           user keeps saying from the very next frame) */
         if (
           vad &&
           handsFreeRef.current &&
           speakingRef.current &&
-          !segActiveRef.current &&
-          !busyRef.current
+          !segActiveRef.current
         ) {
-          const thr = Math.max(
-            BARGE_IN_MIN_RMS,
-            (cfgRef.current.micThreshold || 15) * BARGE_IN_RMS_FACTOR
-          );
           const now = Date.now();
-          const inGrace = now - speakStartedAtRef.current < BARGE_IN_GRACE_MS;
-          if (!inGrace && level >= thr) {
-            if (!loudSinceRef.current) loudSinceRef.current = now;
-            else if (now - loudSinceRef.current >= BARGE_IN_SUSTAIN_MS) {
-              loudSinceRef.current = null;
-              stopReply(); // hush — the 'pause' event finishes the bookkeeping
-              levelRef.current = 0;
-              bargeInSegRef.current = true;
-              startSegment();
+          const ttsRms = levelRef.current * LEVEL_DIVISOR; // the robot's loudness right now
+          if (now - speakStartedAtRef.current < BARGE_IN_GRACE_MS) {
+            // learn this phone's residual echo while the user is (still) quiet
+            if (ttsRms > 2) {
+              echoRatioRef.current = Math.min(
+                BARGE_IN_MAX_RATIO,
+                Math.max(echoRatioRef.current, level / ttsRms)
+              );
             }
-          } else {
+            echoFloorRef.current = Math.min(
+              cfgRef.current.micThreshold || 15,
+              Math.max(echoFloorRef.current, level)
+            );
             loudSinceRef.current = null;
+          } else {
+            const expectedEcho =
+              echoRatioRef.current * ttsRms + echoFloorRef.current * 0.5;
+            const thr = Math.max(
+              BARGE_IN_MIN_RMS,
+              (cfgRef.current.micThreshold || 15) * BARGE_IN_RMS_FACTOR,
+              expectedEcho * BARGE_IN_ECHO_MARGIN
+            );
+            if (level >= thr) {
+              if (!loudSinceRef.current) loudSinceRef.current = now;
+              else if (now - loudSinceRef.current >= BARGE_IN_SUSTAIN_MS) {
+                loudSinceRef.current = null;
+                lastCutAtRef.current = now;
+                stopReply(); // hush — the 'pause' event finishes the bookkeeping
+                levelRef.current = 0;
+                refreshMode(); // → "listening" at once
+              }
+            } else {
+              loudSinceRef.current = null;
+            }
           }
         }
 
