@@ -1,16 +1,31 @@
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router";
-import {
-  useCartState,
-  useEnrichedProducts,
-  useCartActions,
-} from "../../hooks/appHooks";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useEnrichedProducts, useCartActions } from "../../hooks/appHooks";
 import SearchItem from "./SearchItem";
+import ProductComparisonModal from "../PriceList/productComparisonModal";
+import ProductComparison from "../PriceList/productComparison";
+import { haptic } from "../../utils/haptics";
+import { uiSound } from "../../utils/uiSound";
 import "./SearchBar.css";
 
+/* ── Product search (2026-11-02 redesign) ──────────────────────────────
+   Lives inside SearchModal (toolbar 🔍) and as the standalone /search route.
+   • one big search field (auto-focused, clear button, Enter = blur keyboard)
+   • matches every typed word against name / general name / brand / category,
+     ranks "name starts with the query" first, then "name contains", then the
+     rest; products without a price in the current store sink to the bottom
+   • results are white cards with the picture, the name (matches highlighted),
+     brand · weight, the price, the deal, and a −/+ stepper that updates the
+     cart DIRECTLY (no confirm step — same as the products grid)
+   • tapping a result opens the price-comparison modal (the old /priceList
+     page is legacy)
+   • empty state = hint + recent searches (localStorage), no-results state */
 
-/*  דיבאונס קצר כדי שלא נבצע סינון בכל הקלדה  */
-const useDebounced = (value, delay = 300) => {
+const DEBOUNCE_MS = 220;
+const VISIBLE_MAX = 60;
+const RECENT_KEY = "search.recent";
+const RECENT_MAX = 6;
+
+const useDebounced = (value, delay) => {
   const [debounced, setDebounced] = useState(value);
   useEffect(() => {
     const id = setTimeout(() => setDebounced(value), delay);
@@ -19,212 +34,256 @@ const useDebounced = (value, delay = 300) => {
   return debounced;
 };
 
+const norm = (s) => (s == null ? "" : String(s)).toLowerCase().trim();
+
+const loadRecent = () => {
+  try {
+    const arr = JSON.parse(localStorage.getItem(RECENT_KEY) || "[]");
+    return Array.isArray(arr) ? arr.filter((s) => typeof s === "string") : [];
+  } catch {
+    return [];
+  }
+};
+const saveRecent = (arr) => {
+  try {
+    localStorage.setItem(RECENT_KEY, JSON.stringify(arr));
+  } catch {
+    /* storage unavailable — ignore */
+  }
+};
+
+const IconSearch = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <circle cx="11" cy="11" r="7" />
+    <path d="m20 20-3.6-3.6" />
+  </svg>
+);
+const IconClear = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" aria-hidden="true">
+    <path d="M6 6l12 12M18 6 6 18" />
+  </svg>
+);
+const IconClock = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <circle cx="12" cy="12" r="9" />
+    <path d="M12 7v5l3 2" />
+  </svg>
+);
+
 const SearchBar = ({ closeModal }) => {
-  //================================================================
-
-  const [searchQuery, setSearchQuery] = useState(""); // the text in the search bar
-  const [typingTimeout, setTypingTimeout] = useState(null); // timeout for user typing
-
-  //=================================================================
   const { productsWithDetails } = useEnrichedProducts();
-  const { cart: cartState } = useCartState();
   const { add, remove, update } = useCartActions();
 
-  const [queryNew, setQueryNew] = useState("");
-  const debouncedQuery = useDebounced(queryNew, 600);
+  const [query, setQuery] = useState("");
+  const debounced = useDebounced(query, DEBOUNCE_MS);
+  const [recent, setRecent] = useState(loadRecent);
+  const [cmpBarcode, setCmpBarcode] = useState(null);
+  const inputRef = useRef(null);
+  const listRef = useRef(null);
 
-  /* סינון על‑גבי הרשימה המואשרת (כולל כמות ומחיר) */
-  const filtered = debouncedQuery
-    ? productsWithDetails.filter((p) =>
-        [p.name, p.generalName, p.brand]
-          .filter(Boolean)
-          .some((txt) =>
-            txt.toLowerCase().includes(debouncedQuery.toLowerCase())
-          )
-      )
-    : [];
-
-  //=================================================================
-
-  const [productAmounts, setProductAmounts] = useState({});
-  const [oldProductAmounts, setOldProductAmounts] = useState({});
-  const [isLoading, setIsLoading] = useState(true);
-  const navigate = useNavigate();
-
-  // load the products-amounts:
+  /* the keyboard should be up as soon as the modal opens */
   useEffect(() => {
-    const loadProductAmounts = async () => {
-      try {
-        setIsLoading(true);
-        const amountsNew = cartState["products"];
-        const amountsObject = {};
-        amountsNew.forEach((product) => {
-          amountsObject[product.barcode] = product.amount;
-        });
-        setProductAmounts(amountsObject);
-        setOldProductAmounts(amountsObject);
-      } catch (error) {
-        console.error(error);
-      } finally {
-        setIsLoading(false);
-      }
+    const t = setTimeout(() => inputRef.current && inputRef.current.focus(), 60);
+    return () => clearTimeout(t);
+  }, []);
+
+  const words = useMemo(
+    () => norm(debounced).split(/\s+/).filter(Boolean),
+    [debounced]
+  );
+
+  const results = useMemo(() => {
+    if (!words.length) return [];
+    const q = norm(debounced);
+    const rank = (p) => {
+      const name = norm(p.name);
+      if (name.startsWith(q)) return 0;
+      if (name.includes(q)) return 1;
+      return 2;
     };
-    loadProductAmounts();
-  }, [cartState]);
+    return productsWithDetails
+      .filter((p) => {
+        const hay = [p.name, p.generalName, p.brand, p.category, p.subcategory].map(norm);
+        return words.every((w) => hay.some((h) => h.includes(w)));
+      })
+      .map((p) => ({ p, r: rank(p), na: p.price == null ? 1 : 0 }))
+      .sort((a, b) => a.r - b.r || a.na - b.na)
+      .map((x) => x.p);
+  }, [productsWithDetails, words, debounced]);
 
-  const onChangeQuery = (event) => {
-    let query = event.target.value;
-    setQueryNew(query); // New
-    setSearchQuery(query); // Old
+  const visible = results.slice(0, VISIBLE_MAX);
 
-    if (typingTimeout) {
-      clearTimeout(typingTimeout);
-    }
-
-    const newTimeout = setTimeout(() => {}, 1000);
-
-    setTypingTimeout(newTimeout);
-  };
-
-  const handleResultClick = (result) => {
-    navigate(`/priceList/${result.barcode}`);
-    closeModal(); // Call the closeModal function to close the modal
-  };
-
-  //=================================================================
-  const makeVisible = (button) => {
-    button.classList.add("visible");
-  };
-
-  const makeInvisible = (button) => {
-    button.classList.remove("visible");
-  };
-
-  const changeButton = (barcode, oldAmount, currentAmount) => {
-    const button = document.getElementById(`confirm-${barcode}`);
-    if (button) {
-      if (oldAmount === 0 && currentAmount > 0) {
-        button.innerHTML = "הוסף";
-        button.style.backgroundColor = "#00c200";
-        makeVisible(button);
-      } else if (oldAmount > 0 && currentAmount === 0) {
-        button.innerHTML = "הסר";
-        button.style.backgroundColor = "#ff0000";
-        makeVisible(button);
-      } else if (
-        oldAmount > 0 &&
-        currentAmount > 0 &&
-        oldAmount !== currentAmount
-      ) {
-        button.innerHTML = "עדכן";
-        button.style.backgroundColor = "#008cba";
-        makeVisible(button);
-      } else if (currentAmount === oldAmount) {
-        makeInvisible(button);
-      }
-    }
-  };
-  //=================================================================
-
-  const handleIncreaseAmount = (barcode) => {
-    try {
-      const currentAmount = productAmounts[barcode] || 0;
-      const newAmount = currentAmount + 1;
-      const newAmounts = { ...productAmounts, [barcode]: newAmount };
-
-      setProductAmounts(newAmounts);
-
-      changeButton(barcode, oldProductAmounts[barcode] || 0, newAmount);
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
-  const handleDecreaseAmount = (barcode) => {
-    const currentAmount = productAmounts[barcode] || 0;
-    let newAmount = currentAmount > 0 ? currentAmount - 1 : 0;
-    const newAmounts = { ...productAmounts, [barcode]: newAmount };
-
-    // Delete the key if new amount is 0 to mimic the initial state
-    if (newAmount === 0) {
-      delete newAmounts[barcode];
-    }
-
-    setProductAmounts(newAmounts);
-
-    changeButton(barcode, oldProductAmounts[barcode] || 0, newAmount);
-  };
-
-  const handleConfirmChanges = async (barcode) => {
-    // check if the operation is delete, update or add:
-    let oldAmount = oldProductAmounts[barcode];
-    if (oldAmount === undefined) {
-      oldAmount = 0;
-    }
-    let newAmount = productAmounts[barcode];
-
-    // change the button:
-    changeButton(barcode, newAmount, newAmount);
-
-    if (newAmount === undefined) {
-      newAmount = 0;
-    }
-
-    // case add: newAmount > oldAmount=0:
-    if (newAmount > oldAmount && oldAmount === 0) {
-      add(barcode, newAmount);
-      // const response = await adProdductToCart(userId, barcode, newAmount);
-      // console.log(response);
-      // await loadCart(userId);
-    }
-    // case delete: newAmount=0 and oldAmount>0:
-    else if (newAmount === 0 && oldAmount > 0) {
-      remove(barcode);
-    }
-    // case update: newAmount>0 and oldAmount>0 and newAmount!=oldAmount:
-    else if (newAmount > 0 && oldAmount > 0 && newAmount !== oldAmount) {
-      update(barcode, newAmount);
-    }
-
-    // update the oldProductAmounts:
-    const newOldAmounts = { ...oldProductAmounts };
-    newOldAmounts[barcode] = newAmount;
-    setOldProductAmounts(newOldAmounts);
-  };
-
-  // Corrected useEffect hook
+  /* scroll the list back to the top on every new query */
   useEffect(() => {
-    // Condition moved inside the useEffect body
-    console.log(productAmounts);
-    console.log(oldProductAmounts);
-  }, [productAmounts, oldProductAmounts]); // Dependencies array to trigger the effect when either of these change
+    if (listRef.current) listRef.current.scrollTop = 0;
+  }, [debounced]);
 
-  if (isLoading) {
-    return <div></div>;
-  }
+  const rememberQuery = () => {
+    const q = query.trim();
+    if (q.length < 2) return;
+    const next = [q, ...recent.filter((s) => s !== q)].slice(0, RECENT_MAX);
+    setRecent(next);
+    saveRecent(next);
+  };
+
+  const clearRecent = () => {
+    setRecent([]);
+    saveRecent([]);
+    haptic("selection");
+  };
+
+  /* −/+ update the cart directly (like the products grid) */
+  const increment = (product) => {
+    const current = product.amountInCart || 0;
+    haptic("light");
+    uiSound("tap");
+    if (current === 0) add(product.barcode, 1);
+    else update(product.barcode, current + 1);
+    rememberQuery();
+  };
+  const decrement = (product) => {
+    const current = product.amountInCart || 0;
+    if (current <= 0) return;
+    haptic("light");
+    uiSound("tap");
+    if (current === 1) remove(product.barcode);
+    else update(product.barcode, current - 1);
+  };
+
+  const openProduct = (product) => {
+    haptic("selection");
+    rememberQuery();
+    setCmpBarcode(product.barcode);
+  };
+
+  const onKeyDown = (e) => {
+    if (e.key === "Enter") {
+      rememberQuery();
+      inputRef.current && inputRef.current.blur(); // drop the keyboard, show the results
+    } else if (e.key === "Escape" && query) {
+      e.stopPropagation();
+      setQuery("");
+    }
+  };
+
+  const hasQuery = words.length > 0;
+  const typing = query.trim() !== debounced.trim();
 
   return (
-    <div className="search-bar">
-      <input
-        type="text"
-        placeholder="חפש מוצרים"
-        value={searchQuery}
-        onChange={onChangeQuery}
-      />
-      <div className="search-results">
-        {filtered.map((product) => (
-          <SearchItem
-            key={product.barcode}
-            product={product}
-            amount={productAmounts[product.barcode] || 0}
-            oldAmount={oldProductAmounts[product.barcode] || 0}
-            onClick={() => handleResultClick(product)}
-            onIncreaseAmount={() => handleIncreaseAmount(product.barcode)}
-            onDecreaseAmount={() => handleDecreaseAmount(product.barcode)}
-            onConfirmChanges={() => handleConfirmChanges(product.barcode)}
-          />
-        ))}
+    <div className="sr">
+      {/* ── search field ── */}
+      <div className={`sr__field${query ? " has-text" : ""}`}>
+        <span className="sr__field-icon" aria-hidden="true"><IconSearch /></span>
+        <input
+          ref={inputRef}
+          type="search"
+          inputMode="search"
+          enterKeyHint="search"
+          autoComplete="off"
+          autoCorrect="off"
+          spellCheck="false"
+          placeholder="שם מוצר, מותג או קטגוריה…"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          onKeyDown={onKeyDown}
+          aria-label="חיפוש מוצר"
+        />
+        {query && (
+          <button
+            type="button"
+            className="sr__clear"
+            onClick={() => {
+              setQuery("");
+              inputRef.current && inputRef.current.focus();
+            }}
+            aria-label="נקה"
+          >
+            <IconClear />
+          </button>
+        )}
       </div>
+
+      {/* ── status line ── */}
+      {hasQuery && !typing && (
+        <p className="sr__status" aria-live="polite">
+          {results.length === 0
+            ? ""
+            : results.length > VISIBLE_MAX
+            ? `מציג ${VISIBLE_MAX} מתוך ${results.length} תוצאות · דייקו את החיפוש`
+            : results.length === 1
+            ? "תוצאה אחת"
+            : `${results.length} תוצאות`}
+        </p>
+      )}
+
+      {/* ── results / empty states ── */}
+      <div className="sr__list" ref={listRef}>
+        {!hasQuery ? (
+          <div className="sr__empty">
+            <span className="sr__empty-icon" aria-hidden="true"><IconSearch /></span>
+            <p className="sr__empty-title">מה מחפשים היום?</p>
+            <p className="sr__empty-sub">הקלידו שם מוצר, מותג או קטגוריה — התוצאות מופיעות תוך כדי הקלדה</p>
+            {recent.length > 0 && (
+              <div className="sr__recent">
+                <div className="sr__recent-head">
+                  <span className="sr__recent-title">חיפושים אחרונים</span>
+                  <button type="button" className="sr__recent-clear" onClick={clearRecent}>
+                    נקה
+                  </button>
+                </div>
+                <div className="sr__recent-list">
+                  {recent.map((s) => (
+                    <button
+                      key={s}
+                      type="button"
+                      className="sr__recent-item"
+                      onClick={() => {
+                        haptic("selection");
+                        setQuery(s);
+                      }}
+                    >
+                      <IconClock />
+                      <span>{s}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        ) : !typing && results.length === 0 ? (
+          <div className="sr__empty sr__empty--none">
+            <span className="sr__empty-icon" aria-hidden="true"><IconSearch /></span>
+            <p className="sr__empty-title">לא נמצאו מוצרים עבור “{query.trim()}”</p>
+            <p className="sr__empty-sub">נסו מילה אחרת, שם מותג או קטגוריה</p>
+          </div>
+        ) : (
+          <ul className="sr__results">
+            {visible.map((product, idx) => (
+              <SearchItem
+                key={product.barcode}
+                product={product}
+                words={words}
+                index={idx}
+                onOpen={() => openProduct(product)}
+                onIncrement={() => increment(product)}
+                onDecrement={() => decrement(product)}
+              />
+            ))}
+            {results.length > VISIBLE_MAX && (
+              <li className="sr__more">
+                יש עוד {results.length - VISIBLE_MAX} מוצרים — הוסיפו מילה כדי לצמצם
+              </li>
+            )}
+          </ul>
+        )}
+      </div>
+
+      <ProductComparisonModal
+        isOpen={!!cmpBarcode}
+        onClose={() => setCmpBarcode(null)}
+      >
+        <ProductComparison barcode={cmpBarcode} />
+      </ProductComparisonModal>
     </div>
   );
 };

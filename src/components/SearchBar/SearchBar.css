@@ -1,45 +1,275 @@
-.search-bar {
-    display: flex;
-    width: 100%;
-    flex-direction: column ;
-    direction: rtl;
-    align-items: center;
+/* ═══════════════════════════════════════════════════════════════
+   Product search — content (`sr__*`), 2026-11-02 redesign
+   Fills the SearchModal card: the field stays put, the results scroll.
+   Also used standalone on the /search route.
+   ═══════════════════════════════════════════════════════════════ */
+
+.sr {
+  --sr-blue: #2a63e8;
+  --sr-blue-2: #1b45c4;
+  --sr-ink: #0f172a;
+  --sr-muted: #64748b;
+  --sr-faint: #94a3b8;
+  --sr-line: rgba(15, 23, 42, 0.07);
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  direction: rtl;
+  color: var(--sr-ink);
+  font-family: "Heebo", "Open Sans", "Rubik", "Segoe UI", Arial, sans-serif;
 }
 
-.search-bar input[type="text"] {
-    width: calc(100% - 20px); 
-    height: 30px; 
-    padding: 15px; 
-    margin: 10px 0; 
-    border: 2px solid #4CAF50; 
-    border-radius: 25px; 
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1); 
-    font-size: 18px; 
-    background-color: white;
-    color: #333; 
+/* ── the field ── */
+.sr__field {
+  flex: none;
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: 50px;
+  padding: 0 44px 0 44px;
+  border-radius: 16px;
+  background: #fff;
+  border: 1.5px solid rgba(42, 99, 232, 0.18);
+  box-shadow: 0 2px 10px rgba(30, 58, 95, 0.06);
+  transition: border-color 0.18s ease, box-shadow 0.18s ease;
+}
+.sr__field:focus-within {
+  border-color: var(--sr-blue);
+  box-shadow: 0 0 0 4px rgba(42, 99, 232, 0.14), 0 2px 10px rgba(30, 58, 95, 0.06);
+}
+.sr__field input {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  border: 0;
+  background: transparent;
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--sr-ink);
+  outline: none;
+  direction: rtl;
+}
+.sr__field input::placeholder {
+  color: var(--sr-faint);
+  font-weight: 500;
+}
+/* no native clear button — we draw our own */
+.sr__field input::-webkit-search-cancel-button,
+.sr__field input::-webkit-search-decoration {
+  -webkit-appearance: none;
+  appearance: none;
+}
+.sr__field-icon {
+  position: absolute;
+  inset-inline-start: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 20px;
+  height: 20px;
+  color: var(--sr-blue);
+  pointer-events: none;
+}
+.sr__field-icon svg {
+  width: 20px;
+  height: 20px;
+}
+.sr__clear {
+  position: absolute;
+  inset-inline-end: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 28px;
+  height: 28px;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(15, 23, 42, 0.07);
+  color: var(--sr-muted);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.sr__clear svg {
+  width: 12px;
+  height: 12px;
+}
+.sr__clear:active {
+  background: rgba(15, 23, 42, 0.12);
 }
 
-.search-bar input[type="text"]::placeholder {
-    color: #aaa; /* Lighter color for placeholder */
+/* ── status line ── */
+.sr__status {
+  flex: none;
+  margin: 0;
+  min-height: 1em;
+  padding: 0 4px;
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: var(--sr-muted);
 }
 
-.search-bar input[type="text"]:focus {
-    border-color: #3b907f; /* Slightly different border color on focus */
-    outline: none; /* Remove default outline */
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15); /* Slightly more prominent shadow on focus */
+/* ── the scrolling area ── */
+.sr__list {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  padding: 2px 0 4px;
+  scrollbar-width: none;
+}
+.sr__list::-webkit-scrollbar {
+  display: none;
 }
 
-/* Optional: Add transitions for smooth effect */
-.search-bar input[type="text"] {
-    transition: border-color 0.3s, box-shadow 0.3s;
+.sr__results {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
-.search-results {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-    overflow-y: scroll;
-    padding: 0;
+.sr__more {
+  padding: 12px 8px 6px;
+  text-align: center;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--sr-faint);
+}
+
+/* highlighted match inside a result */
+.sr__mark {
+  background: rgba(42, 99, 232, 0.14);
+  color: inherit;
+  border-radius: 4px;
+  padding: 0 1px;
+}
+
+/* ── empty / no-results states ── */
+.sr__empty {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 18px 10px 24px;
+  text-align: center;
+}
+.sr__empty-icon {
+  width: 58px;
+  height: 58px;
+  margin-bottom: 6px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #eaf1ff, #dbe7ff);
+  color: var(--sr-blue);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 20px rgba(42, 99, 232, 0.16);
+}
+.sr__empty-icon svg {
+  width: 26px;
+  height: 26px;
+}
+.sr__empty-title {
+  margin: 0;
+  font-size: 1.02rem;
+  font-weight: 800;
+  color: var(--sr-ink);
+  unicode-bidi: plaintext;
+}
+.sr__empty-sub {
+  margin: 0;
+  max-width: 300px;
+  font-size: 0.82rem;
+  font-weight: 500;
+  line-height: 1.45;
+  color: var(--sr-muted);
+}
+.sr__empty--none .sr__empty-icon {
+  background: rgba(15, 23, 42, 0.06);
+  color: var(--sr-muted);
+  box-shadow: none;
+}
+
+/* recent searches */
+.sr__recent {
+  width: 100%;
+  margin-top: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  text-align: right;
+}
+.sr__recent-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 2px;
+}
+.sr__recent-title {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--sr-muted);
+}
+.sr__recent-clear {
+  border: 0;
+  background: transparent;
+  padding: 2px 4px;
+  font-family: inherit;
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: var(--sr-blue);
+  cursor: pointer;
+}
+.sr__recent-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.sr__recent-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  max-width: 100%;
+  padding: 7px 12px 7px 14px;
+  border-radius: 12px;
+  border: 1px solid var(--sr-line);
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(30, 58, 95, 0.05);
+  font-family: inherit;
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: var(--sr-ink);
+  cursor: pointer;
+  transition: transform 0.12s ease, border-color 0.15s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+.sr__recent-item svg {
+  flex: none;
+  width: 14px;
+  height: 14px;
+  color: var(--sr-faint);
+}
+.sr__recent-item span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.sr__recent-item:active {
+  transform: scale(0.97);
+  border-color: rgba(42, 99, 232, 0.35);
+}
+
+/* standalone /search route: give it the page's room */
+.app-scroll > .sr {
+  padding: 12px 14px 16px;
+  min-height: 100%;
 }

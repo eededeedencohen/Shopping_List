@@ -1,56 +1,115 @@
-.modal-overlay {
-    position: fixed;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background: rgba(0, 0, 0, 0.7);
-    z-index: 10000;
+/* ═══════════════════════════════════════════════════════════════
+   Product search — centered modal shell (`sm__*`)
+   Same language as the price-comparison modal (productComparisonModal.css):
+   navy blurred veil, white→#f0f4fb rounded card, title bar + round ✕.
+   The card has a FIXED height so it doesn't jump while typing.
+   ═══════════════════════════════════════════════════════════════ */
+
+.sm {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 18px 14px;
+  background: rgba(10, 25, 60, 0.5);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  animation: smFade 0.2s ease both;
+  font-family: "Heebo", "Open Sans", "Rubik", "Segoe UI", Arial, sans-serif;
+  -webkit-tap-highlight-color: transparent;
+}
+.sm.is-closing {
+  animation: smFadeOut 0.22s ease forwards;
+}
+
+.sm__card {
+  position: relative;
+  width: min(100%, 560px);
+  height: min(86dvh, 720px);
+  max-height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(180deg, #ffffff 0%, #f0f4fb 100%);
+  border-radius: 24px;
+  box-shadow:
+    0 30px 70px rgba(15, 23, 42, 0.38),
+    0 0 0 1px rgba(255, 255, 255, 0.5) inset;
+  animation: smIn 0.3s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.sm.is-closing .sm__card {
+  animation: smOut 0.22s ease-in forwards;
+}
+
+@keyframes smIn {
+  from { opacity: 0; transform: translateY(14px) scale(0.94); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes smOut {
+  from { opacity: 1; transform: translateY(0) scale(1); }
+  to   { opacity: 0; transform: translateY(10px) scale(0.96); }
+}
+@keyframes smFade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes smFadeOut {
+  from { opacity: 1; }
+  to   { opacity: 0; }
+}
+
+/* ── title bar ── */
+.sm__head {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 14px 14px 6px;
+}
+.sm__title {
+  margin: 0;
+  font-size: 1.08rem;
+  font-weight: 800;
+  color: #0f172a;
+  letter-spacing: -0.2px;
+}
+.sm__x {
+  flex: none;
+  width: 34px;
+  height: 34px;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(15, 23, 42, 0.06);
+  color: #475569;
+  font-size: 1rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.15s ease;
+}
+.sm__x:active {
+  transform: scale(0.92);
+  background: rgba(15, 23, 42, 0.1);
+}
+
+/* ── body: the search bar fills it (field + scrolling results) ── */
+.sm__body {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 0 14px 14px;
+  border-radius: 0 0 24px 24px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sm,
+  .sm__card,
+  .sm.is-closing,
+  .sm.is-closing .sm__card {
+    animation-duration: 0.01s;
   }
-  
-  .modal-window {
-    background: #fff;
-    border-radius: 5px;
-    max-width: 500px;
-    position: relative;
-    animation: slide-down 0.5s ease;
-  }
-  
-  .close-button-container {
-    position: fixed;
-    top: 60px;
-    left: 10%;
-    transform: translateX(-50%);
-    z-index: 1;
-  }
-  
-  .close-button {
-    background: rgb(234, 68, 68);
-    color: white;
-    border: 2px solid rgb(244, 185, 179);
-    border-radius: 50%;
-    padding: 10px;
-    box-shadow: 0 0 5px #dd4141;
-    cursor: pointer;
-    /*Increase the wight a little*/
-    width: 40px;
-  }
-  
-  
-  @keyframes slide-down {
-    0% { transform: translateY(-100%); }
-    100% { transform: translateY(0); }
-  }
-  
-  @media (max-width: 600px) {
-    .modal-window {
-      width: 80%;
-      height: 80%;
-  
-      overflow: auto; /* Add this line */
-    }
-  }
-  
+}
