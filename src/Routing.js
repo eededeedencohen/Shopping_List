@@ -80,6 +80,7 @@ function Routing() {
       <Route path="/add-product" element={<AddProduct />} />
       <Route path="/scraper" element={<Scraper />} />
       <Route path="/settings" element={<Settings />} />
+      <Route path="/settings/:section" element={<Settings />} />
       <Route path="/barcodes-audit" element={<BarcodesAudit />} />
       <Route path="/loading-animations" element={<LoadingAnimations />} />
       <Route path="/refresh-all-prices" element={<RefreshAllPrices />} />

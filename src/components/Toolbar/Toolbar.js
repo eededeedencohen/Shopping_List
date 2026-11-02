@@ -1,9 +1,8 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import ReactDOM from "react-dom";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import SearchBar from "../SearchBar/SearchBar";
 import SearchModal from "../SearchBar/SearchModal";
-import SettingsModal from "../Settings/SettingsModal";
 import { useCartTotals, useFullCart } from "../../hooks/appHooks";
 import useBodyScrollLock from "../../hooks/useBodyScrollLock";
 import { haptic } from "../../utils/haptics";
@@ -69,10 +68,18 @@ function Toolbar() {
   const { totalAmount, totalPrice } = useCartTotals();
   const { fullCart } = useFullCart();
   const location = useLocation();
+  const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
   useBodyScrollLock(isOpen);
+
+  /* settings is a real page (hub + sub-pages) so the phone's back button
+     works inside it; the route change also closes the drawer */
+  const openSettings = () => {
+    haptic("selection");
+    uiSound("select");
+    if (location.pathname !== "/settings") navigate("/settings");
+  };
 
   /* ── cart badge: pop + colour flash (green when adding, red when removing) ── */
   const [pop, setPop] = useState(false);
@@ -294,10 +301,8 @@ function Toolbar() {
             type="button"
             className="drawer-foot__settings"
             onClick={() => {
-              haptic("selection");
-              uiSound("select");
               setIsOpen(false);
-              setIsSettingsModalOpen(true);
+              openSettings();
             }}
           >
             <IconSettings />
@@ -343,10 +348,7 @@ function Toolbar() {
         type="button"
         className="tb-btn settings-link"
         aria-label="הגדרות"
-        onClick={() => {
-          haptic("selection");
-          setIsSettingsModalOpen(true);
-        }}
+        onClick={openSettings}
       >
         <IconSettings className="settings-icon" />
       </button>
@@ -376,11 +378,6 @@ function Toolbar() {
       <SearchModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
         <SearchBar closeModal={() => setIsModalOpen(false)} />
       </SearchModal>
-      <SettingsModal
-        isOpen={isSettingsModalOpen}
-        onClose={() => setIsSettingsModalOpen(false)}
-      />
-
       {drawer}
     </nav>
   );

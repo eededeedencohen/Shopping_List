@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import React, { useEffect, useMemo, useState } from "react";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import "./Settings.css";
 import { useCart } from "../../context/CartContext2";
 import { useProductsLayout } from "../../context/ProductsLayoutContext";
@@ -21,6 +21,13 @@ import { IconClose } from "../Icons/UiIcons";
 import { haptic, isHapticsEnabled, setHapticsEnabled } from "../../utils/haptics";
 import { uiSound, isUiSoundEnabled, setUiSoundEnabled } from "../../utils/uiSound";
 
+/* ═══════════════════════════════════════════════════════════════════
+   Settings — a HUB of grouped rows (each shows its current value) that
+   open focused sub-pages at /settings/:section. Phone-settings mental
+   model: nothing is more than one tap away, the hub never scrolls past
+   two screens, and the phone's back button works everywhere.
+   ═══════════════════════════════════════════════════════════════════ */
+
 /* A fixed "demo" cart — one button fills the active cart with these and switches
    to the chosen supermarket (for presentations). */
 const DEMO_SUPERMARKET_ID = 146;
@@ -37,59 +44,21 @@ const DEMO_CART_PRODUCTS = [
 ];
 
 const PRODUCTS_LAYOUT_OPTIONS = [
-  {
-    value: "list",
-    label: "רשימה",
-    description: "מוצר אחד בכל שורה — תצוגה מורחבת",
-  },
-  {
-    value: "grid",
-    label: "רשת",
-    description: "שני מוצרים בכל שורה — תצוגה קומפקטית",
-  },
+  { value: "list", label: "רשימה", description: "מוצר אחד בכל שורה — תצוגה מורחבת" },
+  { value: "grid", label: "רשת", description: "שני מוצרים בכל שורה — תצוגה קומפקטית" },
 ];
 
 const AI_THEME_OPTIONS = [
-  {
-    value: "neurons",
-    label: "נוירונים",
-    description: "חלקיקים זוהרים מחוברים — קלאסי וטכנולוגי",
-  },
-  {
-    value: "synapse",
-    label: "רשת נוירונים",
-    description: "הקלאסי בגרסה מלוטשת — חלקיקים חדים, חיבורים חיים ואותות",
-  },
-  {
-    value: "hacker",
-    label: "סייבר האקר",
-    description: "מעגל מודפס חי — אותות דוהרים במסלולים, גליץ' וסריקה",
-  },
-  {
-    value: "neon",
-    label: "ניאון סיטי",
-    description: "סייברפאנק עמוק — שמש ניאון, הרים וגריד אינסופי",
-  },
-  {
-    value: "aurora",
-    label: "זוהר צפוני",
-    description: "ענני צבע נעים בתנועה איטית — חולמני",
-  },
-  {
-    value: "galaxy",
-    label: "גלקסיה",
-    description: "כוכבים מנצנצים, ערפילית וכוכבי שביט",
-  },
-  {
-    value: "cyber",
-    label: "סייבר",
-    description: "סינתווייב — שמש ניאון וגריד פרספקטיבה",
-  },
+  { value: "neurons", label: "נוירונים", description: "חלקיקים זוהרים מחוברים — קלאסי וטכנולוגי" },
+  { value: "synapse", label: "רשת נוירונים", description: "הקלאסי בגרסה מלוטשת — חלקיקים חדים, חיבורים חיים ואותות" },
+  { value: "hacker", label: "סייבר האקר", description: "מעגל מודפס חי — אותות דוהרים במסלולים, גליץ' וסריקה" },
+  { value: "neon", label: "ניאון סיטי", description: "סייברפאנק עמוק — שמש ניאון, הרים וגריד אינסופי" },
+  { value: "aurora", label: "זוהר צפוני", description: "ענני צבע נעים בתנועה איטית — חולמני" },
+  { value: "galaxy", label: "גלקסיה", description: "כוכבים מנצנצים, ערפילית וכוכבי שביט" },
+  { value: "cyber", label: "סייבר", description: "סינתווייב — שמש ניאון וגריד פרספקטיבה" },
 ];
 
-/* Voice-reply language + voices — mirrors the picker on the AI page so the
-   voice command (long-press the bottom-nav coin) and the AI page share the
-   same spoken-reply preference (stored in AiSettingsContext). */
+/* Voice-reply language + voices — shared with the AI page through AiSettingsContext. */
 const TTS_LANGUAGE_OPTIONS = [
   { value: "he", label: "עברית" },
   { value: "en", label: "English" },
@@ -122,56 +91,74 @@ const TTS_VOICES = {
 };
 
 const PRICE_COMPARE_LAYOUT_OPTIONS = [
-  {
-    value: "expanded",
-    label: "כל הסניפים",
-    description: "כל סניף מוצג כשורה נפרדת — תמיד",
-  },
-  {
-    value: "grouped",
-    label: "מקובצים לפי רשת",
-    description: "סניפים זהים באותה רשת מתאחדים לשורה אחת",
-  },
+  { value: "expanded", label: "כל הסניפים", description: "כל סניף מוצג כשורה נפרדת — תמיד" },
+  { value: "grouped", label: "מקובצים לפי רשת", description: "סניפים זהים באותה רשת מתאחדים לשורה אחת" },
 ];
 
 const RECEIPT_THEME_OPTIONS = [
-  {
-    value: "color",
-    label: "צבעוני",
-    description: "תצוגה מקורית עם איקונים ותמונות בצבע מלא",
-  },
-  {
-    value: "grayscale",
-    label: "גווני אפור",
-    description: "הקבלה כולה בגוונים של שחור-לבן",
-  },
+  { value: "color", label: "צבעוני", description: "תצוגה מקורית עם איקונים ותמונות בצבע מלא" },
+  { value: "grayscale", label: "גווני אפור", description: "הקבלה כולה בגוונים של שחור-לבן" },
 ];
 
 const CART_CARD_LAYOUT_OPTIONS = [
-  {
-    value: "default",
-    label: "מורחבת",
-    description: "כפתורי +/- ועדכון בשורה נפרדת מתחת",
-  },
-  {
-    value: "compact",
-    label: "קומפקטית",
-    description: "ללא שורת כפתורים — שינוי כמות בהחלקה",
-  },
+  { value: "default", label: "מורחבת", description: "כפתורי +/- ועדכון בשורה נפרדת מתחת" },
+  { value: "compact", label: "קומפקטית", description: "ללא שורת כפתורים — שינוי כמות בהחלקה" },
 ];
 
+/* mic sensitivity (VAD threshold, raw RMS units) — lower = more sensitive */
+const MIC_MIN = 5;
+const MIC_MAX = 40;
+
+const labelOf = (opts, v) => (opts.find((o) => o.value === v) || opts[0]).label;
+
+/* ── section icons (stroke, 24 grid) ─────────────────────────────── */
+const ico = {
+  viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: 2,
+  strokeLinecap: "round", strokeLinejoin: "round", width: "1em", height: "1em", "aria-hidden": true,
+};
+const IconPalette = () => (
+  <svg {...ico}><path d="M12 3a9 9 0 0 0 0 18h1.5a2 2 0 0 0 1.5-3.3 2 2 0 0 1 1.5-3.2H18a3 3 0 0 0 3-3A8.7 8.7 0 0 0 12 3z" /><circle cx="7.5" cy="11.5" r="1.2" fill="currentColor" stroke="none" /><circle cx="10.5" cy="7.5" r="1.2" fill="currentColor" stroke="none" /><circle cx="15.5" cy="7.5" r="1.2" fill="currentColor" stroke="none" /></svg>
+);
+const IconVoice = () => (
+  <svg {...ico}><rect x="9" y="3" width="6" height="11" rx="3" /><path d="M5 11a7 7 0 0 0 14 0" /><line x1="12" y1="18" x2="12" y2="21" /></svg>
+);
+const IconFeel = () => (
+  <svg {...ico}><rect x="8" y="3" width="8" height="18" rx="2" /><path d="M4 9v6M20 9v6M1.5 11v2M22.5 11v2" /></svg>
+);
+const IconStore = () => (
+  <svg {...ico}><path d="M3 9l1.5-5h15L21 9" /><path d="M3 9h18v2a3 3 0 0 1-6 0 3 3 0 0 1-6 0 3 3 0 0 1-6 0V9z" /><path d="M5 13v8h14v-8" /><rect x="10" y="15" width="4" height="6" /></svg>
+);
+const IconCartCheck = () => (
+  <svg {...ico}><circle cx="9" cy="20" r="1.3" /><circle cx="17" cy="20" r="1.3" /><path d="M2 3h3l2.4 11h11.2L21 7H6.2" /><polyline points="9.5 10.5 11.5 12.5 15.5 8.5" /></svg>
+);
+const IconDatabase = () => (
+  <svg {...ico}><ellipse cx="12" cy="5.5" rx="8" ry="3" /><path d="M4 5.5v13c0 1.7 3.6 3 8 3s8-1.3 8-3v-13" /><path d="M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3" /></svg>
+);
+const IconFlask = () => (
+  <svg {...ico}><path d="M9 3h6M10 3v6L4.5 18.5A2 2 0 0 0 6.2 21h11.6a2 2 0 0 0 1.7-2.5L14 9V3" /><path d="M7.5 15h9" /></svg>
+);
+const IconResearch = () => (
+  <svg {...ico}><rect x="4" y="4" width="16" height="17" rx="2.5" /><path d="M9 2.5v3M15 2.5v3" /><polyline points="8.5 13 11 15.5 15.5 10.5" /></svg>
+);
+const IconChevron = () => (
+  <svg {...ico}><polyline points="15 18 9 12 15 6" /></svg>
+);
+const IconBack = () => (
+  <svg {...ico} strokeWidth={2.2}><line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" /></svg>
+);
+const IconSearch = () => (
+  <svg {...ico}><circle cx="11" cy="11" r="7" /><line x1="20" y1="20" x2="16.2" y2="16.2" /></svg>
+);
+
+/* ── previews (unchanged visuals) ────────────────────────────────── */
 function ProductsLayoutPreview({ value }) {
   if (value === "list") {
     return (
-      <div className="layout-preview layout-preview--list">
-        <span /><span /><span />
-      </div>
+      <div className="layout-preview layout-preview--list"><span /><span /><span /></div>
     );
   }
   return (
-    <div className="layout-preview layout-preview--grid">
-      <span /><span /><span /><span />
-    </div>
+    <div className="layout-preview layout-preview--grid"><span /><span /><span /><span /></div>
   );
 }
 
@@ -245,21 +232,13 @@ function PriceComparePreview({ value }) {
   if (value === "expanded") {
     return (
       <div className="price-compare-preview">
-        <div className="price-compare-preview__row">
-          <span className="price-compare-preview__logo" />
-          <span className="price-compare-preview__line" />
-          <span className="price-compare-preview__price" />
-        </div>
-        <div className="price-compare-preview__row">
-          <span className="price-compare-preview__logo" />
-          <span className="price-compare-preview__line" />
-          <span className="price-compare-preview__price" />
-        </div>
-        <div className="price-compare-preview__row">
-          <span className="price-compare-preview__logo" />
-          <span className="price-compare-preview__line" />
-          <span className="price-compare-preview__price" />
-        </div>
+        {[0, 1, 2].map((i) => (
+          <div className="price-compare-preview__row" key={i}>
+            <span className="price-compare-preview__logo" />
+            <span className="price-compare-preview__line" />
+            <span className="price-compare-preview__price" />
+          </div>
+        ))}
       </div>
     );
   }
@@ -279,18 +258,12 @@ function ReceiptThemePreview({ value }) {
   return (
     <div className={`receipt-theme-preview receipt-theme-preview--${value}`}>
       <span className="receipt-theme-preview__line receipt-theme-preview__line--header" />
-      <span className="receipt-theme-preview__row">
-        <span className="receipt-theme-preview__tag" />
-        <span className="receipt-theme-preview__line" />
-      </span>
-      <span className="receipt-theme-preview__row">
-        <span className="receipt-theme-preview__tag" />
-        <span className="receipt-theme-preview__line" />
-      </span>
-      <span className="receipt-theme-preview__row">
-        <span className="receipt-theme-preview__tag" />
-        <span className="receipt-theme-preview__line" />
-      </span>
+      {[0, 1, 2].map((i) => (
+        <span className="receipt-theme-preview__row" key={i}>
+          <span className="receipt-theme-preview__tag" />
+          <span className="receipt-theme-preview__line" />
+        </span>
+      ))}
       <span className="receipt-theme-preview__total" />
     </div>
   );
@@ -338,23 +311,112 @@ function formatRelativeTime(iso) {
   if (diffHr < 24) return `לפני ${diffHr} ${diffHr === 1 ? "שעה" : "שעות"}`;
   const diffDay = Math.round(diffHr / 24);
   if (diffDay < 30) return `לפני ${diffDay} ${diffDay === 1 ? "יום" : "ימים"}`;
-  const d = new Date(iso);
-  return d.toLocaleDateString("he-IL");
+  return new Date(iso).toLocaleDateString("he-IL");
 }
 
+/* ── shared building blocks ──────────────────────────────────────── */
+function Card({ title, hint, children, className = "" }) {
+  return (
+    <section className={`settings-card ${className}`}>
+      {title && (
+        <header className="settings-card__header">
+          <span className="settings-card__title">{title}</span>
+        </header>
+      )}
+      <div className="settings-card__body">
+        {hint && <p className="settings-card__hint">{hint}</p>}
+        {children}
+      </div>
+    </section>
+  );
+}
+
+function OptionGrid({ options, value, onChange, Preview, quad }) {
+  return (
+    <div className={`layout-options${quad ? " layout-options--quad" : ""}`}>
+      {options.map((opt) => {
+        const active = value === opt.value;
+        return (
+          <button
+            key={opt.value}
+            type="button"
+            className={`layout-option ${active ? "is-active" : ""}`}
+            onClick={() => {
+              haptic("selection");
+              uiSound("select");
+              onChange(opt.value);
+            }}
+            aria-pressed={active}
+          >
+            <Preview value={opt.value} />
+            <span className="layout-option__label">{opt.label}</span>
+            <span className="layout-option__desc">{opt.description}</span>
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+function ToggleRow({ title, hint, on, onToggle, last }) {
+  return (
+    <div className={`settings-toggle-row${last ? " settings-toggle-row--last" : ""}`}>
+      <span className="settings-toggle-row__text">
+        <span className="settings-toggle-row__title">{title}</span>
+        {hint && <span className="settings-toggle-row__hint">{hint}</span>}
+      </span>
+      <button
+        type="button"
+        role="switch"
+        aria-checked={on}
+        aria-label={title}
+        className={`settings-switch${on ? " on" : ""}`}
+        onClick={onToggle}
+      >
+        <span className="settings-switch__knob" />
+      </button>
+    </div>
+  );
+}
+
+const ChevronLink = () => (
+  <svg className="settings-link-btn__chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <polyline points="15 18 9 12 15 6" />
+  </svg>
+);
+
+/* ═══════════════════════════════════════════════════════════════════
+   The sections. Each exports { key, title, subtitle, Icon, tone, group,
+   keywords } and a body; the hub derives the live summary line from the
+   same state the body edits.
+   ═══════════════════════════════════════════════════════════════════ */
+
+const SECTIONS = [
+  { key: "appearance", group: "האפליקציה", title: "מראה ותצוגה", subtitle: "איך נראים המוצרים, העגלה, ההשוואות והקבלות", Icon: IconPalette, tone: "violet", keywords: "תצוגה רשימה רשת כרטיסייה עגלה השוואה קבלה ערכת נושא רקע צבע AI" },
+  { key: "feel", group: "האפליקציה", title: "צלילים ורטט", subtitle: "המשוב של הממשק בלחיצות ובפקודות", Icon: IconFeel, tone: "amber", keywords: "צלילים רטט משוב ויברציה האפטיקה" },
+  { key: "voice", group: "הרובוט", title: "קול ומיקרופון", subtitle: "באיזו שפה וקול הרובוט עונה, וכמה המיקרופון רגיש", Icon: IconVoice, tone: "teal", keywords: "קול שפה עברית אנגלית מיקרופון רגישות רובוט דיבור tts" },
+  { key: "stores", group: "הקניות שלי", title: "סניפים מועדפים", subtitle: "הסופרים שאתה אוהב לקנות בהם", Icon: IconStore, tone: "blue", keywords: "סניפים סופר סופרמרקט מועדפים רשת זמינות" },
+  { key: "complete", group: "הקניות שלי", title: "עגלה שלמה", subtitle: "מוצרים שתמיד צריכים להיות בעגלה", Icon: IconCartCheck, tone: "green", keywords: "עגלה שלמה השלמה מוצרים קבועים רשימה" },
+  { key: "data", group: "נתונים", title: "נתונים ותחזוקה", subtitle: "אינדקס הזמינות ורענון מחירים", Icon: IconDatabase, tone: "sky", keywords: "נתונים זמינות אינדקס מחירים רענון עדכון" },
+  { key: "demo", group: "נתונים", title: "הדגמה וכלים", subtitle: "עגלת הדגמה וגלריית אנימציות", Icon: IconFlask, tone: "pink", keywords: "הדגמה דמו מצגת אנימציות טעינה כלים" },
+];
+
+const GROUPS = ["האפליקציה", "הרובוט", "הקניות שלי", "נתונים"];
+
+/* ─────────────────────────────────────────────────────────────────── */
 export default function Settings() {
-  const { layout: productsLayout, setLayout: setProductsLayout } =
-    useProductsLayout();
-  const { layout: cartCardLayout, setLayout: setCartCardLayout } =
-    useCartCardLayout();
-  const { layout: priceCompareLayout, setLayout: setPriceCompareLayout } =
-    usePriceCompareLayout();
+  const { section } = useParams();
+  const navigate = useNavigate();
+
+  const { layout: productsLayout, setLayout: setProductsLayout } = useProductsLayout();
+  const { layout: cartCardLayout, setLayout: setCartCardLayout } = useCartCardLayout();
+  const { layout: priceCompareLayout, setLayout: setPriceCompareLayout } = usePriceCompareLayout();
   const { theme: aiTheme, setTheme: setAITheme } = useAITheme();
   const { theme: receiptTheme, setTheme: setReceiptTheme } = useReceiptTheme();
   const aiSettings = useAiSettings();
-  const ttsLanguage =
-    (aiSettings && aiSettings.settings.ttsLanguage) || "he";
+  const ttsLanguage = (aiSettings && aiSettings.settings.ttsLanguage) || "he";
   const ttsVoice = (aiSettings && aiSettings.settings.ttsVoice) || "";
+  const micThreshold = (aiSettings && aiSettings.settings.micThreshold) || 15;
   const updateAiSetting = aiSettings && aiSettings.updateSetting;
   const {
     preferredSupermarketIDs,
@@ -365,25 +427,36 @@ export default function Settings() {
   } = useSupermarketPreferences();
   const { allSupermarkets } = useSupermarkets();
   const [isBranchPickerOpen, setIsBranchPickerOpen] = useState(false);
-  /* UI feedback (sounds / haptics) — stored in localStorage by the utils */
   const [uiSoundsOn, setUiSoundsOn] = useState(() => isUiSoundEnabled());
   const [hapticsOn, setHapticsOn] = useState(() => isHapticsEnabled());
-  const { completeCartNames, toggleName, setCompleteCartNames } =
-    useCompleteCartPreferences();
+  const { completeCartNames, toggleName, setCompleteCartNames } = useCompleteCartPreferences();
   const { products } = useProductList();
-  const [isCompleteCartPickerOpen, setIsCompleteCartPickerOpen] =
-    useState(false);
-  const allGeneralNames = React.useMemo(
+  const [isCompleteCartPickerOpen, setIsCompleteCartPickerOpen] = useState(false);
+  const allGeneralNames = useMemo(
     () => [...new Set((products || []).map((p) => p.generalName).filter(Boolean))],
     [products]
   );
-
-  const navigate = useNavigate();
   const { cart, setCart, sendActiveCart } = useCart();
+  const { meta, isLoading: isMetaLoading, refetch: refetchMeta } = useAvailabilityMeta();
+  const [isRebuilding, setIsRebuilding] = useState(false);
+  const [rebuildStatus, setRebuildStatus] = useState(null);
+  const [query, setQuery] = useState("");
 
-  /* Demo button: empty the cart, fill it with the fixed demo products, switch to
-     the demo supermarket, persist, and open the cart to show the result. */
+  /* an unknown section → back to the hub */
+  useEffect(() => {
+    if (section && !SECTIONS.some((s) => s.key === section)) {
+      navigate("/settings", { replace: true });
+    }
+  }, [section, navigate]);
+
+  /* every sub-page opens scrolled to the top */
+  useEffect(() => {
+    const scroller = document.querySelector(".app-scroll");
+    if (scroller) scroller.scrollTo({ top: 0 });
+  }, [section]);
+
   const fillDemoCart = () => {
+    haptic("success");
     setCart({
       ...(cart || {}),
       supermarketID: DEMO_SUPERMARKET_ID,
@@ -393,42 +466,27 @@ export default function Settings() {
     navigate("/cart");
   };
 
-  /* "מלא מהעגלה הנוכחית" — add the generalNames of everything currently in the
-     cart to the complete-cart definition (merged, non-destructive). */
-  const cartGeneralNames = React.useMemo(() => {
+  const cartGeneralNames = useMemo(() => {
     const byBarcode = {};
     (products || []).forEach((p) => {
       if (p && p.barcode) byBarcode[p.barcode] = p.generalName;
     });
     return [
-      ...new Set(
-        ((cart && cart.products) || [])
-          .map((cp) => byBarcode[cp.barcode])
-          .filter(Boolean)
-      ),
+      ...new Set(((cart && cart.products) || []).map((cp) => byBarcode[cp.barcode]).filter(Boolean)),
     ];
   }, [products, cart]);
 
   const fillCompleteFromCart = () => {
     if (!cartGeneralNames.length) return;
-    setCompleteCartNames([
-      ...new Set([...completeCartNames, ...cartGeneralNames]),
-    ]);
+    haptic("success");
+    setCompleteCartNames([...new Set([...completeCartNames, ...cartGeneralNames])]);
   };
 
-  /* lookup: id → { name, address, city } — used by the chip list */
-  const supermarketLookup = React.useMemo(() => {
+  const supermarketLookup = useMemo(() => {
     const map = new Map();
-    (allSupermarkets || []).forEach((s) => {
-      map.set(String(s.supermarketID), s);
-    });
+    (allSupermarkets || []).forEach((s) => map.set(String(s.supermarketID), s));
     return map;
   }, [allSupermarkets]);
-
-  const { meta, isLoading: isMetaLoading, refetch: refetchMeta } =
-    useAvailabilityMeta();
-  const [isRebuilding, setIsRebuilding] = useState(false);
-  const [rebuildStatus, setRebuildStatus] = useState(null); // { kind, message }
 
   const handleRebuild = async () => {
     if (isRebuilding) return;
@@ -437,570 +495,371 @@ export default function Settings() {
     try {
       const result = await rebuildAvailabilityIndex();
       await refetchMeta();
-      setRebuildStatus({
-        kind: "success",
-        message: `עודכנו ${result.productCount || 0} מוצרים`,
-      });
+      haptic("success");
+      setRebuildStatus({ kind: "success", message: `עודכנו ${result.productCount || 0} מוצרים` });
     } catch (err) {
-      setRebuildStatus({
-        kind: "error",
-        message: "העדכון נכשל. נסה שוב.",
-      });
+      haptic("error");
+      setRebuildStatus({ kind: "error", message: "העדכון נכשל. נסה שוב." });
     } finally {
       setIsRebuilding(false);
     }
   };
 
+  /* ── the live one-line summary per section (what the hub shows) ── */
+  const summaries = {
+    appearance: [
+      `מוצרים: ${labelOf(PRODUCTS_LAYOUT_OPTIONS, productsLayout)}`,
+      `עגלה: ${labelOf(CART_CARD_LAYOUT_OPTIONS, cartCardLayout)}`,
+      `AI: ${labelOf(AI_THEME_OPTIONS, aiTheme)}`,
+    ].join(" · "),
+    feel: `${uiSoundsOn ? "צלילים פועלים" : "צלילים כבויים"} · ${hapticsOn ? "רטט פועל" : "רטט כבוי"}`,
+    voice: `${labelOf(TTS_LANGUAGE_OPTIONS, ttsLanguage)} · ${labelOf(
+      TTS_VOICES[ttsLanguage] || TTS_VOICES.he,
+      ttsVoice
+    ).replace(/\s*\(.*\)$/, "")} · רגישות ${micThreshold}`,
+    stores:
+      preferredSupermarketIDs.length === 0
+        ? "לא נבחרו סניפים"
+        : `${preferredSupermarketIDs.length} סניפים${availableInAllMode ? " · רק מוצרים משותפים" : ""}`,
+    complete:
+      completeCartNames.length === 0 ? "עוד לא הוגדרו מוצרים" : `${completeCartNames.length} מוצרים ברשימה`,
+    data: isMetaLoading ? "טוען…" : `זמינות: ${formatRelativeTime(meta && meta.updatedAt)}`,
+    demo: "עגלת הדגמה · אנימציות טעינה",
+  };
+
+  /* ═══════════ HUB ═══════════ */
+  if (!section) {
+    const q = query.trim();
+    const visible = SECTIONS.filter((s) =>
+      !q ? true : `${s.title} ${s.subtitle} ${s.keywords} ${summaries[s.key]}`.includes(q)
+    );
+    return (
+      <div className="settings-page settings-page--hub">
+        <div className="settings-page__header">
+          <h1 className="settings-page__title">הגדרות</h1>
+          <p className="settings-page__subtitle">כל הגדרה במקום אחד. מתחת לכל שורה — מה מוגדר כרגע.</p>
+        </div>
+
+        <label className="sh-search">
+          <IconSearch />
+          <input
+            type="search"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="חיפוש הגדרה (למשל: קול, רטט, סניפים)"
+            aria-label="חיפוש הגדרה"
+          />
+        </label>
+
+        <div className="settings-page__content">
+          {GROUPS.map((group) => {
+            const rows = visible.filter((s) => s.group === group);
+            if (!rows.length) return null;
+            return (
+              <section className="sh-group" key={group}>
+                <h2 className="sh-group__title">{group}</h2>
+                <div className="sh-list">
+                  {rows.map(({ key, title, subtitle, Icon, tone }, i) => (
+                    <button
+                      key={key}
+                      type="button"
+                      className={`sh-row sh-row--${tone}`}
+                      style={{ "--i": i }}
+                      onClick={() => {
+                        haptic("selection");
+                        uiSound("select");
+                        navigate(`/settings/${key}`);
+                      }}
+                    >
+                      <span className="sh-row__icon" aria-hidden="true"><Icon /></span>
+                      <span className="sh-row__text">
+                        <span className="sh-row__title">{title}</span>
+                        <span className="sh-row__value">{summaries[key] || subtitle}</span>
+                      </span>
+                      <span className="sh-row__chev" aria-hidden="true"><IconChevron /></span>
+                    </button>
+                  ))}
+                  {group === "הרובוט" && (!q || "מחקר AI היסטוריה שיחות סימון הערות".includes(q)) && (
+                    <Link
+                      to="/ai-history"
+                      className="sh-row sh-row--indigo"
+                      style={{ "--i": rows.length }}
+                      onClick={() => {
+                        haptic("selection");
+                        uiSound("select");
+                      }}
+                    >
+                      <span className="sh-row__icon" aria-hidden="true"><IconResearch /></span>
+                      <span className="sh-row__text">
+                        <span className="sh-row__title">מחקר AI</span>
+                        <span className="sh-row__value">כל השיחות עם הרובוט — סימון ✓/✗ והערות</span>
+                      </span>
+                      <span className="sh-row__chev" aria-hidden="true"><IconChevron /></span>
+                    </Link>
+                  )}
+                </div>
+              </section>
+            );
+          })}
+          {visible.length === 0 && (
+            <div className="sh-empty">לא נמצאה הגדרה שמתאימה ל"{q}"</div>
+          )}
+          <div className="sh-version">Smart Cart · גרסה {BUILD_VERSION}</div>
+        </div>
+      </div>
+    );
+  }
+
+  /* ═══════════ SUB-PAGE ═══════════ */
+  const meta_ = SECTIONS.find((s) => s.key === section);
+  if (!meta_) return null;
+
   return (
-    <div className="settings-page">
-      <div className="settings-page__header">
-        <h1 className="settings-page__title">הגדרות</h1>
-        <p className="settings-page__subtitle">
-          כאן תוכל לנהל את ההעדפות של האפליקציה
-        </p>
+    <div className="settings-page settings-page--section" key={section}>
+      <div className="sh-head">
+        <button
+          type="button"
+          className="sh-back"
+          onClick={() => {
+            haptic("light");
+            navigate("/settings");
+          }}
+          aria-label="חזרה להגדרות"
+        >
+          <IconBack />
+        </button>
+        <div className="sh-head__text">
+          <span className="sh-head__crumb">הגדרות</span>
+          <h1 className="sh-head__title">{meta_.title}</h1>
+          <p className="sh-head__sub">{meta_.subtitle}</p>
+        </div>
+        <span className={`sh-head__icon sh-row--${meta_.tone}`} aria-hidden="true"><meta_.Icon /></span>
       </div>
 
       <div className="settings-page__content">
-        <section className="settings-card">
-          <header className="settings-card__header">
-            <span className="settings-card__title">הדגמה</span>
-          </header>
-          <div className="settings-card__body">
-            <p className="settings-card__hint">
-              מילוי מהיר של העגלה בעגלת הדגמה קבועה (לצורך מצגת): מרוקן את העגלה
-              הנוכחית, מוסיף את מוצרי ההדגמה, ומחליף לסופרמרקט המוגדר, ופותח את
-              העגלה.
-            </p>
-            <button
-              type="button"
-              className="settings-link-btn"
-              onClick={fillDemoCart}
-            >
-              <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                <path d="M7 18a2 2 0 1 0 .001 4.001A2 2 0 0 0 7 18zm10 0a2 2 0 1 0 .001 4.001A2 2 0 0 0 17 18zM7.16 14l.94-2h7.45a2 2 0 0 0 1.8-1.11l3.02-6.1A1 1 0 0 0 20.48 3H5.21l-.94-2H1v2h2l3.6 7.59-1.35 2.44A2 2 0 0 0 7 16h12v-2H7.16z" />
-              </svg>
-              מלא עגלת הדגמה
-            </button>
-          </div>
-        </section>
+        {/* ── מראה ותצוגה ── */}
+        {section === "appearance" && (
+          <>
+            <Card title="רשימת המוצרים" hint="כמה מוצרים בכל שורה בעמוד המוצרים">
+              <OptionGrid options={PRODUCTS_LAYOUT_OPTIONS} value={productsLayout} onChange={setProductsLayout} Preview={ProductsLayoutPreview} />
+            </Card>
+            <Card title="כרטיסיית מוצר בעגלה" hint="צורת הכרטיסייה של מוצרי העגלה">
+              <OptionGrid options={CART_CARD_LAYOUT_OPTIONS} value={cartCardLayout} onChange={setCartCardLayout} Preview={CartCardPreview} />
+            </Card>
+            <Card title="השוואת מחירים" hint="איך מוצגים סניפים של אותה רשת באותו מוצר">
+              <OptionGrid options={PRICE_COMPARE_LAYOUT_OPTIONS} value={priceCompareLayout} onChange={setPriceCompareLayout} Preview={PriceComparePreview} />
+            </Card>
+            <Card title="קבלה בהיסטוריה" hint="איך תוצג קבלה בהיסטוריית הקניות">
+              <OptionGrid options={RECEIPT_THEME_OPTIONS} value={receiptTheme} onChange={setReceiptTheme} Preview={ReceiptThemePreview} />
+            </Card>
+            <Card title="ערכת נושא לעמוד ה-AI" hint="רקע ופלטת צבעים לצ'אט, לכפתורים ולכל המראה">
+              <OptionGrid options={AI_THEME_OPTIONS} value={aiTheme} onChange={setAITheme} Preview={AIThemePreview} quad />
+            </Card>
+          </>
+        )}
 
-        <section className="settings-card">
-          <header className="settings-card__header">
-            <span className="settings-card__title">תצוגת רשימת המוצרים</span>
-          </header>
-          <div className="settings-card__body">
-            <p className="settings-card__hint">
-              בחר כיצד יוצגו המוצרים בעמוד המוצרים
-            </p>
-            <div className="layout-options">
-              {PRODUCTS_LAYOUT_OPTIONS.map((opt) => {
-                const active = productsLayout === opt.value;
-                return (
-                  <button
-                    key={opt.value}
-                    type="button"
-                    className={`layout-option ${active ? "is-active" : ""}`}
-                    onClick={() => setProductsLayout(opt.value)}
-                    aria-pressed={active}
-                  >
-                    <ProductsLayoutPreview value={opt.value} />
-                    <span className="layout-option__label">{opt.label}</span>
-                    <span className="layout-option__desc">
-                      {opt.description}
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-        </section>
+        {/* ── צלילים ורטט ── */}
+        {section === "feel" && (
+          <Card hint="צלילים קצרים ורטט עדין מלווים את התפריטים ואת הרובוט (פתיחה, בחירה, תחילת הקלטה). הרטט עובד במכשירי אנדרואיד.">
+            <ToggleRow
+              title="צלילי ממשק"
+              hint="צליל עדין בפתיחת תפריטים ובבחירת פעולות"
+              on={uiSoundsOn}
+              onToggle={() => {
+                const next = !uiSoundsOn;
+                setUiSoundEnabled(next);
+                setUiSoundsOn(next);
+                if (next) uiSound("open");
+              }}
+            />
+            <ToggleRow
+              title="רטט"
+              hint="משוב מישוש קצר בלחיצות ובפקודות קוליות"
+              on={hapticsOn}
+              onToggle={() => {
+                const next = !hapticsOn;
+                setHapticsEnabled(next);
+                setHapticsOn(next);
+                if (next) haptic("success");
+              }}
+              last
+            />
+          </Card>
+        )}
 
-        <section className="settings-card">
-          <header className="settings-card__header">
-            <span className="settings-card__title">תצוגת כרטיסיית מוצר בעגלה</span>
-          </header>
-          <div className="settings-card__body">
-            <p className="settings-card__hint">
-              בחר את צורת הכרטיסייה של מוצרי העגלה
-            </p>
-            <div className="layout-options">
-              {CART_CARD_LAYOUT_OPTIONS.map((opt) => {
-                const active = cartCardLayout === opt.value;
-                return (
-                  <button
-                    key={opt.value}
-                    type="button"
-                    className={`layout-option ${active ? "is-active" : ""}`}
-                    onClick={() => setCartCardLayout(opt.value)}
-                    aria-pressed={active}
-                  >
-                    <CartCardPreview value={opt.value} />
-                    <span className="layout-option__label">{opt.label}</span>
-                    <span className="layout-option__desc">
-                      {opt.description}
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-        </section>
-
-        <section className="settings-card">
-          <header className="settings-card__header">
-            <span className="settings-card__title">ערכת נושא ל-AI</span>
-          </header>
-          <div className="settings-card__body">
-            <p className="settings-card__hint">
-              בחר רקע ופלטת צבעים לעמוד ה-AI — הצ׳אט, הכפתורים וכל המראה
-            </p>
-            <div className="layout-options layout-options--quad">
-              {AI_THEME_OPTIONS.map((opt) => {
-                const active = aiTheme === opt.value;
-                return (
-                  <button
-                    key={opt.value}
-                    type="button"
-                    className={`layout-option ${active ? "is-active" : ""}`}
-                    onClick={() => setAITheme(opt.value)}
-                    aria-pressed={active}
-                  >
-                    <AIThemePreview value={opt.value} />
-                    <span className="layout-option__label">{opt.label}</span>
-                    <span className="layout-option__desc">
-                      {opt.description}
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-        </section>
-
-        <section className="settings-card">
-          <header className="settings-card__header">
-            <span className="settings-card__title">תשובה קולית</span>
-          </header>
-          <div className="settings-card__body">
-            <p className="settings-card__hint">
-              בחר את שפת התשובה הקולית והקול לפקודות קוליות — לחיצה ארוכה על
-              כפתור ה-AI בסרגל התחתון מקליטה פקודה, והעוזר משיב בקול.
-            </p>
-
-            <div className="voice-reply-row">
-              <span className="voice-reply-row__label">שפת תשובה</span>
-              <div className="voice-reply-langs">
-                {TTS_LANGUAGE_OPTIONS.map((opt) => {
-                  const active = ttsLanguage === opt.value;
-                  return (
-                    <button
-                      key={opt.value}
-                      type="button"
-                      className={`voice-reply-lang-btn ${
-                        active ? "is-active" : ""
-                      }`}
-                      aria-pressed={active}
-                      onClick={() => {
-                        if (!updateAiSetting) return;
-                        updateAiSetting("ttsLanguage", opt.value);
-                        updateAiSetting("ttsVoice", "");
-                      }}
-                    >
-                      {opt.label}
-                    </button>
-                  );
-                })}
+        {/* ── קול ומיקרופון ── */}
+        {section === "voice" && (
+          <>
+            <Card title="התשובה הקולית" hint="הרובוט בסרגל התחתון (ועמוד ה-AI) עונים בשפה ובקול שתבחר. הפקודות שלך תמיד בעברית.">
+              <div className="voice-reply-row">
+                <span className="voice-reply-row__label">שפת תשובה</span>
+                <div className="voice-reply-langs">
+                  {TTS_LANGUAGE_OPTIONS.map((opt) => {
+                    const active = ttsLanguage === opt.value;
+                    return (
+                      <button
+                        key={opt.value}
+                        type="button"
+                        className={`voice-reply-lang-btn ${active ? "is-active" : ""}`}
+                        aria-pressed={active}
+                        onClick={() => {
+                          if (!updateAiSetting) return;
+                          haptic("selection");
+                          updateAiSetting("ttsLanguage", opt.value);
+                          updateAiSetting("ttsVoice", "");
+                        }}
+                      >
+                        {opt.label}
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
-            </div>
-
-            <div className="voice-reply-row">
-              <span className="voice-reply-row__label">קול</span>
-              <select
-                className="voice-reply-select"
-                value={ttsVoice}
-                onChange={(e) =>
-                  updateAiSetting && updateAiSetting("ttsVoice", e.target.value)
-                }
-              >
-                {(TTS_VOICES[ttsLanguage] || TTS_VOICES.he).map((v) => (
-                  <option key={v.value || "default"} value={v.value}>
-                    {v.label}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
-        </section>
-
-        <section className="settings-card">
-          <header className="settings-card__header">
-            <span className="settings-card__title">משוב ותחושה</span>
-          </header>
-          <div className="settings-card__body">
-            <p className="settings-card__hint">
-              צלילים קצרים ורטט עדין מלווים את התפריטים ואת הרובוט (פתיחה,
-              בחירה, תחילת הקלטה). הרטט עובד במכשירי אנדרואיד.
-            </p>
-
-            <div className="settings-toggle-row">
-              <span className="settings-toggle-row__text">
-                <span className="settings-toggle-row__title">צלילי ממשק</span>
-                <span className="settings-toggle-row__hint">
-                  צליל עדין בפתיחת תפריטים ובבחירת פעולות
-                </span>
-              </span>
-              <button
-                type="button"
-                role="switch"
-                aria-checked={uiSoundsOn}
-                aria-label="צלילי ממשק"
-                className={`settings-switch${uiSoundsOn ? " on" : ""}`}
-                onClick={() => {
-                  const next = !uiSoundsOn;
-                  setUiSoundEnabled(next);
-                  setUiSoundsOn(next);
-                  if (next) uiSound("open");
-                }}
-              >
-                <span className="settings-switch__knob" />
-              </button>
-            </div>
-
-            <div className="settings-toggle-row">
-              <span className="settings-toggle-row__text">
-                <span className="settings-toggle-row__title">רטט</span>
-                <span className="settings-toggle-row__hint">
-                  משוב מישוש קצר בלחיצות ובפקודות קוליות
-                </span>
-              </span>
-              <button
-                type="button"
-                role="switch"
-                aria-checked={hapticsOn}
-                aria-label="רטט"
-                className={`settings-switch${hapticsOn ? " on" : ""}`}
-                onClick={() => {
-                  const next = !hapticsOn;
-                  setHapticsEnabled(next);
-                  setHapticsOn(next);
-                  if (next) haptic("success");
-                }}
-              >
-                <span className="settings-switch__knob" />
-              </button>
-            </div>
-          </div>
-        </section>
-
-        <section className="settings-card">
-          <header className="settings-card__header">
-            <span className="settings-card__title">תצוגת השוואת מחירים</span>
-          </header>
-          <div className="settings-card__body">
-            <p className="settings-card__hint">
-              בחר כיצד יוצגו מחירים של אותה רשת באותו מוצר
-            </p>
-            <div className="layout-options">
-              {PRICE_COMPARE_LAYOUT_OPTIONS.map((opt) => {
-                const active = priceCompareLayout === opt.value;
-                return (
-                  <button
-                    key={opt.value}
-                    type="button"
-                    className={`layout-option ${active ? "is-active" : ""}`}
-                    onClick={() => setPriceCompareLayout(opt.value)}
-                    aria-pressed={active}
-                  >
-                    <PriceComparePreview value={opt.value} />
-                    <span className="layout-option__label">{opt.label}</span>
-                    <span className="layout-option__desc">
-                      {opt.description}
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-        </section>
-
-        <section className="settings-card">
-          <header className="settings-card__header">
-            <span className="settings-card__title">תצוגת קבלה</span>
-          </header>
-          <div className="settings-card__body">
-            <p className="settings-card__hint">
-              בחר כיצד תוצג קבלה בהיסטוריית הקניות
-            </p>
-            <div className="layout-options">
-              {RECEIPT_THEME_OPTIONS.map((opt) => {
-                const active = receiptTheme === opt.value;
-                return (
-                  <button
-                    key={opt.value}
-                    type="button"
-                    className={`layout-option ${active ? "is-active" : ""}`}
-                    onClick={() => setReceiptTheme(opt.value)}
-                    aria-pressed={active}
-                  >
-                    <ReceiptThemePreview value={opt.value} />
-                    <span className="layout-option__label">{opt.label}</span>
-                    <span className="layout-option__desc">
-                      {opt.description}
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-        </section>
-
-        <section className="settings-card">
-          <header className="settings-card__header">
-            <span className="settings-card__title">עדכון נתונים</span>
-          </header>
-          <div className="settings-card__body">
-            <p className="settings-card__hint">
-              עדכון אינדקס הזמינות של המוצרים בסופרים — משמש להצגה רק של
-              סופרים שמכילים את כל מוצרי העגלה.
-            </p>
-
-            <div className="settings-row">
-              <span className="settings-row__label">עודכן לאחרונה</span>
-              <span className="settings-row__value">
-                {isMetaLoading
-                  ? "טוען…"
-                  : formatRelativeTime(meta && meta.updatedAt)}
-              </span>
-            </div>
-            <div className="settings-row">
-              <span className="settings-row__label">מוצרים באינדקס</span>
-              <span className="settings-row__value">
-                {isMetaLoading ? "—" : (meta && meta.productCount) || 0}
-              </span>
-            </div>
-
-            <button
-              type="button"
-              className={`settings-rebuild-btn ${
-                isRebuilding ? "is-loading" : ""
-              }`}
-              onClick={handleRebuild}
-              disabled={isRebuilding}
-            >
-              {isRebuilding ? (
-                <span className="settings-rebuild-spinner" aria-hidden />
-              ) : (
-                <svg
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2.4"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  aria-hidden="true"
+              <div className="voice-reply-row">
+                <span className="voice-reply-row__label">קול</span>
+                <select
+                  className="voice-reply-select"
+                  value={ttsVoice}
+                  onChange={(e) => updateAiSetting && updateAiSetting("ttsVoice", e.target.value)}
                 >
-                  <polyline points="23 4 23 10 17 10" />
-                  <polyline points="1 20 1 14 7 14" />
-                  <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15" />
-                </svg>
-              )}
-              {isRebuilding ? "מעדכן…" : "עדכן עכשיו"}
-            </button>
-
-            {rebuildStatus && (
-              <div
-                className={`settings-rebuild-status settings-rebuild-status--${rebuildStatus.kind}`}
-                role="status"
-              >
-                {rebuildStatus.message}
+                  {(TTS_VOICES[ttsLanguage] || TTS_VOICES.he).map((v) => (
+                    <option key={v.value || "default"} value={v.value}>{v.label}</option>
+                  ))}
+                </select>
               </div>
-            )}
-          </div>
-        </section>
+            </Card>
 
-        <section className="settings-card">
-          <header className="settings-card__header">
-            <span className="settings-card__title">רענון כל המחירים</span>
-          </header>
-          <div className="settings-card__body">
-            <p className="settings-card__hint">
-              טעינה מחדש של מחירי כל המוצרים מ-chp.co.il והחלפת כל אובייקטי
-              המחירים במסד הנתונים. התהליך רץ בשלושה שלבים מקבילים עם פידבק חי.
-            </p>
+            <Card title="רגישות המיקרופון" hint="מאיזו עוצמת קול הרובוט מתחיל להקליט בשיחה רציפה. נמוך = קולט גם דיבור שקט (אבל גם רעשי רקע); גבוה = צריך לדבר ברור.">
+              <div className="sh-slider">
+                <span className="sh-slider__end">רגיש</span>
+                <input
+                  type="range"
+                  min={MIC_MIN}
+                  max={MIC_MAX}
+                  step={1}
+                  value={micThreshold}
+                  onChange={(e) => updateAiSetting && updateAiSetting("micThreshold", Number(e.target.value))}
+                  aria-label="רגישות המיקרופון"
+                />
+                <span className="sh-slider__end">ברור</span>
+              </div>
+              <div className="sh-slider__value">
+                סף נוכחי: <b>{micThreshold}</b>
+                <button
+                  type="button"
+                  className="sh-reset"
+                  disabled={micThreshold === 15}
+                  onClick={() => updateAiSetting && updateAiSetting("micThreshold", 15)}
+                >
+                  איפוס (15)
+                </button>
+              </div>
+            </Card>
 
-            <Link to="/refresh-all-prices" className="settings-link-btn">
-              <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2.4"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden="true"
-              >
-                <polyline points="23 4 23 10 17 10" />
-                <polyline points="1 20 1 14 7 14" />
-                <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15" />
-              </svg>
-              רענן את כל המחירים
-              <svg
-                className="settings-link-btn__chevron"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2.4"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden="true"
-              >
-                <polyline points="15 18 9 12 15 6" />
-              </svg>
-            </Link>
-          </div>
-        </section>
+            <Card title="שיפור הרובוט">
+              <Link to="/ai-history" className="settings-link-btn" onClick={() => haptic("selection")}>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <rect x="4" y="4" width="16" height="17" rx="2.5" /><path d="M9 2.5v3M15 2.5v3" /><polyline points="8.5 13 11 15.5 15.5 10.5" />
+                </svg>
+                מחקר AI — סקירת כל השיחות
+                <ChevronLink />
+              </Link>
+            </Card>
+          </>
+        )}
 
-        <section className="settings-card">
-          <header className="settings-card__header">
-            <span className="settings-card__title">סניפים מועדפים</span>
-          </header>
-          <div className="settings-card__body">
-            <p className="settings-card__hint">
-              בחר את הסניפים שאתה מעדיף לקנות בהם. הכפתור "לפי העדפות"
-              באופטימיזציית עגלות יסמן בדיוק את הסניפים האלה.
-            </p>
-
-            <div className="settings-toggle-row">
-              <span className="settings-toggle-row__text">
-                <span className="settings-toggle-row__title">
-                  הצג רק מוצרים הקיימים בכל הסניפים
-                </span>
-                <span className="settings-toggle-row__hint">
-                  בעמוד המוצרים יוצגו רק מוצרים שנמכרים בכל הסניפים המועדפים
-                  שברשימה
-                </span>
-              </span>
-              <button
-                type="button"
-                role="switch"
-                aria-checked={availableInAllMode}
-                aria-label="הצג רק מוצרים הקיימים בכל הסניפים המועדפים"
-                className={`settings-switch${availableInAllMode ? " on" : ""}`}
-                onClick={() => setAvailableInAllMode((v) => !v)}
-              >
-                <span className="settings-switch__knob" />
-              </button>
-            </div>
-
+        {/* ── סניפים מועדפים ── */}
+        {section === "stores" && (
+          <Card hint='הסניפים שאתה מעדיף לקנות בהם. הכפתור "לפי העדפות" באופטימיזציית העגלות יסמן בדיוק אותם.'>
+            <ToggleRow
+              title="הצג רק מוצרים הקיימים בכל הסניפים"
+              hint="בעמוד המוצרים יוצגו רק מוצרים שנמכרים בכל הסניפים המועדפים"
+              on={availableInAllMode}
+              onToggle={() => {
+                haptic("selection");
+                setAvailableInAllMode((v) => !v);
+              }}
+            />
             <div className="settings-row">
               <span className="settings-row__label">סניפים מועדפים</span>
               <span className="settings-row__value">
-                {preferredSupermarketIDs.length === 0
-                  ? "לא נבחרו"
-                  : preferredSupermarketIDs.length}
+                {preferredSupermarketIDs.length === 0 ? "לא נבחרו" : preferredSupermarketIDs.length}
               </span>
             </div>
-
             {preferredSupermarketIDs.length > 0 && (
               <div className="settings-preferred-chips">
                 {preferredSupermarketIDs.slice(0, 24).map((id) => {
                   const s = supermarketLookup.get(String(id));
-                  const label = s
-                    ? `${s.name}${s.address ? ` · ${s.address}` : ""}`
-                    : `סניף #${id}`;
+                  const label = s ? `${s.name}${s.address ? ` · ${s.address}` : ""}` : `סניף #${id}`;
                   return (
                     <span key={id} className="settings-preferred-chip">
                       <span className="settings-preferred-chip__text">{label}</span>
-                      <button
-                        type="button"
-                        className="settings-preferred-chip__x"
-                        onClick={() => toggleSupermarket(id)}
-                        aria-label="הסר"
-                      >
+                      <button type="button" className="settings-preferred-chip__x" onClick={() => toggleSupermarket(id)} aria-label="הסר">
                         <IconClose />
                       </button>
                     </span>
                   );
                 })}
                 {preferredSupermarketIDs.length > 24 && (
-                  <span className="settings-preferred-chip-more">
-                    + עוד {preferredSupermarketIDs.length - 24}
-                  </span>
+                  <span className="settings-preferred-chip-more">+ עוד {preferredSupermarketIDs.length - 24}</span>
                 )}
               </div>
             )}
-
             <button
               type="button"
-              className="settings-link-btn"
-              onClick={() => setIsBranchPickerOpen(true)}
+              className="settings-link-btn settings-link-btn--primary"
+              onClick={() => {
+                haptic("selection");
+                setIsBranchPickerOpen(true);
+              }}
             >
-              <svg
-                viewBox="0 0 24 24"
-                fill="currentColor"
-                aria-hidden="true"
-              >
+              <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                 <path d="M12 2l2.9 6.55 7.1.85-5.3 4.85 1.5 7.1L12 17.77 5.8 21.35l1.5-7.1L2 9.4l7.1-.85L12 2z" />
               </svg>
               {preferredSupermarketIDs.length === 0 ? "בחר סניפים" : "ערוך סניפים"}
-              <svg
-                className="settings-link-btn__chevron"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2.4"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden="true"
-              >
-                <polyline points="15 18 9 12 15 6" />
-              </svg>
+              <ChevronLink />
             </button>
-          </div>
-        </section>
+          </Card>
+        )}
 
-        <section className="settings-card">
-          <header className="settings-card__header">
-            <span className="settings-card__title">עגלה שלמה</span>
-          </header>
-          <div className="settings-card__body">
-            <p className="settings-card__hint">
-              בחר מוצרים שתמיד צריכים להיות בעגלה. הפעולה "השלם את העגלה" (בכפתור
-              ה-AI) תוסיף כל מוצר כזה שחסר — לפי המחיר הזול ליחידת משקל, או לפי מה
-              שקנית לאחרונה.
-            </p>
-
+        {/* ── עגלה שלמה ── */}
+        {section === "complete" && (
+          <Card hint='מוצרים שתמיד צריכים להיות בעגלה. הפעולה "השלם את העגלה" (בכפתור ה-AI, או בקול) תוסיף כל מוצר כזה שחסר — לפי המחיר הזול ליחידת משקל, או לפי מה שקנית לאחרונה.'>
             <div className="settings-row">
               <span className="settings-row__label">מוצרים בעגלה השלמה</span>
               <span className="settings-row__value">
-                {completeCartNames.length === 0
-                  ? "לא נבחרו"
-                  : completeCartNames.length}
+                {completeCartNames.length === 0 ? "לא נבחרו" : completeCartNames.length}
               </span>
             </div>
-
             {completeCartNames.length > 0 && (
               <div className="settings-preferred-chips">
                 {completeCartNames.slice(0, 30).map((name) => (
                   <span key={name} className="settings-preferred-chip">
                     <span className="settings-preferred-chip__text">{name}</span>
-                    <button
-                      type="button"
-                      className="settings-preferred-chip__x"
-                      onClick={() => toggleName(name)}
-                      aria-label="הסר"
-                    >
+                    <button type="button" className="settings-preferred-chip__x" onClick={() => toggleName(name)} aria-label="הסר">
                       <IconClose />
                     </button>
                   </span>
                 ))}
                 {completeCartNames.length > 30 && (
-                  <span className="settings-preferred-chip-more">
-                    + עוד {completeCartNames.length - 30}
-                  </span>
+                  <span className="settings-preferred-chip-more">+ עוד {completeCartNames.length - 30}</span>
                 )}
               </div>
             )}
-
+            <button
+              type="button"
+              className="settings-link-btn settings-link-btn--primary"
+              onClick={() => {
+                haptic("selection");
+                setIsCompleteCartPickerOpen(true);
+              }}
+            >
+              <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm1 9h4v2h-4v4h-2v-4H7v-2h4V7h2v4z" />
+              </svg>
+              {completeCartNames.length === 0 ? "בחר מוצרים" : "ערוך מוצרים"}
+              <ChevronLink />
+            </button>
             <button
               type="button"
               className="settings-link-btn"
@@ -1010,86 +869,84 @@ export default function Settings() {
               <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                 <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z" />
               </svg>
-              {cartGeneralNames.length
-                ? `מלא מהעגלה הנוכחית (${cartGeneralNames.length})`
-                : "העגלה ריקה"}
+              {cartGeneralNames.length ? `הוסף מהעגלה הנוכחית (${cartGeneralNames.length})` : "העגלה הנוכחית ריקה"}
             </button>
+          </Card>
+        )}
 
-            <button
-              type="button"
-              className="settings-link-btn"
-              onClick={() => setIsCompleteCartPickerOpen(true)}
-            >
-              <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                <path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm1 9h4v2h-4v4h-2v-4H7v-2h4V7h2v4z" />
-              </svg>
-              {completeCartNames.length === 0 ? "בחר מוצרים" : "ערוך מוצרים"}
-              <svg
-                className="settings-link-btn__chevron"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2.4"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden="true"
+        {/* ── נתונים ותחזוקה ── */}
+        {section === "data" && (
+          <>
+            <Card title="אינדקס זמינות המוצרים" hint="משמש להצגה רק של סופרים שמכילים את כל מוצרי העגלה.">
+              <div className="settings-row">
+                <span className="settings-row__label">עודכן לאחרונה</span>
+                <span className="settings-row__value">{isMetaLoading ? "טוען…" : formatRelativeTime(meta && meta.updatedAt)}</span>
+              </div>
+              <div className="settings-row">
+                <span className="settings-row__label">מוצרים באינדקס</span>
+                <span className="settings-row__value">{isMetaLoading ? "—" : (meta && meta.productCount) || 0}</span>
+              </div>
+              <button
+                type="button"
+                className={`settings-rebuild-btn ${isRebuilding ? "is-loading" : ""}`}
+                onClick={handleRebuild}
+                disabled={isRebuilding}
               >
-                <polyline points="15 18 9 12 15 6" />
-              </svg>
-            </button>
-          </div>
-        </section>
+                {isRebuilding ? (
+                  <span className="settings-rebuild-spinner" aria-hidden />
+                ) : (
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                    <polyline points="23 4 23 10 17 10" /><polyline points="1 20 1 14 7 14" /><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15" />
+                  </svg>
+                )}
+                {isRebuilding ? "מעדכן…" : "עדכן עכשיו"}
+              </button>
+              {rebuildStatus && (
+                <div className={`settings-rebuild-status settings-rebuild-status--${rebuildStatus.kind}`} role="status">
+                  {rebuildStatus.message}
+                </div>
+              )}
+            </Card>
+            <Card title="רענון כל המחירים" hint="טעינה מחדש של מחירי כל המוצרים מ-chp.co.il והחלפת כל המחירים במסד הנתונים. תהליך ארוך עם פידבק חי.">
+              <Link to="/refresh-all-prices" className="settings-link-btn" onClick={() => haptic("selection")}>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <polyline points="23 4 23 10 17 10" /><polyline points="1 20 1 14 7 14" /><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15" />
+                </svg>
+                רענן את כל המחירים
+                <ChevronLink />
+              </Link>
+            </Card>
+          </>
+        )}
 
-        <section className="settings-card">
-          <header className="settings-card__header">
-            <span className="settings-card__title">אנימציות טעינה</span>
-          </header>
-          <div className="settings-card__body">
-            <p className="settings-card__hint">
-              גלריית אנימציות בסגנון דואלינגו — דמויות שעושות פעולה
-              שמתאימה למצב הטעינה. לתצוגה בלבד.
-            </p>
-            <Link to="/loading-animations" className="settings-link-btn">
-              <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2.4"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden="true"
-              >
-                <circle cx="12" cy="12" r="3" />
-                <path d="M12 1v6m0 10v6M4.22 4.22l4.24 4.24m7.08 7.08l4.24 4.24M1 12h6m10 0h6M4.22 19.78l4.24-4.24m7.08-7.08l4.24-4.24" />
-              </svg>
-              פתח את הגלריה
-              <svg
-                className="settings-link-btn__chevron"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2.4"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden="true"
-              >
-                <polyline points="15 18 9 12 15 6" />
-              </svg>
-            </Link>
-          </div>
-        </section>
-
-        <section className="settings-card">
-          <header className="settings-card__header">
-            <span className="settings-card__title">אודות</span>
-          </header>
-          <div className="settings-card__body">
-            <div className="settings-row">
-              <span className="settings-row__label">גרסה</span>
-              <span className="settings-row__value">{BUILD_VERSION}</span>
-            </div>
-          </div>
-        </section>
+        {/* ── הדגמה וכלים ── */}
+        {section === "demo" && (
+          <>
+            <Card title="עגלת הדגמה" hint="למצגות: מרוקן את העגלה הנוכחית, ממלא אותה בעגלת הדגמה קבועה, מחליף לסופרמרקט המוגדר ופותח את העגלה.">
+              <button type="button" className="settings-link-btn settings-link-btn--primary" onClick={fillDemoCart}>
+                <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                  <path d="M7 18a2 2 0 1 0 .001 4.001A2 2 0 0 0 7 18zm10 0a2 2 0 1 0 .001 4.001A2 2 0 0 0 17 18zM7.16 14l.94-2h7.45a2 2 0 0 0 1.8-1.11l3.02-6.1A1 1 0 0 0 20.48 3H5.21l-.94-2H1v2h2l3.6 7.59-1.35 2.44A2 2 0 0 0 7 16h12v-2H7.16z" />
+                </svg>
+                מלא עגלת הדגמה
+              </button>
+            </Card>
+            <Card title="אנימציות טעינה" hint="גלריית אנימציות בסגנון דואלינגו — לתצוגה בלבד.">
+              <Link to="/loading-animations" className="settings-link-btn" onClick={() => haptic("selection")}>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <circle cx="12" cy="12" r="3" /><path d="M12 1v6m0 10v6M4.22 4.22l4.24 4.24m7.08 7.08l4.24 4.24M1 12h6m10 0h6M4.22 19.78l4.24-4.24m7.08-7.08l4.24-4.24" />
+                </svg>
+                פתח את הגלריה
+                <ChevronLink />
+              </Link>
+            </Card>
+            <Card title="אודות">
+              <div className="settings-row">
+                <span className="settings-row__label">גרסה</span>
+                <span className="settings-row__value">{BUILD_VERSION}</span>
+              </div>
+            </Card>
+          </>
+        )}
       </div>
 
       {isBranchPickerOpen && (
