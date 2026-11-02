@@ -1,6 +1,7 @@
 /* ═══════════════════════════════════════════════════════════════
-   Product comparison — bottom sheet shell (`pcs__*`)
-   Slides up from the bottom on phones, centered dialog from 640px.
+   Product comparison — CENTERED modal shell (`pcs__*`)
+   A rounded card in the middle of the screen (every screen size — the
+   user explicitly wanted a modal in the middle, not a bottom sheet).
    The content inside is `productComparison.css` (`pc*`).
    ═══════════════════════════════════════════════════════════════ */
 
@@ -9,60 +10,46 @@
   inset: 0;
   z-index: 9999;
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   justify-content: center;
+  padding: 18px 14px;
   background: rgba(10, 25, 60, 0.5);
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
-  animation: pcsFade 0.22s ease both;
+  animation: pcsFade 0.2s ease both;
   font-family: "Heebo", "Open Sans", "Rubik", "Segoe UI", Arial, sans-serif;
   -webkit-tap-highlight-color: transparent;
 }
 
 .pcs.is-closing {
-  animation: pcsFadeOut 0.24s ease forwards;
+  animation: pcsFadeOut 0.22s ease forwards;
 }
 
 .pcs__sheet {
   position: relative;
-  width: 100%;
-  max-width: 560px;
-  max-height: min(92dvh, 100%);
+  width: min(100%, 560px);
+  max-height: min(88dvh, 100%);
   display: flex;
   flex-direction: column;
   background: linear-gradient(180deg, #ffffff 0%, #f0f4fb 100%);
-  border-radius: 26px 26px 0 0;
+  border-radius: 24px;
   box-shadow:
-    0 -18px 50px rgba(15, 23, 42, 0.32),
-    inset 0 1px 0 rgba(255, 255, 255, 0.9);
-  padding-bottom: env(safe-area-inset-bottom, 0px);
-  /* `backwards` only: once the slide-up is over the inline drag transform
-     must win (fill-mode both would pin translateY(0) forever) */
-  animation: pcsUp 0.34s cubic-bezier(0.22, 1, 0.36, 1) backwards;
-  will-change: transform;
-}
-
-/* spring back after a short drag; none while the finger is down */
-.pcs__sheet:not(.is-dragging) {
-  transition: transform 0.26s cubic-bezier(0.22, 1, 0.36, 1);
-}
-.pcs__sheet.is-dragging {
-  transition: none;
+    0 30px 70px rgba(15, 23, 42, 0.38),
+    0 0 0 1px rgba(255, 255, 255, 0.5) inset;
+  animation: pcsIn 0.3s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 .pcs.is-closing .pcs__sheet {
-  /* continues from wherever the drag left it (--drag) */
-  animation: pcsDown 0.24s ease-in forwards;
-  transition: none;
+  animation: pcsOut 0.22s ease-in forwards;
 }
 
-@keyframes pcsUp {
-  from { transform: translateY(100%); }
-  to   { transform: translateY(0); }
+@keyframes pcsIn {
+  from { opacity: 0; transform: translateY(14px) scale(0.94); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
 }
-@keyframes pcsDown {
-  from { transform: translateY(var(--drag, 0px)); }
-  to   { transform: translateY(110%); }
+@keyframes pcsOut {
+  from { opacity: 1; transform: translateY(0) scale(1); }
+  to   { opacity: 0; transform: translateY(10px) scale(0.96); }
 }
 @keyframes pcsFade {
   from { opacity: 0; }
@@ -73,33 +60,14 @@
   to   { opacity: 0; }
 }
 
-/* ── grip + title bar (= the drag handle) ── */
-.pcs__handle {
-  flex: none;
-  padding: 8px 14px 8px;
-  touch-action: none;
-  cursor: grab;
-  user-select: none;
-  -webkit-user-select: none;
-}
-.pcs__handle:active {
-  cursor: grabbing;
-}
-
-.pcs__grip {
-  display: block;
-  width: 44px;
-  height: 5px;
-  margin: 0 auto 10px;
-  border-radius: 999px;
-  background: rgba(15, 23, 42, 0.16);
-}
-
+/* ── title bar ── */
 .pcs__head {
+  flex: none;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 10px;
+  padding: 14px 14px 8px;
 }
 
 .pcs__title {
@@ -137,25 +105,14 @@
   overflow-y: auto;
   overscroll-behavior: contain;
   -webkit-overflow-scrolling: touch;
-  padding: 0 14px 18px;
-  /* touch-scrolled sheet: no scrollbar track along the edge */
+  padding: 0 14px 16px;
+  /* rounded card: the content is clipped by the card's corners */
+  border-radius: 0 0 24px 24px;
+  /* touch-scrolled: no scrollbar track along the edge */
   scrollbar-width: none;
 }
 .pcs__scroll::-webkit-scrollbar {
   display: none;
-}
-
-/* wide screens: a centered dialog instead of a sheet */
-@media (min-width: 640px) {
-  .pcs {
-    align-items: center;
-    padding: 24px;
-  }
-  .pcs__sheet {
-    border-radius: 26px;
-    max-height: 86vh;
-    box-shadow: 0 30px 70px rgba(15, 23, 42, 0.38);
-  }
 }
 
 @media (prefers-reduced-motion: reduce) {
