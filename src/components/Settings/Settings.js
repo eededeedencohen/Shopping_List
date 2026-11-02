@@ -18,6 +18,8 @@ import CompleteCartPickerSheet from "./CompleteCartPickerSheet";
 import { rebuildAvailabilityIndex } from "../../services/productAvailabilityService";
 import { BUILD_VERSION } from "../../buildInfo";
 import { IconClose } from "../Icons/UiIcons";
+import { haptic, isHapticsEnabled, setHapticsEnabled } from "../../utils/haptics";
+import { uiSound, isUiSoundEnabled, setUiSoundEnabled } from "../../utils/uiSound";
 
 /* A fixed "demo" cart — one button fills the active cart with these and switches
    to the chosen supermarket (for presentations). */
@@ -363,6 +365,9 @@ export default function Settings() {
   } = useSupermarketPreferences();
   const { allSupermarkets } = useSupermarkets();
   const [isBranchPickerOpen, setIsBranchPickerOpen] = useState(false);
+  /* UI feedback (sounds / haptics) — stored in localStorage by the utils */
+  const [uiSoundsOn, setUiSoundsOn] = useState(() => isUiSoundEnabled());
+  const [hapticsOn, setHapticsOn] = useState(() => isHapticsEnabled());
   const { completeCartNames, toggleName, setCompleteCartNames } =
     useCompleteCartPreferences();
   const { products } = useProductList();
@@ -623,6 +628,66 @@ export default function Settings() {
                   </option>
                 ))}
               </select>
+            </div>
+          </div>
+        </section>
+
+        <section className="settings-card">
+          <header className="settings-card__header">
+            <span className="settings-card__title">משוב ותחושה</span>
+          </header>
+          <div className="settings-card__body">
+            <p className="settings-card__hint">
+              צלילים קצרים ורטט עדין מלווים את התפריטים ואת הרובוט (פתיחה,
+              בחירה, תחילת הקלטה). הרטט עובד במכשירי אנדרואיד.
+            </p>
+
+            <div className="settings-toggle-row">
+              <span className="settings-toggle-row__text">
+                <span className="settings-toggle-row__title">צלילי ממשק</span>
+                <span className="settings-toggle-row__hint">
+                  צליל עדין בפתיחת תפריטים ובבחירת פעולות
+                </span>
+              </span>
+              <button
+                type="button"
+                role="switch"
+                aria-checked={uiSoundsOn}
+                aria-label="צלילי ממשק"
+                className={`settings-switch${uiSoundsOn ? " on" : ""}`}
+                onClick={() => {
+                  const next = !uiSoundsOn;
+                  setUiSoundEnabled(next);
+                  setUiSoundsOn(next);
+                  if (next) uiSound("open");
+                }}
+              >
+                <span className="settings-switch__knob" />
+              </button>
+            </div>
+
+            <div className="settings-toggle-row">
+              <span className="settings-toggle-row__text">
+                <span className="settings-toggle-row__title">רטט</span>
+                <span className="settings-toggle-row__hint">
+                  משוב מישוש קצר בלחיצות ובפקודות קוליות
+                </span>
+              </span>
+              <button
+                type="button"
+                role="switch"
+                aria-checked={hapticsOn}
+                aria-label="רטט"
+                className={`settings-switch${hapticsOn ? " on" : ""}`}
+                onClick={() => {
+                  const next = !hapticsOn;
+                  setHapticsEnabled(next);
+                  setHapticsOn(next);
+                  if (next) haptic("success");
+                }}
+              >
+                <span className="settings-switch__knob" />
+              </button>
             </div>
           </div>
         </section>
