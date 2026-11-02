@@ -1,27 +1,26 @@
-/* ───────────────────────────────────────────────────────────
-   Bottom navigation — slim blue bar + peeking robot "coin".
+/* ═══════════════════════════════════════════════════════════════════════
+   Bottom navigation — the brand-blue dock + the robot "coin" (row 3 of the
+   .App grid), its voice states, and the AI action sheet.
 
-   Grid row 3 of the .App shell. The blue bar is SHORT; the robot coin
-   peeks above it and nests in a transparent circular notch (cradle) cut
-   into the bar's top edge.
-
-   STABILITY RULES (the earlier FAB broke the app — do not regress):
-   - The coin peeks above the BLUE bar but stays WITHIN the nav row's height
-     (--nav-bar-h), so it never overflows into page content.
-   - No infinite animations (no breathing halo / rotating aurora).
-   - The bar and coin are SIBLINGS so the bar's notch mask never clips the coin.
+   STABILITY RULES (the earlier floating FAB broke the app — do not regress):
+   - The coin peeks a few px above the BLUE bar but stays almost entirely within
+     the nav row; it must never float into page content.
+   - No infinite animations while IDLE (voice states are transient).
+   - The bar and the coin are SIBLINGS so the bar's notch mask never clips the coin.
 
    --nav-bar-h must stay in sync with --bottom-nav-h in index.css.
-   ─────────────────────────────────────────────────────────── */
+   ═══════════════════════════════════════════════════════════════════════ */
 
 .bottom-nav {
-  --nav-blue-1: #4f9bff; /* bright top of the coin */
-  --nav-blue-2: #2563eb;
-  --nav-blue-3: #1d4ed8;
+  --nav-blue-1: #5aa0ff; /* bright top of the coin */
+  --nav-blue-2: #2f6cf0;
+  --nav-blue-3: #1e4fd6;
+  --bar-1: #2a63e8;
+  --bar-2: #1b45c4;
 
-  --nav-bar-h: 54px; /* the nav ROW height = the full blue bar height */
-  --fab: 60px; /* coin diameter */
-  --gap: 5px; /* transparent hole thickness around the coin */
+  --nav-bar-h: 58px; /* the nav ROW height = the full blue bar height */
+  --fab: 64px; /* coin diameter */
+  --gap: 4px; /* transparent hole thickness around the coin */
   --vlevel: 0; /* live voice amplitude 0..1 (set by VoiceWaves) — coin + waves */
 
   position: relative;
@@ -38,87 +37,66 @@
   position: absolute;
   inset: 0;
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.16) 0%, rgba(255, 255, 255, 0) 50%),
-    linear-gradient(180deg, var(--nav-blue-2) 0%, var(--nav-blue-3) 100%);
+    linear-gradient(180deg, rgba(255, 255, 255, 0.18) 0%, rgba(255, 255, 255, 0) 45%),
+    linear-gradient(180deg, var(--bar-1) 0%, var(--bar-2) 100%);
   -webkit-mask: radial-gradient(
     circle calc(var(--fab) / 2 + var(--gap))
-      at 50% calc(var(--nav-bar-h) - 2px - var(--fab) / 2),
+      at 50% calc(var(--nav-bar-h) - 3px - var(--fab) / 2),
     transparent calc(var(--fab) / 2 + var(--gap) - 1px),
     #000 calc(var(--fab) / 2 + var(--gap))
   );
   mask: radial-gradient(
     circle calc(var(--fab) / 2 + var(--gap))
-      at 50% calc(var(--nav-bar-h) - 2px - var(--fab) / 2),
+      at 50% calc(var(--nav-bar-h) - 3px - var(--fab) / 2),
     transparent calc(var(--fab) / 2 + var(--gap) - 1px),
     #000 calc(var(--fab) / 2 + var(--gap))
   );
 }
 
 /* ── Voice-active backdrop ──────────────────────────────────────────
-   While the voice engine is active, the bright blue bar washed out the neon
-   waves. We crossfade a DARK backdrop (with a mode-colored glow rising from the
-   coin) over the bar so the waves + coin pop and it reads as a premium
-   "assistant active" state. It's a SEPARATE sibling (not the bar's ::after —
-   the bar's notch mask was clipping the pseudo-element), painted over the blue
-   bar and under the waves/coin. Opacity crossfade → smooth in/out. */
+   While the voice engine is active, a DARK backdrop (with a mode-coloured glow
+   rising from the coin) crossfades over the blue bar so the waves + coin pop.
+   A SEPARATE sibling (not the bar's ::after — the notch mask clipped it),
+   painted over the blue bar and under the waves/coin. */
 .bottom-nav__voicebg {
   position: absolute;
   inset: 0;
   background:
     radial-gradient(
-      circle calc(var(--fab) * 1.7) at 50% 100%,
-      rgba(var(--bar-accent, 56, 189, 248), 0.55) 0%,
-      rgba(var(--bar-accent, 56, 189, 248), 0) 62%
+      circle calc(var(--fab) * 1.9) at 50% 100%,
+      rgba(var(--bar-accent, 56, 189, 248), 0.5) 0%,
+      rgba(var(--bar-accent, 56, 189, 248), 0) 64%
     ),
-    linear-gradient(180deg, #1b2b5e 0%, #0a1126 100%);
-  /* keep the SAME transparent notch (hole) as the blue bar, so the coin's
-     floating hole is preserved in voice mode (a masked sibling clips fine; an
-     ::after did not). */
+    linear-gradient(180deg, #152455 0%, #080f24 100%);
   -webkit-mask: radial-gradient(
     circle calc(var(--fab) / 2 + var(--gap))
-      at 50% calc(var(--nav-bar-h) - 2px - var(--fab) / 2),
+      at 50% calc(var(--nav-bar-h) - 3px - var(--fab) / 2),
     transparent calc(var(--fab) / 2 + var(--gap) - 1px),
     #000 calc(var(--fab) / 2 + var(--gap))
   );
   mask: radial-gradient(
     circle calc(var(--fab) / 2 + var(--gap))
-      at 50% calc(var(--nav-bar-h) - 2px - var(--fab) / 2),
+      at 50% calc(var(--nav-bar-h) - 3px - var(--fab) / 2),
     transparent calc(var(--fab) / 2 + var(--gap) - 1px),
     #000 calc(var(--fab) / 2 + var(--gap))
   );
   opacity: 0;
-  transition: opacity 0.35s ease;
+  transition: opacity 0.4s ease;
   pointer-events: none;
 }
 .bottom-nav--voice .bottom-nav__voicebg {
   opacity: 1;
 }
-.bottom-nav--voice-listening {
-  --bar-accent: 56, 189, 248;
-}
-.bottom-nav--voice-recording {
-  --bar-accent: 244, 63, 94;
-}
-.bottom-nav--voice-speaking {
-  --bar-accent: 139, 92, 246;
-}
-.bottom-nav--voice-processing {
-  --bar-accent: 148, 163, 184;
-}
+.bottom-nav--voice-listening  { --bar-accent: 56, 189, 248; }
+.bottom-nav--voice-recording  { --bar-accent: 251, 113, 133; }
+.bottom-nav--voice-speaking   { --bar-accent: 167, 139, 250; }
+.bottom-nav--voice-processing { --bar-accent: 148, 163, 184; }
 
-@media (prefers-reduced-motion: reduce) {
-  .bottom-nav__voicebg {
-    transition: none;
-  }
-}
-
-/* The robot coin — glossy raised circle centered in the bar, ringed in cream. */
+/* ── The robot coin — a glossy orb centred in the notch ── */
 .bottom-nav__btn {
   position: absolute;
   left: 50%;
-  /* The coin (60px) is larger than the 54px bar, so it sits at the bottom and
-     peeks a little above it (bar height / grid unchanged). */
-  bottom: calc(2px + env(safe-area-inset-bottom, 0px));
+  bottom: calc(3px + env(safe-area-inset-bottom, 0px));
   transform: translateX(-50%);
   display: grid;
   place-items: center;
@@ -129,60 +107,249 @@
   border: 0;
   border-radius: 50%;
   cursor: pointer;
-  color: inherit;
+  color: #fff;
   font: inherit;
   -webkit-appearance: none;
   appearance: none;
   -webkit-tap-highlight-color: transparent;
+  touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
   background:
-    radial-gradient(125% 95% at 50% 6%, rgba(255, 255, 255, 0.55) 0%, rgba(255, 255, 255, 0) 52%),
-    linear-gradient(180deg, var(--nav-blue-1) 0%, var(--nav-blue-2) 58%, var(--nav-blue-3) 100%);
+    radial-gradient(120% 90% at 50% 6%, rgba(255, 255, 255, 0.6) 0%, rgba(255, 255, 255, 0) 46%),
+    radial-gradient(80% 80% at 50% 112%, rgba(34, 211, 238, 0.75) 0%, rgba(34, 211, 238, 0) 58%),
+    linear-gradient(180deg, var(--nav-blue-1) 0%, var(--nav-blue-2) 56%, var(--nav-blue-3) 100%);
   /* Inset gloss only — NO outward shadow/ring (it would fall into the
      transparent hole and darken it). */
   box-shadow:
-    inset 0 1px 1px rgba(255, 255, 255, 0.6),
-    inset 0 -6px 10px rgba(13, 42, 99, 0.32);
-  transition: transform 0.18s cubic-bezier(0.22, 1, 0.36, 1);
+    inset 0 1px 1px rgba(255, 255, 255, 0.75),
+    inset 0 -8px 14px rgba(10, 40, 110, 0.38),
+    inset 0 0 0 1.5px rgba(255, 255, 255, 0.2);
+  transition:
+    transform 0.26s cubic-bezier(0.34, 1.56, 0.64, 1),
+    filter 0.2s ease;
 }
-
 .bottom-nav__btn:hover {
-  transform: translateX(-50%) translateY(-1px);
+  filter: brightness(1.05);
 }
-
 .bottom-nav__btn:active {
-  transform: translateX(-50%) scale(0.93);
+  transform: translateX(-50%) scale(0.9);
 }
-
+.bottom-nav__btn.is-open {
+  transform: translateX(-50%) translateY(-2px);
+  filter: brightness(1.08) saturate(1.1);
+}
 .bottom-nav__btn:focus-visible {
   outline: none;
   box-shadow:
     0 0 0 3px #ffffff,
-    0 0 0 5px rgba(0, 116, 207, 0.6),
-    0 2px 7px rgba(13, 42, 99, 0.42);
+    0 0 0 5px rgba(0, 116, 207, 0.6);
 }
 
+/* the face: the robot glyph; it "looks up" while the sheet is open */
+.bottom-nav__face {
+  display: grid;
+  place-items: center;
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.bottom-nav__btn.is-open .bottom-nav__face {
+  transform: translateY(-1px) scale(1.06);
+}
 .bottom-nav__icon {
   width: 38px;
   height: 38px;
   display: block;
   color: #ffffff;
   fill: currentColor;
-  filter: drop-shadow(0 1px 1.5px rgba(13, 42, 99, 0.45));
+  filter: drop-shadow(0 1.5px 2px rgba(13, 42, 99, 0.45));
 }
-
 .bottom-nav__icon path {
   fill: currentColor;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .bottom-nav__btn {
-    transition: none;
+/* mode ring — sits just outside the coin, inside the notch gap */
+.bottom-nav__ring {
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+/* ── Voice states of the coin ───────────────────────────────────── */
+/* single-shot recording: rose coin, a soft pulsing halo */
+.bottom-nav__btn--recording {
+  background:
+    radial-gradient(120% 90% at 50% 6%, rgba(255, 255, 255, 0.55) 0%, rgba(255, 255, 255, 0) 46%),
+    linear-gradient(180deg, #ff8a9a 0%, #f43f5e 58%, #be123c 100%);
+  animation: vc-pulse-rose 1.25s ease-out infinite;
+}
+@keyframes vc-pulse-rose {
+  0% {
+    box-shadow:
+      inset 0 1px 1px rgba(255, 255, 255, 0.7),
+      inset 0 -8px 14px rgba(120, 13, 40, 0.38),
+      0 0 0 0 rgba(251, 113, 133, 0.6);
+  }
+  70% {
+    box-shadow:
+      inset 0 1px 1px rgba(255, 255, 255, 0.7),
+      inset 0 -8px 14px rgba(120, 13, 40, 0.38),
+      0 0 0 14px rgba(251, 113, 133, 0);
+  }
+  100% {
+    box-shadow:
+      inset 0 1px 1px rgba(255, 255, 255, 0.7),
+      inset 0 -8px 14px rgba(120, 13, 40, 0.38),
+      0 0 0 0 rgba(251, 113, 133, 0);
   }
 }
 
-/* ───────────────────────────────────────────────────────────
+/* processing: dim steady coin + a thin white arc orbiting the ring */
+.bottom-nav__btn--processing {
+  filter: saturate(0.6) brightness(0.92);
+}
+.bottom-nav__btn--processing .bottom-nav__ring {
+  opacity: 1;
+  background: conic-gradient(
+    from 0deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0) 55%,
+    rgba(255, 255, 255, 0.95) 82%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 2.5px));
+  mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #000 calc(100% - 2.5px));
+  animation: vc-orbit 1.1s linear infinite;
+}
+@keyframes vc-orbit {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* hands-free listening: sky coin + a slow breathing ring */
+.bottom-nav__btn--listening {
+  background:
+    radial-gradient(120% 90% at 50% 6%, rgba(255, 255, 255, 0.55) 0%, rgba(255, 255, 255, 0) 46%),
+    linear-gradient(180deg, #67d3fb 0%, #0ea5e9 58%, #0369a1 100%);
+}
+.bottom-nav__btn--listening .bottom-nav__ring {
+  opacity: 1;
+  box-shadow:
+    0 0 0 1.5px rgba(125, 211, 252, 0.7),
+    0 0 14px 2px rgba(56, 189, 248, 0.45);
+  animation: vc-breathe-ring 2.2s ease-in-out infinite;
+}
+@keyframes vc-breathe-ring {
+  0%, 100% { transform: scale(0.98); opacity: 0.7; }
+  50% { transform: scale(1.04); opacity: 1; }
+}
+
+/* AI speaking: violet coin that PULSES in size with the AI's voice
+   (TTS amplitude via --vlevel). Clamped so it never crosses the notch. */
+.bottom-nav__btn.bottom-nav__btn--speaking {
+  background:
+    radial-gradient(120% 90% at 50% 6%, rgba(255, 255, 255, 0.55) 0%, rgba(255, 255, 255, 0) 46%),
+    linear-gradient(180deg, #c4b5fd 0%, #8b5cf6 58%, #6d28d9 100%);
+  transform: translateX(-50%) scale(min(calc(1 + var(--vlevel, 0) * 0.3), 1.1));
+  transition: transform 0.06s linear;
+}
+.bottom-nav__btn--speaking .bottom-nav__ring {
+  opacity: calc(0.35 + var(--vlevel, 0) * 0.65);
+  box-shadow:
+    0 0 0 1.5px rgba(196, 181, 253, 0.8),
+    0 0 16px 3px rgba(167, 139, 250, 0.55);
+}
+
+/* ── Status chip floating just above the bar ── */
+.voice-hint {
+  --hint-rgb: 56, 189, 248;
+  position: absolute;
+  left: 50%;
+  bottom: calc(var(--nav-bar-h) + 14px + env(safe-area-inset-bottom, 0px));
+  transform: translateX(-50%);
+  z-index: 60;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px 8px 12px;
+  border-radius: 999px;
+  background: rgba(10, 18, 38, 0.86);
+  -webkit-backdrop-filter: blur(10px) saturate(140%);
+  backdrop-filter: blur(10px) saturate(140%);
+  color: #fff;
+  font-family: "Heebo", "Open Sans", Arial, sans-serif;
+  font-size: 0.86rem;
+  font-weight: 600;
+  white-space: nowrap;
+  box-shadow:
+    0 8px 24px rgba(5, 12, 30, 0.4),
+    inset 0 0 0 1px rgba(var(--hint-rgb), 0.35);
+  pointer-events: none;
+  animation: vc-hint-in 0.32s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.voice-hint--recording  { --hint-rgb: 251, 113, 133; }
+.voice-hint--starting   { --hint-rgb: 251, 113, 133; }
+.voice-hint--speaking   { --hint-rgb: 167, 139, 250; }
+.voice-hint--processing { --hint-rgb: 148, 163, 184; }
+.voice-hint--error      { --hint-rgb: 251, 191, 36; }
+
+.voice-hint__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: rgba(var(--hint-rgb), 0.22);
+  color: rgb(var(--hint-rgb));
+  font-size: 14px;
+}
+.voice-hint--recording .voice-hint__icon {
+  animation: vc-rec-blink 1.1s ease-in-out infinite;
+}
+.voice-hint--processing .voice-hint__icon svg {
+  animation: vc-orbit 0.9s linear infinite;
+}
+@keyframes vc-rec-blink {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(var(--hint-rgb), 0.55); }
+  50% { box-shadow: 0 0 0 5px rgba(var(--hint-rgb), 0); }
+}
+@keyframes vc-hint-in {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(10px) scale(0.92);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0) scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bottom-nav__btn,
+  .bottom-nav__face,
+  .bottom-nav__voicebg {
+    transition: none;
+  }
+  .bottom-nav__btn--recording,
+  .bottom-nav__btn--processing .bottom-nav__ring,
+  .bottom-nav__btn--listening .bottom-nav__ring,
+  .voice-hint,
+  .voice-hint__icon,
+  .voice-hint__icon svg {
+    animation: none;
+  }
+  .bottom-nav__btn.bottom-nav__btn--speaking {
+    transform: translateX(-50%);
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
    AI action sheet (opens from the bottom when the coin is tapped)
-   ─────────────────────────────────────────────────────────── */
+   ═══════════════════════════════════════════════════════════════════════ */
 .ai-sheet__overlay {
   position: fixed;
   inset: 0;
@@ -190,72 +357,133 @@
   display: flex;
   align-items: flex-end;
   justify-content: center;
-  background: rgba(10, 20, 35, 0.5);
-  -webkit-backdrop-filter: blur(3px);
-  backdrop-filter: blur(3px);
-  animation: ai-sheet-fade 0.2s ease;
+  background: rgba(6, 14, 30, 0.5);
+  -webkit-backdrop-filter: blur(8px) saturate(120%);
+  backdrop-filter: blur(8px) saturate(120%);
+  animation: ai-sheet-fade 0.24s ease both;
+}
+.ai-sheet__overlay.is-closing {
+  animation: ai-sheet-fade-out 0.23s ease both;
+  pointer-events: none;
 }
 
 .ai-sheet {
+  --sheet-pad-x: 14px;
+  position: relative;
   width: 100%;
   max-width: 520px;
-  max-height: 80vh;
-  overflow-y: auto;
-  overflow-x: hidden;
-  -webkit-overflow-scrolling: touch;
-  overscroll-behavior: contain;
-  background: rgba(255, 255, 255, 0.97);
-  -webkit-backdrop-filter: blur(20px) saturate(160%);
-  backdrop-filter: blur(20px) saturate(160%);
-  border-radius: 22px 22px 0 0;
-  box-shadow: 0 -12px 40px rgba(10, 20, 35, 0.28);
-  padding: 8px 14px calc(16px + env(safe-area-inset-bottom, 0px));
+  max-height: 88vh;
+  max-height: 88dvh;
+  display: flex;
+  flex-direction: column;
+  background:
+    radial-gradient(120% 50% at 50% 0%, rgba(96, 165, 250, 0.14) 0%, rgba(96, 165, 250, 0) 55%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.97) 0%, rgba(243, 247, 255, 0.98) 100%);
+  -webkit-backdrop-filter: blur(24px) saturate(160%);
+  backdrop-filter: blur(24px) saturate(160%);
+  border-radius: 30px 30px 0 0;
+  box-shadow:
+    0 -16px 50px rgba(6, 14, 30, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  padding: 0 0 calc(12px + env(safe-area-inset-bottom, 0px));
   font-family: "Heebo", "Open Sans", Arial, sans-serif;
-  animation: ai-sheet-up 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+  /* `backwards` (not `both`): once the entrance has played, the inline
+     transform of the pull-down gesture must win again */
+  animation: ai-sheet-up 0.42s cubic-bezier(0.32, 0.72, 0, 1) backwards;
+  transition: transform 0.32s cubic-bezier(0.32, 0.72, 0, 1);
+  overflow: hidden;
+}
+.ai-sheet.is-dragging {
+  transition: none;
+}
+.ai-sheet.is-closing {
+  animation: ai-sheet-down 0.23s cubic-bezier(0.4, 0, 1, 1) both;
 }
 
 /* ── Cheapest results: a NON-modal floating card that sits ABOVE the bottom
    nav so it never hides or blocks the robot coin (the user can long-press the
-   coin again for a follow-up voice command). The overlay becomes transparent
-   and click-through; only the card itself is interactive. ── */
+   coin again for a follow-up voice command). ── */
 .ai-sheet__overlay--bare {
   background: transparent;
   -webkit-backdrop-filter: none;
   backdrop-filter: none;
   pointer-events: none; /* clicks pass through to the coin / page */
 }
-
 .ai-sheet--floating {
   pointer-events: auto; /* the card stays interactive */
   width: calc(100% - 24px);
   max-width: 460px;
-  /* lift the card above the bottom nav + the peeking coin */
-  margin-bottom: calc(var(--bottom-nav-h, 54px) + 30px + env(safe-area-inset-bottom, 0px));
+  margin-bottom: calc(var(--bottom-nav-h, 58px) + 30px + env(safe-area-inset-bottom, 0px));
   max-height: 58vh;
-  border-radius: 22px;
+  border-radius: 26px;
   box-shadow:
-    0 14px 44px rgba(10, 20, 35, 0.34),
+    0 18px 50px rgba(6, 14, 30, 0.34),
     0 0 0 1px rgba(15, 23, 42, 0.05);
-  padding: 8px 14px 14px;
 }
 
+/* the drag handle = grip + header */
+.ai-sheet__handle {
+  flex: 0 0 auto;
+  padding: 8px var(--sheet-pad-x) 6px;
+  touch-action: none;
+  cursor: grab;
+}
 .ai-sheet__grip {
-  width: 40px;
-  height: 4px;
-  margin: 6px auto 10px;
+  width: 42px;
+  height: 5px;
+  margin: 0 auto 10px;
   border-radius: 999px;
-  background: rgba(15, 23, 42, 0.18);
+  background: rgba(15, 23, 42, 0.16);
 }
 
-.ai-sheet__header {
-  display: grid;
-  grid-template-columns: 36px 1fr 36px;
+/* main-view hero header: avatar + title + subtitle + close */
+.ai-sheet__hero {
+  display: flex;
   align-items: center;
-  gap: 6px;
-  min-height: 34px;
-  padding: 0 10px 12px;
+  gap: 12px;
+  padding: 0 4px 8px;
 }
-
+.ai-sheet__avatar {
+  position: relative;
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 16px;
+  background: linear-gradient(145deg, #5aa0ff 0%, #2f6cf0 58%, #1e4fd6 100%);
+  color: #fff;
+  box-shadow:
+    0 8px 20px rgba(37, 99, 235, 0.35),
+    inset 0 1px 1px rgba(255, 255, 255, 0.6);
+}
+.ai-sheet__avatar svg {
+  width: 28px;
+  height: 28px;
+  fill: currentColor;
+  filter: drop-shadow(0 1px 1px rgba(13, 42, 99, 0.4));
+}
+.ai-sheet__avatar svg path {
+  fill: currentColor;
+}
+.ai-sheet__avatar-dot {
+  position: absolute;
+  right: -2px;
+  bottom: -2px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #22c55e;
+  box-shadow: 0 0 0 2.5px #fff;
+}
+.ai-sheet__hero-text {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
 .ai-sheet__title {
   max-width: 100%;
   font-size: 1.05rem;
@@ -266,15 +494,35 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
+.ai-sheet__title--hero {
+  font-size: 1.15rem;
+  text-align: start;
+  letter-spacing: -0.2px;
+}
+.ai-sheet__subtitle {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #64748b;
+}
+
+.ai-sheet__header {
+  display: grid;
+  grid-template-columns: 36px 1fr 36px;
+  align-items: center;
+  gap: 6px;
+  min-height: 36px;
+  padding: 0 2px 8px;
+}
 
 .ai-sheet__close,
 .ai-sheet__back {
   justify-self: center;
+  flex: 0 0 auto;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
   margin: 0;
   padding: 0;
   border: 0;
@@ -287,24 +535,234 @@
   -webkit-appearance: none;
   appearance: none;
   -webkit-tap-highlight-color: transparent;
-  transition: background 0.15s ease, transform 0.12s ease;
+  transition: background 0.15s ease, transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
-
-.ai-sheet__close:hover,
-.ai-sheet__back:hover {
-  background: rgba(15, 23, 42, 0.12);
-}
-
 .ai-sheet__close:active,
 .ai-sheet__back:active {
-  transform: scale(0.92);
+  transform: scale(0.88);
+  background: rgba(15, 23, 42, 0.12);
 }
-
+.ai-sheet__close:active {
+  transform: scale(0.88) rotate(90deg);
+}
 .ai-sheet__back {
-  font-size: 1.5rem;
+  font-size: 1.4rem;
   font-weight: 700;
 }
 
+/* the scrolling body of the current view (re-mounted per view → entrance) */
+.ai-sheet__view {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  padding: 2px var(--sheet-pad-x) 6px;
+  animation: ai-view-in 0.3s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+@keyframes ai-view-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ── Main view: the action cards ── */
+.ai-sheet__grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 9px;
+}
+.ai-sheet__action {
+  --tone-bg: rgba(96, 165, 250, 0.2);
+  --tone-fg: #2563eb;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  min-height: 98px;
+  margin: 0;
+  padding: 12px 12px 11px;
+  border: 1px solid rgba(15, 23, 42, 0.06);
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.88);
+  color: #0f172a;
+  font-family: inherit;
+  text-align: start;
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+  -webkit-tap-highlight-color: transparent;
+  box-shadow:
+    0 6px 16px rgba(15, 23, 42, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  transition:
+    transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1),
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
+  animation: ai-card-in 0.46s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+  animation-delay: calc(60ms + var(--i, 0) * 38ms);
+}
+.ai-sheet__action:active {
+  transform: scale(0.96);
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.08);
+  border-color: rgba(37, 99, 235, 0.25);
+}
+@keyframes ai-card-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+.ai-sheet__action-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  flex: 0 0 auto;
+  border-radius: 13px;
+  background: var(--tone-bg);
+  color: var(--tone-fg);
+  font-size: 22px;
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.7);
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.ai-sheet__action:active .ai-sheet__action-icon {
+  transform: scale(0.9) rotate(-6deg);
+}
+.ai-sheet__action-text {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+.ai-sheet__action-label {
+  font-size: 0.95rem;
+  font-weight: 800;
+  line-height: 1.2;
+}
+.ai-sheet__action-caption {
+  font-size: 0.74rem;
+  font-weight: 500;
+  line-height: 1.3;
+  color: #64748b;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* hues */
+.ai-sheet__action--green  { --tone-bg: rgba(74, 222, 128, 0.25);  --tone-fg: #16a34a; }
+.ai-sheet__action--violet { --tone-bg: rgba(167, 139, 250, 0.25); --tone-fg: #7c3aed; }
+.ai-sheet__action--amber  { --tone-bg: rgba(251, 191, 36, 0.25);  --tone-fg: #d97706; }
+.ai-sheet__action--rose   { --tone-bg: rgba(251, 113, 133, 0.22); --tone-fg: #e11d48; }
+.ai-sheet__action--blue   { --tone-bg: rgba(96, 165, 250, 0.22);  --tone-fg: #2563eb; }
+.ai-sheet__action--teal   { --tone-bg: rgba(45, 212, 191, 0.25);  --tone-fg: #0d9488; }
+.ai-sheet__action--sky    { --tone-bg: rgba(56, 189, 248, 0.22);  --tone-fg: #0284c7; }
+
+/* the signature action: full-width gradient card */
+.ai-sheet__action--hero {
+  grid-column: 1 / -1;
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+  min-height: 0;
+  padding: 13px 14px;
+  border: 0;
+  color: #fff;
+  background:
+    radial-gradient(90% 120% at 100% 0%, rgba(255, 255, 255, 0.28) 0%, rgba(255, 255, 255, 0) 55%),
+    linear-gradient(120deg, #2563eb 0%, #4f46e5 60%, #7c3aed 100%);
+  box-shadow:
+    0 10px 26px rgba(79, 70, 229, 0.38),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4);
+}
+.ai-sheet__action--hero .ai-sheet__action-icon {
+  width: 46px;
+  height: 46px;
+  border-radius: 15px;
+  background: rgba(255, 255, 255, 0.2);
+  color: #fff;
+  font-size: 24px;
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.45);
+}
+.ai-sheet__action--hero .ai-sheet__action-text {
+  flex: 1 1 auto;
+}
+.ai-sheet__action--hero .ai-sheet__action-label {
+  font-size: 1.05rem;
+}
+.ai-sheet__action--hero .ai-sheet__action-caption {
+  color: rgba(255, 255, 255, 0.82);
+}
+.ai-sheet__action-go {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.18);
+  font-size: 18px;
+}
+
+/* a full-width compact card (last row) */
+.ai-sheet__action--wide {
+  grid-column: 1 / -1;
+  flex-direction: row;
+  align-items: center;
+  min-height: 0;
+  padding: 11px 13px;
+}
+.ai-sheet__action--wide .ai-sheet__action-icon {
+  width: 40px;
+  height: 40px;
+}
+
+/* gesture tips under the grid */
+.ai-sheet__tips {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  margin: 10px 2px 0;
+  padding: 8px 12px;
+  border-radius: 14px;
+  background: rgba(37, 99, 235, 0.06);
+}
+.ai-sheet__tip {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 0.76rem;
+  font-weight: 500;
+  line-height: 1.3;
+  color: #475569;
+}
+.ai-sheet__tip b {
+  font-weight: 800;
+  color: #1d4ed8;
+}
+.ai-sheet__tip svg {
+  font-size: 18px;
+  color: #2563eb;
+  flex: 0 0 auto;
+}
+
+/* ── Sub-view lists (nav / categories / shelf) ── */
 .ai-sheet__list {
   list-style: none;
   margin: 0;
@@ -313,112 +771,130 @@
   flex-direction: column;
   gap: 8px;
 }
+.ai-sheet__list > li {
+  animation: ai-card-in 0.4s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+  animation-delay: calc(30ms + min(var(--i, 0), 10) * 30ms);
+}
 
 .ai-sheet__item {
+  --tone-bg: rgba(96, 165, 250, 0.2);
+  --tone-fg: #2563eb;
   width: 100%;
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 14px 16px;
+  padding: 13px 14px;
   margin: 0;
   border: 1px solid rgba(15, 23, 42, 0.06);
-  border-radius: 14px;
-  background: rgba(248, 250, 252, 0.9);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.88);
   color: #0f172a;
   font-family: inherit;
-  font-size: 1rem;
-  font-weight: 600;
-  text-align: right;
+  font-size: 0.98rem;
+  font-weight: 700;
+  text-align: start;
   cursor: pointer;
   -webkit-appearance: none;
   appearance: none;
   -webkit-tap-highlight-color: transparent;
-  transition: background 0.15s ease, transform 0.12s ease, border-color 0.15s ease;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.04);
+  transition:
+    background 0.15s ease,
+    transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1),
+    border-color 0.15s ease;
 }
-
-.ai-sheet__item:hover {
-  background: rgba(37, 99, 235, 0.08);
-  border-color: rgba(37, 99, 235, 0.25);
-}
-
 .ai-sheet__item:active {
-  transform: scale(0.985);
+  transform: scale(0.975);
+  background: rgba(37, 99, 235, 0.06);
+  border-color: rgba(37, 99, 235, 0.22);
 }
-
 .ai-sheet__item-label {
   flex: 1;
+  min-width: 0;
 }
-
 .ai-sheet__chevron {
-  color: #64748b;
-  font-size: 1.4rem;
+  color: #cbd5e1;
+  font-size: 1.3rem;
   line-height: 1;
+  display: inline-flex;
 }
 
-/* Products view: sub-categories grouped under their category heading. */
-.ai-sheet__groups {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.ai-sheet__group-title {
-  padding: 2px 6px 6px;
-  font-size: 0.85rem;
-  font-weight: 800;
-  color: #1d4ed8;
-}
-
-/* Navigation sub-category rows: leading round icon badge. */
-.ai-sheet__item--nav {
-  font-weight: 700;
-}
-
+/* navigation rows: coloured icon tile */
 .ai-sheet__item-icon {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 38px;
-  height: 38px;
+  width: 40px;
+  height: 40px;
   flex: 0 0 auto;
-  border-radius: 50%;
-  background: linear-gradient(180deg, #3b82f6 0%, #1d4ed8 100%);
-  color: #ffffff;
+  border-radius: 13px;
+  background: var(--tone-bg);
+  color: var(--tone-fg);
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.7);
 }
-
 .ai-sheet__item-icon svg {
-  width: 20px;
-  height: 20px;
+  width: 21px;
+  height: 21px;
   fill: currentColor;
 }
-
 .ai-sheet__item-icon svg path,
 .ai-sheet__item-icon svg circle,
 .ai-sheet__item-icon svg rect,
 .ai-sheet__item-icon svg g {
   fill: currentColor;
 }
+.ai-sheet__item--blue   { --tone-bg: rgba(96, 165, 250, 0.22);  --tone-fg: #2563eb; }
+.ai-sheet__item--sky    { --tone-bg: rgba(56, 189, 248, 0.22);  --tone-fg: #0284c7; }
+.ai-sheet__item--green  { --tone-bg: rgba(74, 222, 128, 0.25);  --tone-fg: #16a34a; }
+.ai-sheet__item--teal   { --tone-bg: rgba(45, 212, 191, 0.25);  --tone-fg: #0d9488; }
+.ai-sheet__item--amber  { --tone-bg: rgba(251, 191, 36, 0.25);  --tone-fg: #d97706; }
+.ai-sheet__item--pink   { --tone-bg: rgba(244, 114, 182, 0.25); --tone-fg: #db2777; }
+.ai-sheet__item--violet { --tone-bg: rgba(167, 139, 250, 0.25); --tone-fg: #7c3aed; }
+.ai-sheet__item--slate  { --tone-bg: rgba(148, 163, 184, 0.25); --tone-fg: #475569; }
+
+/* Products view: sub-categories grouped under their category heading. */
+.ai-sheet__groups {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.ai-sheet__group-title {
+  padding: 4px 6px 6px;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  color: #2563eb;
+}
 
 @keyframes ai-sheet-fade {
   from { opacity: 0; }
   to { opacity: 1; }
 }
-
+@keyframes ai-sheet-fade-out {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
 @keyframes ai-sheet-up {
   from { transform: translateY(100%); }
   to { transform: translateY(0); }
 }
+@keyframes ai-sheet-down {
+  to { transform: translateY(110%); }
+}
 
 @media (prefers-reduced-motion: reduce) {
   .ai-sheet__overlay,
-  .ai-sheet {
+  .ai-sheet,
+  .ai-sheet__view,
+  .ai-sheet__action,
+  .ai-sheet__list > li {
     animation: none;
   }
 }
 
-/* ───────────────────────────────────────────────────────────
+/* ═══════════════════════════════════════════════════════════════════════
    Cheapest-supermarket result (action #3 in the sheet)
-   ─────────────────────────────────────────────────────────── */
+   ═══════════════════════════════════════════════════════════════════════ */
 .ai-sheet__cheapest {
   display: flex;
   flex-direction: column;
@@ -426,7 +902,7 @@
   padding: 4px 2px 2px;
 }
 
-/* action #5 — compare mode picker */
+/* action #5 — compare mode picker (also #6 / #7 strategy pickers) */
 .ai-sheet__compare {
   display: flex;
   flex-direction: column;
@@ -434,10 +910,10 @@
   padding: 4px 2px 2px;
 }
 .ai-sheet__compare-hint {
-  margin: 0 2px 2px;
+  margin: 0 2px 4px;
   font-size: 0.86rem;
-  font-weight: 600;
-  line-height: 1.4;
+  font-weight: 500;
+  line-height: 1.45;
   color: #64748b;
 }
 .ai-sheet__compare-opt {
@@ -446,13 +922,25 @@
   gap: 10px;
   width: 100%;
   padding: 14px 14px;
-  border: 1px solid rgba(15, 23, 42, 0.08);
-  border-radius: 14px;
+  border: 1px solid rgba(15, 23, 42, 0.06);
+  border-radius: 16px;
   background: rgba(255, 255, 255, 0.9);
   cursor: pointer;
   font-family: inherit;
   text-align: start;
+  -webkit-appearance: none;
+  appearance: none;
+  -webkit-tap-highlight-color: transparent;
   box-shadow: 0 4px 12px rgba(15, 23, 42, 0.05);
+  transition:
+    transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1),
+    border-color 0.15s ease,
+    background 0.15s ease;
+}
+.ai-sheet__compare-opt:active {
+  transform: scale(0.975);
+  border-color: rgba(37, 99, 235, 0.22);
+  background: rgba(37, 99, 235, 0.06);
 }
 .ai-sheet__compare-opt:disabled {
   opacity: 0.5;
@@ -472,7 +960,7 @@
 }
 .ai-sheet__compare-opt-sub {
   font-size: 0.8rem;
-  font-weight: 600;
+  font-weight: 500;
   color: #64748b;
 }
 
@@ -496,7 +984,6 @@
   border-top-color: #2563eb;
   animation: vc-spin 0.7s linear infinite;
 }
-
 @keyframes vc-spin {
   to {
     transform: rotate(360deg);
@@ -508,20 +995,16 @@
   align-items: center;
   gap: 12px;
   padding: 14px;
-  border: 1px solid rgba(15, 23, 42, 0.08);
-  border-radius: 16px;
-  background: linear-gradient(
-    180deg,
-    rgba(34, 197, 94, 0.1) 0%,
-    rgba(248, 250, 252, 0.92) 100%
-  );
+  border: 1px solid rgba(34, 197, 94, 0.2);
+  border-radius: 18px;
+  background: linear-gradient(180deg, rgba(34, 197, 94, 0.12) 0%, rgba(255, 255, 255, 0.92) 100%);
+  box-shadow: 0 6px 18px rgba(22, 163, 74, 0.1);
 }
-
 .ai-sheet__cheapest-logo {
   width: 56px;
   height: 56px;
   flex: 0 0 auto;
-  border-radius: 12px;
+  border-radius: 14px;
   overflow: hidden;
   background: #fff;
   display: flex;
@@ -529,14 +1012,12 @@
   justify-content: center;
   box-shadow: 0 1px 3px rgba(15, 23, 42, 0.12);
 }
-
 .ai-sheet__cheapest-logo img,
 .ai-sheet__cheapest-logo svg {
   width: 100%;
   height: 100%;
   object-fit: contain;
 }
-
 .ai-sheet__cheapest-info {
   flex: 1;
   min-width: 0;
@@ -544,7 +1025,6 @@
   flex-direction: column;
   gap: 2px;
 }
-
 .ai-sheet__cheapest-name {
   font-size: 1.05rem;
   font-weight: 800;
@@ -553,7 +1033,6 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
-
 .ai-sheet__cheapest-addr {
   font-size: 0.85rem;
   color: #64748b;
@@ -561,52 +1040,47 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
-
 .ai-sheet__cheapest-price {
   display: flex;
   flex-direction: column;
   align-items: flex-end;
   flex: 0 0 auto;
 }
-
 .ai-sheet__cheapest-price-label {
   font-size: 0.72rem;
   color: #64748b;
   font-weight: 600;
 }
-
 .ai-sheet__cheapest-price-value {
   font-size: 1.25rem;
   font-weight: 800;
   color: #16a34a;
   white-space: nowrap;
 }
-
 .ai-sheet__cheapest-note {
   text-align: center;
   font-size: 0.82rem;
   color: #64748b;
 }
-
 .ai-sheet__cheapest-cta {
   align-self: stretch;
   border: 0;
-  border-radius: 14px;
-  padding: 13px;
+  border-radius: 16px;
+  padding: 14px;
   font-family: inherit;
   font-size: 1rem;
-  font-weight: 700;
+  font-weight: 800;
   color: #fff;
-  background: linear-gradient(180deg, #3b82f6 0%, #2563eb 100%);
+  background: linear-gradient(120deg, #3b82f6 0%, #2563eb 100%);
+  box-shadow: 0 8px 20px rgba(37, 99, 235, 0.32);
   cursor: pointer;
   -webkit-appearance: none;
   appearance: none;
   -webkit-tap-highlight-color: transparent;
-  transition: transform 0.12s ease;
+  transition: transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
-
 .ai-sheet__cheapest-cta:active {
-  transform: scale(0.985);
+  transform: scale(0.975);
 }
 
 /* Mode toggle (immediate replace / display & choose) */
@@ -617,7 +1091,6 @@
   border-radius: 999px;
   padding: 4px;
 }
-
 .ai-sheet__mode-btn {
   flex: 1;
   border: 0;
@@ -632,13 +1105,12 @@
   -webkit-appearance: none;
   appearance: none;
   -webkit-tap-highlight-color: transparent;
-  transition: background 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
+  transition: background 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
 }
-
 .ai-sheet__mode-btn.is-active {
   background: #fff;
   color: #1d4ed8;
-  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.15);
+  box-shadow: 0 1px 4px rgba(15, 23, 42, 0.15);
 }
 
 /* Ranked supermarkets list (display mode) */
@@ -650,38 +1122,35 @@
   flex-direction: column;
   gap: 8px;
 }
-
 .ai-sheet__ranked-row {
   width: 100%;
   display: flex;
   align-items: center;
   gap: 10px;
   padding: 10px 12px;
-  border: 1px solid rgba(15, 23, 42, 0.08);
-  border-radius: 14px;
-  background: rgba(248, 250, 252, 0.9);
+  border: 1px solid rgba(15, 23, 42, 0.06);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.9);
   cursor: pointer;
   font-family: inherit;
-  text-align: right;
+  text-align: start;
   -webkit-appearance: none;
   appearance: none;
   -webkit-tap-highlight-color: transparent;
-  transition: background 0.15s ease, border-color 0.15s ease, transform 0.12s ease;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease,
+    transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
-
-.ai-sheet__ranked-row:hover {
-  background: rgba(37, 99, 235, 0.08);
-  border-color: rgba(37, 99, 235, 0.25);
-}
-
 .ai-sheet__ranked-row:active {
-  transform: scale(0.985);
+  transform: scale(0.975);
+  background: rgba(37, 99, 235, 0.06);
+  border-color: rgba(37, 99, 235, 0.22);
 }
-
 .ai-sheet__ranked-rank {
   flex: 0 0 auto;
-  width: 22px;
-  height: 22px;
+  width: 24px;
+  height: 24px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -691,18 +1160,15 @@
   font-size: 0.78rem;
   font-weight: 800;
 }
-
-/* cheapest row (first) gets a green rank badge */
 .ai-sheet__ranked li:first-child .ai-sheet__ranked-rank {
   background: #16a34a;
   color: #fff;
 }
-
 .ai-sheet__ranked-logo {
   width: 40px;
   height: 40px;
   flex: 0 0 auto;
-  border-radius: 10px;
+  border-radius: 11px;
   overflow: hidden;
   background: #fff;
   display: flex;
@@ -710,14 +1176,12 @@
   justify-content: center;
   box-shadow: 0 1px 2px rgba(15, 23, 42, 0.12);
 }
-
 .ai-sheet__ranked-logo img,
 .ai-sheet__ranked-logo svg {
   width: 100%;
   height: 100%;
   object-fit: contain;
 }
-
 .ai-sheet__ranked-info {
   flex: 1;
   min-width: 0;
@@ -725,7 +1189,6 @@
   flex-direction: column;
   gap: 1px;
 }
-
 .ai-sheet__ranked-name {
   font-size: 0.95rem;
   font-weight: 700;
@@ -734,7 +1197,6 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
-
 .ai-sheet__ranked-addr {
   font-size: 0.78rem;
   color: #64748b;
@@ -742,179 +1204,12 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
-
 .ai-sheet__ranked-price {
   flex: 0 0 auto;
   font-size: 1.05rem;
   font-weight: 800;
   color: #16a34a;
   white-space: nowrap;
-}
-
-/* ───────────────────────────────────────────────────────────
-   Voice command (long-press the coin) — recording feedback.
-   Additive only; the base coin/bar rules above are untouched.
-   ─────────────────────────────────────────────────────────── */
-
-/* Let a long-press happen without the browser hijacking it for scroll/select. */
-.bottom-nav__btn {
-  touch-action: none;
-  -webkit-user-select: none;
-  user-select: none;
-}
-
-/* Recording: the coin turns red and emits a pulsing ring. The inset gloss is
-   preserved (so the transparent hole isn't darkened); only an outward red
-   halo is animated. */
-.bottom-nav__btn--recording {
-  background:
-    radial-gradient(125% 95% at 50% 6%, rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0) 52%),
-    linear-gradient(180deg, #ff6a6a 0%, #ef4444 58%, #dc2626 100%);
-  animation: vc-pulse 1.3s ease-out infinite;
-}
-
-@keyframes vc-pulse {
-  0% {
-    box-shadow:
-      inset 0 1px 1px rgba(255, 255, 255, 0.6),
-      inset 0 -6px 10px rgba(120, 13, 13, 0.32),
-      0 0 0 0 rgba(239, 68, 68, 0.55);
-  }
-  70% {
-    box-shadow:
-      inset 0 1px 1px rgba(255, 255, 255, 0.6),
-      inset 0 -6px 10px rgba(120, 13, 13, 0.32),
-      0 0 0 12px rgba(239, 68, 68, 0);
-  }
-  100% {
-    box-shadow:
-      inset 0 1px 1px rgba(255, 255, 255, 0.6),
-      inset 0 -6px 10px rgba(120, 13, 13, 0.32),
-      0 0 0 0 rgba(239, 68, 68, 0);
-  }
-}
-
-/* Processing: gentle breathing while waiting for the server, plus a soft glow so
-   the floating hole reads as a glowing coin (not a bare white frame) on the dark
-   bar — matching the other voice modes. */
-.bottom-nav__btn--processing {
-  animation: vc-breathe 1s ease-in-out infinite;
-  box-shadow:
-    inset 0 1px 1px rgba(255, 255, 255, 0.6),
-    inset 0 -6px 10px rgba(13, 42, 99, 0.32),
-    0 0 14px 2px rgba(79, 155, 255, 0.55);
-}
-
-@keyframes vc-breathe {
-  0%,
-  100% {
-    opacity: 0.7;
-  }
-  50% {
-    opacity: 1;
-  }
-}
-
-/* Hands-free listening: cyan-tinted coin with a soft glow (waves do the rest). */
-.bottom-nav__btn--listening {
-  background:
-    radial-gradient(125% 95% at 50% 6%, rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0) 52%),
-    linear-gradient(180deg, #38bdf8 0%, #0ea5e9 58%, #0284c7 100%);
-  animation: vc-glow-cyan 1.8s ease-in-out infinite;
-}
-
-@keyframes vc-glow-cyan {
-  0%,
-  100% {
-    box-shadow:
-      inset 0 1px 1px rgba(255, 255, 255, 0.6),
-      inset 0 -6px 10px rgba(3, 55, 90, 0.32),
-      0 0 8px 1px rgba(56, 189, 248, 0.45);
-  }
-  50% {
-    box-shadow:
-      inset 0 1px 1px rgba(255, 255, 255, 0.6),
-      inset 0 -6px 10px rgba(3, 55, 90, 0.32),
-      0 0 16px 3px rgba(56, 189, 248, 0.75);
-  }
-}
-
-/* AI speaking: violet-tinted coin with a soft glow, and the coin PULSES in size
-   with the AI's voice (TTS amplitude via the shared --vlevel). The doubled-class
-   selector raises specificity so the pulse wins over :hover/:active transforms. */
-.bottom-nav__btn.bottom-nav__btn--speaking {
-  background:
-    radial-gradient(125% 95% at 50% 6%, rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0) 52%),
-    linear-gradient(180deg, #a78bfa 0%, #8b5cf6 58%, #7c3aed 100%);
-  animation: vc-glow-violet 1.2s ease-in-out infinite;
-  /* Bigger pulse, but clamped so the coin only grows up to the hole edge
-     (coin r=fab/2=30px; hole r=fab/2+gap≈35px → max scale ≈ 1.13) — it reaches
-     the gap but never crosses into the bar. */
-  transform: translateX(-50%) scale(min(calc(1 + var(--vlevel, 0) * 0.32), 1.13));
-  transition: transform 0.06s linear;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .bottom-nav__btn.bottom-nav__btn--speaking {
-    transform: translateX(-50%);
-  }
-}
-
-@keyframes vc-glow-violet {
-  0%,
-  100% {
-    box-shadow:
-      inset 0 1px 1px rgba(255, 255, 255, 0.6),
-      inset 0 -6px 10px rgba(49, 16, 99, 0.32),
-      0 0 8px 1px rgba(139, 92, 246, 0.45);
-  }
-  50% {
-    box-shadow:
-      inset 0 1px 1px rgba(255, 255, 255, 0.6),
-      inset 0 -6px 10px rgba(49, 16, 99, 0.32),
-      0 0 18px 4px rgba(139, 92, 246, 0.8);
-  }
-}
-
-/* Status chip floating just above the bar. */
-.voice-hint {
-  position: absolute;
-  left: 50%;
-  bottom: calc(var(--nav-bar-h) + 10px);
-  transform: translateX(-50%);
-  z-index: 60;
-  padding: 7px 14px;
-  border-radius: 999px;
-  background: rgba(15, 23, 42, 0.92);
-  color: #fff;
-  font-family: "Heebo", "Open Sans", Arial, sans-serif;
-  font-size: 0.85rem;
-  font-weight: 600;
-  white-space: nowrap;
-  box-shadow: 0 6px 18px rgba(10, 20, 35, 0.35);
-  pointer-events: none;
-  animation: vc-hint-in 0.18s ease;
-}
-
-@keyframes vc-hint-in {
-  from {
-    opacity: 0;
-    transform: translateX(-50%) translateY(6px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(-50%) translateY(0);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .bottom-nav__btn--recording,
-  .bottom-nav__btn--processing,
-  .bottom-nav__btn--listening,
-  .bottom-nav__btn--speaking,
-  .voice-hint {
-    animation: none;
-  }
 }
 
 /* ── Action #8: find-product-on-shelf panel ── */

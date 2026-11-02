@@ -44,22 +44,109 @@ import { ReactComponent as ReceiptIcon } from "../Toolbar/wishlist.svg";
 import { ReactComponent as PieChartIcon } from "../Toolbar/pie-chart.svg";
 import { ReactComponent as BarcodeIcon } from "../Toolbar/barcode.svg";
 import { IconClose, IconChevronLeft, IconChevronRight } from "../Icons/UiIcons";
+import {
+  IconCompass,
+  IconGrid,
+  IconTag,
+  IconSparkles,
+  IconScale,
+  IconCartCheck,
+  IconCartSwitch,
+  IconShelfPin,
+  IconMic,
+  IconEar,
+  IconSpeaker,
+  IconSpinner,
+  IconAlert,
+  IconHold,
+  IconDoubleTap,
+} from "./ActionIcons";
+import { haptic } from "../../utils/haptics";
+import { uiSound, primeUiSound } from "../../utils/uiSound";
 
-/* The 5 actions shown in the AI action sheet.
+/* The actions shown in the AI action sheet (order = visual order).
+   `hero` = the signature action, rendered as the full-width gradient card;
+   `wide` = spans both grid columns (compact horizontal layout).
    - "ניווט"                    → expands to the navigation sub-categories (pages).
-   - "פעולה מספר 2"             → expands to the products page sub-categories.
-   - "הסופר הזול ביותר לעגלה"   → computes & shows the cheapest supermarket.
-   - 2 remaining are placeholders for now. */
+   - "קטגוריות מוצרים"          → expands to the products page sub-categories.
+   - "הסופר הזול ביותר לעגלה"   → computes & shows the cheapest supermarket. */
 const ACTIONS = [
-  { key: "nav", label: "ניווט", view: "nav" },
-  { key: "products", label: "פעולה מספר 2", view: "products" },
-  { key: "cheapest", label: "הסופר הזול ביותר לעגלה", view: "cheapest" },
-  { key: "a4", label: "ייעל את העגלה לסופר הנוכחי" },
-  { key: "a5", label: "השווה מחירים בין סופרים", view: "compare" },
-  { key: "a6", label: "השלם את העגלה", view: "complete" },
-  { key: "a7", label: "השלם ועבור לסופר הזול", view: "complete7" },
-  { key: "a8", label: "מצא מוצר במדף", view: "find" },
+  {
+    key: "a4",
+    label: "ייעל את העגלה",
+    caption: "החלפות משתלמות לאותה עגלה, בסופר הנוכחי",
+    Icon: IconSparkles,
+    tone: "hero",
+    hero: true,
+  },
+  {
+    key: "cheapest",
+    label: "הסופר הזול לעגלה",
+    caption: "איפה העגלה שלך הכי זולה",
+    Icon: IconTag,
+    tone: "green",
+    view: "cheapest",
+  },
+  {
+    key: "a5",
+    label: "השוואת סופרים",
+    caption: "מוצר מול מוצר בין קבוצת סופרים",
+    Icon: IconScale,
+    tone: "violet",
+    view: "compare",
+  },
+  {
+    key: "a6",
+    label: "השלם את העגלה",
+    caption: "ממלא את מה שחסר מהרשימה הקבועה",
+    Icon: IconCartCheck,
+    tone: "amber",
+    view: "complete",
+  },
+  {
+    key: "a7",
+    label: "השלם ועבור לזול",
+    caption: "השלמה ואז מעבר לסופר הזול ביותר",
+    Icon: IconCartSwitch,
+    tone: "rose",
+    view: "complete7",
+  },
+  {
+    key: "nav",
+    label: "ניווט",
+    caption: "קפיצה מהירה לכל מסך",
+    Icon: IconCompass,
+    tone: "blue",
+    view: "nav",
+  },
+  {
+    key: "products",
+    label: "קטגוריות מוצרים",
+    caption: "ישר לתת-קטגוריה במדף",
+    Icon: IconGrid,
+    tone: "teal",
+    view: "products",
+  },
+  {
+    key: "a8",
+    label: "מצא מוצר במדף",
+    caption: "גלילה אוטומטית עד המוצר",
+    Icon: IconShelfPin,
+    tone: "sky",
+    view: "find",
+    wide: true,
+  },
 ];
+
+/* hint-chip icon per voice mode */
+const HINT_ICONS = {
+  starting: IconMic,
+  recording: IconMic,
+  listening: IconEar,
+  speaking: IconSpeaker,
+  processing: IconSpinner,
+  error: IconAlert,
+};
 
 /* Action #8 — extra shelf targets beyond the classification families:
    generalNames that sit DEEP in their subcategory's scroll (cottage, ski
@@ -86,15 +173,19 @@ const TALPIOT_SUPERMARKET_IDS = new Set([
 
 /* Navigation sub-categories → routes. */
 const NAV_ITEMS = [
-  { to: "/", label: "בית", Icon: HomeIcon },
-  { to: "/products", label: "מוצרים", Icon: GroceryIcon },
-  { to: "/cart", label: "עגלת קניות", Icon: CartIcon },
-  { to: "/history", label: "היסטוריית קניות", Icon: HistoryIcon },
-  { to: "/image-parser", label: "סריקת קבלות", Icon: ReceiptIcon },
-  { to: "/advanced-stats", label: "סטטיסטיקות", Icon: PieChartIcon },
-  { to: "/barcode-scanner", label: "סורק ברקוד", Icon: BarcodeIcon },
-  { to: "/ai", label: "עוזר AI", Icon: RobotIcon },
+  { to: "/", label: "בית", Icon: HomeIcon, tone: "blue" },
+  { to: "/products", label: "מוצרים", Icon: GroceryIcon, tone: "green" },
+  { to: "/cart", label: "עגלת קניות", Icon: CartIcon, tone: "sky" },
+  { to: "/history", label: "היסטוריית קניות", Icon: HistoryIcon, tone: "violet" },
+  { to: "/image-parser", label: "סריקת קבלות", Icon: ReceiptIcon, tone: "amber" },
+  { to: "/advanced-stats", label: "סטטיסטיקות", Icon: PieChartIcon, tone: "pink" },
+  { to: "/barcode-scanner", label: "סורק ברקוד", Icon: BarcodeIcon, tone: "slate" },
+  { to: "/ai", label: "עוזר AI", Icon: RobotIcon, tone: "teal" },
 ];
+
+/* sheet exit animation length (ms) — keep in sync with BottomNav.css */
+const SHEET_CLOSE_MS = 230;
+const SHEET_DISMISS_PX = 90; // drag the header down this far → close
 
 /* A short, controlled spoken summary of a cart-optimization result — a status
    snapshot ("what was worthwhile"), not a free-form ramble. Spoken after a
@@ -357,16 +448,88 @@ export default function BottomNav() {
      scrollable — otherwise it could be clicked but not scrolled. */
   useBodyScrollLock(open && view !== "cheapest");
 
-  const close = useCallback(() => setOpen(false), []);
+  /* ── sheet lifecycle: open → (closing: exit animation) → unmounted ── */
+  const [sheetDrag, setSheetDrag] = useState(0); // header drag offset (px)
+  const [closing, setClosing] = useState(false);
+  const closeTimerRef = useRef(null);
+  const openRef = useRef(false);
+  openRef.current = open;
+  const close = useCallback(() => {
+    if (!openRef.current) return;
+    if (closeTimerRef.current) return; // already closing
+    uiSound("close");
+    setClosing(true);
+    closeTimerRef.current = setTimeout(() => {
+      closeTimerRef.current = null;
+      setClosing(false);
+      setOpen(false);
+      setSheetDrag(0);
+    }, SHEET_CLOSE_MS);
+  }, []);
+  useEffect(() => () => clearTimeout(closeTimerRef.current), []);
 
   const openSheet = () => {
+    clearTimeout(closeTimerRef.current);
+    closeTimerRef.current = null;
+    setClosing(false);
     setView("main");
     // fresh state for a manual open so action #3 re-fetches
     setCheapestMode("immediate");
     setCheapest({ status: "idle" });
     setRanked({ status: "idle" });
     setCompareWithComplete(false);
+    haptic("medium");
+    uiSound("open");
     setOpen(true);
+  };
+
+  /* every button inside a sheet view is a "selection" — one capture-phase
+     handler gives them all the same feel (tick + haptic) without touching
+     each handler */
+  const onViewClickCapture = (e) => {
+    const btn = e.target.closest && e.target.closest("button");
+    if (!btn || btn.disabled) return;
+    haptic("selection");
+    uiSound("select");
+  };
+  const goBack = () => {
+    haptic("selection");
+    setView("main");
+  };
+
+  /* ── drag the header down to dismiss (mobile affordance) ── */
+  const [sheetDragging, setSheetDragging] = useState(false);
+  const sheetDragRef = useRef({ active: false, y0: 0, dy: 0, t0: 0 });
+  const onSheetHandleDown = (e) => {
+    if (e.pointerType === "mouse" && e.button !== 0) return;
+    // the close / back buttons live inside the handle — leave their clicks alone
+    if (e.target.closest && e.target.closest("button")) return;
+    sheetDragRef.current = { active: true, y0: e.clientY, dy: 0, t0: Date.now() };
+    setSheetDragging(true);
+    try {
+      e.currentTarget.setPointerCapture(e.pointerId);
+    } catch (err) {
+      /* ignore */
+    }
+  };
+  const onSheetHandleMove = (e) => {
+    const d = sheetDragRef.current;
+    if (!d.active) return;
+    d.dy = Math.max(0, e.clientY - d.y0);
+    setSheetDrag(d.dy);
+  };
+  const onSheetHandleUp = () => {
+    const d = sheetDragRef.current;
+    if (!d.active) return;
+    d.active = false;
+    setSheetDragging(false);
+    const fast = d.dy > 24 && Date.now() - d.t0 < 200;
+    if (d.dy > SHEET_DISMISS_PX || fast) {
+      haptic("light");
+      close(); // the exit animation continues from the dragged position
+    } else {
+      setSheetDrag(0); // spring back
+    }
   };
 
   /* Action #4 — optimize the whole cart for the current supermarket. Close the
@@ -1225,10 +1388,14 @@ export default function BottomNav() {
 
   const onCoinPointerDown = () => {
     longPressFired.current = false; // reset every press (covers a prior long-press)
+    primeUiSound(); // first gesture → the audio context is ready for later sounds
+    haptic("light"); // every press on the robot "feels" like a press
     if (voiceState !== "idle" || handsFree) return; // arm long-press only from idle
     clearTimeout(longPressTimer.current);
     longPressTimer.current = setTimeout(() => {
       longPressFired.current = true;
+      haptic("recStart");
+      uiSound("recStart");
       startRecording();
     }, LONG_PRESS_MS);
   };
@@ -1242,10 +1409,14 @@ export default function BottomNav() {
       return;
     }
     if (handsFree) {
+      haptic("listenOff");
+      uiSound("listenOff");
       stopHandsFree(); // a single tap exits hands-free mode
       return;
     }
     if (voiceState === "recording" || voiceState === "starting") {
+      haptic("recStop");
+      uiSound("recStop");
       stopRecording(); // tap while recording → stop & send
       return;
     }
@@ -1261,9 +1432,18 @@ export default function BottomNav() {
     } else {
       clearTimeout(tapTimer.current);
       tapCount.current = 0;
+      haptic("listenOn");
+      uiSound("listenOn");
       startHandsFree();
     }
   };
+
+  /* an error (mic denied / network…) gets its own feel */
+  useEffect(() => {
+    if (!voiceError) return;
+    haptic("error");
+    uiSound("error");
+  }, [voiceError]);
 
   // clear any pending timers on unmount
   useEffect(
@@ -1275,26 +1455,28 @@ export default function BottomNav() {
   );
 
   const recording = voiceMode === "recording";
-  const voiceHint =
+  /* status chip above the bar: text + which icon / colour family */
+  const hint =
     voiceState === "starting"
-      ? "🎙️ פותח מיקרופון…"
+      ? { text: "פותח מיקרופון…", kind: "starting" }
       : voiceMode === "recording"
       ? handsFree
-        ? "🎧 מקשיב… דבר"
-        : "🎙️ מקליט… הקש לסיום"
+        ? { text: "מקשיב… דברו", kind: "recording" }
+        : { text: "מקליט… הקישו לסיום", kind: "recording" }
       : voiceMode === "speaking"
-      ? "🔊 משיב…"
+      ? { text: "משיב…", kind: "speaking" }
       : voiceMode === "processing"
-      ? "מעבד…"
+      ? { text: "חושב…", kind: "processing" }
       : voiceMode === "listening"
-      ? "" /* static listening: no chip (it covered the app); the waves show it */
+      ? null /* static listening: no chip (it covered the app); the waves show it */
       : voiceError === "mic-denied"
-      ? "אין הרשאת מיקרופון"
+      ? { text: "אין הרשאת מיקרופון", kind: "error" }
       : voiceError === "unsupported"
-      ? "הדפדפן לא תומך בהקלטה"
+      ? { text: "הדפדפן לא תומך בהקלטה", kind: "error" }
       : voiceError === "network"
-      ? "תקלת רשת, נסה שוב"
-      : "";
+      ? { text: "תקלת רשת, נסו שוב", kind: "error" }
+      : null;
+  const HintIcon = hint ? HINT_ICONS[hint.kind] : null;
 
   const TITLES = {
     main: "מה תרצה לעשות?",
@@ -1309,13 +1491,21 @@ export default function BottomNav() {
     find: "מצא מוצר במדף",
   };
 
+  const runAction = (a) => {
+    if (a.key === "a4") startOptimize();
+    else if (a.key === "a5") {
+      setCompareWithComplete(false);
+      setView("compare");
+    } else if (a.view) setView(a.view);
+  };
+
   const sheet =
     open &&
     ReactDOM.createPortal(
       <div
         className={`ai-sheet__overlay${
           view === "cheapest" ? " ai-sheet__overlay--bare" : ""
-        }`}
+        }${closing ? " is-closing" : ""}`}
         onClick={(e) => {
           if (e.target.classList.contains("ai-sheet__overlay")) close();
         }}
@@ -1323,80 +1513,143 @@ export default function BottomNav() {
         <div
           className={`ai-sheet${
             view === "cheapest" ? " ai-sheet--floating" : ""
-          }`}
+          }${closing ? " is-closing" : ""}${sheetDragging ? " is-dragging" : ""}`}
+          style={
+            sheetDrag ? { transform: `translateY(${sheetDrag}px)` } : undefined
+          }
           role="dialog"
           aria-modal={view === "cheapest" ? "false" : "true"}
           aria-label={TITLES[view]}
           dir="rtl"
         >
-          <div className="ai-sheet__grip" aria-hidden="true" />
+          {/* grip + header = the drag handle (pull down to dismiss) */}
+          <div
+            className="ai-sheet__handle"
+            onPointerDown={onSheetHandleDown}
+            onPointerMove={onSheetHandleMove}
+            onPointerUp={onSheetHandleUp}
+            onPointerCancel={onSheetHandleUp}
+          >
+            <div className="ai-sheet__grip" aria-hidden="true" />
 
-          <div className="ai-sheet__header">
-            {view !== "main" ? (
-              <button
-                type="button"
-                className="ai-sheet__back"
-                aria-label="חזרה"
-                onClick={() => setView("main")}
-              >
-                <IconChevronRight />
-              </button>
+            {view === "main" ? (
+              <div className="ai-sheet__hero">
+                <span className="ai-sheet__avatar" aria-hidden="true">
+                  <RobotIcon />
+                  <span className="ai-sheet__avatar-dot" />
+                </span>
+                <span className="ai-sheet__hero-text">
+                  <span className="ai-sheet__title ai-sheet__title--hero">
+                    מה תרצה לעשות?
+                  </span>
+                  <span className="ai-sheet__subtitle">
+                    בחר פעולה, או דבר עם הרובוט
+                  </span>
+                </span>
+                <button
+                  type="button"
+                  className="ai-sheet__close"
+                  aria-label="סגור"
+                  onClick={close}
+                >
+                  <IconClose />
+                </button>
+              </div>
             ) : (
-              <span aria-hidden="true" />
+              <div className="ai-sheet__header">
+                <button
+                  type="button"
+                  className="ai-sheet__back"
+                  aria-label="חזרה"
+                  onClick={goBack}
+                >
+                  <IconChevronRight />
+                </button>
+                <span className="ai-sheet__title">{TITLES[view]}</span>
+                <button
+                  type="button"
+                  className="ai-sheet__close"
+                  aria-label="סגור"
+                  onClick={close}
+                >
+                  <IconClose />
+                </button>
+              </div>
             )}
-            <span className="ai-sheet__title">{TITLES[view]}</span>
-            <button
-              type="button"
-              className="ai-sheet__close"
-              aria-label="סגור"
-              onClick={close}
-            >
-              <IconClose />
-            </button>
           </div>
 
-          {/* ── Main: the 5 actions ── */}
+          <div
+            className="ai-sheet__view"
+            key={view}
+            onClickCapture={onViewClickCapture}
+          >
+          {/* ── Main: the action cards ── */}
           {view === "main" && (
-            <ul className="ai-sheet__list">
-              {ACTIONS.map((a) => (
-                <li key={a.key}>
+            <>
+              <div className="ai-sheet__grid">
+                {ACTIONS.map((a, i) => (
                   <button
+                    key={a.key}
                     type="button"
-                    className="ai-sheet__item"
-                    onClick={() => {
-                      if (a.key === "a4") startOptimize();
-                      else if (a.key === "a5") {
-                        setCompareWithComplete(false);
-                        setView("compare");
-                      } else if (a.view) setView(a.view);
-                    }}
+                    className={`ai-sheet__action ai-sheet__action--${a.tone}${
+                      a.hero ? " ai-sheet__action--hero" : ""
+                    }${a.wide ? " ai-sheet__action--wide" : ""}`}
+                    style={{ "--i": i }}
+                    onClick={() => runAction(a)}
                   >
-                    <span className="ai-sheet__item-label">{a.label}</span>
-                    {a.view && (
-                      <span className="ai-sheet__chevron" aria-hidden="true">
+                    <span className="ai-sheet__action-icon" aria-hidden="true">
+                      <a.Icon />
+                    </span>
+                    <span className="ai-sheet__action-text">
+                      <span className="ai-sheet__action-label">{a.label}</span>
+                      <span className="ai-sheet__action-caption">
+                        {a.caption}
+                      </span>
+                    </span>
+                    {a.hero && (
+                      <span className="ai-sheet__action-go" aria-hidden="true">
                         <IconChevronLeft />
                       </span>
                     )}
                   </button>
-                </li>
-              ))}
-            </ul>
+                ))}
+              </div>
+
+              {/* the robot's gestures — a gentle reminder, not a tutorial */}
+              <div className="ai-sheet__tips" aria-label="פקודות קוליות">
+                <span className="ai-sheet__tip">
+                  <IconHold />
+                  <span>
+                    <b>לחיצה ארוכה</b> על הרובוט — פקודה קולית
+                  </span>
+                </span>
+                <span className="ai-sheet__tip">
+                  <IconDoubleTap />
+                  <span>
+                    <b>הקשה כפולה</b> — שיחה רציפה
+                  </span>
+                </span>
+              </div>
+            </>
           )}
 
           {/* ── Navigation: pages ── */}
           {view === "nav" && (
             <ul className="ai-sheet__list ai-sheet__list--nav">
-              {NAV_ITEMS.map(({ to, label, Icon }) => (
-                <li key={to}>
+              {NAV_ITEMS.map(({ to, label, Icon, tone }, i) => (
+                <li key={to} style={{ "--i": i }}>
                   <button
                     type="button"
-                    className="ai-sheet__item ai-sheet__item--nav"
+                    className={`ai-sheet__item ai-sheet__item--nav ai-sheet__item--${tone}`}
                     onClick={() => goTo(to)}
                   >
                     <span className="ai-sheet__item-icon">
                       <Icon />
                     </span>
                     <span className="ai-sheet__item-label">{label}</span>
+                    <span className="ai-sheet__chevron" aria-hidden="true">
+                      <IconChevronLeft />
+                    </span>
                   </button>
                 </li>
               ))}
@@ -1869,6 +2122,7 @@ export default function BottomNav() {
               )}
             </div>
           )}
+          </div>
         </div>
       </div>,
       document.getElementById("modal-root")
@@ -1886,9 +2140,19 @@ export default function BottomNav() {
       >
         <div className="bottom-nav__bar" aria-hidden="true" />
         <div className="bottom-nav__voicebg" aria-hidden="true" />
-        {voiceHint && (
-          <div className="voice-hint" dir="rtl" role="status">
-            {voiceHint}
+        {hint && (
+          <div
+            className={`voice-hint voice-hint--${hint.kind}`}
+            dir="rtl"
+            role="status"
+            key={hint.kind}
+          >
+            {HintIcon && (
+              <span className="voice-hint__icon" aria-hidden="true">
+                <HintIcon />
+              </span>
+            )}
+            <span className="voice-hint__text">{hint.text}</span>
           </div>
         )}
         <VoiceWaves
@@ -1900,7 +2164,7 @@ export default function BottomNav() {
           type="button"
           className={`bottom-nav__btn${
             voiceMode !== "idle" ? ` bottom-nav__btn--${voiceMode}` : ""
-          }`}
+          }${open && !closing ? " is-open" : ""}`}
           aria-label="פעולות — הקשה לתפריט, הקשה כפולה לדיבור רציף, לחיצה ארוכה להקלטה"
           aria-haspopup="dialog"
           aria-expanded={open}
@@ -1911,7 +2175,10 @@ export default function BottomNav() {
           onClick={onCoinClick}
           onContextMenu={(e) => e.preventDefault()}
         >
-          <RobotIcon className="bottom-nav__icon" aria-hidden="true" />
+          <span className="bottom-nav__ring" aria-hidden="true" />
+          <span className="bottom-nav__face" aria-hidden="true">
+            <RobotIcon className="bottom-nav__icon" />
+          </span>
         </button>
       </nav>
       {sheet}
