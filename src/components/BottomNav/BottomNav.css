@@ -15,14 +15,11 @@
   --nav-blue-1: #5aa0ff; /* bright top of the coin */
   --nav-blue-2: #2f6cf0;
   --nav-blue-3: #1e4fd6;
-  --bar-1: #2f6ff3;
-  --bar-2: #163aa8;
-
-  --nav-bar-h: 58px; /* the nav ROW height = the full blue bar height */
+  --nav-bar-h: 58px; /* the nav ROW height = the full dock height */
   --fab: 64px; /* coin diameter */
-  --gap: 4px; /* transparent hole thickness around the coin */
+  --gap: 4px; /* hole thickness around the coin (filled by the coin's white ring) */
   --vlevel: 0; /* live voice amplitude 0..1 (set by VoiceWaves) — coin + waves */
-  /* the notch geometry, shared by the bar, its socket rim and the ripples */
+  /* the notch geometry, shared by the dock and its cut-out shading */
   --hole-r: calc(var(--fab) / 2 + var(--gap));
   --hole-cy: calc(var(--nav-bar-h) - 3px - var(--fab) / 2);
 
@@ -32,35 +29,30 @@
   z-index: 50;
   direction: ltr;
   height: calc(var(--nav-bar-h) + env(safe-area-inset-bottom, 0px));
-  /* the dock lifts off the page: a soft shadow upward (outside the box only,
-     so the notch stays untouched) */
-  box-shadow: 0 -6px 18px rgba(8, 36, 110, 0.16);
+  /* a whisper of elevation above the page (outside the box only, so the
+     notch stays untouched) */
+  box-shadow: 0 -4px 20px rgba(15, 23, 42, 0.07);
 }
 
-/* The blue bar fills the WHOLE grid row, with a clean transparent circular
-   HOLE around the coin. Layers (top → bottom): a bright hairline rim hugging
-   the notch, a soft ambient-occlusion halo around it (the coin sits in a
-   SOCKET, not on a flat strip), the top sheen, the brand gradient. */
+/* ── The dock: light frosted glass, iOS-tab-bar calm ──
+   Fills the WHOLE grid row, with a clean circular HOLE around the coin.
+   No brand colour here on purpose — the blue robot is the ONE accent, so the
+   eye lands on it. A hairline top edge separates it from the page; the notch
+   gets a faint inner shading so it reads as a real cut-out. */
 .bottom-nav__bar {
   position: absolute;
   inset: 0;
   background:
     radial-gradient(
       circle at 50% var(--hole-cy),
-      rgba(255, 255, 255, 0) var(--hole-r),
-      rgba(255, 255, 255, 0.55) calc(var(--hole-r) + 1px),
-      rgba(255, 255, 255, 0.16) calc(var(--hole-r) + 5px),
-      rgba(255, 255, 255, 0) calc(var(--hole-r) + 14px)
+      rgba(15, 23, 42, 0.14) var(--hole-r),
+      rgba(15, 23, 42, 0.05) calc(var(--hole-r) + 5px),
+      rgba(15, 23, 42, 0) calc(var(--hole-r) + 12px)
     ),
-    radial-gradient(
-      circle at 50% var(--hole-cy),
-      rgba(6, 22, 76, 0.42) var(--hole-r),
-      rgba(6, 22, 76, 0.18) calc(var(--hole-r) + 10px),
-      rgba(6, 22, 76, 0) calc(var(--hole-r) + 30px)
-    ),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0.04) 38%, rgba(255, 255, 255, 0) 60%),
-    linear-gradient(180deg, var(--bar-1) 0%, var(--bar-2) 100%);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4); /* crisp top edge */
+    linear-gradient(180deg, rgba(255, 255, 255, 0.92) 0%, rgba(246, 248, 252, 0.92) 100%);
+  -webkit-backdrop-filter: blur(18px) saturate(160%);
+  backdrop-filter: blur(18px) saturate(160%);
+  box-shadow: inset 0 1px 0 rgba(15, 23, 42, 0.08); /* hairline top edge */
   -webkit-mask: radial-gradient(
     circle calc(var(--fab) / 2 + var(--gap))
       at 50% calc(var(--nav-bar-h) - 3px - var(--fab) / 2),
@@ -73,41 +65,6 @@
     transparent calc(var(--fab) / 2 + var(--gap) - 1px),
     #000 calc(var(--fab) / 2 + var(--gap))
   );
-}
-
-/* Static ripples spreading from the coin across the bar — the robot's
-   "signature" even while it is silent. Very faint, fading out towards the
-   edges (the element's own mask), and clipped by the bar's notch mask. */
-.bottom-nav__bar::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: repeating-radial-gradient(
-    circle at 50% var(--hole-cy),
-    rgba(255, 255, 255, 0) 0,
-    rgba(255, 255, 255, 0) 12px,
-    rgba(255, 255, 255, 0.075) 12px,
-    rgba(255, 255, 255, 0.075) 13.5px
-  );
-  -webkit-mask: radial-gradient(
-    circle at 50% var(--hole-cy),
-    rgba(0, 0, 0, 0) calc(var(--hole-r) + 4px),
-    #000 calc(var(--hole-r) + 16px),
-    rgba(0, 0, 0, 0.5) calc(var(--hole-r) + 70px),
-    rgba(0, 0, 0, 0) calc(var(--hole-r) + 150px)
-  );
-  mask: radial-gradient(
-    circle at 50% var(--hole-cy),
-    rgba(0, 0, 0, 0) calc(var(--hole-r) + 4px),
-    #000 calc(var(--hole-r) + 16px),
-    rgba(0, 0, 0, 0.5) calc(var(--hole-r) + 70px),
-    rgba(0, 0, 0, 0) calc(var(--hole-r) + 150px)
-  );
-  pointer-events: none;
-}
-/* the ripples belong to the idle bar only — the voice backdrop has its own life */
-.bottom-nav--voice .bottom-nav__bar::before {
-  opacity: 0;
 }
 
 /* ── Voice-active backdrop ──────────────────────────────────────────
@@ -173,23 +130,17 @@
   -webkit-user-select: none;
   user-select: none;
   background:
-    /* top gloss + an off-centre specular, like a polished button */
-    radial-gradient(120% 90% at 50% 6%, rgba(255, 255, 255, 0.62) 0%, rgba(255, 255, 255, 0) 46%),
-    radial-gradient(55% 40% at 32% 22%, rgba(255, 255, 255, 0.35) 0%, rgba(255, 255, 255, 0) 70%),
-    /* cyan under-glow rising from the bottom */
-    radial-gradient(80% 80% at 50% 112%, rgba(34, 211, 238, 0.8) 0%, rgba(34, 211, 238, 0) 58%),
-    /* a gentle hue sweep so the orb is not one flat blue */
-    conic-gradient(from 210deg at 50% 50%, #4e92ff, #2d68ee 30%, #1d4ed8 55%, #3b7bff 80%, #4e92ff),
+    radial-gradient(120% 90% at 50% 6%, rgba(255, 255, 255, 0.55) 0%, rgba(255, 255, 255, 0) 46%),
+    radial-gradient(80% 80% at 50% 112%, rgba(34, 211, 238, 0.7) 0%, rgba(34, 211, 238, 0) 58%),
     linear-gradient(180deg, var(--nav-blue-1) 0%, var(--nav-blue-2) 56%, var(--nav-blue-3) 100%);
+  /* a crisp WHITE ring fills the notch gap (the iOS "centre button" look)
+     and a soft blue drop shadow lifts the orb off the light dock */
   box-shadow:
-    inset 0 1px 1px rgba(255, 255, 255, 0.8),
-    inset 0 -8px 14px rgba(10, 40, 110, 0.4),
-    inset 0 0 0 1.5px rgba(255, 255, 255, 0.22),
-    /* a hairline bezel + a soft blue drop + a faint cyan aura: the orb
-       FLOATS in its socket instead of being pasted on the strip */
-    0 0 0 1px rgba(255, 255, 255, 0.3),
-    0 8px 18px rgba(16, 52, 170, 0.42),
-    0 0 22px rgba(56, 189, 248, 0.22);
+    inset 0 1px 1px rgba(255, 255, 255, 0.75),
+    inset 0 -8px 14px rgba(10, 40, 110, 0.36),
+    0 0 0 var(--gap) #ffffff,
+    0 2px 3px calc(var(--gap)) rgba(15, 23, 42, 0.08),
+    0 10px 22px rgba(37, 99, 235, 0.35);
   transition:
     transform 0.26s cubic-bezier(0.34, 1.56, 0.64, 1),
     filter 0.2s ease,
