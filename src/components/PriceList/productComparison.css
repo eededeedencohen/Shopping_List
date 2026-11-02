@@ -455,6 +455,11 @@
   color: #b91c1c;
   unicode-bidi: plaintext;
 }
+/* the deal text never breaks mid-sentence: when it doesn't fit beside the
+   tag it drops under it as one line */
+.pc-row__deal > span:not(.pc-row__deal-tag) {
+  white-space: nowrap;
+}
 .pc-row__deal-tag {
   display: inline-flex;
   align-items: center;
