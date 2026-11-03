@@ -1,0 +1,669 @@
+/* ═══════════════════════════════════════════════════════════════
+   ScannerView (scn) - the shared barcode viewfinder
+   + the standalone scanner page (bsp)
+   ═══════════════════════════════════════════════════════════════ */
+
+.scn {
+  --scn-sky: #7dd3fc;
+  --scn-blue: #2a63e8;
+  --scn-navy: #0b1220;
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 260px;
+  overflow: hidden;
+  border-radius: 24px;
+  background:
+    radial-gradient(120% 90% at 50% 0%, #16284a 0%, #0b1220 60%);
+  font-family: "Heebo", "Open Sans", Arial, sans-serif;
+  color: #fff;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  box-shadow:
+    0 20px 50px rgba(5, 10, 25, 0.5),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+}
+.scn__video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+.scn--live .scn__video {
+  opacity: 1;
+}
+.scn__shade {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, rgba(11, 18, 32, 0.55) 0%, rgba(11, 18, 32, 0) 28%, rgba(11, 18, 32, 0) 70%, rgba(11, 18, 32, 0.6) 100%);
+  pointer-events: none;
+}
+
+/* ── the scan window ── */
+.scn__window {
+  position: absolute;
+  left: 50%;
+  top: 48%;
+  width: 78%;
+  max-width: 360px;
+  aspect-ratio: 1.75;
+  transform: translate(-50%, -50%);
+  border-radius: 20px;
+  box-shadow: 0 0 0 999px rgba(8, 14, 28, 0.42);
+  transition: box-shadow 0.25s ease;
+  pointer-events: none;
+}
+.scn__corner {
+  position: absolute;
+  width: 30px;
+  height: 30px;
+  border: 3px solid var(--scn-sky);
+  filter: drop-shadow(0 0 6px rgba(125, 211, 252, 0.75));
+  animation: scnBreathe 1.9s ease-in-out infinite;
+}
+.scn__corner--tl { top: -2px; left: -2px; border-right: 0; border-bottom: 0; border-top-left-radius: 18px; }
+.scn__corner--tr { top: -2px; right: -2px; border-left: 0; border-bottom: 0; border-top-right-radius: 18px; }
+.scn__corner--bl { bottom: -2px; left: -2px; border-right: 0; border-top: 0; border-bottom-left-radius: 18px; }
+.scn__corner--br { bottom: -2px; right: -2px; border-left: 0; border-top: 0; border-bottom-right-radius: 18px; }
+.scn__laser {
+  position: absolute;
+  left: 7%;
+  right: 7%;
+  top: 8%;
+  height: 2px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, transparent, var(--scn-sky) 25%, #ffffff 50%, var(--scn-sky) 75%, transparent);
+  box-shadow: 0 0 14px 2px rgba(125, 211, 252, 0.65);
+  animation: scnSweep 2.4s ease-in-out infinite alternate;
+}
+.scn--opening .scn__laser,
+.scn--opening .scn__corner {
+  opacity: 0.35;
+  animation-play-state: paused;
+}
+.scn__hitmark {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #22c55e, #15803d);
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transform: translate(-50%, -50%) scale(0);
+  opacity: 0;
+  box-shadow: 0 10px 26px rgba(22, 163, 74, 0.5);
+}
+.scn__hitmark svg {
+  width: 28px;
+  height: 28px;
+}
+/* a hit: the window flashes green, the laser rests, the check pops */
+.scn.is-hit .scn__window {
+  box-shadow:
+    inset 0 0 0 2px #22c55e,
+    0 0 0 999px rgba(8, 14, 28, 0.42),
+    0 0 30px rgba(34, 197, 94, 0.55);
+}
+.scn.is-hit .scn__corner {
+  border-color: #4ade80;
+  filter: drop-shadow(0 0 8px rgba(74, 222, 128, 0.9));
+  animation: none;
+}
+.scn.is-hit .scn__laser,
+.scn.is-paused .scn__laser {
+  opacity: 0;
+  animation-play-state: paused;
+}
+.scn.is-hit .scn__hitmark {
+  animation: scnPop 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+.scn.is-paused:not(.is-hit) .scn__window {
+  box-shadow:
+    inset 0 0 0 2px rgba(74, 222, 128, 0.8),
+    0 0 0 999px rgba(8, 14, 28, 0.55);
+}
+.scn.is-paused:not(.is-hit) .scn__corner {
+  border-color: #4ade80;
+  animation: none;
+}
+.scn.is-paused:not(.is-hit) .scn__hitmark {
+  transform: translate(-50%, -50%) scale(1);
+  opacity: 1;
+}
+
+/* ── status pill ── */
+.scn__status {
+  position: absolute;
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  max-width: calc(100% - 24px);
+  padding: 7px 13px;
+  border-radius: 999px;
+  background: rgba(8, 14, 28, 0.62);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  font-size: 0.8rem;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  animation: scnDrop 0.4s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+}
+.scn__status-dot {
+  flex: none;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--scn-sky);
+  box-shadow: 0 0 0 3px rgba(125, 211, 252, 0.22);
+  animation: scnPulse 1.6s ease-in-out infinite;
+}
+.scn__status--opening .scn__status-dot {
+  background: transparent;
+  box-shadow: none;
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  border-top-color: #fff;
+  animation: scnSpin 0.8s linear infinite;
+}
+.scn__status--error .scn__status-dot,
+.scn__status--unsupported .scn__status-dot {
+  background: #f59e0b;
+  box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.22);
+  animation: none;
+}
+.scn.is-hit .scn__status-dot,
+.scn.is-paused .scn__status-dot {
+  background: #4ade80;
+  box-shadow: 0 0 0 3px rgba(74, 222, 128, 0.25);
+  animation: none;
+}
+
+/* ── tools (torch, zoom) ── */
+.scn__tools {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+.scn__tool {
+  width: 40px;
+  height: 40px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 50%;
+  background: rgba(8, 14, 28, 0.6);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 0.12s ease, background 0.2s ease;
+}
+.scn__tool svg {
+  width: 18px;
+  height: 18px;
+}
+.scn__tool:active {
+  transform: scale(0.9);
+}
+.scn__tool.is-on {
+  background: #fbbf24;
+  color: #1f2937;
+  border-color: transparent;
+  box-shadow: 0 0 18px rgba(251, 191, 36, 0.6);
+}
+.scn__zoom {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 4px;
+  border-radius: 999px;
+  background: rgba(8, 14, 28, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+.scn__zoom .scn__tool {
+  width: 32px;
+  height: 32px;
+  background: transparent;
+  border: 0;
+}
+.scn__zoom-value {
+  font-size: 0.7rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+/* ── no camera ── */
+.scn__fallback {
+  position: absolute;
+  left: 18px;
+  right: 18px;
+  top: 50%;
+  transform: translateY(-58%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 18px 16px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px dashed rgba(255, 255, 255, 0.22);
+  text-align: center;
+  animation: scnRise 0.4s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+}
+.scn__fallback-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  color: #fbbf24;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 4px;
+}
+.scn__fallback-icon svg {
+  width: 26px;
+  height: 26px;
+}
+.scn__fallback-title {
+  font-size: 1rem;
+  font-weight: 800;
+}
+.scn__fallback-text {
+  font-size: 0.8rem;
+  font-weight: 600;
+  line-height: 1.45;
+  color: rgba(255, 255, 255, 0.78);
+  max-width: 280px;
+}
+
+/* ── in-stage flash (continuous mode: "נוסף: …") ── */
+.scn__flash {
+  position: absolute;
+  left: 14px;
+  right: 14px;
+  bottom: 70px;
+  padding: 9px 12px;
+  border-radius: 12px;
+  background: rgba(22, 163, 74, 0.95);
+  color: #fff;
+  font-size: 0.82rem;
+  font-weight: 800;
+  text-align: center;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+  animation: scnRise 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.scn__flash.is-bad {
+  background: rgba(185, 28, 28, 0.95);
+}
+
+/* ── manual entry ── */
+.scn__manual {
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 46px;
+  padding: 0 6px 0 12px;
+  border-radius: 999px;
+  background: rgba(8, 14, 28, 0.66);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  animation: scnRise 0.4s cubic-bezier(0.22, 1, 0.36, 1) 0.1s backwards;
+}
+.scn__manual-icon {
+  flex: none;
+  color: var(--scn-sky);
+  display: inline-flex;
+}
+.scn__manual-icon svg {
+  width: 18px;
+  height: 18px;
+}
+.scn__manual input {
+  flex: 1 1 auto;
+  min-width: 0;
+  border: 0;
+  outline: none;
+  background: transparent;
+  color: #fff;
+  font-family: inherit;
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  direction: ltr;
+  text-align: right;
+}
+.scn__manual input::placeholder {
+  color: rgba(255, 255, 255, 0.55);
+  letter-spacing: 0;
+}
+.scn__manual-go {
+  flex: none;
+  width: 36px;
+  height: 36px;
+  border: 0;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #2a63e8, #1b45c4);
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(42, 99, 232, 0.45);
+  transition: opacity 0.2s ease, transform 0.12s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+.scn__manual-go svg {
+  width: 17px;
+  height: 17px;
+}
+.scn__manual-go:disabled {
+  opacity: 0.35;
+  box-shadow: none;
+}
+.scn__manual-go:active:not(:disabled) {
+  transform: scale(0.9);
+}
+
+/* ═════════════ the standalone page ═════════════ */
+.bsp {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 14px 14px 24px;
+  font-family: "Heebo", "Open Sans", Arial, sans-serif;
+  color: #fff;
+  text-align: right;
+  background:
+    radial-gradient(90% 60% at 100% 0%, rgba(42, 99, 232, 0.35) 0%, rgba(42, 99, 232, 0) 60%),
+    linear-gradient(180deg, #0f1d3a 0%, #0b1220 100%);
+}
+.bsp__head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  animation: scnDrop 0.45s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+}
+.bsp__icon {
+  flex: none;
+  width: 46px;
+  height: 46px;
+  border-radius: 15px;
+  background: linear-gradient(135deg, #2a63e8, #1b45c4);
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 20px rgba(42, 99, 232, 0.4);
+}
+.bsp__icon svg {
+  width: 24px;
+  height: 24px;
+}
+.bsp__title {
+  margin: 0;
+  font-size: 1.3rem;
+  font-weight: 900;
+  letter-spacing: -0.3px;
+}
+.bsp__sub {
+  margin: 2px 0 0;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.72);
+}
+.bsp__stage {
+  flex: 1 1 auto;
+  min-height: 380px;
+  max-height: 560px;
+  /* a flex row so the viewfinder STRETCHES to the stage's height (a
+     percentage height would not resolve against a flex-grown box) */
+  display: flex;
+  animation: scnRise 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.05s backwards;
+}
+.bsp__stage > .scn {
+  flex: 1 1 auto;
+  height: auto;
+}
+
+/* the result card: the scanned product */
+.bsp__result {
+  display: grid;
+  grid-template-columns: 64px minmax(0, 1fr);
+  grid-template-areas: "pic text" "actions actions";
+  align-items: center;
+  gap: 10px 12px;
+  padding: 12px;
+  border-radius: 20px;
+  background: linear-gradient(180deg, #ffffff 0%, #f0f4fb 100%);
+  color: #0f172a;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35);
+  animation: scnRise 0.42s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.bsp__result-pic {
+  grid-area: pic;
+  width: 64px;
+  height: 64px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.bsp__result-pic img {
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  display: block;
+  filter: drop-shadow(0 8px 12px rgba(15, 23, 42, 0.2));
+}
+.bsp__result-pic--none {
+  border-radius: 16px;
+  background: #e2e8f0;
+  color: #64748b;
+}
+.bsp__result-pic--none svg {
+  width: 26px;
+  height: 26px;
+}
+.bsp__result-text {
+  grid-area: text;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.bsp__result-eyebrow {
+  font-size: 0.68rem;
+  font-weight: 800;
+  color: #16a34a;
+}
+.bsp__result-eyebrow--none {
+  color: #c2410c;
+}
+.bsp__result-name {
+  font-size: 0.98rem;
+  font-weight: 800;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+  unicode-bidi: plaintext;
+}
+.bsp__result-meta {
+  font-size: 0.74rem;
+  font-weight: 600;
+  color: #64748b;
+}
+.bsp__result-price {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 2px 8px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #334155;
+}
+.bsp__result-price b {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #0f172a;
+  direction: ltr;
+  font-variant-numeric: tabular-nums;
+}
+.bsp__result-deal {
+  color: #b91c1c;
+}
+.bsp__result-code {
+  font-size: 0.74rem;
+  font-weight: 700;
+  color: #64748b;
+  direction: ltr;
+  letter-spacing: 1px;
+  font-variant-numeric: tabular-nums;
+}
+.bsp__result-actions {
+  grid-area: actions;
+  display: flex;
+  gap: 8px;
+}
+.bsp__btn {
+  flex: 1 1 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 42px;
+  border: 0;
+  border-radius: 999px;
+  font-family: inherit;
+  font-size: 0.88rem;
+  font-weight: 800;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 0.12s ease;
+}
+.bsp__btn svg {
+  width: 17px;
+  height: 17px;
+}
+.bsp__btn:active {
+  transform: scale(0.96);
+}
+.bsp__btn--primary {
+  color: #fff;
+  background: linear-gradient(135deg, #2a63e8, #1b45c4);
+  box-shadow: 0 6px 14px rgba(42, 99, 232, 0.3);
+}
+.bsp__btn--ghost {
+  color: #334155;
+  background: #e8edf5;
+}
+
+/* tips while nothing is scanned yet */
+.bsp__tips {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  animation: scnRise 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.12s backwards;
+}
+.bsp__tip {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 12px 8px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  text-align: center;
+  font-size: 0.72rem;
+  font-weight: 700;
+  line-height: 1.35;
+  color: rgba(255, 255, 255, 0.85);
+}
+.bsp__tip svg {
+  width: 22px;
+  height: 22px;
+  color: #7dd3fc;
+}
+
+/* ── keyframes ── */
+@keyframes scnSweep {
+  from { top: 8%; }
+  to { top: 90%; }
+}
+@keyframes scnBreathe {
+  0%, 100% { opacity: 0.8; }
+  50% { opacity: 1; filter: drop-shadow(0 0 10px rgba(125, 211, 252, 1)); }
+}
+@keyframes scnPulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(0.75); opacity: 0.7; }
+}
+@keyframes scnSpin {
+  to { transform: rotate(360deg); }
+}
+@keyframes scnPop {
+  0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+  60% { transform: translate(-50%, -50%) scale(1.15); opacity: 1; }
+  100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+}
+@keyframes scnDrop {
+  from { opacity: 0; transform: translate(-50%, -10px); }
+  to { opacity: 1; transform: translate(-50%, 0); }
+}
+.bsp__head {
+  animation-name: scnDropPlain;
+}
+@keyframes scnDropPlain {
+  from { opacity: 0; transform: translateY(-12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes scnRise {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scn__corner,
+  .scn__laser,
+  .scn__status,
+  .scn__status-dot,
+  .scn__hitmark,
+  .scn__fallback,
+  .scn__flash,
+  .scn__manual,
+  .bsp__head,
+  .bsp__stage,
+  .bsp__result,
+  .bsp__tips {
+    animation: none !important;
+  }
+}

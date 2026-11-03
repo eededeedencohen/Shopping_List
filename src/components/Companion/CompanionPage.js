@@ -9,13 +9,14 @@
  *            here) with one-tap actions; "סיים קנייה" → summary sheet with
  *            "save to history".
  */
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useCompanion, SCAN_MS } from "../../context/CompanionContext";
 import { useProductList } from "../../hooks/appHooks";
 import { ProductImageDisplay } from "../Images/ProductImageService";
 import SupermarketImage from "../Images/SupermarketImage";
 import ReplaceSupermarket from "../Cart/ReplaceSupermarket/ReplaceSupermarket";
+import ScannerView from "../Scanner/ScannerView";
 import useBodyScrollLock from "../../hooks/useBodyScrollLock";
 import { IconClose } from "../Icons/UiIcons";
 import { IconCompanion } from "../BottomNav/ActionIcons";
@@ -26,7 +27,6 @@ import "./Companion.css";
 
 const RESULTS_MAX = 8;
 const OK_FLASH_MS = 2000;
-const SCAN_COOLDOWN_MS = 1800;
 
 /* ───────────── icons ───────────── */
 const ico = {
@@ -598,117 +598,7 @@ function LineRow({ line, index }) {
 
 /* ───────────── the barcode camera sheet (continuous: scan, scan, scan) ───────────── */
 function ScanSheet({ open, onClose, onDetected }) {
-  const videoRef = useRef(null);
-  const canvasRef = useRef(null);
-  const streamRef = useRef(null);
-  const detectorRef = useRef(null);
-  const rafRef = useRef(null);
-  const liveRef = useRef(false);
-  const lastRef = useRef({ code: "", at: 0 });
-  const [status, setStatus] = useState("opening"); // opening | live | error | unsupported
-  const [flash, setFlash] = useState(null); // {ok, text}
-  const [manual, setManual] = useState("");
   useBodyScrollLock(open);
-  /* the parent re-renders on every add; the camera must NOT restart for that */
-  const onDetectedRef = useRef(onDetected);
-  onDetectedRef.current = onDetected;
-  const flashTimer = useRef(null);
-
-  const stop = useCallback(() => {
-    liveRef.current = false;
-    if (rafRef.current) cancelAnimationFrame(rafRef.current);
-    rafRef.current = null;
-    if (streamRef.current) {
-      streamRef.current.getTracks().forEach((t) => t.stop());
-      streamRef.current = null;
-    }
-  }, []);
-
-  const handle = useCallback((code) => {
-    const now = Date.now();
-    if (lastRef.current.code === code && now - lastRef.current.at < SCAN_COOLDOWN_MS * 1.5) return;
-    lastRef.current = { code, at: now };
-    const res = onDetectedRef.current(code);
-    setFlash(res);
-    clearTimeout(flashTimer.current);
-    flashTimer.current = setTimeout(() => setFlash(null), SCAN_COOLDOWN_MS);
-  }, []);
-  useEffect(() => () => clearTimeout(flashTimer.current), []);
-
-  useEffect(() => {
-    if (!open) {
-      stop();
-      return undefined;
-    }
-    let cancelled = false;
-    setFlash(null);
-    lastRef.current = { code: "", at: 0 };
-    if (typeof window === "undefined" || !("BarcodeDetector" in window) || !navigator.mediaDevices) {
-      setStatus("unsupported");
-      return undefined;
-    }
-    setStatus("opening");
-    (async () => {
-      try {
-        if (!detectorRef.current) {
-          detectorRef.current = new window.BarcodeDetector({ formats: ["ean_13", "ean_8", "code_128", "upc_a"] });
-        }
-        const stream = await navigator.mediaDevices.getUserMedia({
-          video: { facingMode: "environment", width: { ideal: 1920 }, height: { ideal: 1080 } },
-          audio: false,
-        });
-        if (cancelled) {
-          stream.getTracks().forEach((t) => t.stop());
-          return;
-        }
-        streamRef.current = stream;
-        const video = videoRef.current;
-        if (!video) return;
-        video.srcObject = stream;
-        await video.play();
-        setStatus("live");
-        liveRef.current = true;
-        const loop = () => {
-          if (!liveRef.current) return;
-          const v = videoRef.current;
-          const cv = canvasRef.current;
-          if (!v || !cv || v.readyState < 2) {
-            rafRef.current = requestAnimationFrame(loop);
-            return;
-          }
-          const w = v.videoWidth * 0.8;
-          const h = v.videoHeight * 0.3;
-          cv.width = w;
-          cv.height = h;
-          cv.getContext("2d").drawImage(v, (v.videoWidth - w) / 2, (v.videoHeight - h) / 2, w, h, 0, 0, w, h);
-          detectorRef.current
-            .detect(cv)
-            .then((codes) => {
-              if (!liveRef.current) return;
-              if (codes.length) {
-                handle(codes[0].rawValue);
-                setTimeout(() => {
-                  if (liveRef.current) rafRef.current = requestAnimationFrame(loop);
-                }, SCAN_COOLDOWN_MS);
-                return;
-              }
-              rafRef.current = requestAnimationFrame(loop);
-            })
-            .catch(() => {
-              if (liveRef.current) rafRef.current = requestAnimationFrame(loop);
-            });
-        };
-        rafRef.current = requestAnimationFrame(loop);
-      } catch (e) {
-        if (!cancelled) setStatus("error");
-      }
-    })();
-    return () => {
-      cancelled = true;
-      stop();
-    };
-  }, [open, stop, handle]);
-
   if (!open) return null;
   return (
     <div className="cmp-sheet-layer is-open cmp-scan" dir="rtl">
@@ -728,43 +618,9 @@ function ScanSheet({ open, onClose, onDetected }) {
           </button>
         </header>
         <div className="cmp-sheet__body">
-          <div className="cmp-scan__view">
-            <video ref={videoRef} className="cmp-scan__video" playsInline autoPlay muted />
-            <canvas ref={canvasRef} style={{ display: "none" }} />
-            {status === "live" && (
-              <div className="cmp-scan__frame" aria-hidden="true">
-                <span className="cmp-scan__line" />
-              </div>
-            )}
-            {status === "opening" && <div className="cmp-scan__msg">פותח מצלמה...</div>}
-            {status === "error" && <div className="cmp-scan__msg">לא הצלחנו לפתוח את המצלמה. אפשר להקליד ברקוד למטה.</div>}
-            {status === "unsupported" && (
-              <div className="cmp-scan__msg">הדפדפן הזה לא תומך בסריקה במצלמה. אפשר להקליד ברקוד למטה.</div>
-            )}
-            {flash && <div className={`cmp-scan__flash${flash.ok ? " is-ok" : " is-bad"}`}>{flash.text}</div>}
+          <div className="cmp-scan__stage">
+            <ScannerView active={open} mode="continuous" onDetected={onDetected} hint="סורקים מוצר אחרי מוצר" />
           </div>
-          <form
-            className="cmp-scan__manual"
-            onSubmit={(e) => {
-              e.preventDefault();
-              const code = manual.trim();
-              if (code.length < 5) return;
-              handle(code);
-              setManual("");
-            }}
-          >
-            <input
-              type="text"
-              inputMode="numeric"
-              value={manual}
-              onChange={(e) => setManual(e.target.value.replace(/\D/g, ""))}
-              placeholder="או הקלידו ברקוד"
-              aria-label="ברקוד ידני"
-            />
-            <button type="submit" className="cmp-btn cmp-btn--primary cmp-btn--sm" disabled={manual.trim().length < 5}>
-              הוסף
-            </button>
-          </form>
         </div>
       </div>
     </div>

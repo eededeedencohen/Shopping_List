@@ -25,7 +25,7 @@ import AnimationMove from "./components/AAAnimationTests/AnimationMove";
 import AnimationTouchMove from "./components/AAAnimationTests/AnimationTouchMove";
 import Chatbot from "./components/Design/Chatbot/Chatbot";
 import StatsDashboard from "./components/Design/Charts/StatsDashboard";
-import BarcodeScanner from "./components/AAAnimationTests/BarcodeScanner";
+import BarcodeScanner from "./components/Scanner/BarcodeScannerPage";
 import AdvancedStatsDashboard from "./components/Stats/AdvancedStatsDashboard";
 import ProductsListServer from "./components/ProductList/ProductListServer";
 import AddProduct from "./components/AddProduct/AddProduct";
