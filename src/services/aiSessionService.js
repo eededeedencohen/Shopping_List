@@ -1,7 +1,7 @@
 import { DOMAIN } from "../constants";
 
 /* The research log of the bottom-nav voice assistant (server: AiSession).
-   Lifecycle calls are fire-and-forget and never throw — logging must not get
+   Lifecycle calls are fire-and-forget and never throw - logging must not get
    in the way of the voice flow. Reading/review calls throw on failure so the
    review page can show an error. */
 
@@ -94,4 +94,9 @@ export function reviewAiTurn(sessionId, turnId, review) {
   return strict(
     fetch(`${BASE}/${sessionId}/turns/${turnId}/review`, json("PATCH", review))
   );
+}
+
+/** Remove a chat from the research log (the user's deliberate choice). */
+export function deleteAiSession(sessionId) {
+  return strict(fetch(`${BASE}/${sessionId}`, { method: "DELETE" }));
 }

@@ -1,12 +1,14 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import "./AiHistory.css";
+import "./AiHistory.delete.css";
 import {
   listAiSessions,
   getAiSession,
   getAiSessionStats,
   reviewAiSession,
   reviewAiTurn,
+  deleteAiSession,
 } from "../../services/aiSessionService";
 import { haptic } from "../../utils/haptics";
 import { uiSound } from "../../utils/uiSound";
@@ -175,6 +177,17 @@ const IconSearchSmall = (p) => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" width="1em" height="1em" aria-hidden="true" {...p}>
     <circle cx="11" cy="11" r="7" />
     <line x1="20" y1="20" x2="16.2" y2="16.2" />
+  </svg>
+);
+const IconTrash = (p) => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" width="1em" height="1em" aria-hidden="true" {...p}>
+    <path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3" />
+  </svg>
+);
+const IconSelect = (p) => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" width="1em" height="1em" aria-hidden="true" {...p}>
+    <rect x="3.5" y="3.5" width="17" height="17" rx="4" />
+    <polyline points="8 12.5 11 15.5 16.5 9.5" />
   </svg>
 );
 
@@ -378,6 +391,26 @@ function TurnCard({ turn, onReview }) {
 function SessionDetail({ id, onBack }) {
   const [session, setSession] = useState(null);
   const [error, setError] = useState(null);
+  /* delete from the chat view: an inline confirm, then the server DELETE,
+     then back to the list (which reloads without it) */
+  const [confirmDel, setConfirmDel] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [delError, setDelError] = useState(null);
+  const doDelete = async () => {
+    if (deleting) return;
+    setDeleting(true);
+    setDelError(null);
+    try {
+      await deleteAiSession(id);
+      haptic("success");
+      uiSound("close");
+      onBack();
+    } catch (e) {
+      setDeleting(false);
+      setDelError("המחיקה נכשלה. נסו שוב.");
+      haptic("error");
+    }
+  };
 
   const load = useCallback(async () => {
     try {
@@ -463,7 +496,38 @@ function SessionDetail({ id, onBack }) {
             {bad > 0 && <span className="aih-count aih-count--bad">✗ {bad}</span>}
           </span>
         </div>
+        <button
+          type="button"
+          className={`aih-trash${confirmDel ? " is-armed" : ""}`}
+          aria-label="מחק את השיחה"
+          aria-expanded={confirmDel}
+          onClick={() => {
+            haptic("light");
+            setDelError(null);
+            setConfirmDel((v) => !v);
+          }}
+        >
+          <IconTrash />
+        </button>
       </div>
+
+      {confirmDel && (
+        <div className="aih-confirm" role="alertdialog" aria-label="אישור מחיקה">
+          <span className="aih-confirm__text">
+            למחוק את השיחה הזאת מהמחקר לצמיתות? {turns.length ? `${turns.length} פקודות ייעלמו.` : ""}
+          </span>
+          <span className="aih-confirm__btns">
+            <button type="button" className="aih-confirm__btn aih-confirm__btn--ghost" onClick={() => setConfirmDel(false)} disabled={deleting}>
+              ביטול
+            </button>
+            <button type="button" className="aih-confirm__btn aih-confirm__btn--danger" onClick={doDelete} disabled={deleting}>
+              <IconTrash />
+              {deleting ? "מוחק..." : "מחק"}
+            </button>
+          </span>
+          {delError && <span className="aih-confirm__err">{delError}</span>}
+        </div>
+      )}
 
       <section className="aih-card aih-card--session-review">
         <div className="aih-card__title">השיחה כולה</div>
@@ -488,12 +552,33 @@ function SessionDetail({ id, onBack }) {
 }
 
 /* ── list card ─────────────────────────────────────────────────── */
-function SessionCard({ s, onOpen }) {
+function SessionCard({ s, onOpen, onDelete, selecting, selected, onToggle }) {
   const live = sessionIsLive(s);
   const marks = s.turnMarks || [];
+  const activate = () => {
+    if (selecting) onToggle(s._id);
+    else onOpen(s._id);
+  };
   return (
-    <li>
-      <button type="button" className="aih-session" onClick={() => onOpen(s._id)}>
+    <li className={`aih-item${selecting ? " is-selecting" : ""}${selected ? " is-selected" : ""}`}>
+      {selecting && (
+        <span className={`aih-pick${selected ? " is-on" : ""}`} aria-hidden="true">
+          <IconCheck />
+        </span>
+      )}
+      <div
+        className="aih-session"
+        role="button"
+        tabIndex={0}
+        aria-pressed={selecting ? selected : undefined}
+        onClick={activate}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            activate();
+          }
+        }}
+      >
         <div className="aih-session__top">
           <span className="aih-session__when">
             <b>{fmtDate(s.startedAt)}</b> {fmtTime(s.startedAt)}
@@ -534,7 +619,20 @@ function SessionCard({ s, onOpen }) {
             </span>
           ) : null}
         </div>
-      </button>
+      </div>
+      {!selecting && (
+        <button
+          type="button"
+          className="aih-del"
+          aria-label="מחק שיחה"
+          onClick={(e) => {
+            e.stopPropagation();
+            onDelete(s);
+          }}
+        >
+          <IconTrash />
+        </button>
+      )}
     </li>
   );
 }
@@ -563,6 +661,99 @@ export default function AiHistory() {
       .then((d) => setStats(d))
       .catch(() => {});
   }, []);
+
+  /* ── delete (per card, or several at once in selection mode) ──
+     Same deferred-commit model as the purchase history: the chats leave the
+     list at once and a 6s "ביטול" snackbar appears; the server DELETE fires
+     only when the snackbar closes (timeout / a newer delete / leaving the
+     page), so undo is a plain client-side restore. */
+  const [selecting, setSelecting] = useState(false);
+  const [selected, setSelected] = useState(() => new Set());
+  const [pending, setPending] = useState(null); // {items:[session]}
+  const [notice, setNotice] = useState(null);
+  const pendingRef = useRef(null);
+  pendingRef.current = pending;
+  const snackTimer = useRef(null);
+
+  const commitPending = useCallback(
+    async (p) => {
+      if (!p || !p.items.length) return;
+      const results = await Promise.allSettled(p.items.map((s) => deleteAiSession(s._id)));
+      const failed = p.items.filter((_, i) => results[i].status === "rejected");
+      if (failed.length) {
+        setSessions((prev) =>
+          [...prev, ...failed].sort((a, b) => new Date(b.startedAt) - new Date(a.startedAt))
+        );
+        setTotal((t) => t + failed.length);
+        setNotice(failed.length === 1 ? "שיחה אחת לא נמחקה. נסו שוב." : `${failed.length} שיחות לא נמחקו. נסו שוב.`);
+        setTimeout(() => setNotice(null), 5000);
+      }
+      loadStats();
+    },
+    [loadStats]
+  );
+
+  const removeSessions = (items) => {
+    if (!items.length) return;
+    if (pendingRef.current) {
+      clearTimeout(snackTimer.current);
+      commitPending(pendingRef.current);
+    }
+    const ids = new Set(items.map((s) => s._id));
+    setSessions((prev) => prev.filter((s) => !ids.has(s._id)));
+    setTotal((t) => Math.max(0, t - items.length));
+    const p = { items };
+    setPending(p);
+    pendingRef.current = p;
+    snackTimer.current = setTimeout(() => {
+      setPending(null);
+      pendingRef.current = null;
+      commitPending(p);
+    }, 6000);
+    haptic("warning");
+    uiSound("close");
+  };
+
+  const undoDelete = () => {
+    clearTimeout(snackTimer.current);
+    const p = pendingRef.current;
+    pendingRef.current = null;
+    setPending(null);
+    if (p) {
+      setSessions((prev) =>
+        [...prev, ...p.items].sort((a, b) => new Date(b.startedAt) - new Date(a.startedAt))
+      );
+      setTotal((t) => t + p.items.length);
+    }
+    haptic("selection");
+    uiSound("tap");
+  };
+
+  /* leaving the page flushes a pending delete */
+  useEffect(
+    () => () => {
+      clearTimeout(snackTimer.current);
+      if (pendingRef.current) commitPending(pendingRef.current);
+    },
+    [commitPending]
+  );
+
+  const toggleSelected = (sid) =>
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (next.has(sid)) next.delete(sid);
+      else next.add(sid);
+      return next;
+    });
+  const exitSelecting = () => {
+    setSelecting(false);
+    setSelected(new Set());
+  };
+  const deleteSelected = () => {
+    const items = sessions.filter((s) => selected.has(s._id));
+    exitSelecting();
+    removeSessions(items);
+  };
 
   const loadList = useCallback(
     async (skip = 0) => {
@@ -665,15 +856,32 @@ export default function AiHistory() {
       )}
 
       <div className="aih-tools">
-        <div className="aih-search">
-          <IconSearchSmall />
-          <input
-            type="search"
-            value={q}
-            onChange={(e) => setQ(e.target.value)}
-            placeholder="חיפוש בתמלולים, בתשובות ובהערות"
-            aria-label="חיפוש"
-          />
+        <div className="aih-tools__row">
+          <div className="aih-search">
+            <IconSearchSmall />
+            <input
+              type="search"
+              value={q}
+              onChange={(e) => setQ(e.target.value)}
+              placeholder="חיפוש בתמלולים, בתשובות ובהערות"
+              aria-label="חיפוש"
+            />
+          </div>
+          <button
+            type="button"
+            className={`aih-selectbtn${selecting ? " is-active" : ""}`}
+            aria-pressed={selecting}
+            disabled={!sessions.length}
+            onClick={() => {
+              haptic("selection");
+              uiSound("select");
+              if (selecting) exitSelecting();
+              else setSelecting(true);
+            }}
+          >
+            <IconSelect />
+            {selecting ? "סיום" : "בחירה"}
+          </button>
         </div>
         <div className="aih-filters" role="tablist">
           {FILTERS.map((f) => (
@@ -694,6 +902,28 @@ export default function AiHistory() {
         </div>
       </div>
 
+      {selecting && (
+        <div className="aih-selectbar" role="toolbar" aria-label="מחיקת שיחות">
+          <span className="aih-selectbar__count">
+            {selected.size === 0 ? "הקישו על שיחות לבחירה" : selected.size === 1 ? "נבחרה שיחה אחת" : `נבחרו ${selected.size} שיחות`}
+          </span>
+          <button
+            type="button"
+            className="aih-selectbar__btn"
+            onClick={() => {
+              haptic("selection");
+              setSelected(selected.size === sessions.length ? new Set() : new Set(sessions.map((s) => s._id)));
+            }}
+          >
+            {selected.size === sessions.length ? "נקה" : "בחר הכל"}
+          </button>
+          <button type="button" className="aih-selectbar__btn aih-selectbar__btn--danger" disabled={!selected.size} onClick={deleteSelected}>
+            <IconTrash />
+            מחק
+          </button>
+        </div>
+      )}
+
       {error ? (
         <div className="aih-empty">
           {error}
@@ -711,7 +941,15 @@ export default function AiHistory() {
         <>
           <ul className="aih-list">
             {sessions.map((s) => (
-              <SessionCard key={s._id} s={s} onOpen={(sid) => navigate(`/ai-history/${sid}`)} />
+              <SessionCard
+                key={s._id}
+                s={s}
+                onOpen={(sid) => navigate(`/ai-history/${sid}`)}
+                onDelete={(item) => removeSessions([item])}
+                selecting={selecting}
+                selected={selected.has(s._id)}
+                onToggle={toggleSelected}
+              />
             ))}
           </ul>
           {sessions.length < total && (
@@ -726,6 +964,23 @@ export default function AiHistory() {
           )}
           {loading && sessions.length === 0 && <div className="aih-empty">טוען…</div>}
         </>
+      )}
+
+      {/* undo snackbar for a pending delete */}
+      {pending && (
+        <div className="aih-snack" role="status">
+          <span className="aih-snack__text">
+            {pending.items.length === 1 ? "השיחה נמחקה" : `${pending.items.length} שיחות נמחקו`}
+          </span>
+          <button type="button" className="aih-snack__undo" onClick={undoDelete}>
+            ביטול
+          </button>
+        </div>
+      )}
+      {notice && (
+        <div className="aih-snack aih-snack--error" role="alert">
+          <span className="aih-snack__text">{notice}</span>
+        </div>
       )}
     </div>
   );
