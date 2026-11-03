@@ -1486,13 +1486,11 @@
   bottom: calc(var(--bottom-nav-h, 58px) + 10px + env(safe-area-inset-bottom, 0px));
   z-index: 900;
   transform: translateX(-50%);
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
+  display: block;
   height: 44px;
   max-width: calc(100% - 24px);
   margin: 0;
-  padding: 0 10px 0 14px;
+  padding: 0;
   border: 1px solid rgba(255, 255, 255, 0.14);
   border-radius: 999px;
   background: rgba(15, 23, 42, 0.84);
@@ -1515,20 +1513,62 @@
 .cmp-dock:active {
   transform: translateX(-50%) scale(0.97);
 }
-/* placed by the user: absolute spot, no centring transform */
+/* the row of content: always laid out horizontally; on a side edge the
+   whole row is rotated inside the (now tall) chip */
+.cmp-dock__inner {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 42px;
+  padding: 0 10px 0 14px;
+  white-space: nowrap;
+}
+/* docked by the user: absolute spot, no centring transform, and the snap
+   to the edge glides */
 .cmp-dock.is-placed {
   animation: none;
-  transition: box-shadow 0.2s ease;
+  transition:
+    left 0.3s cubic-bezier(0.22, 1, 0.36, 1),
+    top 0.3s cubic-bezier(0.22, 1, 0.36, 1),
+    width 0.3s cubic-bezier(0.22, 1, 0.36, 1),
+    height 0.3s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.2s ease;
 }
 .cmp-dock.is-placed:active {
   transform: none;
 }
 .cmp-dock.is-dragging {
   transform: scale(1.05) !important;
+  transition: box-shadow 0.2s ease;
   box-shadow:
     0 18px 40px rgba(15, 23, 42, 0.45),
     inset 0 1px 0 rgba(255, 255, 255, 0.16);
   cursor: grabbing;
+}
+/* on the left/right edge the chip stands: the row is rotated 90° like a
+   book spine (right edge reads top→bottom, left edge bottom→top) */
+.cmp-dock--vertical {
+  width: 44px;
+  overflow: visible;
+}
+.cmp-dock--vertical .cmp-dock__inner {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform-origin: center;
+}
+.cmp-dock--right .cmp-dock__inner {
+  transform: translate(-50%, -50%) rotate(90deg);
+}
+.cmp-dock--left .cmp-dock__inner {
+  transform: translate(-50%, -50%) rotate(-90deg);
+}
+/* the logo stays upright whichever way the chip stands */
+.cmp-dock--right .cmp-dock__logo {
+  transform: rotate(-90deg);
+}
+.cmp-dock--left .cmp-dock__logo {
+  transform: rotate(90deg);
 }
 .cmp-dock__grip {
   flex: none;
